@@ -34,20 +34,20 @@ const KBSheetContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed z-50 gap-4 bg-white p-6 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out',
-        side === 'top' && 'inset-x-0 top-0 border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top',
+        'fixed z-50 gap-4 bg-white dark:bg-gray-800 p-6 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out',
+        side === 'top' && 'inset-x-0 top-0 border-b border-gray-200 dark:border-gray-700 data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top',
         side === 'bottom' &&
-          'inset-x-0 bottom-0 border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
+          'inset-x-0 bottom-0 border-t border-gray-200 dark:border-gray-700 data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
         side === 'left' &&
-          'inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm',
+          'inset-y-0 left-0 h-full w-3/4 border-r border-gray-200 dark:border-gray-700 data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm',
         side === 'right' &&
-          'inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm',
+          'inset-y-0 right-0 h-full w-3/4 border-l border-gray-200 dark:border-gray-700 data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm',
         className
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-gray-100">
+      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-white dark:ring-offset-gray-800 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-gray-950 dark:focus:ring-gray-300 focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-gray-100 dark:data-[state=open]:bg-gray-700">
         ×
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>
@@ -70,7 +70,7 @@ const KBSheetTitle = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
 >(({ className, ...props }, ref) => (
-  <DialogPrimitive.Title ref={ref} className={cn('text-lg font-semibold text-gray-950', className)} {...props} />
+  <DialogPrimitive.Title ref={ref} className={cn('text-lg font-semibold text-gray-950 dark:text-white', className)} {...props} />
 ));
 KBSheetTitle.displayName = DialogPrimitive.Title.displayName;
 
@@ -78,7 +78,7 @@ const KBSheetDescription = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Description>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
 >(({ className, ...props }, ref) => (
-  <DialogPrimitive.Description ref={ref} className={cn('text-sm text-gray-500', className)} {...props} />
+  <DialogPrimitive.Description ref={ref} className={cn('text-sm text-gray-500 dark:text-gray-400', className)} {...props} />
 ));
 KBSheetDescription.displayName = DialogPrimitive.Description.displayName;
 

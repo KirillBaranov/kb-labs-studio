@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, ShieldCheck, Rocket, Link2, Brain, BarChart3, Settings, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Home, ShieldCheck, Rocket, Link2, Brain, BarChart3, Settings, ChevronRight, ChevronLeft, ChevronDown } from 'lucide-react';
 import { cn, KBBadge } from '@kb-labs/ui-react';
 import { useSidebar } from './sidebar-context';
 
@@ -80,6 +80,14 @@ const navigation = [
 export function StudioSidebar() {
   const location = useLocation();
   const { collapsed, toggleCollapse } = useSidebar();
+  const [expandedItems, setExpandedItems] = React.useState<Record<string, boolean>>({});
+
+  const toggleExpand = (itemName: string) => {
+    setExpandedItems((prev) => ({
+      ...prev,
+      [itemName]: !prev[itemName],
+    }));
+  };
 
   return (
     <aside
@@ -93,24 +101,36 @@ export function StudioSidebar() {
           <ul className="space-y-1 px-2">
             {navigation.map((item) => {
               const isActive = location.pathname === item.to;
+              const isExpanded = expandedItems[item.name] ?? false;
               const Icon = item.icon;
               
               return (
                 <li key={item.name}>
-                  <Link
-                    to={item.to}
-                    className={cn(
-                      'flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors',
-                      isActive
-                        ? 'bg-blue-50 text-blue-600 border-l-2 border-blue-500 dark:bg-blue-900/50 dark:text-blue-400'
-                        : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50'
+                  <div className="flex items-center">
+                    <Link
+                      to={item.to}
+                      className={cn(
+                        'flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors flex-1',
+                        isActive
+                          ? 'bg-blue-50 text-blue-600 border-l-2 border-blue-500 dark:bg-blue-900/50 dark:text-blue-400'
+                          : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50'
+                      )}
+                    >
+                      <Icon className="h-5 w-5 flex-shrink-0" />
+                      {!collapsed && <span>{item.name}</span>}
+                    </Link>
+                    
+                    {!collapsed && item.subItems.length > 0 && (
+                      <button
+                        onClick={() => toggleExpand(item.name)}
+                        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                      >
+                        <ChevronDown className={cn('h-4 w-4 text-gray-500 transition-transform', isExpanded && 'rotate-180')} />
+                      </button>
                     )}
-                  >
-                    <Icon className={cn('h-5 w-5 flex-shrink-0', collapsed ? 'mx-auto' : '')} />
-                    {!collapsed && <span className="flex-1">{item.name}</span>}
-                  </Link>
+                  </div>
                   
-                  {!collapsed && (
+                  {!collapsed && isExpanded && (
                     <ul className="mt-1 ml-4 space-y-1">
                       {item.subItems.map((subItem) => (
                         <li key={subItem.to}>

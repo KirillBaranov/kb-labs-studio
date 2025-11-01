@@ -1,7 +1,7 @@
 import { jsx as _jsx } from "react/jsx-runtime";
 import * as React from 'react';
 import { cn } from '../lib/utils';
-const KBCard = React.forwardRef(({ className, ...props }, ref) => (_jsx("div", { ref: ref, className: cn('rounded-lg border bg-white shadow', className), ...props })));
+const KBCard = React.forwardRef(({ className, ...props }, ref) => (_jsx("div", { ref: ref, className: cn('rounded-lg border bg-white dark:bg-gray-800 shadow dark:border-gray-700', className), ...props })));
 KBCard.displayName = 'KBCard';
 const KBCardHeader = React.forwardRef(({ className, ...props }, ref) => (_jsx("div", { ref: ref, className: cn('flex flex-col space-y-1.5 p-6', className), ...props })));
 KBCardHeader.displayName = 'KBCardHeader';

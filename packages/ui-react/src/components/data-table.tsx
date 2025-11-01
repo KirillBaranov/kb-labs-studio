@@ -62,17 +62,17 @@ export function DataTable<T extends Record<string, unknown>>({
   }, [data, sortConfig]);
 
   return (
-    <div className={cn('overflow-x-auto rounded-lg border border-gray-200', className)}>
+    <div className={cn('overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700', className)}>
       <table className="w-full">
-        <thead className="bg-gray-50">
+        <thead className="bg-gray-50 dark:bg-gray-900">
           <tr>
             {columns.map((column) => (
               <th
                 key={column.id}
                 onClick={() => handleSort(column.id)}
                 className={cn(
-                  'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500',
-                  column.sortable && 'cursor-pointer hover:bg-gray-100 select-none'
+                  'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400',
+                  column.sortable && 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 select-none'
                 )}
               >
                 <div className="flex items-center space-x-1">
@@ -91,17 +91,17 @@ export function DataTable<T extends Record<string, unknown>>({
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200 bg-white">
+        <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
           {sortedData.map((row, rowIdx) => (
             <tr
               key={rowIdx}
               onClick={() => onRowClick?.(row)}
-              className={cn(onRowClick && 'cursor-pointer hover:bg-gray-50')}
+              className={cn(onRowClick && 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50')}
             >
               {columns.map((column) => {
                 const value = row[column.id as keyof T];
                 return (
-                  <td key={column.id} className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
+                  <td key={column.id} className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                     {column.render ? column.render(value, row) : String(value || '')}
                   </td>
                 );
@@ -110,7 +110,7 @@ export function DataTable<T extends Record<string, unknown>>({
           ))}
           {sortedData.length === 0 && (
             <tr>
-              <td colSpan={columns.length} className="px-6 py-8 text-center text-sm text-gray-500">
+              <td colSpan={columns.length} className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                 No data available
               </td>
             </tr>
