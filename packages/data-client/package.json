@@ -1,0 +1,39 @@
+{
+  "name": "@kb-labs/data-client",
+  "version": "0.1.0",
+  "private": true,
+  "description": "KB Labs Studio data client — API SDK with versioned contracts, mocks, and TanStack Query hooks",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsup",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint . --max-warnings=0"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.62.23",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@kb-labs/devkit": "file:../../../kb-labs-devkit",
+    "@types/react": "^18.3.18",
+    "eslint": "^9",
+    "react": "^18.3.1",
+    "rimraf": "^6",
+    "tsup": "^8",
+    "typescript": "^5"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1"
+  }
+}
+
