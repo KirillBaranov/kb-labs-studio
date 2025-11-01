@@ -1,0 +1,155 @@
+import * as React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Home, ShieldCheck, Rocket, Link2, Brain, BarChart3, Settings, ChevronRight, ChevronLeft } from 'lucide-react';
+import { cn, KBBadge } from '@kb-labs/ui-react';
+import { useSidebar } from './sidebar-context';
+
+const navigation = [
+  {
+    name: 'Dashboard',
+    to: '/',
+    icon: Home,
+    subItems: [
+      { name: 'Overview', to: '/dashboard/overview' },
+      { name: 'Metrics', to: '/dashboard/metrics' },
+      { name: 'Recent Activity', to: '/dashboard/activity' },
+    ],
+  },
+  {
+    name: 'Audit',
+    to: '/audit',
+    icon: ShieldCheck,
+    subItems: [
+      { name: 'Summary', to: '/audit/summary' },
+      { name: 'Packages', to: '/audit/packages' },
+      { name: 'Reports', to: '/audit/reports' },
+    ],
+  },
+  {
+    name: 'Release',
+    to: '/release',
+    icon: Rocket,
+    subItems: [
+      { name: 'Preview', to: '/release/preview' },
+      { name: 'History', to: '/release/history' },
+      { name: 'Settings', to: '/release/settings' },
+    ],
+  },
+  {
+    name: 'DevLink',
+    to: '/devlink',
+    icon: Link2,
+    subItems: [
+      { name: 'Graph', to: '/devlink/graph' },
+      { name: 'Cycles', to: '/devlink/cycles' },
+      { name: 'Dependencies', to: '/devlink/dependencies' },
+    ],
+  },
+  {
+    name: 'Mind',
+    to: '/mind',
+    icon: Brain,
+    subItems: [
+      { name: 'Verification', to: '/mind/verification' },
+      { name: 'Freshness', to: '/mind/freshness' },
+      { name: 'Reports', to: '/mind/reports' },
+    ],
+  },
+  {
+    name: 'Analytics',
+    to: '/analytics',
+    icon: BarChart3,
+    subItems: [
+      { name: 'Events', to: '/analytics/events' },
+      { name: 'Performance', to: '/analytics/performance' },
+      { name: 'Usage', to: '/analytics/usage' },
+    ],
+  },
+  {
+    name: 'Settings',
+    to: '/settings',
+    icon: Settings,
+    subItems: [
+      { name: 'General', to: '/settings/general' },
+      { name: 'Data Sources', to: '/settings/data-sources' },
+      { name: 'Preferences', to: '/settings/preferences' },
+    ],
+  },
+];
+
+export function StudioSidebar() {
+  const location = useLocation();
+  const { collapsed, toggleCollapse } = useSidebar();
+
+  return (
+    <aside
+      className={cn(
+        'fixed left-0 top-16 z-40 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700 transition-all duration-300',
+        collapsed ? 'w-16' : 'w-60'
+      )}
+    >
+      <nav className="h-full flex flex-col">
+        <div className="flex-1 overflow-y-auto py-4">
+          <ul className="space-y-1 px-2">
+            {navigation.map((item) => {
+              const isActive = location.pathname === item.to;
+              const Icon = item.icon;
+              
+              return (
+                <li key={item.name}>
+                  <Link
+                    to={item.to}
+                    className={cn(
+                      'flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors',
+                      isActive
+                        ? 'bg-blue-50 text-blue-600 border-l-2 border-blue-500 dark:bg-blue-900/50 dark:text-blue-400'
+                        : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50'
+                    )}
+                  >
+                    <Icon className={cn('h-5 w-5 flex-shrink-0', collapsed ? 'mx-auto' : '')} />
+                    {!collapsed && <span className="flex-1">{item.name}</span>}
+                  </Link>
+                  
+                  {!collapsed && (
+                    <ul className="mt-1 ml-4 space-y-1">
+                      {item.subItems.map((subItem) => (
+                        <li key={subItem.to}>
+                          <Link
+                            to={subItem.to}
+                            className="flex items-center gap-2 px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-700/30 rounded-md transition-colors"
+                          >
+                            <span className="flex-1">{subItem.name}</span>
+                            <KBBadge variant="default" className="text-[10px]">
+                              Soon
+                            </KBBadge>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        
+        <div className="border-t border-gray-200 dark:border-gray-700 p-2">
+          <button
+            onClick={toggleCollapse}
+            className="flex items-center justify-center w-full px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
+          >
+            {collapsed ? (
+              <ChevronRight className="h-5 w-5" />
+            ) : (
+              <>
+                <ChevronLeft className="h-5 w-5" />
+                <span className="ml-2">Collapse</span>
+              </>
+            )}
+          </button>
+        </div>
+      </nav>
+    </aside>
+  );
+}
+
