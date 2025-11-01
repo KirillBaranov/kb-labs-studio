@@ -1,0 +1,1 @@
+{"version":3,"file":"kb-skeleton.js","sourceRoot":"","sources":["kb-skeleton.tsx"],"names":[],"mappings":";AAAA,OAAO,EAAE,EAAE,EAAE,MAAM,cAAc,CAAC;AAElC,SAAS,UAAU,CAAC,EAAE,SAAS,EAAE,GAAG,KAAK,EAAwC;IAC/E,OAAO,cAAK,SAAS,EAAE,EAAE,CAAC,sCAAsC,EAAE,SAAS,CAAC,KAAM,KAAK,GAAI,CAAC;AAC9F,CAAC;AAED,OAAO,EAAE,UAAU,EAAE,CAAC"}
