@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@kb-labs/ui-core": ["../../packages/ui-core/src"],
+      "@kb-labs/ui-react": ["../../packages/ui-react/src"],
+      "@kb-labs/data-client": ["../../packages/data-client/src"]
+    }
+  },
+  "include": ["src", "vite.config.ts"]
+}
+
