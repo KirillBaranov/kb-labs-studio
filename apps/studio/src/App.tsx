@@ -4,8 +4,6 @@ import { RouterProvider } from 'react-router-dom';
 import { ThemeProvider } from '@kb-labs/ui-react';
 import { DataSourcesProvider } from './providers/data-sources-provider';
 import { AuthProvider } from './providers/auth-provider';
-import { StudioNav } from './components/studio-nav';
-import { HealthBanner } from './components/health-banner';
 import { router } from './router';
 
 const queryClient = new QueryClient({
@@ -23,15 +21,9 @@ export function App() {
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
           <DataSourcesProvider>
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-              <StudioNav />
-              <HealthBanner />
-              <div className="container mx-auto py-8">
-                <RouterProvider router={router} />
-              </div>
-            </div>
+            <RouterProvider router={router} />
+            <ReactQueryDevtools initialIsOpen={false} />
           </DataSourcesProvider>
-          <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </AuthProvider>
     </ThemeProvider>
