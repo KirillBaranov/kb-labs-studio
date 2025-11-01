@@ -10,6 +10,6 @@ export function HealthBanner() {
     }
     const failedSources = data.sources.filter((s) => !s.ok);
     const isDegraded = failedSources.length < data.sources.length && failedSources.length > 0;
-    return (_jsx("div", { className: "border-b border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20", children: _jsx("div", { className: "container mx-auto px-4 py-3", children: _jsxs("div", { className: "flex items-center space-x-2", children: [_jsx(AlertTriangle, { className: "h-5 w-5 text-yellow-600" }), _jsxs("div", { className: "flex-1", children: [_jsx("p", { className: "text-sm font-medium text-yellow-800", children: isDegraded ? 'Degraded Mode' : 'Critical Error' }), _jsxs("p", { className: "text-sm text-yellow-700", children: [failedSources.map((s) => s.name).join(', '), " unavailable"] })] })] }) }) }));
+    return (_jsx("div", { className: "border-b border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/20", children: _jsx("div", { className: "container mx-auto px-4 py-3", children: _jsxs("div", { className: "flex items-center space-x-2", children: [_jsx(AlertTriangle, { className: "h-5 w-5 text-yellow-600 dark:text-yellow-400" }), _jsxs("div", { className: "flex-1", children: [_jsx("p", { className: "text-sm font-medium text-yellow-800 dark:text-yellow-200", children: isDegraded ? 'Degraded Mode' : 'Critical Error' }), _jsxs("p", { className: "text-sm text-yellow-700 dark:text-yellow-300", children: [failedSources.map((s) => s.name).join(', '), " unavailable"] })] })] }) }) }));
 }
 //# sourceMappingURL=health-banner.js.map

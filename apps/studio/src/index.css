@@ -1,3 +1,7 @@
+/* Theme variables and base styles - must be first */
+@import './styles/variables.css';
+@import './styles/theme.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

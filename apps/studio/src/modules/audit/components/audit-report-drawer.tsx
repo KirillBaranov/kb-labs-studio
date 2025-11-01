@@ -40,10 +40,10 @@ export function AuditReportDrawer({ packageName, onClose }: AuditReportDrawerPro
         ) : data ? (
           <div className="mt-6">
             <div className="mb-6 space-y-4">
-              <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-4">
+              <div className="flex items-center justify-between rounded-lg border border-theme bg-theme-secondary p-4">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Last Run</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm font-medium">Last Run</p>
+                  <p className="text-sm">
                     {new Date(data.lastRun.startedAt).toLocaleString()}
                   </p>
                 </div>
@@ -53,15 +53,15 @@ export function AuditReportDrawer({ packageName, onClose }: AuditReportDrawerPro
               </div>
 
               <div>
-                <p className="mb-3 text-sm font-medium text-gray-900">Checks</p>
+                <p className="mb-3 text-sm font-medium">Checks</p>
                 <div className="space-y-2">
                   {data.checks.map((check) => (
                     <div
                       key={check.id}
-                      className="flex items-center justify-between rounded border border-gray-200 bg-white p-3"
+                      className="flex items-center justify-between rounded border border-theme bg-theme-primary p-3"
                     >
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{check.id}</p>
+                        <p className="text-sm font-medium">{check.id}</p>
                         {check.errors !== undefined && check.errors > 0 && (
                           <p className="text-xs text-red-600">{check.errors} errors</p>
                         )}
@@ -85,24 +85,24 @@ export function AuditReportDrawer({ packageName, onClose }: AuditReportDrawerPro
                 <KBTabsTrigger value="text">Text</KBTabsTrigger>
               </KBTabsList>
               <KBTabsContent value="markdown">
-                <pre className="max-h-[400px] overflow-auto rounded-md bg-gray-50 p-4 text-sm">
+                <pre className="max-h-[400px] overflow-auto rounded-md bg-theme-secondary p-4 text-sm">
                   {data.artifacts.md || 'No markdown artifact available'}
                 </pre>
               </KBTabsContent>
               <KBTabsContent value="json">
-                <pre className="max-h-[400px] overflow-auto rounded-md bg-gray-50 p-4 text-sm">
+                <pre className="max-h-[400px] overflow-auto rounded-md bg-theme-secondary p-4 text-sm">
                   {data.artifacts.json || JSON.stringify(data, null, 2)}
                 </pre>
               </KBTabsContent>
               <KBTabsContent value="text">
-                <pre className="max-h-[400px] overflow-auto rounded-md bg-gray-50 p-4 text-sm">
+                <pre className="max-h-[400px] overflow-auto rounded-md bg-theme-secondary p-4 text-sm">
                   {data.artifacts.txt || 'No text artifact available'}
                 </pre>
               </KBTabsContent>
             </KBTabs>
           </div>
         ) : (
-          <div className="mt-6 text-center text-gray-500">No data available</div>
+          <div className="mt-6 text-center">No data available</div>
         )}
       </KBSheetContent>
     </KBSheet>

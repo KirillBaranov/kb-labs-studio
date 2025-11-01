@@ -15,7 +15,7 @@ function LayoutContent() {
   const { collapsed } = useSidebar();
   
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-theme-secondary">
       <StudioHeader />
       <StudioSidebar />
       <main className={`pt-16 transition-all duration-300 ${collapsed ? 'ml-16' : 'ml-60'}`}>

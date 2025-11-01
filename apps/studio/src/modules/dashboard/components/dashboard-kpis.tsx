@@ -7,11 +7,11 @@ export function DashboardKpis() {
   const { data, isLoading } = useAuditSummary(sources.audit);
 
   if (isLoading) {
-    return <div className="text-gray-500">Loading KPIs...</div>;
+    return <div>Loading KPIs...</div>;
   }
 
   if (!data) {
-    return <div className="text-gray-500">No data available</div>;
+    return <div>No data available</div>;
   }
 
   return (

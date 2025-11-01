@@ -13,7 +13,7 @@ import { MindPage } from './modules/mind/pages/mind-page';
 import { AnalyticsPage } from './modules/analytics/pages/analytics-page';
 function LayoutContent() {
     const { collapsed } = useSidebar();
-    return (_jsxs("div", { className: "min-h-screen bg-gray-50 dark:bg-gray-900", children: [_jsx(StudioHeader, {}), _jsx(StudioSidebar, {}), _jsxs("main", { className: `pt-16 transition-all duration-300 ${collapsed ? 'ml-16' : 'ml-60'}`, children: [_jsx(HealthBanner, {}), _jsx("div", { className: "p-8", children: _jsx(Outlet, {}) })] })] }));
+    return (_jsxs("div", { className: "min-h-screen bg-theme-secondary", children: [_jsx(StudioHeader, {}), _jsx(StudioSidebar, {}), _jsxs("main", { className: `pt-16 transition-all duration-300 ${collapsed ? 'ml-16' : 'ml-60'}`, children: [_jsx(HealthBanner, {}), _jsx("div", { className: "p-8", children: _jsx(Outlet, {}) })] })] }));
 }
 function Layout() {
     return (_jsx(SidebarProvider, { children: _jsx(LayoutContent, {}) }));

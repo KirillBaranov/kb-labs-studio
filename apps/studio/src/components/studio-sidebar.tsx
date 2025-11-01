@@ -92,7 +92,7 @@ export function StudioSidebar() {
   return (
     <aside
       className={cn(
-        'fixed left-0 top-16 z-40 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700 transition-all duration-300',
+        'fixed left-0 top-16 z-40 h-[calc(100vh-4rem)] bg-theme-primary border-r border-theme transition-all duration-300',
         collapsed ? 'w-16' : 'w-60'
       )}
     >
@@ -113,7 +113,7 @@ export function StudioSidebar() {
                         'flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors flex-1',
                         isActive
                           ? 'bg-blue-50 text-blue-600 border-l-2 border-blue-500 dark:bg-blue-900/50 dark:text-blue-400'
-                          : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50'
+                          : 'hover:bg-theme-secondary'
                       )}
                     >
                       <Icon className="h-5 w-5 flex-shrink-0" />
@@ -123,9 +123,9 @@ export function StudioSidebar() {
                     {!collapsed && item.subItems.length > 0 && (
                       <button
                         onClick={() => toggleExpand(item.name)}
-                        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                        className="p-1 hover:bg-theme-secondary rounded transition-colors"
                       >
-                        <ChevronDown className={cn('h-4 w-4 text-gray-500 transition-transform', isExpanded && 'rotate-180')} />
+                        <ChevronDown className={cn('h-4 w-4 transition-transform', isExpanded && 'rotate-180')} />
                       </button>
                     )}
                   </div>
@@ -136,7 +136,7 @@ export function StudioSidebar() {
                         <li key={subItem.to}>
                           <Link
                             to={subItem.to}
-                            className="flex items-center gap-2 px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-700/30 rounded-md transition-colors"
+                            className="flex items-center gap-2 px-3 py-1.5 text-xs hover:bg-theme-secondary rounded-md transition-colors"
                           >
                             <span className="flex-1">{subItem.name}</span>
                             <KBBadge variant="default" className="text-[10px]">
@@ -153,10 +153,10 @@ export function StudioSidebar() {
           </ul>
         </div>
         
-        <div className="border-t border-gray-200 dark:border-gray-700 p-2">
+        <div className="border-t border-theme p-2">
           <button
             onClick={toggleCollapse}
-            className="flex items-center justify-center w-full px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
+            className="flex items-center justify-center w-full px-3 py-2 text-sm font-medium hover:bg-theme-secondary rounded-lg transition-colors"
           >
             {collapsed ? (
               <ChevronRight className="h-5 w-5" />

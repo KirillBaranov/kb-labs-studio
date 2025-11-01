@@ -59,8 +59,8 @@ export function AuditListPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Audit</h1>
-          <p className="mt-2 text-gray-600">Package audit results and reports</p>
+          <h1 className="text-3xl font-bold">Audit</h1>
+          <p className="mt-2">Package audit results and reports</p>
         </div>
         <KBButton>Run Audit</KBButton>
       </div>
@@ -79,19 +79,19 @@ export function AuditListPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 <div>
-                  <p className="text-sm text-gray-500">Total Packages</p>
-                  <p className="text-2xl font-bold text-gray-900">{data.totals.packages}</p>
+                  <p className="text-sm text-secondary">Total Packages</p>
+                  <p className="text-2xl font-bold">{data.totals.packages}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">OK</p>
+                  <p className="text-sm text-secondary">OK</p>
                   <p className="text-2xl font-bold text-green-600">{data.totals.ok}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Warnings</p>
+                  <p className="text-sm text-secondary">Warnings</p>
                   <p className="text-2xl font-bold text-yellow-600">{data.totals.warn}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Failed</p>
+                  <p className="text-sm text-secondary">Failed</p>
                   <p className="text-2xl font-bold text-red-600">{data.totals.fail}</p>
                 </div>
               </div>

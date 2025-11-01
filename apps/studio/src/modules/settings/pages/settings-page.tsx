@@ -10,8 +10,8 @@ export function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="mt-2 text-gray-600">Configure Studio and manage data sources</p>
+        <h1 className="text-3xl font-bold">Settings</h1>
+        <p className="mt-2">Configure Studio and manage data sources</p>
       </div>
 
       <KBCard>
@@ -28,11 +28,11 @@ export function SettingsPage() {
           ) : data ? (
             <div className="space-y-2">
               {data.sources.map((source) => (
-                <div key={source.name} className="flex items-center justify-between border-b border-gray-100 pb-2">
-                  <span className="font-medium text-gray-900">{source.name}</span>
+                <div key={source.name} className="flex items-center justify-between border-b border-theme pb-2">
+                  <span className="font-medium">{source.name}</span>
                   <div className="flex items-center gap-3">
                     {source.latency && (
-                      <span className="text-sm text-gray-500">{source.latency}ms</span>
+                      <span className="text-sm">{source.latency}ms</span>
                     )}
                     <HealthIndicator status={source.ok ? 'ok' : 'down'} />
                   </div>
@@ -40,7 +40,7 @@ export function SettingsPage() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500">No health data available</p>
+            <p>No health data available</p>
           )}
         </KBCardContent>
       </KBCard>
