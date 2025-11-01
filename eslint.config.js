@@ -1,7 +1,7 @@
-import nodePreset from '@kb-labs/devkit/eslint/node.js';
+import reactPreset from '@kb-labs/devkit/eslint/react.js';
 
 export default [
-  ...nodePreset,
+  ...reactPreset,
   {
     ignores: [
       '**/dist/**',
@@ -9,8 +9,7 @@ export default [
       '**/node_modules/**',
       '**/*.d.ts',
       '**/tsup.config.ts',
-      '**/vitest.config.ts',
-      '**/*.vue'
+      '**/vitest.config.ts'
     ]
   }
 ];

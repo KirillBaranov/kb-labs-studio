@@ -1,8 +1,8 @@
 {
-  "name": "@kb-labs/product-template",
+  "name": "kb-labs-studio",
   "version": "0.1.0",
   "private": true,
-  "description": "KB Labs product template — zero-config starter powered by @kb-labs/devkit.",
+  "description": "KB Labs Studio — unified web dashboard for observing and managing the KB Labs ecosystem.",
   "type": "module",
   "author": {
     "name": "Kirill Baranov",
@@ -11,12 +11,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kirill-baranov/kb-labs-product-template.git"
+    "url": "https://github.com/kirill-baranov/kb-labs.git",
+    "directory": "kb-labs-studio"
   },
-  "bugs": {
-    "url": "https://github.com/kirill-baranov/kb-labs-product-template/issues"
-  },
-  "homepage": "https://github.com/kirill-baranov/kb-labs-product-template#readme",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -38,6 +35,7 @@
     "test": "pnpm -r --if-present run test",
     "test:coverage": "pnpm -r --if-present run test --coverage",
     "test:watch": "pnpm -r --parallel --if-present run test:watch",
+    "test:e2e": "playwright test",
     "type-check": "pnpm -r run type-check",
     "format": "prettier -w .",
     "format:check": "prettier -c .",
@@ -57,18 +55,28 @@
     ]
   },
   "devDependencies": {
-    "@kb-labs/devkit": "link:../kb-labs-devkit",
+    "@kb-labs/devkit": "file:../kb-labs-devkit",
+    "@playwright/test": "^1.49.0",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/jest-dom": "^6.6.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
     "@typescript-eslint/eslint-plugin": "^8",
     "@typescript-eslint/parser": "^8",
+    "@vitejs/plugin-react": "^4.3.4",
     "@vitest/coverage-v8": "^3",
-    "@vue/eslint-config-typescript": "^14.6.0",
     "eslint": "^9",
-    "eslint-plugin-vue": "^10.5.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^5.1.0",
     "prettier": "^3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "rimraf": "^6",
     "tsup": "^8",
     "typescript": "^5",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "vite": "^6.0.7"
   },
   "engines": {
     "node": ">=18.18.0",
