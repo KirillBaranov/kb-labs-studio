@@ -1,106 +1,184 @@
-# KB Labs — Product Template
+# KB Labs Studio
 
-This is the **baseline template** for products under the **@kb-labs** namespace.  
-It is designed for multi-package repositories using pnpm workspaces.
+**Unified web dashboard for observing and managing the KB Labs ecosystem.**
 
-**Goals:** Fast bootstrap, unified quality rules, simple publishing, and reusable core.
+## Overview
 
-## 📁 Repository Structure
+KB Labs Studio is a React-based web application that provides observability and management capabilities for the KB Labs ecosystem, including audit, release management, devlink, mind, and analytics.
+
+## Features
+
+- **Dashboard**: KPIs overview and recent activity
+- **Audit**: Package audit results and reports  
+- **Release**: Package release preview and execution
+- **DevLink**: Dependency graph and cycle detection (coming soon)
+- **Mind**: Knowledge freshness verification (coming soon)
+- **Analytics**: Event metrics and performance charts (coming soon)
+- **Settings**: Configuration and data source management
+
+## Architecture
+
+### Monorepo Structure
 
 ```
-apps/
-├── demo/                    # Example app / playground
-packages/
-├── package-name/            # Example package (lib/cli/adapter)
-fixtures/                    # Fixtures for snapshot/integration testing
-docs/
-└── adr/                     # Architecture Decision Records (ADRs)
+kb-labs-studio/
+├── apps/studio/                 # Main React SPA application
+├── packages/
+│   ├── ui-core/                 # Design tokens and themes (framework-agnostic)
+│   ├── ui-react/                # Shared React components (future kb-labs-ui)
+│   └── data-client/             # API SDK with versioned contracts and mocks
 ```
 
-## 🚀 Quick Start
+### Tech Stack
+
+- **React 18** + **TypeScript** + **Vite**
+- **TanStack Query** for data fetching and caching
+- **shadcn/ui** via custom wrappers (@kb-labs/ui-react)
+- **Tailwind CSS** with design tokens from ui-core
+- **React Router v6** for navigation
+- **Vitest** + **Testing Library** for testing
+
+### Data Layer
+
+- **Versioned contracts (v1.0)** with Zod validation
+- **Mock-first approach**: Deterministic fixtures, easy swap to real API
+- **Factory pattern**: Switch between mock and HTTP data sources
+- **Centralized query keys**: Predictable TanStack Query cache invalidation
+
+### Component Organization
+
+- **`packages/ui-react/`**: Generic, reusable components (KBCard, KBButton, StatCard)
+- **`apps/studio/src/components/`**: Studio-specific components (RunBadge, HealthIndicator)
+- **Component separation**: Generic vs domain-specific based on future extraction to kb-labs-ui
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js >= 20.0.0
+- pnpm >= 9.11.0
 
 ### Installation
 
 ```bash
+cd kb-labs-studio
 pnpm install
 ```
 
 ### Development
 
-```bash
-pnpm dev         # Parallel dev mode for selected packages/apps
-pnpm build       # Build all packages
-pnpm test        # Run tests
-pnpm lint        # Lint code
-```
-
-### Creating a New Package
+Start the development server:
 
 ```bash
-# Using the CLI tool (recommended)
-pnpm dlx @kb-labs/create-pkg my-new-pkg
-
-# Or manually copy and modify
-cp -r packages/package-name packages/<new-package-name>
-# Then update metadata and imports
+pnpm dev
 ```
 
-## 🛠️ Available Scripts
+Studio will be available at http://localhost:3000
 
-| Script             | Description                                |
-| ------------------ | ------------------------------------------ |
-| `pnpm dev`         | Start development mode for all packages    |
-| `pnpm build`       | Build all packages                         |
-| `pnpm build:clean` | Clean and build all packages               |
-| `pnpm test`        | Run all tests                              |
-| `pnpm test:watch`  | Run tests in watch mode                    |
-| `pnpm lint`        | Lint all code                              |
-| `pnpm lint:fix`    | Fix linting issues                         |
-| `pnpm type-check`  | TypeScript type checking                   |
-| `pnpm check`       | Run lint, type-check, and tests            |
-| `pnpm ci`          | Full CI pipeline (clean, build, check)     |
-| `pnpm clean`       | Clean build artifacts                      |
-| `pnpm clean:all`   | Clean all node_modules and build artifacts |
+### Building
 
-### 🔧 DevKit Commands
+Build all packages:
 
-| Script              | Description                                |
-| ------------------- | ------------------------------------------ |
-| `pnpm devkit:sync`  | Sync DevKit configurations to workspace   |
-| `pnpm devkit:check` | Check if DevKit sync is needed             |
-| `pnpm devkit:force` | Force DevKit sync (overwrite existing)     |
-| `pnpm devkit:help`  | Show DevKit sync help                      |
+```bash
+pnpm build
+```
 
-## 🔧 DevKit Integration
+### Running Locally with Mocks
 
-This template uses `@kb-labs/devkit` for shared tooling and configurations. DevKit provides:
+By default, Studio runs with mock data sources. No backend required for development.
 
-- **Unified Configurations:** ESLint, Prettier, TypeScript, Vitest, and TSUP configs
-- **Automatic Sync:** Keeps workspace configs in sync with latest DevKit versions
-- **Zero Maintenance:** No need to manually update config files
+To switch to HTTP sources:
 
-### DevKit Commands Usage
+```bash
+VITE_DATA_SOURCE_MODE=http VITE_API_BASE_URL=http://localhost:8080/api pnpm dev
+```
 
-- **`pnpm devkit:sync`** - Syncs DevKit configurations to your workspace (runs automatically on `pnpm install`)
-- **`pnpm devkit:check`** - Checks if your workspace configs are up-to-date with DevKit
-- **`pnpm devkit:force`** - Forces sync even if local files exist (overwrites local changes)
-- **`pnpm devkit:help`** - Shows detailed help and available options
+## Development Scripts
 
-For more details, see [ADR-0005: Use DevKit for Shared Tooling](docs/adr/0005-use-devkit-for-shared-tooling.md).
+- `pnpm dev` - Start dev server
+- `pnpm build` - Build all packages
+- `pnpm test` - Run tests
+- `pnpm lint` - Lint code
+- `pnpm type-check` - TypeScript type checking
 
-## 📋 Development Policies
+## Package Details
 
-- **Code Style:** ESLint + Prettier, TypeScript strict mode
-- **Testing:** Vitest with fixtures for integration testing
-- **Versioning:** SemVer with automated releases through Changesets
-- **Architecture:** Document decisions in ADRs (see `docs/adr/`)
-- **Tooling:** Shared configurations via `@kb-labs/devkit` (see [ADR-0005](docs/adr/0005-use-devkit-for-shared-tooling.md))
+### @kb-labs/ui-core
 
-## 🔧 Requirements
+Design system foundation:
+- Design tokens (colors, spacing, typography, radius, shadows)
+- Theme system (light/dark)
+- CSS variable generator
 
-- **Node.js:** >= 18.18.0
-- **pnpm:** >= 9.0.0
+### @kb-labs/ui-react
 
-## 📄 License
+Shared React component library:
+- KB-prefixed components wrapping shadcn/ui
+- Generic business components (StatCard, EmptyState)
+- Layout components (KBCard, KBSkeleton)
 
-MIT © KB Labs
+### @kb-labs/data-client
+
+Data layer and API SDK:
+- **Contracts**: TypeScript interfaces + Zod schemas (v1.0)
+- **Sources**: Audit, Release, System data source interfaces
+- **Mocks**: Deterministic mock implementations with fixtures
+- **Hooks**: TanStack Query hooks for data fetching
+- **Factory**: Switch between mock and HTTP modes
+
+## Mock Data
+
+Studio uses deterministic mock fixtures for development:
+- `packages/data-client/src/mocks/fixtures/audit-summary.json`
+- `packages/data-client/src/mocks/fixtures/release-preview.json`
+
+All mocks include realistic delays (200-600ms) to simulate real API behavior.
+
+## Configuration
+
+### Environment Variables
+
+- `VITE_DATA_SOURCE_MODE`: `mock` (default) or `http`
+- `VITE_API_BASE_URL`: Base URL for HTTP data sources
+
+### Studio Config
+
+Located in `apps/studio/src/config/studio.config.ts`:
+- Data source mode
+- API base URL
+- Feature flags (enableDevlink, enableMind, enableAnalytics)
+
+## Roadmap
+
+### Completed (MVP Phase 1)
+
+✅ DevKit React presets (tsconfig, eslint, vitest, vite, tsup)  
+✅ Monorepo initialization with workspace setup  
+✅ UI Core with design tokens and themes  
+✅ Data Client with versioned contracts and mocks  
+✅ TanStack Query integration  
+✅ Dashboard module with KPIs  
+✅ Audit module with summary and reports  
+✅ Release module with preview and execution  
+✅ Settings module with health monitoring  
+✅ Navigation with all module stubs  
+
+### Next Steps
+
+- Enhanced UI components (tables, drawers, modals)
+- Widget registry for dashboard extensibility
+- Role-based access control
+- More detailed audit reports
+- Release history
+- Analytics visualizations
+- Real API integration
+- E2E tests with Playwright
+- Documentation and guides
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development guidelines.
+
+## License
+
+MIT
