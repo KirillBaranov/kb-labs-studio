@@ -1,7 +1,7 @@
 # ADR-0013: Shadcn Adapter Pattern
 
-**Date:** 2025-11-01
-**Status:** Accepted
+**Date:** 2025-11-01  
+**Status:** Superseded by [ADR-0018: Ant Design Migration](./0018-ant-design-migration.md)  
 **Deciders:** KB Labs Team
 
 ## Context
