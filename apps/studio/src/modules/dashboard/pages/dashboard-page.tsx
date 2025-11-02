@@ -1,5 +1,6 @@
-import { KBPageContainer, KBPageHeader } from '@kb-labs/ui-react';
+import { KBPageContainer, KBPageHeader, KBSection } from '@kb-labs/ui-react';
 import { DashboardKpis } from '../components/dashboard-kpis';
+import { DashboardChart } from '../components/dashboard-chart';
 
 export function DashboardPage() {
   return (
@@ -9,6 +10,9 @@ export function DashboardPage() {
         description="KB Labs ecosystem overview"
       />
       <DashboardKpis />
+      <KBSection>
+        <DashboardChart />
+      </KBSection>
     </KBPageContainer>
   );
 }
