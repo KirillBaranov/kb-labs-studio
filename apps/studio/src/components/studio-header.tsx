@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { User } from 'lucide-react';
-import { ThemeToggle } from '@kb-labs/ui-react';
+import { KBThemeToggle } from '@kb-labs/ui-react';
 
 export function StudioHeader() {
   return (
@@ -14,7 +14,7 @@ export function StudioHeader() {
         </Link>
         
         <div className="flex items-center gap-4">
-          <ThemeToggle />
+          <KBThemeToggle />
           
           <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400">
             <User className="h-5 w-5" />

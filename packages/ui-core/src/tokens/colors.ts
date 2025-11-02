@@ -51,26 +51,26 @@ export const colors = {
     700: '#b91c1c',
   },
   
-  // Neutral grays
+  // Neutral grays - updated to KB Labs UI Color Kit
   neutral: {
-    0: '#ffffff',
-    50: '#fafafa',
-    100: '#f5f5f5',
-    200: '#e5e5e5',
-    300: '#d4d4d4',
-    400: '#a3a3a3',
-    500: '#737373',
-    600: '#525252',
-    700: '#404040',
-    800: '#262626',
-    900: '#171717',
-    950: '#0a0a0a',
+    0: '#ffffff',        // Light: Surface/Card
+    50: '#f9fafb',       // Light: Background
+    100: '#f3f4f6',      // Light: Muted Surface
+    200: '#e5e7eb',      // Light: Border
+    300: '#d4d4d4',      // Light: Lighter borders
+    400: '#9ca3af',      // Light: Disabled
+    500: '#6b7280',      // Light: Text Secondary
+    600: '#525252',      // Light: Darker text
+    700: '#404040',      // Dark: Lighter borders
+    800: '#27272a',      // Dark: Muted Surface
+    900: '#1a1a1c',      // Dark: Surface/Card
+    950: '#0d0d0f',      // Dark: Background
   },
   
-  // Muted/subtle colors
+  // Muted/subtle colors - updated to KB Labs UI Color Kit
   muted: {
-    background: '#fafafa',
-    foreground: '#737373',
+    background: '#F3F4F6',  // Light: Muted Surface
+    foreground: '#6B7280',   // Light: Text Secondary
   },
 } as const;
 

@@ -1,3 +1,4 @@
+import { Tabs } from 'antd';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useAuditPackage } from '@kb-labs/data-client';
 import {
@@ -7,12 +8,13 @@ import {
   KBSheetTitle,
   KBSheetDescription,
   KBTabs,
-  KBTabsContent,
-  KBTabsList,
-  KBTabsTrigger,
   KBSkeleton,
   KBBadge,
+  KBStack,
+  KBCard,
 } from '@kb-labs/ui-react';
+
+const { TabPane } = Tabs;
 
 interface AuditReportDrawerProps {
   packageName: string | null;
@@ -24,26 +26,31 @@ export function AuditReportDrawer({ packageName, onClose }: AuditReportDrawerPro
   const { data, isLoading } = useAuditPackage(packageName || '', sources.audit);
 
   return (
-    <KBSheet open={!!packageName} onOpenChange={(open) => !open && onClose()}>
-      <KBSheetContent side="right" className="w-full sm:max-w-2xl">
-        <KBSheetHeader>
-          <KBSheetTitle>{packageName}</KBSheetTitle>
-          <KBSheetDescription>Detailed audit report and artifacts</KBSheetDescription>
-        </KBSheetHeader>
+    <KBSheet
+      open={!!packageName}
+      onOpenChange={(open) => !open && onClose()}
+      placement="right"
+      width={640}
+      title={packageName || ''}
+    >
+      <KBSheetHeader>
+        <KBSheetDescription>Detailed audit report and artifacts</KBSheetDescription>
+      </KBSheetHeader>
 
-        {isLoading ? (
-          <div className="mt-6 space-y-4">
-            <KBSkeleton className="h-8 w-full" />
-            <KBSkeleton className="h-40 w-full" />
-            <KBSkeleton className="h-40 w-full" />
-          </div>
-        ) : data ? (
-          <div className="mt-6">
-            <div className="mb-6 space-y-4">
-              <div className="flex items-center justify-between rounded-lg border border-theme bg-theme-secondary p-4">
+      {isLoading ? (
+        <KBStack>
+          <KBSkeleton active paragraph={{ rows: 2 }} />
+          <KBSkeleton active paragraph={{ rows: 4 }} />
+          <KBSkeleton active paragraph={{ rows: 4 }} />
+        </KBStack>
+      ) : data ? (
+        <div>
+          <KBStack style={{ marginBottom: 24 }}>
+            <KBCard>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <p className="text-sm font-medium">Last Run</p>
-                  <p className="text-sm">
+                  <p style={{ margin: 0, fontSize: 14, fontWeight: 500 }}>Last Run</p>
+                  <p style={{ margin: '4px 0 0', fontSize: 12, color: '#666' }}>
                     {new Date(data.lastRun.startedAt).toLocaleString()}
                   </p>
                 </div>
@@ -51,60 +58,85 @@ export function AuditReportDrawer({ packageName, onClose }: AuditReportDrawerPro
                   {data.lastRun.status.toUpperCase()}
                 </KBBadge>
               </div>
+            </KBCard>
 
-              <div>
-                <p className="mb-3 text-sm font-medium">Checks</p>
-                <div className="space-y-2">
-                  {data.checks.map((check) => (
-                    <div
-                      key={check.id}
-                      className="flex items-center justify-between rounded border border-theme bg-theme-primary p-3"
-                    >
+            <div>
+              <p style={{ marginBottom: 12, fontSize: 14, fontWeight: 500 }}>Checks</p>
+              <KBStack>
+                {data.checks.map((check) => (
+                  <KBCard key={check.id}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div>
-                        <p className="text-sm font-medium">{check.id}</p>
+                        <p style={{ margin: 0, fontSize: 14, fontWeight: 500 }}>{check.id}</p>
                         {check.errors !== undefined && check.errors > 0 && (
-                          <p className="text-xs text-red-600">{check.errors} errors</p>
+                          <p style={{ margin: '4px 0 0', fontSize: 12, color: '#ff4d4f' }}>
+                            {check.errors} errors
+                          </p>
                         )}
                         {check.warnings !== undefined && check.warnings > 0 && (
-                          <p className="text-xs text-yellow-600">{check.warnings} warnings</p>
+                          <p style={{ margin: '4px 0 0', fontSize: 12, color: '#faad14' }}>
+                            {check.warnings} warnings
+                          </p>
                         )}
                       </div>
                       <KBBadge variant={check.ok ? 'success' : 'error'}>
                         {check.ok ? 'OK' : 'FAIL'}
                       </KBBadge>
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </KBCard>
+                ))}
+              </KBStack>
             </div>
+          </KBStack>
 
-            <KBTabs defaultValue="markdown" className="w-full">
-              <KBTabsList>
-                <KBTabsTrigger value="markdown">Markdown</KBTabsTrigger>
-                <KBTabsTrigger value="json">JSON</KBTabsTrigger>
-                <KBTabsTrigger value="text">Text</KBTabsTrigger>
-              </KBTabsList>
-              <KBTabsContent value="markdown">
-                <pre className="max-h-[400px] overflow-auto rounded-md bg-theme-secondary p-4 text-sm">
-                  {data.artifacts.md || 'No markdown artifact available'}
-                </pre>
-              </KBTabsContent>
-              <KBTabsContent value="json">
-                <pre className="max-h-[400px] overflow-auto rounded-md bg-theme-secondary p-4 text-sm">
-                  {data.artifacts.json || JSON.stringify(data, null, 2)}
-                </pre>
-              </KBTabsContent>
-              <KBTabsContent value="text">
-                <pre className="max-h-[400px] overflow-auto rounded-md bg-theme-secondary p-4 text-sm">
-                  {data.artifacts.txt || 'No text artifact available'}
-                </pre>
-              </KBTabsContent>
-            </KBTabs>
-          </div>
-        ) : (
-          <div className="mt-6 text-center">No data available</div>
-        )}
-      </KBSheetContent>
+          <KBTabs defaultActiveKey="markdown">
+            <TabPane tab="Markdown" key="markdown">
+              <pre
+                style={{
+                  maxHeight: 400,
+                  overflow: 'auto',
+                  padding: 16,
+                  background: '#f5f5f5',
+                  borderRadius: 4,
+                  fontSize: 12,
+                }}
+              >
+                {data.artifacts.md || 'No markdown artifact available'}
+              </pre>
+            </TabPane>
+            <TabPane tab="JSON" key="json">
+              <pre
+                style={{
+                  maxHeight: 400,
+                  overflow: 'auto',
+                  padding: 16,
+                  background: '#f5f5f5',
+                  borderRadius: 4,
+                  fontSize: 12,
+                }}
+              >
+                {data.artifacts.json || JSON.stringify(data, null, 2)}
+              </pre>
+            </TabPane>
+            <TabPane tab="Text" key="text">
+              <pre
+                style={{
+                  maxHeight: 400,
+                  overflow: 'auto',
+                  padding: 16,
+                  background: '#f5f5f5',
+                  borderRadius: 4,
+                  fontSize: 12,
+                }}
+              >
+                {data.artifacts.txt || 'No text artifact available'}
+              </pre>
+            </TabPane>
+          </KBTabs>
+        </div>
+      ) : (
+        <div style={{ textAlign: 'center', padding: 24 }}>No data available</div>
+      )}
     </KBSheet>
   );
 }

@@ -2,18 +2,15 @@ import { useState } from 'react';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useAuditSummary } from '@kb-labs/data-client';
 import {
-  PageContainer,
-  PageHeader,
-  Section,
+  KBPageContainer,
+  KBPageHeader,
+  KBSection,
   KBCard,
-  KBCardHeader,
-  KBCardTitle,
-  KBCardContent,
   KBSkeleton,
   KBButton,
-  DataTable,
-  InfoPanel,
-  Stack,
+  KBDataTable,
+  KBInfoPanel,
+  KBStack,
   type Column,
 } from '@kb-labs/ui-react';
 import { AuditReportDrawer } from '../components/audit-report-drawer';
@@ -62,62 +59,49 @@ export function AuditListPage() {
 
   const summaryItems = data ? [
     { label: 'Total Packages', value: data.totals.packages },
-    { label: 'OK', value: <span className="text-green-600 dark:text-green-400">{data.totals.ok}</span> },
-    { label: 'Warnings', value: <span className="text-yellow-600 dark:text-yellow-400">{data.totals.warn}</span> },
-    { label: 'Failed', value: <span className="text-red-600 dark:text-red-400">{data.totals.fail}</span> },
+    { label: 'OK', value: <span style={{ color: '#52c41a' }}>{data.totals.ok}</span> },
+    { label: 'Warnings', value: <span style={{ color: '#faad14' }}>{data.totals.warn}</span> },
+    { label: 'Failed', value: <span style={{ color: '#ff4d4f' }}>{data.totals.fail}</span> },
   ] : [];
 
   return (
-    <PageContainer>
-      <PageHeader
+    <KBPageContainer>
+      <KBPageHeader
         title="Audit"
         description="Package audit results and reports"
-        action={<KBButton>Run Audit</KBButton>}
+        extra={<KBButton>Run Audit</KBButton>}
       />
 
-      <Section>
-        <KBCard>
-          <KBCardHeader>
-            <KBCardTitle>Summary</KBCardTitle>
-          </KBCardHeader>
-          <KBCardContent>
-            {isLoading ? (
-              <Stack>
-                <KBSkeleton className="h-8 w-full" />
-                <KBSkeleton className="h-8 w-full" />
-              </Stack>
-            ) : summaryItems.length > 0 ? (
-              <InfoPanel items={summaryItems} columns={4} />
-            ) : null}
-          </KBCardContent>
+      <KBSection>
+        <KBCard title="Summary">
+          {isLoading ? (
+            <KBStack>
+              <KBSkeleton active paragraph={{ rows: 2 }} />
+            </KBStack>
+          ) : summaryItems.length > 0 ? (
+            <KBInfoPanel items={summaryItems} columns={4} />
+          ) : null}
         </KBCard>
-      </Section>
+      </KBSection>
 
-      <Section>
-        <KBCard>
-          <KBCardHeader>
-            <KBCardTitle>Packages</KBCardTitle>
-          </KBCardHeader>
-          <KBCardContent>
+      <KBSection>
+        <KBCard title="Packages">
             {isLoading ? (
-              <Stack>
-                <KBSkeleton className="h-10 w-full" />
-                <KBSkeleton className="h-10 w-full" />
-                <KBSkeleton className="h-10 w-full" />
-              </Stack>
+              <KBStack>
+                <KBSkeleton active paragraph={{ rows: 3 }} />
+              </KBStack>
             ) : (
-              <DataTable
+              <KBDataTable
                 columns={columns}
                 data={tableData}
-                onRowClick={(row) => setSelectedPackage(row.package)}
+                onRowClick={(row) => setSelectedPackage(row.package as string)}
               />
             )}
-          </KBCardContent>
         </KBCard>
-      </Section>
+      </KBSection>
 
       <AuditReportDrawer packageName={selectedPackage} onClose={() => setSelectedPackage(null)} />
-    </PageContainer>
+    </KBPageContainer>
   );
 }
 

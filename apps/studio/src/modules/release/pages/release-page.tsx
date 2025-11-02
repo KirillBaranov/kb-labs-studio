@@ -1,7 +1,10 @@
 import { useState } from 'react';
+import { Tabs, List } from 'antd';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useReleasePreview, useRunRelease } from '@kb-labs/data-client';
-import { PageContainer, PageHeader, Section, KBCard, KBCardHeader, KBCardTitle, KBCardContent, KBButton, KBSkeleton, KBTabs, KBTabsList, KBTabsTrigger, KBTabsContent, Inline, Stack, DataList, ListItem } from '@kb-labs/ui-react';
+import { KBPageContainer, KBPageHeader, KBSection, KBCard, KBButton, KBSkeleton, KBTabs, KBStack, KBListItem } from '@kb-labs/ui-react';
+
+const { TabPane } = Tabs;
 
 export function ReleasePage() {
   const sources = useDataSources();
@@ -17,77 +20,66 @@ export function ReleasePage() {
   };
 
   return (
-    <PageContainer>
-      <PageHeader
+    <KBPageContainer>
+      <KBPageHeader
         title="Release"
         description="Package release preview and execution"
-        action={
+        extra={
           <KBButton onClick={handleRun} disabled={isPending || isLoading}>
             {isPending ? 'Running...' : 'Run Release'}
           </KBButton>
         }
       />
 
-      <Section>
-        <KBCard>
-          <KBCardHeader>
-            <KBCardTitle>Release Preview</KBCardTitle>
-          </KBCardHeader>
-          <KBCardContent>
-            {isLoading ? (
-              <Stack>
-                <KBSkeleton className="h-8 w-full" />
-                <KBSkeleton className="h-8 w-full" />
-                <KBSkeleton className="h-8 w-full" />
-              </Stack>
-            ) : data ? (
-              <KBTabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
-                <KBTabsList>
-                  <KBTabsTrigger value="packages">Packages</KBTabsTrigger>
-                  <KBTabsTrigger value="markdown">Markdown</KBTabsTrigger>
-                  <KBTabsTrigger value="json">JSON</KBTabsTrigger>
-                </KBTabsList>
-                <KBTabsContent value="packages">
-                  <Stack>
-                    <p className="typo-body">
-                      From: <span className="font-mono">{data.range.from}</span> → To: <span className="font-mono">{data.range.to}</span>
-                    </p>
-                    <DataList>
-                      {data.packages.map((pkg, idx) => (
-                        <ListItem
+      <KBSection>
+        <KBCard title="Release Preview">
+          {isLoading ? (
+            <KBStack>
+              <KBSkeleton active paragraph={{ rows: 3 }} />
+            </KBStack>
+          ) : data ? (
+            <KBTabs activeKey={activeTab} onChange={(v) => setActiveTab(v as typeof activeTab)}>
+              <TabPane tab="Packages" key="packages">
+                <KBStack>
+                  <p>
+                    From: <code>{data.range.from}</code> → To: <code>{data.range.to}</code>
+                  </p>
+                    <List
+                      dataSource={data.packages}
+                      renderItem={(pkg: any, idx: number) => (
+                        <KBListItem
                           key={idx}
                           title={pkg.name}
                           description={`${pkg.prev} → ${pkg.next} (${pkg.bump})`}
                           action={
                             pkg.breaking ? (
-                              <span className="rounded-full bg-red-100 dark:bg-red-900 px-2 py-1 text-xs font-semibold text-red-800 dark:text-red-200">
+                              <span style={{ padding: '4px 8px', fontSize: 12, borderRadius: 4, background: '#fee', color: '#c33' }}>
                                 {pkg.breaking} breaking
                               </span>
                             ) : undefined
                           }
                         />
-                      ))}
-                    </DataList>
-                  </Stack>
-                </KBTabsContent>
-                <KBTabsContent value="markdown">
-                  <pre className="overflow-x-auto rounded-md bg-theme-secondary" style={{ padding: 'var(--spacing-item)', fontSize: 'var(--typo-description-size)' }}>
-                    {data.markdown}
-                  </pre>
-                </KBTabsContent>
-                <KBTabsContent value="json">
-                  <pre className="overflow-x-auto rounded-md bg-theme-secondary" style={{ padding: 'var(--spacing-item)', fontSize: 'var(--typo-description-size)' }}>
-                    {JSON.stringify(data, null, 2)}
-                  </pre>
-                </KBTabsContent>
-              </KBTabs>
-            ) : (
-              <p>No release preview data available</p>
-            )}
-          </KBCardContent>
+                      )}
+                    />
+                </KBStack>
+              </TabPane>
+              <TabPane tab="Markdown" key="markdown">
+                <pre style={{ overflowX: 'auto', padding: 16, background: '#f5f5f5', borderRadius: 4 }}>
+                  {data.markdown}
+                </pre>
+              </TabPane>
+              <TabPane tab="JSON" key="json">
+                <pre style={{ overflowX: 'auto', padding: 16, background: '#f5f5f5', borderRadius: 4 }}>
+                  {JSON.stringify(data, null, 2)}
+                </pre>
+              </TabPane>
+            </KBTabs>
+          ) : (
+            <p>No release preview data available</p>
+          )}
         </KBCard>
-      </Section>
-    </PageContainer>
+      </KBSection>
+    </KBPageContainer>
   );
 }
 

@@ -1,6 +1,7 @@
+import { List } from 'antd';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useHealthStatus } from '@kb-labs/data-client';
-import { PageContainer, PageHeader, Section, KBCard, KBCardHeader, KBCardTitle, KBCardContent, KBSkeleton, DataList, ListItem, Stack } from '@kb-labs/ui-react';
+import { KBPageContainer, KBPageHeader, KBSection, KBCard, KBSkeleton, KBListItem, KBStack } from '@kb-labs/ui-react';
 import { HealthIndicator } from '@/components/health-indicator';
 
 export function SettingsPage() {
@@ -8,42 +9,36 @@ export function SettingsPage() {
   const { data, isLoading } = useHealthStatus(sources.system);
 
   return (
-    <PageContainer>
-      <PageHeader 
+    <KBPageContainer>
+      <KBPageHeader 
         title="Settings"
         description="Configure Studio and manage data sources"
       />
 
-      <Section>
-        <KBCard>
-          <KBCardHeader>
-            <KBCardTitle>Data Sources Health</KBCardTitle>
-          </KBCardHeader>
-          <KBCardContent>
+      <KBSection>
+        <KBCard title="Data Sources Health">
             {isLoading ? (
-              <Stack>
-                <KBSkeleton className="h-8 w-full" />
-                <KBSkeleton className="h-8 w-full" />
-                <KBSkeleton className="h-8 w-full" />
-              </Stack>
+              <KBStack>
+                <KBSkeleton active paragraph={{ rows: 3 }} />
+              </KBStack>
             ) : data ? (
-              <DataList>
-                {data.sources.map((source) => (
-                  <ListItem
+              <List
+                dataSource={data.sources}
+                renderItem={(source) => (
+                  <KBListItem
                     key={source.name}
                     title={source.name}
                     description={source.latency ? `${source.latency}ms` : undefined}
                     action={<HealthIndicator status={source.ok ? 'ok' : 'down'} />}
                   />
-                ))}
-              </DataList>
+                )}
+              />
             ) : (
               <p>No health data available</p>
             )}
-          </KBCardContent>
         </KBCard>
-      </Section>
-    </PageContainer>
+      </KBSection>
+    </KBPageContainer>
   );
 }
 
