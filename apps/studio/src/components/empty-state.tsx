@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { Empty } from 'antd';
 import { KBButton } from '@kb-labs/ui-react';
 
@@ -9,9 +10,16 @@ export interface EmptyStateProps {
 }
 
 export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
+  // Convert icon component to React element if it's a component
+  const iconElement = React.isValidElement(icon)
+    ? icon
+    : icon && typeof icon === 'function'
+    ? React.createElement(icon as React.ComponentType, { size: 60 })
+    : icon;
+
   return (
     <Empty
-      image={icon}
+      image={iconElement}
       imageStyle={{ height: 60 }}
       description={
         <div>
