@@ -29,6 +29,9 @@ export * from './components/kb-sheet';
 export * from './components/kb-config-provider';
 export * from './components/kb-theme-toggle';
 
+// Chart components
+export * from './components/kb-chart';
+
 // Utils
 export * from './lib/utils';
 
