@@ -1,15 +1,68 @@
-# KB Labs Studio
+# KB Labs Studio (@kb-labs/studio)
 
-**Unified web dashboard for observing and managing the KB Labs ecosystem.**
+> **Unified web dashboard for observing and managing the KB Labs ecosystem.** React-based web application that provides observability and management capabilities for the KB Labs ecosystem.
 
-## Overview
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/Node.js-18.18.0+-green.svg)](https://nodejs.org/)
+[![pnpm](https://img.shields.io/badge/pnpm-9.0.0+-orange.svg)](https://pnpm.io/)
 
-KB Labs Studio is a React-based web application that provides observability and management capabilities for the KB Labs ecosystem, including audit, release management, devlink, mind, and analytics.
+## 🎯 Vision
 
-## Features
+KB Labs Studio is a React-based web application that provides observability and management capabilities for the KB Labs ecosystem, including audit, release management, devlink, mind, and analytics. This project serves as the central dashboard for the **@kb-labs** ecosystem and enables unified monitoring and management across all products.
+
+The project solves the problem of fragmented observability across multiple KB Labs tools by providing a unified dashboard for monitoring and managing the entire ecosystem. Instead of switching between different CLI tools and separate interfaces, developers can use Studio to observe KPIs, audit results, release status, dependency graphs, knowledge freshness, and analytics in one place.
+
+This project is part of the **@kb-labs** ecosystem and integrates seamlessly with REST API, API Contracts, UI, and all other KB Labs tools.
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Clone repository
+git clone https://github.com/kirill-baranov/kb-labs-studio.git
+cd kb-labs-studio
+
+# Install dependencies
+pnpm install
+```
+
+### Development
+
+```bash
+# Start development server
+pnpm dev
+
+# Studio will be available at http://localhost:3000
+```
+
+### Building
+
+```bash
+# Build all packages
+pnpm build
+
+# Run tests
+pnpm test
+
+# Lint code
+pnpm lint
+```
+
+### Running Locally with Mocks
+
+By default, Studio runs with mock data sources. No backend required for development.
+
+To switch to HTTP sources:
+
+```bash
+VITE_DATA_SOURCE_MODE=http VITE_API_BASE_URL=http://localhost:8080/api pnpm dev
+```
+
+## ✨ Features
 
 - **Dashboard**: KPIs overview, activity charts, and recent activity
-- **Audit**: Package audit results and reports  
+- **Audit**: Package audit results and reports
 - **Release**: Package release preview and execution
 - **DevLink**: Dependency graph and cycle detection (coming soon)
 - **Mind**: Knowledge freshness verification (coming soon)
@@ -18,18 +71,76 @@ KB Labs Studio is a React-based web application that provides observability and 
 - **Theme System**: Light/Dark/Auto theme switching with CSS variables
 - **Data Visualization**: Interactive charts with drill-down capabilities
 
-## Architecture
-
-### Monorepo Structure
+## 📁 Repository Structure
 
 ```
 kb-labs-studio/
-├── apps/studio/                 # Main React SPA application
-├── packages/
-│   ├── ui-core/                 # Design tokens and themes (framework-agnostic)
-│   ├── ui-react/                # Shared React components (future kb-labs-ui)
-│   └── data-client/             # API SDK with versioned contracts and mocks
+├── apps/                    # Applications
+│   └── studio/              # Main React SPA application
+├── packages/                # Core packages
+│   ├── ui-core/             # Design tokens and themes (framework-agnostic)
+│   ├── ui-react/            # Shared React components (future kb-labs-ui)
+│   └── data-client/         # API SDK with versioned contracts and mocks
+├── docs/                    # Documentation
+│   └── adr/                 # Architecture Decision Records
+└── scripts/                 # Utility scripts
 ```
+
+### Directory Descriptions
+
+- **`apps/studio/`** - Main React SPA application with dashboard, audit, release, and settings modules
+- **`packages/ui-core/`** - Framework-agnostic design tokens and themes
+- **`packages/ui-react/`** - Shared React component library with KB-prefixed wrappers around Ant Design
+- **`packages/data-client/`** - API SDK with versioned contracts, mocks, and TanStack Query hooks
+- **`docs/`** - Documentation including ADRs and guides
+
+## 📦 Packages
+
+| Package | Description |
+|---------|-------------|
+| [@kb-labs/ui-core](./packages/ui-core/) | Design tokens and themes (framework-agnostic) |
+| [@kb-labs/ui-react](./packages/ui-react/) | Shared React component library (KB-prefixed wrappers) |
+| [@kb-labs/data-client](./packages/data-client/) | API SDK with versioned contracts and mocks |
+
+### Package Details
+
+**@kb-labs/ui-core** provides the design system foundation:
+- Design tokens (colors, spacing, typography, radius, shadows)
+- Theme system (light/dark) with CSS variable generator
+- Framework-agnostic design system
+
+**@kb-labs/ui-react** provides shared React components:
+- KB-prefixed components wrapping Ant Design React
+- Generic business components (StatCard, EmptyState, Charts)
+- Layout components (KBPageLayout, KBHeader, KBSidebar, KBContent)
+- Chart components (KBLineChart, KBColumnChart, KBAreaChart, KBPieChart, KBBarChart)
+- Theme integration via CSS variables and Ant Design tokens
+
+**@kb-labs/data-client** provides the data layer:
+- TypeScript interfaces + Zod schemas (v1.0)
+- Audit, Release, System data source interfaces
+- Deterministic mock implementations with fixtures
+- TanStack Query hooks for data fetching
+- Factory for switching between mock and HTTP modes
+
+## 🛠️ Available Scripts
+
+| Script | Description |
+|--------|-------------|
+| `pnpm dev` | Start development server |
+| `pnpm build` | Build all packages |
+| `pnpm test` | Run all tests |
+| `pnpm test:coverage` | Run tests with coverage reporting |
+| `pnpm lint` | Lint all code |
+| `pnpm lint:fix` | Fix linting issues |
+| `pnpm format` | Format code with Prettier |
+| `pnpm type-check` | TypeScript type checking |
+| `pnpm check` | Run lint, type-check, and tests |
+| `pnpm ci` | Full CI pipeline (clean, build, check) |
+| `pnpm clean` | Clean build artifacts |
+| `pnpm clean:all` | Clean all node_modules and build artifacts |
+
+## 🏗️ Architecture
 
 ### Tech Stack
 
@@ -55,145 +166,66 @@ kb-labs-studio/
 - **`apps/studio/src/modules/`**: Feature modules with pages and components
 - **Component separation**: Generic vs domain-specific based on future extraction to kb-labs-ui
 
-## Quick Start
+### Configuration
 
-### Prerequisites
-
-- Node.js >= 20.0.0
-- pnpm >= 9.11.0
-
-### Installation
-
-```bash
-cd kb-labs-studio
-pnpm install
-```
-
-### Development
-
-Start the development server:
-
-```bash
-pnpm dev
-```
-
-Studio will be available at http://localhost:3000
-
-### Building
-
-Build all packages:
-
-```bash
-pnpm build
-```
-
-### Running Locally with Mocks
-
-By default, Studio runs with mock data sources. No backend required for development.
-
-To switch to HTTP sources:
-
-```bash
-VITE_DATA_SOURCE_MODE=http VITE_API_BASE_URL=http://localhost:8080/api pnpm dev
-```
-
-## Development Scripts
-
-- `pnpm dev` - Start dev server
-- `pnpm build` - Build all packages
-- `pnpm test` - Run tests
-- `pnpm lint` - Lint code
-- `pnpm type-check` - TypeScript type checking
-
-## Package Details
-
-### @kb-labs/ui-core
-
-Design system foundation:
-- Design tokens (colors, spacing, typography, radius, shadows)
-- Theme system (light/dark)
-- CSS variable generator
-
-### @kb-labs/ui-react
-
-Shared React component library:
-- KB-prefixed components wrapping Ant Design React
-- Generic business components (StatCard, EmptyState, Charts)
-- Layout components (KBPageLayout, KBHeader, KBSidebar, KBContent)
-- Chart components (KBLineChart, KBColumnChart, KBAreaChart, KBPieChart, KBBarChart)
-- Theme integration via CSS variables and Ant Design tokens
-
-### @kb-labs/data-client
-
-Data layer and API SDK:
-- **Contracts**: TypeScript interfaces + Zod schemas (v1.0)
-- **Sources**: Audit, Release, System data source interfaces
-- **Mocks**: Deterministic mock implementations with fixtures
-- **Hooks**: TanStack Query hooks for data fetching
-- **Factory**: Switch between mock and HTTP modes
-
-## Mock Data
-
-Studio uses deterministic mock fixtures for development:
-- `packages/data-client/src/mocks/fixtures/audit-summary.json`
-- `packages/data-client/src/mocks/fixtures/release-preview.json`
-
-All mocks include realistic delays (200-600ms) to simulate real API behavior.
-
-## Configuration
-
-### Environment Variables
+#### Environment Variables
 
 - `VITE_DATA_SOURCE_MODE`: `mock` (default) or `http`
 - `VITE_API_BASE_URL`: Base URL for HTTP data sources
 
-### Studio Config
+#### Studio Config
 
 Located in `apps/studio/src/config/studio.config.ts`:
 - Data source mode
 - API base URL
 - Feature flags (enableDevlink, enableMind, enableAnalytics)
 
-## Roadmap
+## 📋 Development Policies
 
-### Completed (MVP Phase 1)
+- **Code Style**: ESLint + Prettier, TypeScript strict mode
+- **Testing**: Vitest + Testing Library with comprehensive test coverage
+- **Versioning**: SemVer with automated releases through Changesets
+- **Architecture**: Document decisions in ADRs (see `docs/adr/`)
+- **UI Components**: KB-prefixed wrappers around Ant Design for consistency
+- **Data Layer**: Mock-first development with deterministic fixtures
 
-✅ DevKit React presets (tsconfig, eslint, vitest, vite, tsup)  
-✅ Monorepo initialization with workspace setup  
-✅ UI Core with design tokens and themes  
-✅ Data Client with versioned contracts and mocks  
-✅ TanStack Query integration  
-✅ Dashboard module with KPIs and charts  
-✅ Audit module with summary and reports  
-✅ Release module with preview and execution  
-✅ Settings module with health monitoring  
-✅ Navigation with all module stubs  
-✅ **Ant Design React migration** with KB-prefixed component wrappers  
-✅ **Theme system** with CSS variables and Ant Design token adapter  
-✅ **Chart components** integration (@ant-design/charts)  
-✅ **404 Not Found page**  
+## 🔧 Requirements
 
-### Next Steps
+- **Node.js**: >= 20.0.0
+- **pnpm**: >= 9.11.0
 
-- Enhanced chart types and drill-down functionality
-- Time period navigation (week/month/quarter/year) for charts
-- Widget registry for dashboard extensibility
-- Role-based access control
-- More detailed audit reports
-- Release history
-- Analytics visualizations
-- Real API integration
-- E2E tests with Playwright
-- Documentation and guides
+## 📚 Documentation
 
-## Architecture Decisions
+- [Documentation Standard](./docs/DOCUMENTATION.md) - Full documentation guidelines
+- [Contributing Guide](./CONTRIBUTING.md) - How to contribute
+- [Architecture Decisions](./docs/adr/) - ADRs for this project
 
-See [ADR-0018: Ant Design Migration](./docs/adr/0018-ant-design-migration.md) for details on the UI library migration from shadcn/ui to Ant Design React.
+**Guides:**
+- [ADR-0018: Ant Design Migration](./docs/adr/0018-ant-design-migration.md) - UI library migration details
 
-## Contributing
+## 🔗 Related Packages
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for development guidelines.
+### Dependencies
 
-## License
+- [@kb-labs/api-contracts](https://github.com/KirillBaranov/kb-labs-api-contracts) - API contracts and schemas
+- [@kb-labs/rest-api](https://github.com/KirillBaranov/kb-labs-rest-api) - REST API backend
 
-MIT
+### Used By
+
+- All KB Labs ecosystem users (web dashboard)
+
+### Ecosystem
+
+- [KB Labs](https://github.com/KirillBaranov/kb-labs) - Main ecosystem repository
+
+## 🤝 Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development guidelines and contribution process.
+
+## 📄 License
+
+MIT © KB Labs
+
+---
+
+**See [CONTRIBUTING.md](./CONTRIBUTING.md) for development guidelines and contribution process.**
