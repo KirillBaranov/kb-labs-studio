@@ -12,4 +12,16 @@ export * from './components/kb-sheet';
 export * from './components/theme-provider';
 export * from './components/theme-toggle';
 export * from './components/data-table';
+export * from './components/page-container';
+export * from './components/page-header';
+export * from './components/section';
+export * from './components/section-header';
+export * from './components/stack';
+export * from './components/inline';
+export * from './components/text';
+export * from './components/heading';
+export * from './components/stat-grid';
+export * from './components/list-item';
+export * from './components/data-list';
+export * from './components/info-panel';
 
