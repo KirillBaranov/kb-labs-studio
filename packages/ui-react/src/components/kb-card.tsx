@@ -14,21 +14,31 @@ KBCard.displayName = 'KBCard';
 
 const KBCardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('flex flex-col space-y-1.5 p-6', className)} {...props} />
+    <div 
+      ref={ref} 
+      className={cn('flex flex-col', className)} 
+      style={{ padding: 'var(--spacing-section)', gap: 'var(--spacing-tight)' }}
+      {...props} 
+    />
   )
 );
 KBCardHeader.displayName = 'KBCardHeader';
 
 const KBCardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <h3 ref={ref} className={cn('text-2xl font-semibold leading-none tracking-tight', className)} {...props} />
+    <h3 ref={ref} className={cn('typo-card-title', className)} {...props} />
   )
 );
 KBCardTitle.displayName = 'KBCardTitle';
 
 const KBCardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />
+    <div 
+      ref={ref} 
+      className={className}
+      style={{ padding: 'var(--spacing-section)', paddingTop: 0 }}
+      {...props} 
+    />
   )
 );
 KBCardContent.displayName = 'KBCardContent';
