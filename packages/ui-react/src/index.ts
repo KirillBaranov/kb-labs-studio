@@ -1,27 +1,34 @@
-export * from './lib/utils';
+// Layout components
+export * from './components/kb-page-layout';
+export * from './components/kb-header';
+export * from './components/kb-sidebar';
+export * from './components/kb-content';
+
+// Page components
+export * from './components/kb-page-container';
+export * from './components/kb-page-header';
+export * from './components/kb-breadcrumb';
+
+// Basic components
 export * from './components/kb-button';
 export * from './components/kb-card';
 export * from './components/kb-badge';
+export * from './components/kb-grid';
 export * from './components/kb-skeleton';
-export * from './components/stat-card';
 export * from './components/kb-tabs';
-export * from './components/kb-dialog';
-export * from './components/kb-toast';
-export * from './components/kb-switch';
+export * from './components/kb-list';
+export * from './components/kb-table';
+export * from './components/kb-stack';
+export * from './components/kb-section';
+export * from './components/kb-info-panel';
+export * from './components/kb-stat-card';
+export * from './components/kb-stat-grid';
 export * from './components/kb-sheet';
-export * from './components/theme-provider';
-export * from './components/theme-toggle';
-export * from './components/data-table';
-export * from './components/page-container';
-export * from './components/page-header';
-export * from './components/section';
-export * from './components/section-header';
-export * from './components/stack';
-export * from './components/inline';
-export * from './components/text';
-export * from './components/heading';
-export * from './components/stat-grid';
-export * from './components/list-item';
-export * from './components/data-list';
-export * from './components/info-panel';
+
+// Theme components
+export * from './components/kb-config-provider';
+export * from './components/kb-theme-toggle';
+
+// Utils
+export * from './lib/utils';
 
