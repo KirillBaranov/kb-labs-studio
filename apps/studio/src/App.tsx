@@ -1,10 +1,12 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { RouterProvider } from 'react-router-dom';
-import { ThemeProvider } from '@kb-labs/ui-react';
+import { KBConfigProvider } from '@kb-labs/ui-react';
 import { DataSourcesProvider } from './providers/data-sources-provider';
 import { AuthProvider } from './providers/auth-provider';
 import { router } from './router';
+// Ant Design 5.x styles are optional - components use CSS-in-JS
+// If needed, uncomment: import 'antd/dist/reset.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,7 +19,7 @@ const queryClient = new QueryClient({
 
 export function App() {
   return (
-    <ThemeProvider defaultTheme="light" storageKey="studio-ui-theme">
+    <KBConfigProvider defaultTheme="light" storageKey="studio-ui-theme">
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
           <DataSourcesProvider>
@@ -26,7 +28,7 @@ export function App() {
           </DataSourcesProvider>
         </QueryClientProvider>
       </AuthProvider>
-    </ThemeProvider>
+    </KBConfigProvider>
   );
 }
 
