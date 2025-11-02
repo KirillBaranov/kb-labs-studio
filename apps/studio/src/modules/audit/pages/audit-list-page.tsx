@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useAuditSummary } from '@kb-labs/data-client';
 import {
+  PageContainer,
+  PageHeader,
+  Section,
   KBCard,
   KBCardHeader,
   KBCardTitle,
@@ -9,6 +12,8 @@ import {
   KBSkeleton,
   KBButton,
   DataTable,
+  InfoPanel,
+  Stack,
   type Column,
 } from '@kb-labs/ui-react';
 import { AuditReportDrawer } from '../components/audit-report-drawer';
@@ -55,74 +60,64 @@ export function AuditListPage() {
     fail: failure.checks.length,
   })) || [];
 
+  const summaryItems = data ? [
+    { label: 'Total Packages', value: data.totals.packages },
+    { label: 'OK', value: <span className="text-green-600 dark:text-green-400">{data.totals.ok}</span> },
+    { label: 'Warnings', value: <span className="text-yellow-600 dark:text-yellow-400">{data.totals.warn}</span> },
+    { label: 'Failed', value: <span className="text-red-600 dark:text-red-400">{data.totals.fail}</span> },
+  ] : [];
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Audit</h1>
-          <p className="mt-2">Package audit results and reports</p>
-        </div>
-        <KBButton>Run Audit</KBButton>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title="Audit"
+        description="Package audit results and reports"
+        action={<KBButton>Run Audit</KBButton>}
+      />
 
-      <KBCard>
-        <KBCardHeader>
-          <KBCardTitle>Summary</KBCardTitle>
-        </KBCardHeader>
-        <KBCardContent>
-          {isLoading ? (
-            <div className="space-y-2">
-              <KBSkeleton className="h-8 w-full" />
-              <KBSkeleton className="h-8 w-full" />
-            </div>
-          ) : data ? (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                <div>
-                  <p className="text-sm text-secondary">Total Packages</p>
-                  <p className="text-2xl font-bold">{data.totals.packages}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-secondary">OK</p>
-                  <p className="text-2xl font-bold text-green-600">{data.totals.ok}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-secondary">Warnings</p>
-                  <p className="text-2xl font-bold text-yellow-600">{data.totals.warn}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-secondary">Failed</p>
-                  <p className="text-2xl font-bold text-red-600">{data.totals.fail}</p>
-                </div>
-              </div>
-            </div>
-          ) : null}
-        </KBCardContent>
-      </KBCard>
+      <Section>
+        <KBCard>
+          <KBCardHeader>
+            <KBCardTitle>Summary</KBCardTitle>
+          </KBCardHeader>
+          <KBCardContent>
+            {isLoading ? (
+              <Stack>
+                <KBSkeleton className="h-8 w-full" />
+                <KBSkeleton className="h-8 w-full" />
+              </Stack>
+            ) : summaryItems.length > 0 ? (
+              <InfoPanel items={summaryItems} columns={4} />
+            ) : null}
+          </KBCardContent>
+        </KBCard>
+      </Section>
 
-      <KBCard>
-        <KBCardHeader>
-          <KBCardTitle>Packages</KBCardTitle>
-        </KBCardHeader>
-        <KBCardContent>
-          {isLoading ? (
-            <div className="space-y-2">
-              <KBSkeleton className="h-10 w-full" />
-              <KBSkeleton className="h-10 w-full" />
-              <KBSkeleton className="h-10 w-full" />
-            </div>
-          ) : (
-            <DataTable
-              columns={columns}
-              data={tableData}
-              onRowClick={(row) => setSelectedPackage(row.package)}
-            />
-          )}
-        </KBCardContent>
-      </KBCard>
+      <Section>
+        <KBCard>
+          <KBCardHeader>
+            <KBCardTitle>Packages</KBCardTitle>
+          </KBCardHeader>
+          <KBCardContent>
+            {isLoading ? (
+              <Stack>
+                <KBSkeleton className="h-10 w-full" />
+                <KBSkeleton className="h-10 w-full" />
+                <KBSkeleton className="h-10 w-full" />
+              </Stack>
+            ) : (
+              <DataTable
+                columns={columns}
+                data={tableData}
+                onRowClick={(row) => setSelectedPackage(row.package)}
+              />
+            )}
+          </KBCardContent>
+        </KBCard>
+      </Section>
 
       <AuditReportDrawer packageName={selectedPackage} onClose={() => setSelectedPackage(null)} />
-    </div>
+    </PageContainer>
   );
 }
 

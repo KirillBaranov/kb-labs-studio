@@ -20,9 +20,7 @@ function LayoutContent() {
       <StudioSidebar />
       <main className={`pt-16 transition-all duration-300 ${collapsed ? 'ml-16' : 'ml-60'}`}>
         <HealthBanner />
-        <div className="p-8">
-          <Outlet />
-        </div>
+        <Outlet />
       </main>
     </div>
   );

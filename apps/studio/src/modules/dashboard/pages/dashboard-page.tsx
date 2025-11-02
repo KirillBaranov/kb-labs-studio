@@ -1,14 +1,15 @@
+import { PageContainer, PageHeader } from '@kb-labs/ui-react';
 import { DashboardKpis } from '../components/dashboard-kpis';
 
 export function DashboardPage() {
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="mt-2">KB Labs ecosystem overview</p>
-      </div>
+    <PageContainer>
+      <PageHeader 
+        title="Dashboard"
+        description="KB Labs ecosystem overview"
+      />
       <DashboardKpis />
-    </div>
+    </PageContainer>
   );
 }
 
