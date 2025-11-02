@@ -1,8 +1,12 @@
-import { cn } from '../lib/utils';
+import * as React from 'react';
+import { Skeleton } from 'antd';
+import type { SkeletonProps } from 'antd';
 
-function KBSkeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('animate-pulse rounded-md bg-gray-200', className)} {...props} />;
+export interface KBSkeletonProps extends SkeletonProps {
+  className?: string;
 }
 
-export { KBSkeleton };
+export function KBSkeleton(props: KBSkeletonProps) {
+  return <Skeleton {...props} />;
+}
 

@@ -1,47 +1,42 @@
 import * as React from 'react';
-import { cn } from '../lib/utils';
+import { Card } from 'antd';
+import type { CardProps } from 'antd';
 
-const KBCard = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn('rounded-lg border bg-white dark:bg-gray-800 shadow dark:border-gray-700', className)}
-      {...props}
-    />
-  )
-);
-KBCard.displayName = 'KBCard';
+export interface KBCardProps extends CardProps {
+  children?: React.ReactNode;
+}
 
-const KBCardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div 
-      ref={ref} 
-      className={cn('flex flex-col', className)} 
-      style={{ padding: 'var(--spacing-section)', gap: 'var(--spacing-tight)' }}
-      {...props} 
-    />
-  )
-);
-KBCardHeader.displayName = 'KBCardHeader';
+export interface KBCardHeaderProps {
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  extra?: React.ReactNode;
+}
 
-const KBCardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
-  ({ className, ...props }, ref) => (
-    <h3 ref={ref} className={cn('typo-card-title', className)} {...props} />
-  )
-);
-KBCardTitle.displayName = 'KBCardTitle';
+export interface KBCardTitleProps {
+  children?: React.ReactNode;
+}
 
-const KBCardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div 
-      ref={ref} 
-      className={className}
-      style={{ padding: 'var(--spacing-section)', paddingTop: 0 }}
-      {...props} 
-    />
-  )
-);
-KBCardContent.displayName = 'KBCardContent';
+export interface KBCardContentProps {
+  children?: React.ReactNode;
+}
 
-export { KBCard, KBCardHeader, KBCardTitle, KBCardContent };
+export function KBCard({ children, title, extra, ...props }: KBCardProps) {
+  return (
+    <Card title={title} extra={extra} {...props}>
+      {children}
+    </Card>
+  );
+}
+
+export function KBCardHeader({ title, description, extra }: KBCardHeaderProps) {
+  return null; // Used via Card props
+}
+
+export function KBCardTitle({ children }: KBCardTitleProps) {
+  return <>{children}</>;
+}
+
+export function KBCardContent({ children }: KBCardContentProps) {
+  return <>{children}</>;
+}
 

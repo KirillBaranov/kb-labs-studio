@@ -1,53 +1,50 @@
 import * as React from 'react';
-import * as TabsPrimitive from '@radix-ui/react-tabs';
-import { cn } from '../lib/utils';
+import { Tabs } from 'antd';
+import type { TabsProps } from 'antd';
 
-const KBTabs = TabsPrimitive.Root;
+const { TabPane } = Tabs;
 
-const KBTabsList = React.forwardRef<
-  React.ElementRef<typeof TabsPrimitive.List>,
-  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
->(({ className, ...props }, ref) => (
-  <TabsPrimitive.List
-    ref={ref}
-    className={cn(
-      'inline-flex h-10 items-center justify-center rounded-md bg-gray-100 dark:bg-gray-800 p-1 text-gray-500 dark:text-gray-400',
-      className
-    )}
-    {...props}
-  />
-));
-KBTabsList.displayName = TabsPrimitive.List.displayName;
+export interface KBTabsProps extends TabsProps {
+  value?: string;
+  onValueChange?: (value: string) => void;
+  children?: React.ReactNode;
+}
 
-const KBTabsTrigger = React.forwardRef<
-  React.ElementRef<typeof TabsPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
->(({ className, ...props }, ref) => (
-  <TabsPrimitive.Trigger
-    ref={ref}
-    className={cn(
-      'inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-white dark:ring-offset-gray-800 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 dark:focus-visible:ring-gray-300 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-gray-950 dark:data-[state=active]:text-white data-[state=active]:shadow-sm',
-      className
-    )}
-    {...props}
-  />
-));
-KBTabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
+export function KBTabs({ value, onValueChange, children, ...props }: KBTabsProps) {
+  return (
+    <Tabs activeKey={value} onChange={onValueChange} {...props}>
+      {children}
+    </Tabs>
+  );
+}
 
-const KBTabsContent = React.forwardRef<
-  React.ElementRef<typeof TabsPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
->(({ className, ...props }, ref) => (
-  <TabsPrimitive.Content
-    ref={ref}
-    className={cn(
-      'mt-2 ring-offset-white dark:ring-offset-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 dark:focus-visible:ring-gray-300 focus-visible:ring-offset-2',
-      className
-    )}
-    {...props}
-  />
-));
-KBTabsContent.displayName = TabsPrimitive.Content.displayName;
+export interface KBTabsListProps {
+  children?: React.ReactNode;
+}
 
-export { KBTabs, KBTabsList, KBTabsTrigger, KBTabsContent };
+export function KBTabsList({ children }: KBTabsListProps) {
+  return null; // No-op, tabs are defined via children
+}
+
+export interface KBTabsTriggerProps {
+  value: string;
+  children?: React.ReactNode;
+}
+
+export interface KBTabsContentProps {
+  value: string;
+  children?: React.ReactNode;
+}
+
+export function KBTabsTrigger({ value, children }: KBTabsTriggerProps) {
+  return null; // Used via TabPane tab prop
+}
+
+export function KBTabsContent({ value, children }: KBTabsContentProps) {
+  return (
+    <TabPane key={value} tab={value}>
+      {children}
+    </TabPane>
+  );
+}
 

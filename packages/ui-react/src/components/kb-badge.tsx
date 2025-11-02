@@ -1,34 +1,38 @@
 import * as React from 'react';
-import { cn } from '../lib/utils';
+import { Badge, Tag } from 'antd';
+import type { BadgeProps } from 'antd';
+import type { TagProps } from 'antd';
 
-export interface KBBadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'success' | 'warning' | 'error' | 'info';
+export interface KBBadgeProps extends Omit<TagProps, 'color'> {
+  variant?: 'default' | 'success' | 'error' | 'warning' | 'info' | 'processing' | 'dot';
+  children?: React.ReactNode;
 }
 
-const KBBadge = React.forwardRef<HTMLDivElement, KBBadgeProps>(
-  ({ className, variant = 'default', ...props }, ref) => {
-    const variantClasses = {
-      default: 'bg-gray-100 text-gray-800',
-      success: 'bg-green-100 text-green-800',
-      warning: 'bg-yellow-100 text-yellow-800',
-      error: 'bg-red-100 text-red-800',
-      info: 'bg-blue-100 text-blue-800',
-    };
+const variantColors: Record<string, string> = {
+  default: 'default',
+  success: 'success',
+  error: 'error',
+  warning: 'warning',
+  info: 'processing',
+  processing: 'processing',
+  dot: 'processing',
+};
 
+export function KBBadge({ variant = 'default', children, ...props }: KBBadgeProps) {
+  const color = variantColors[variant] || 'default';
+
+  if (variant === 'dot') {
     return (
-      <div
-        ref={ref}
-        className={cn(
-          'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold',
-          variantClasses[variant],
-          className
-        )}
-        {...props}
-      />
+      <Badge dot {...props}>
+        {children}
+      </Badge>
     );
   }
-);
-KBBadge.displayName = 'KBBadge';
 
-export { KBBadge };
+  return (
+    <Tag color={color} {...props}>
+      {children}
+    </Tag>
+  );
+}
 
