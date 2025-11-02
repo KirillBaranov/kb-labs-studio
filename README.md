@@ -8,13 +8,15 @@ KB Labs Studio is a React-based web application that provides observability and 
 
 ## Features
 
-- **Dashboard**: KPIs overview and recent activity
+- **Dashboard**: KPIs overview, activity charts, and recent activity
 - **Audit**: Package audit results and reports  
 - **Release**: Package release preview and execution
 - **DevLink**: Dependency graph and cycle detection (coming soon)
 - **Mind**: Knowledge freshness verification (coming soon)
 - **Analytics**: Event metrics and performance charts (coming soon)
 - **Settings**: Configuration and data source management
+- **Theme System**: Light/Dark/Auto theme switching with CSS variables
+- **Data Visualization**: Interactive charts with drill-down capabilities
 
 ## Architecture
 
@@ -33,8 +35,9 @@ kb-labs-studio/
 
 - **React 18** + **TypeScript** + **Vite**
 - **TanStack Query** for data fetching and caching
-- **shadcn/ui** via custom wrappers (@kb-labs/ui-react)
-- **Tailwind CSS** with design tokens from ui-core
+- **Ant Design React 5** via custom wrappers (@kb-labs/ui-react)
+- **@ant-design/charts** for data visualization
+- **CSS Variables** with design tokens from ui-core (framework-agnostic)
 - **React Router v6** for navigation
 - **Vitest** + **Testing Library** for testing
 
@@ -47,8 +50,9 @@ kb-labs-studio/
 
 ### Component Organization
 
-- **`packages/ui-react/`**: Generic, reusable components (KBCard, KBButton, StatCard)
-- **`apps/studio/src/components/`**: Studio-specific components (RunBadge, HealthIndicator)
+- **`packages/ui-react/`**: Generic, reusable components (KBPageLayout, KBCard, KBButton, KBChart, StatCard)
+- **`apps/studio/src/components/`**: Studio-specific components (RunBadge, HealthIndicator, EmptyState)
+- **`apps/studio/src/modules/`**: Feature modules with pages and components
 - **Component separation**: Generic vs domain-specific based on future extraction to kb-labs-ui
 
 ## Quick Start
@@ -113,9 +117,11 @@ Design system foundation:
 ### @kb-labs/ui-react
 
 Shared React component library:
-- KB-prefixed components wrapping shadcn/ui
-- Generic business components (StatCard, EmptyState)
-- Layout components (KBCard, KBSkeleton)
+- KB-prefixed components wrapping Ant Design React
+- Generic business components (StatCard, EmptyState, Charts)
+- Layout components (KBPageLayout, KBHeader, KBSidebar, KBContent)
+- Chart components (KBLineChart, KBColumnChart, KBAreaChart, KBPieChart, KBBarChart)
+- Theme integration via CSS variables and Ant Design tokens
 
 ### @kb-labs/data-client
 
@@ -157,15 +163,20 @@ Located in `apps/studio/src/config/studio.config.ts`:
 ✅ UI Core with design tokens and themes  
 ✅ Data Client with versioned contracts and mocks  
 ✅ TanStack Query integration  
-✅ Dashboard module with KPIs  
+✅ Dashboard module with KPIs and charts  
 ✅ Audit module with summary and reports  
 ✅ Release module with preview and execution  
 ✅ Settings module with health monitoring  
 ✅ Navigation with all module stubs  
+✅ **Ant Design React migration** with KB-prefixed component wrappers  
+✅ **Theme system** with CSS variables and Ant Design token adapter  
+✅ **Chart components** integration (@ant-design/charts)  
+✅ **404 Not Found page**  
 
 ### Next Steps
 
-- Enhanced UI components (tables, drawers, modals)
+- Enhanced chart types and drill-down functionality
+- Time period navigation (week/month/quarter/year) for charts
 - Widget registry for dashboard extensibility
 - Role-based access control
 - More detailed audit reports
@@ -174,6 +185,10 @@ Located in `apps/studio/src/config/studio.config.ts`:
 - Real API integration
 - E2E tests with Playwright
 - Documentation and guides
+
+## Architecture Decisions
+
+See [ADR-0018: Ant Design Migration](./docs/adr/0018-ant-design-migration.md) for details on the UI library migration from shadcn/ui to Ant Design React.
 
 ## Contributing
 
