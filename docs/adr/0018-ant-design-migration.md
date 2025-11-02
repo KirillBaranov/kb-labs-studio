@@ -1,8 +1,10 @@
 # ADR-0018: Ant Design Migration
 
-**Date:** 2025-01-27  
-**Status:** Accepted  
-**Deciders:** KB Labs Team  
+**Date:** 2025-01-27
+**Status:** Accepted
+**Deciders:** KB Labs Team
+**Last Reviewed:** 2025-11-03
+**Tags:** [ui/ux, architecture]  
 **Supersedes:** [ADR-0013: Shadcn Adapter Pattern](./0013-shadcn-adapter-pattern.md)
 
 ## Context

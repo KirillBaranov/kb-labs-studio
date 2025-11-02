@@ -3,6 +3,8 @@
 **Date:** 2025-11-01
 **Status:** Accepted
 **Deciders:** KB Labs Team
+**Last Reviewed:** 2025-11-03
+**Tags:** [process, architecture]
 
 ## Context
 
