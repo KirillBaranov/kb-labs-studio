@@ -11,6 +11,7 @@ import { SettingsPage } from './modules/settings/pages/settings-page';
 import { DevlinkPage } from './modules/devlink/pages/devlink-page';
 import { MindPage } from './modules/mind/pages/mind-page';
 import { AnalyticsPage } from './modules/analytics/pages/analytics-page';
+import { NotFoundPage } from './pages/not-found-page';
 
 const navigationItems: NavigationItem[] = [
   {
@@ -158,6 +159,10 @@ export const router = createBrowserRouter([
         element: <SettingsPage />,
       },
     ],
+  },
+  {
+    path: '*',
+    element: <NotFoundPage />,
   },
 ]);
 
