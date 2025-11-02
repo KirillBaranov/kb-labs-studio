@@ -50,6 +50,13 @@ export function KBDataTable<T extends Record<string, unknown>>({
         style: onRowClick ? { cursor: 'pointer' } : undefined,
       })}
       pagination={false}
+      showSorterTooltip={false} // Disable tooltips on sortable columns to prevent UI artifacts
+      // Override Ant Design's default table styles to use CSS variables
+      className="kb-table"
+      style={{
+        backgroundColor: 'var(--bg-secondary)',
+        ...props.style,
+      }}
       {...props}
     />
   );

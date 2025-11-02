@@ -187,3 +187,25 @@ a:hover {
   color: var(--text-tertiary);
 }
 
+/* Ant Design Table overrides to use CSS variables */
+.kb-table .ant-table,
+.kb-table .ant-table-thead > tr > th {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-primary) !important;
+}
+
+.kb-table .ant-table-tbody > tr > td {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-primary) !important;
+}
+
+.kb-table .ant-table-tbody > tr:hover > td {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.kb-table .ant-table-thead > tr > th.ant-table-column-sort {
+  background-color: var(--bg-tertiary) !important;
+}
+
