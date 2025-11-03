@@ -18,25 +18,34 @@ export class MockAuditSource implements AuditDataSource {
   async getPackageReport(name: string): Promise<AuditPackageReport> {
     await delay(200);
     if (name === '@kb-labs/cli') {
-      return auditPackageFixture as AuditPackageReport;
+      // Transform fixture to api-contracts format (GetAuditReportResponse['data'])
+      const fixture = auditPackageFixture as any;
+      return {
+        report: fixture,
+        createdAt: new Date().toISOString(),
+      };
     }
+    // Return in api-contracts format
     return {
-      pkg: { name, version: '1.0.0' },
-      lastRun: {
-        id: `run-${name}`,
-        startedAt: '2025-01-01T10:00:00.000Z',
-        endedAt: '2025-01-01T10:02:00.000Z',
-        status: 'ok',
+      report: {
+        pkg: { name, version: '1.0.0' },
+        lastRun: {
+          id: `run-${name}`,
+          startedAt: '2025-01-01T10:00:00.000Z',
+          endedAt: '2025-01-01T10:02:00.000Z',
+          status: 'ok',
+        },
+        checks: [
+          { id: 'style', ok: true },
+          { id: 'types', ok: true },
+          { id: 'tests', ok: true },
+          { id: 'build', ok: true },
+          { id: 'devlink', ok: true },
+          { id: 'mind', ok: true },
+        ],
+        artifacts: { json: '/tmp/audit.json', md: '/tmp/audit.md' },
       },
-      checks: [
-        { id: 'style', ok: true },
-        { id: 'types', ok: true },
-        { id: 'tests', ok: true },
-        { id: 'build', ok: true },
-        { id: 'devlink', ok: true },
-        { id: 'mind', ok: true },
-      ],
-      artifacts: { json: '/tmp/audit.json', md: '/tmp/audit.md' },
+      createdAt: new Date().toISOString(),
     };
   }
 

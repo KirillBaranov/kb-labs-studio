@@ -81,7 +81,11 @@ See [ADR-0011: Mock-First Data Strategy](docs/adr/0011-mock-first-data-strategy.
 ### Architectural Decisions
 
 - **ADRs required**: For architectural changes
-- **Create ADR**: `docs/adr/XXXX-descriptive-name.md`
+- **Create ADR**: `docs/adr/XXXX-descriptive-name.md` following the template in `docs/adr/0000-template.md`
+- **Include required metadata**: Date, Status, Deciders, **Last Reviewed**, **Tags**
+- **Last Reviewed** date is required and should be updated periodically
+- **Tags** are mandatory (minimum 1, maximum 5 tags from approved list)
+- See [Documentation Standard](./docs/DOCUMENTATION.md) for ADR format requirements
 - **Follow template**: See `docs/adr/0000-template.md`
 - **Link from README**: Reference in relevant docs
 
@@ -206,4 +210,4 @@ import { NewComponent } from '@/components/new-component'
 
 ---
 
-**Thank you for contributing to KB Labs Studio!** 🎉
+**See [Documentation Standard](./docs/DOCUMENTATION.md) for complete documentation guidelines.**

@@ -1,39 +1,15 @@
-import type { PackageRef, RunRef, ID, ISODate } from './common';
+/**
+ * @module @kb-labs/data-client/contracts/audit
+ * Re-export audit contracts from api-contracts (single source of truth)
+ */
 
-export interface AuditSummary {
-  ts: ISODate;
-  totals: {
-    packages: number;
-    ok: number;
-    warn: number;
-    fail: number;
-    durationMs: number;
-  };
-  topFailures: Array<{
-    pkg: string;
-    checks: Array<'style' | 'types' | 'tests' | 'build' | 'devlink' | 'mind'>;
-  }>;
-}
+import type {
+  GetAuditSummaryResponse,
+  GetAuditReportResponse,
+} from '@kb-labs/api-contracts';
 
-export interface AuditCheck {
-  id: 'style' | 'types' | 'tests' | 'build' | 'devlink' | 'mind';
-  ok: boolean;
-  errors?: number;
-  warnings?: number;
-  meta?: unknown;
-}
+export type { GetAuditSummaryResponse, GetAuditReportResponse };
 
-export interface AuditArtifacts {
-  json?: string;
-  md?: string;
-  txt?: string;
-  html?: string;
-}
-
-export interface AuditPackageReport {
-  pkg: PackageRef;
-  lastRun: RunRef;
-  checks: AuditCheck[];
-  artifacts: AuditArtifacts;
-}
+export type AuditSummary = GetAuditSummaryResponse['data'];
+export type AuditPackageReport = GetAuditReportResponse['data'];
 

@@ -3,8 +3,13 @@
   "compilerOptions": {
     "outDir": "dist",
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "noEmit": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/**/*.js", "src/**/*.js.map", "node_modules", "dist"],
+  "ts-node": {
+    "transpileOnly": true
+  }
 }
 

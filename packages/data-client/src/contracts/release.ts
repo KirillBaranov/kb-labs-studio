@@ -1,18 +1,11 @@
-import type { ISODate } from './common';
+/**
+ * @module @kb-labs/data-client/contracts/release
+ * Re-export release contracts from api-contracts (single source of truth)
+ */
 
-export interface ReleasePreview {
-  range: {
-    from: string;
-    to: string;
-  };
-  packages: Array<{
-    name: string;
-    prev: string;
-    next: string;
-    bump: 'major' | 'minor' | 'patch' | 'none';
-    breaking?: number;
-  }>;
-  manifestJson?: string;
-  markdown?: string;
-}
+import type { ReleasePreviewResponse } from '@kb-labs/api-contracts';
+
+export type { ReleasePreviewResponse };
+
+export type ReleasePreview = ReleasePreviewResponse['data'];
 

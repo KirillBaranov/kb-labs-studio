@@ -4,6 +4,10 @@ import type { SystemDataSource } from './sources/system-source';
 import { MockAuditSource } from './mocks/mock-audit-source';
 import { MockReleaseSource } from './mocks/mock-release-source';
 import { MockSystemSource } from './mocks/mock-system-source';
+import { HttpAuditSource } from './sources/http-audit-source';
+import { HttpReleaseSource } from './sources/http-release-source';
+import { HttpSystemSource } from './sources/http-system-source';
+import { HttpClient } from './client/http-client';
 
 export interface DataSourcesConfig {
   mode: 'mock' | 'http';
@@ -25,7 +29,14 @@ export function createDataSources(config: DataSourcesConfig): DataSources {
     };
   }
 
-  // HTTP sources will be implemented later
-  throw new Error('HTTP data sources not yet implemented');
+  // HTTP mode: create HTTP client and sources
+  const baseUrl = config.baseUrl || '';
+  const client = new HttpClient(baseUrl);
+
+  return {
+    audit: new HttpAuditSource(client),
+    release: new HttpReleaseSource(client),
+    system: new HttpSystemSource(client),
+  };
 }
 
