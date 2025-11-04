@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "noEmit": true,
     "paths": {
       "@/*": ["./src/*"],
       "@kb-labs/ui-core": ["../../packages/ui-core/src"],

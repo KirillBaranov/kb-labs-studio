@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@kb-labs/devkit": "file:../../../kb-labs-devkit",
+    "@types/node": "^22.10.0",
     "@types/react": "^18.3.18",
     "eslint": "^9",
     "react": "^18.3.1",

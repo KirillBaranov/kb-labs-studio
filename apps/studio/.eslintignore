@@ -1,0 +1,4 @@
+# Ignore compiled files
+src/**/*.js
+src/**/*.js.map
+!src/**/*.config.js

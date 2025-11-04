@@ -1,6 +1,7 @@
 {
   "extends": "@kb-labs/devkit/tsconfig/react-lib.json",
   "compilerOptions": {
+    "noEmit": true,
     "outDir": "dist",
     "declaration": true,
     "declarationMap": true
