@@ -14,7 +14,7 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
   const iconElement = React.isValidElement(icon)
     ? icon
     : icon && typeof icon === 'function'
-    ? React.createElement(icon as React.ComponentType, { size: 60 })
+    ? React.createElement(icon as React.ComponentType)
     : icon;
 
   return (

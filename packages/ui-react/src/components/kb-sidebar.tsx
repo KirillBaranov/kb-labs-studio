@@ -9,7 +9,7 @@ export interface NavigationItem {
   key: string;
   label: string;
   icon?: React.ReactNode;
-  path: string;
+  path?: string; // Optional - parent items with children may not have a path
   children?: NavigationItem[];
 }
 
@@ -45,30 +45,57 @@ export function KBSidebar({
     [controlledCollapsed, onCollapse]
   );
 
+  // Build a map from key to path for navigation
+  const keyToPathMap = React.useMemo(() => {
+    const map = new Map<string, string>();
+    const buildMap = (navItems: NavigationItem[]) => {
+      for (const item of navItems) {
+        // Use item.key as the key (must be consistent with menuItems)
+        const menuKey = item.key;
+        if (item.path && menuKey) {
+          map.set(menuKey, item.path);
+        }
+        if (item.children) {
+          buildMap(item.children);
+        }
+      }
+    };
+    buildMap(items);
+    return map;
+  }, [items]);
+
   // Convert navigation items to Ant Design menu items
   const menuItems: MenuProps['items'] = React.useMemo(() => {
     const convertItems = (navItems: NavigationItem[]): MenuProps['items'] => {
       return navItems.map((item) => {
+        const path = item.path;
+        const hasPath = !!path;
+        const hasChildren = item.children && item.children.length > 0;
+        
+        // Use item.key directly (must be consistent with keyToPathMap)
+        const menuKey = item.key;
+
         const menuItem: any = {
-          key: item.key || item.path,
+          key: menuKey,
           icon: item.icon,
           label: item.label,
+          // Make all items with path selectable (including children)
+          // This ensures onClick/onSelect will fire for nested items
+          selectable: hasPath,
         };
 
-        if (item.children && item.children.length > 0) {
+        if (hasChildren && item.children) {
+          // Recursively convert children
           menuItem.children = convertItems(item.children);
-          // Parent items should still navigate when clicked
-          menuItem.onClick = () => onNavigate?.(item.path);
-        } else {
-          menuItem.onClick = () => onNavigate?.(item.path);
         }
 
         return menuItem;
       });
     };
 
-    return convertItems(items);
-  }, [items, onNavigate]);
+    const result = convertItems(items);
+    return result;
+  }, [items]);
 
   // Get selected keys based on current path
   const selectedKeys = React.useMemo(() => {
@@ -77,12 +104,12 @@ export function KBSidebar({
     const findKeys = (path: string, navItems: NavigationItem[]): string[] => {
       for (const item of navItems) {
         if (item.path === path) {
-          return [item.key || item.path];
+          return [item.key || item.path || `item-${Math.random()}`];
         }
         if (item.children) {
           const childKeys = findKeys(path, item.children);
           if (childKeys.length > 0) {
-            return [item.key || item.path, ...childKeys];
+            return [item.key || item.path || `item-${Math.random()}`, ...childKeys];
           }
         }
       }
@@ -100,7 +127,7 @@ export function KBSidebar({
         if (item.children) {
           const childKeys = findOpenKeys(path, item.children);
           if (childKeys.length > 0) {
-            return [item.key || item.path, ...childKeys];
+            return [item.key || item.path || `item-${Math.random()}`, ...childKeys];
           }
         }
       }
@@ -147,6 +174,13 @@ export function KBSidebar({
         selectedKeys={selectedKeys}
         defaultOpenKeys={openKeys}
         items={menuItems}
+        onClick={(e) => {
+          const key = e.key as string;
+          const path = keyToPathMap.get(key);
+          if (path && onNavigate) {
+            onNavigate(path);
+          }
+        }}
         style={{ height: '100%', borderRight: 0 }}
       />
     </AntSider>
