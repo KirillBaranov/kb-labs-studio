@@ -86,9 +86,9 @@ function LayoutContent() {
         return a.id.localeCompare(b.id);
       });
       
-      // Get plugin display name (first menu entry has plugin info)
-      const firstEntry = sortedEntries[0];
-      const displayName = (firstEntry?.plugin as any)?.displayName || pluginId;
+      // Get plugin display name from registry plugins
+      const plugin = registry.plugins.find((p) => p.id === pluginId);
+      const displayName = plugin?.displayName || pluginId;
       
       // Get icon for plugin (map plugin.id to icon)
       const pluginIcon = getPluginIcon(pluginId);
@@ -151,7 +151,7 @@ export const router = createBrowserRouter([
         element: <GalleryPage />,
       },
       {
-        path: '/plugins/*',
+        path: '/plugins/:pluginId/:widgetName',
         element: <PluginPage />,
       },
       {

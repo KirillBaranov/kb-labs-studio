@@ -86,10 +86,17 @@ async function fetchRestData(
   const { routeId, method = 'GET', headers } = source;
   const filteredHeaders = filterHeaders(headers);
   
-  // Use manifest.id directly (e.g., "mind") - this is what REST API expects
-  // REST API path format: /api/v1/plugins/{manifestId}/{routeId}
+  // Extract package name from manifest.id (e.g., "@kb-labs/mind" -> "mind")
+  // REST API path format: /api/v1/plugins/{packageName}/{routeId}
   // Example: /api/v1/plugins/mind/query
-  const url = `${basePath}/plugins/${manifestId}/${routeId}`;
+  // Note: basePath already includes /api/v1, so we just need to add /plugins/{packageName}/{routeId}
+  const packageName = manifestId.includes('/') 
+    ? manifestId.split('/').pop() || manifestId
+    : manifestId;
+  
+  // Ensure routeId doesn't start with / (it's relative to basePath)
+  const cleanRouteId = routeId.startsWith('/') ? routeId.slice(1) : routeId;
+  const url = `${basePath}/plugins/${packageName}/${cleanRouteId}`;
 
   const options: RequestInit = {
     method,
@@ -100,12 +107,30 @@ async function fetchRestData(
     signal: abortController.signal,
   };
 
+  // Add body for POST/PUT/PATCH requests if provided
+  if ((method === 'POST' || method === 'PUT' || method === 'PATCH') && source.body) {
+    options.body = typeof source.body === 'string' 
+      ? source.body 
+      : JSON.stringify(source.body);
+  } else if ((method === 'POST' || method === 'PUT' || method === 'PATCH') && !source.body) {
+    // For POST requests without body, send empty object
+    options.body = JSON.stringify({});
+  }
+
   const response = await fetch(url, options);
 
   if (!response.ok) {
     let error: ErrorEnvelope | null = null;
+    let errorData: unknown = null;
     try {
-      error = (await response.json()) as ErrorEnvelope;
+      const jsonData = await response.json();
+      errorData = jsonData;
+      // Check if it's an envelope format
+      if (jsonData && typeof jsonData === 'object' && 'ok' in jsonData && !jsonData.ok && 'error' in jsonData) {
+        error = jsonData as ErrorEnvelope;
+      } else if (jsonData && typeof jsonData === 'object' && 'error' in jsonData) {
+        error = jsonData as ErrorEnvelope;
+      }
     } catch {
       // Ignore parse errors
     }
@@ -114,17 +139,41 @@ async function fetchRestData(
       throw new Error(error.error.message || response.statusText);
     }
 
-    throw new Error(response.statusText);
+    // If 404, provide more helpful error message
+    if (response.status === 404) {
+      throw new Error(`Route not found: ${method} ${url}. Check if the plugin is registered and the route exists.`);
+    }
+
+    throw new Error(response.statusText || `HTTP ${response.status}`);
   }
 
   const data = await response.json();
 
-  // Handle envelope format
-  if (data && typeof data === 'object' && 'ok' in data && data.ok === true && 'data' in data) {
-    return data.data;
+  // Recursively unwrap envelope formats until we get the actual data
+  let unwrapped = data;
+  let maxDepth = 5; // Prevent infinite loops
+  let depth = 0;
+
+  while (depth < maxDepth && unwrapped && typeof unwrapped === 'object') {
+    // Handle envelope format: { status: 'ok', data: ..., meta: {...} }
+    if ('status' in unwrapped && unwrapped.status === 'ok' && 'data' in unwrapped) {
+      unwrapped = (unwrapped as any).data;
+      depth++;
+      continue;
+    }
+
+    // Handle envelope format: { ok: true, data: ... }
+    if ('ok' in unwrapped && unwrapped.ok === true && 'data' in unwrapped) {
+      unwrapped = (unwrapped as any).data;
+      depth++;
+      continue;
+    }
+
+    // No more envelope wrapping found, return what we have
+    break;
   }
 
-  return data;
+  return unwrapped;
 }
 
 /**

@@ -45,6 +45,12 @@ export type { StatusBadgesProps, StatusBadgesOptions } from './StatusBadges.js';
 export { Progress } from './Progress.js';
 export type { ProgressProps, ProgressOptions } from './Progress.js';
 
+export { InfoPanel } from './InfoPanel.js';
+export type { InfoPanelProps, InfoPanelOptions } from './InfoPanel.js';
+
+export { KeyValue } from './KeyValue.js';
+export type { KeyValueProps, KeyValueOptions } from './KeyValue.js';
+
 export type { BaseWidgetProps, WidgetState } from './types.js';
 
 

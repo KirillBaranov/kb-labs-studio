@@ -21,6 +21,7 @@ const WIDGET_COMPONENTS: Record<string, React.ComponentType<any>> = {
   metric: Widgets.Metric,
   panel: Widgets.CardList, // Panel uses CardList as base
   card: Widgets.CardList,
+  cardlist: Widgets.CardList, // Universal card list widget
   table: Widgets.Table,
   chart: Widgets.ChartLine, // Default chart is line
   tree: Widgets.Tree,
@@ -30,6 +31,8 @@ const WIDGET_COMPONENTS: Record<string, React.ComponentType<any>> = {
   diff: Widgets.DiffViewer,
   status: Widgets.StatusBadges,
   progress: Widgets.Progress,
+  infopanel: Widgets.InfoPanel, // Universal info panel widget
+  keyvalue: Widgets.KeyValue, // Universal key-value widget
 };
 
 /**
@@ -96,14 +99,26 @@ export function WidgetRenderer({
 
   // Load widget data
   // Use widget.plugin.id (manifest.id) for REST API path construction
-  // This ensures correct URL format: /api/v1/plugins/{manifestId}/{routeId}
+  // Extract package name from manifest.id (e.g., "@kb-labs/mind" -> "mind")
+  // This ensures correct URL format: /api/v1/plugins/{packageName}/{routeId}
   const manifestId = widget?.plugin?.id || pluginId;
+  
+  // Construct basePath: ensure it ends with /v1
+  // If apiBaseUrl is '/api', add '/v1' -> '/api/v1'
+  // If apiBaseUrl is '/api/v1', use as-is -> '/api/v1'
+  // If apiBaseUrl is 'http://localhost:5050/api/v1', use as-is
+  let basePath = studioConfig.apiBaseUrl;
+  if (!basePath.endsWith('/v1')) {
+    // Remove trailing slash if present, then add /v1
+    basePath = basePath.replace(/\/$/, '') + '/v1';
+  }
+  
   const widgetData = useWidgetData(
     widgetId,
     manifestId,
     widget?.data?.source || { type: 'mock', fixtureId: 'empty' },
     widget?.pollingMs || 0,
-    studioConfig.apiBaseUrl + '/v1' // Use config base URL + /v1 for API calls
+    basePath
   );
 
   // Track widget error

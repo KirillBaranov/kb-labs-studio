@@ -25,11 +25,17 @@ export function ErrorState({ error, retryable, hint, onRetry }: ErrorStateProps)
   const isRetryable = retryable ?? (error && typeof error === 'object' && 'error' in error && typeof error.error === 'object' && 'ui' in error.error && typeof error.error.ui === 'object' && error.error.ui?.retryable) ?? false;
   const errorHint = hint ?? (error && typeof error === 'object' && 'error' in error && typeof error.error === 'object' && 'ui' in error.error && typeof error.error.ui === 'object' && error.error.ui?.hint) ?? undefined;
 
+  // Check if error is "Not Found" and provide more helpful message
+  const isNotFound = errorMessage.toLowerCase().includes('not found') || errorMessage.toLowerCase().includes('404');
+  const displayMessage = isNotFound && !hint
+    ? 'The requested resource was not found. Please check if the plugin is registered and the route exists.'
+    : errorMessage;
+
   return (
     <Result
       status="error"
-      title="Error"
-      subTitle={errorMessage}
+      title={isNotFound ? 'Not Found' : 'Error'}
+      subTitle={displayMessage}
       extra={
         isRetryable && onRetry ? (
           <Button type="primary" onClick={onRetry}>

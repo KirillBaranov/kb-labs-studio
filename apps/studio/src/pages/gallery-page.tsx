@@ -53,16 +53,38 @@ export function GalleryPage(): React.ReactElement {
     <div style={{ padding: '2rem' }}>
       <h1>Widget Gallery</h1>
       <p>Showcase of all available widgets</p>
-      <DashboardGrid cols={{ sm: 4, md: 8, lg: 12 }} rowHeight={8}>
-        {widgets.map((widget) => (
-          <WidgetRenderer
-            key={`${widget.pluginId}:${widget.widgetId}`}
-            widgetId={widget.widgetId}
-            pluginId={widget.pluginId}
-            layoutHint={widget.layoutHint}
-          />
-        ))}
-      </DashboardGrid>
+      <p style={{ color: '#666', fontSize: '0.875rem' }}>
+        Click on a widget in the sidebar to view it. Widgets are not loaded here to avoid unnecessary API calls.
+      </p>
+      <div style={{ marginTop: '2rem' }}>
+        <h2>Available Widgets</h2>
+        <ul style={{ listStyle: 'none', padding: 0 }}>
+          {widgets.map((widget) => {
+            const pluginName = widget.pluginId.includes('/') 
+              ? widget.pluginId.split('/').pop() || widget.pluginId
+              : widget.pluginId;
+            const widgetName = widget.widgetId.includes('.') 
+              ? widget.widgetId.split('.').pop() || widget.widgetId
+              : widget.widgetId;
+            const widgetPath = `/plugins/${pluginName}/${widgetName}`;
+            
+            return (
+              <li key={`${widget.pluginId}:${widget.widgetId}`} style={{ marginBottom: '0.5rem' }}>
+                <a 
+                  href={widgetPath}
+                  style={{ color: '#1890ff', textDecoration: 'none' }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = widgetPath;
+                  }}
+                >
+                  {widget.widgetId}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </div>
   );
 }
