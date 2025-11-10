@@ -1,6 +1,7 @@
 import type { ThemeConfig } from 'antd';
-import type { MappingAlgorithm } from 'antd/es/config-provider/context';
 import { theme as antdTheme } from 'antd';
+
+type MappingAlgorithm = typeof antdTheme.defaultAlgorithm;
 
 /**
  * Maps CSS variables from ui-core to Ant Design tokens
@@ -96,7 +97,6 @@ export function getAntDesignTokens(theme: 'light' | 'dark' | 'auto' = 'light'): 
     // ============ Border Colors ============
     colorBorder: 'var(--border-primary, #E5E7EB)',
     colorBorderSecondary: 'var(--border-secondary, #D4D4D4)',
-    colorBorderDashed: 'var(--border-primary, #E5E7EB)', // Dashed borders use primary
     colorSplit: 'var(--border-primary, #E5E7EB)', // Splitter/divider uses primary border
 
     // ============ Fill Colors (for input backgrounds, etc.) ============
@@ -107,7 +107,6 @@ export function getAntDesignTokens(theme: 'light' | 'dark' | 'auto' = 'light'): 
 
     // ============ Neutral Colors ============
     colorWhite: '#FFFFFF', // Always white
-    colorBlack: '#000000', // Always black
 
     // ============ Shadow ============
     boxShadow: 'var(--shadow, rgba(0, 0, 0, 0.05))',
@@ -165,15 +164,11 @@ export function getAntDesignTokens(theme: 'light' | 'dark' | 'auto' = 'light'): 
     motionDurationSlow: '0.3s',
     motionEaseInOut: 'cubic-bezier(0.645, 0.045, 0.355, 1)',
     motionEaseOut: 'cubic-bezier(0.215, 0.61, 0.355, 1)',
-    motionEaseIn: 'cubic-bezier(0.55, 0.055, 0.675, 0.19)',
 
     // ============ Link ============
-    linkColor: 'var(--link, #2563EB)',
-    linkHoverColor: 'var(--link-hover, #1E40AF)',
-    linkActiveColor: 'var(--link-hover, #1E40AF)',
-    linkDecoration: 'none',
-    linkHoverDecoration: 'underline',
-    linkFocusOutline: 'var(--link, #2563EB)',
+    colorLink: 'var(--link, #2563EB)',
+    colorLinkHover: 'var(--link-hover, #1E40AF)',
+    colorLinkActive: 'var(--link-hover, #1E40AF)',
 
     // ============ Screen Sizes (for responsive) ============
     screenXS: 480,
