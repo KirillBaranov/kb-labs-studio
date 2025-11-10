@@ -56,7 +56,10 @@ By default, Studio runs with mock data sources. No backend required for developm
 To switch to HTTP sources:
 
 ```bash
-VITE_DATA_SOURCE_MODE=http VITE_API_BASE_URL=http://localhost:8080/api pnpm dev
+VITE_DATA_SOURCE_MODE=http \
+VITE_API_BASE_URL=http://localhost:5050/api/v1 \
+VITE_EVENTS_BASE_URL=http://localhost:5050/api/v1 \
+pnpm dev
 ```
 
 ## ✨ Features
@@ -68,6 +71,7 @@ VITE_DATA_SOURCE_MODE=http VITE_API_BASE_URL=http://localhost:8080/api pnpm dev
 - **Mind**: Knowledge freshness verification (coming soon)
 - **Analytics**: Event metrics and performance charts (coming soon)
 - **Settings**: Configuration and data source management
+- **SSE-aware registry**: Auto-retry registry feed with configurable base URL/path and optional access token via query string (`VITE_EVENTS_AUTH_TOKEN`).
 - **Theme System**: Light/Dark/Auto theme switching with CSS variables
 - **Data Visualization**: Interactive charts with drill-down capabilities
 
@@ -171,7 +175,11 @@ kb-labs-studio/
 #### Environment Variables
 
 - `VITE_DATA_SOURCE_MODE`: `mock` (default) or `http`
-- `VITE_API_BASE_URL`: Base URL for HTTP data sources
+- `VITE_API_BASE_URL`: Base URL for HTTP data sources (REST API)
+- `VITE_EVENTS_BASE_URL`: Base URL for SSE events (defaults to `VITE_API_BASE_URL`)
+- `VITE_EVENTS_REGISTRY_PATH`: Path for registry SSE stream (default `/events/registry`)
+- `VITE_EVENTS_AUTH_TOKEN`: Optional access token appended to SSE URL as `access_token=<token>`
+- `VITE_EVENTS_HEADERS`: JSON object of additional headers for SSE (if terminating proxy injects them upstream)
 
 #### Studio Config
 
@@ -179,6 +187,7 @@ Located in `apps/studio/src/config/studio.config.ts`:
 - Data source mode
 - API base URL
 - Feature flags (enableDevlink, enableMind, enableAnalytics)
+- SSE configuration (base URL, registry path, retry delays, custom headers/token)
 
 ## 📋 Development Policies
 
