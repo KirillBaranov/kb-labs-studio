@@ -6,8 +6,17 @@
 import * as React from 'react';
 import { Skeleton, EmptyState, ErrorState } from './utils/index.js';
 import type { BaseWidgetProps } from './types.js';
-import type { ChartSeries } from '@kb-labs/api-contracts';
 import { KBPieChart } from '@kb-labs/ui-react';
+
+export interface ChartSeriesPoint {
+  x: number | string;
+  y: number;
+}
+
+export interface ChartSeries {
+  name: string;
+  points: ChartSeriesPoint[];
+}
 
 export interface ChartPieOptions {
   showLegend?: boolean;

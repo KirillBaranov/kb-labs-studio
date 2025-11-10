@@ -29,7 +29,9 @@ export function Table<T extends Record<string, unknown>>({ data, loading, error,
     return <ErrorState error={error} />;
   }
 
-  if (!data || data.length === 0) {
+  const rows: T[] = Array.isArray(data) ? data : Array.isArray((data as any)?.rows) ? ((data as any).rows as T[]) : [];
+
+  if (!rows || rows.length === 0) {
     return <EmptyState title="No data" description="No table data available" />;
   }
 
@@ -41,7 +43,7 @@ export function Table<T extends Record<string, unknown>>({ data, loading, error,
   // Convert data to columns if not provided
   const tableColumns: Column<T>[] = columns.length > 0
     ? columns
-    : Object.keys(data[0] || {}).map((key) => ({
+    : Object.keys(rows[0] || {}).map((key) => ({
         id: key,
         label: key,
         sortable,
@@ -52,7 +54,7 @@ export function Table<T extends Record<string, unknown>>({ data, loading, error,
     <div className="widget-table" data-sticky-header={stickyHeader}>
       <KBDataTable<T>
         columns={tableColumns}
-        data={data}
+        data={rows}
         onRowClick={onRowClick}
         pagination={{
           pageSize,

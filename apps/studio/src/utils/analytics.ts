@@ -3,6 +3,10 @@
  * Analytics helpers for widget events
  */
 
+import { createStudioLogger } from './logger.js';
+
+const analyticsLogger = createStudioLogger('analytics');
+
 /**
  * Track widget event
  * Fire-and-forget, analytics failures should not break execution
@@ -19,10 +23,17 @@ export function trackWidgetEvent(
   try {
     // TODO: Integrate with @kb-labs/analytics-sdk-node
     // For now, just log
-    console.log('[analytics]', `plugin.ui.widget.${event}`, data);
+    analyticsLogger.info('Widget analytic event', {
+      event,
+      ...data,
+    });
   } catch (e) {
     // Silently fail - analytics should not break execution
-    console.warn('[analytics] Failed to track event:', e);
+    analyticsLogger.warn('Failed to track widget event', {
+      event,
+      data,
+      error: e instanceof Error ? e.message : String(e),
+    });
   }
 }
 

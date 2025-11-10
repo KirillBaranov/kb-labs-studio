@@ -6,8 +6,17 @@
 import * as React from 'react';
 import { Skeleton, EmptyState, ErrorState } from './utils/index.js';
 import type { BaseWidgetProps } from './types.js';
-import type { ChartSeries } from '@kb-labs/api-contracts';
 import { KBLineChart } from '@kb-labs/ui-react';
+
+export interface ChartSeriesPoint {
+  x: number | string;
+  y: number;
+}
+
+export interface ChartSeries {
+  name: string;
+  points: ChartSeriesPoint[];
+}
 
 export interface ChartLineOptions {
   showLegend?: boolean;
@@ -15,7 +24,7 @@ export interface ChartLineOptions {
   height?: number;
 }
 
-export interface ChartLineProps extends BaseWidgetProps<ChartSeries[], ChartLineOptions> {}
+export interface ChartLineProps extends BaseWidgetProps<ChartSeries[] | { series: ChartSeries[] }, ChartLineOptions> {}
 
 export function ChartLine({ data, loading, error, options }: ChartLineProps) {
   if (loading) {
@@ -26,7 +35,13 @@ export function ChartLine({ data, loading, error, options }: ChartLineProps) {
     return <ErrorState error={error} />;
   }
 
-  if (!data || data.length === 0) {
+  const seriesArray: ChartSeries[] = Array.isArray(data)
+    ? data
+    : data && 'series' in data
+      ? (data.series as ChartSeries[])
+      : [];
+
+  if (!seriesArray || seriesArray.length === 0) {
     return <EmptyState title="No data" description="No chart data available" />;
   }
 
@@ -34,7 +49,7 @@ export function ChartLine({ data, loading, error, options }: ChartLineProps) {
   const showTooltip = options?.showTooltip !== false;
   const height = options?.height || 300;
 
-  const chartData = data.flatMap((series) =>
+  const chartData = seriesArray.flatMap((series) =>
     series.points.map((point: { x: number | string; y: number }) => ({
       x: point.x,
       y: point.y,

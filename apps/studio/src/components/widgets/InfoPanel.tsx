@@ -7,7 +7,7 @@ import * as React from 'react';
 import { Card, Collapse, Tabs, Typography } from 'antd';
 import { Skeleton, EmptyState, ErrorState } from './utils/index.js';
 import type { BaseWidgetProps } from './types.js';
-import type { InfoPanelData } from '@kb-labs/plugin-manifest/studio-widgets';
+import type { InfoPanelData, KeyValueData } from '@kb-labs/plugin-manifest';
 import { JsonViewer } from './JsonViewer.js';
 import { KeyValue } from './KeyValue.js';
 
@@ -57,23 +57,49 @@ export function InfoPanel({ data, loading, error, options }: InfoPanelProps) {
   const renderSectionContent = (section: InfoPanelData['sections'][0]) => {
     const { data: sectionData, format } = section;
 
+    if (sectionData === null || sectionData === undefined) {
+      return (
+        <Paragraph style={{ margin: 0, color: '#666' }}>
+          No data provided.
+        </Paragraph>
+      );
+    }
+
     if (format === 'json') {
-      return <JsonViewer data={sectionData} options={{ collapsed: defaultCollapsed }} />;
+      return (
+        <JsonViewer
+          data={sectionData}
+          loading={false}
+          error={null}
+          options={{ collapsed: defaultCollapsed }}
+        />
+      );
     }
 
     if (format === 'keyvalue') {
       // Convert object to KeyValue format
       if (typeof sectionData === 'object' && sectionData !== null && !Array.isArray(sectionData)) {
-        const items = Object.entries(sectionData).map(([key, value]) => ({
+        const items: KeyValueData['items'] = Object.entries(sectionData).map(([key, value]) => ({
           key,
           value: String(value ?? ''),
-          type: typeof value === 'number' ? 'number' : typeof value === 'boolean' ? 'boolean' : 'string',
+          type:
+            typeof value === 'number'
+              ? 'number'
+              : typeof value === 'boolean'
+              ? 'boolean'
+              : 'string',
         }));
-        return <KeyValue data={{ items }} />;
+        return <KeyValue data={{ items }} loading={false} error={null} />;
       }
       // If already in KeyValue format
       if (typeof sectionData === 'object' && 'items' in sectionData) {
-        return <KeyValue data={sectionData as any} />;
+        return (
+          <KeyValue
+            data={sectionData as KeyValueData}
+            loading={false}
+            error={null}
+          />
+        );
       }
     }
 
@@ -86,7 +112,14 @@ export function InfoPanel({ data, loading, error, options }: InfoPanelProps) {
     }
 
     // Default: try to render as JSON
-    return <JsonViewer data={sectionData} options={{ collapsed: defaultCollapsed }} />;
+    return (
+      <JsonViewer
+        data={sectionData}
+        loading={false}
+        error={null}
+        options={{ collapsed: defaultCollapsed }}
+      />
+    );
   };
 
   if (layout === 'tabs') {

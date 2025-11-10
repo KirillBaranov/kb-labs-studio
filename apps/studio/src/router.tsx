@@ -2,6 +2,7 @@ import * as React from 'react';
 import { createBrowserRouter, Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { KBPageLayout, type NavigationItem } from '@kb-labs/ui-react';
 import { Home, Brain, Settings } from 'lucide-react';
+import type { StudioRegistry } from '@kb-labs/plugin-adapter-studio';
 import { useAuth } from './providers/auth-provider';
 import { useRegistry } from './providers/registry-provider';
 import { HealthBanner } from './components/health-banner';
@@ -9,6 +10,20 @@ import { NotFoundPage } from './pages/not-found-page';
 import { PluginPage } from './routes/plugin-page';
 import { SettingsPage } from './modules/settings/pages/settings-page';
 import { GalleryPage } from './pages/gallery-page';
+import { createStudioLogger } from './utils/logger.js';
+
+type PluginNavRoute = {
+  key: string;
+  label: string;
+  path: string;
+  order?: number;
+};
+
+type PluginNavModel = {
+  pluginId: string;
+  displayName: string;
+  routes: PluginNavRoute[];
+};
 
 // Helper function to get icon for plugin
 function getPluginIcon(pluginId: string): React.ReactElement {
@@ -38,89 +53,78 @@ function getPluginIcon(pluginId: string): React.ReactElement {
 }
 
 function LayoutContent() {
+  const logger = React.useMemo(() => createStudioLogger('router'), []);
+
   const auth = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const { registry } = useRegistry();
-  
-  // Build navigation from plugin registry only (no hardcoded menu)
-  // Group plugin menus by plugin.id and add icons
-  const allNavigationItems: NavigationItem[] = React.useMemo(() => {
-    const items: NavigationItem[] = [];
-    
-    // Add Dashboard/Gallery as first item
-    items.push({
-      key: 'dashboard',
-      label: 'Dashboard',
-      icon: React.createElement(Home, { size: 16 }),
-      path: '/',
-    });
-    
-    // Add Settings
-    items.push({
-      key: 'settings',
-      label: 'Settings',
-      icon: React.createElement(Settings, { size: 16 }),
-      path: '/settings',
-    });
-    
-    // Group plugin menus by plugin.id
-    const pluginGroups = new Map<string, typeof registry.menus>();
-    for (const menuEntry of registry.menus) {
-      const pluginId = menuEntry.plugin.id;
-      if (!pluginGroups.has(pluginId)) {
-        pluginGroups.set(pluginId, []);
-      }
-      pluginGroups.get(pluginId)!.push(menuEntry);
+  const { registry, loading, error, retrying, hasData, refresh, registryMeta, health } = useRegistry();
+
+  const [pluginNavModel, setPluginNavModel] = React.useState<PluginNavModel[]>([]);
+
+  React.useEffect(() => {
+    if (!hasData) {
+      setPluginNavModel(prev => (prev.length > 0 ? [] : prev));
+      return;
     }
-    
-    // Add grouped plugin menu items
-    for (const [pluginId, menuEntries] of pluginGroups.entries()) {
-      // Sort menu entries by order
-      const sortedEntries = [...menuEntries].sort((a, b) => {
-        if (a.order !== undefined && b.order !== undefined) {
-          return a.order - b.order;
-        }
-        if (a.order !== undefined) return -1;
-        if (b.order !== undefined) return 1;
-        return a.id.localeCompare(b.id);
-      });
-      
-      // Get plugin display name from registry plugins
-      const plugin = registry.plugins.find((p) => p.id === pluginId);
-      const displayName = plugin?.displayName || pluginId;
-      
-      // Get icon for plugin (map plugin.id to icon)
-      const pluginIcon = getPluginIcon(pluginId);
-      
-      // Create plugin group menu item
-      // IMPORTANT: Don't set path on parent item when it has children - let children handle navigation
-      const pluginGroupItem: NavigationItem = {
-        key: `plugin-${pluginId}`,
-        label: displayName,
-        icon: pluginIcon,
-        // Don't set path on parent - children will have their own paths
-        // path is optional for parent items with children
-        children: sortedEntries.map((entry) => ({
-          key: entry.id,
-          label: entry.label,
-          path: entry.target, // Each child has its own path
+
+    const nextModel = buildPluginNavModel(registry);
+    setPluginNavModel(prev => (arePluginModelsEqual(prev, nextModel) ? prev : nextModel));
+  }, [registry, hasData]);
+
+  const sidebarSkeleton = loading && !hasData;
+  const sidebarError = !!error && !hasData;
+  const sidebarWarning = hasData && !sidebarError && !sidebarSkeleton && (
+    registryMeta.partial ||
+    registryMeta.stale ||
+    (health?.pluginsFailed ?? 0) > 0
+  );
+
+  const allNavigationItems = React.useMemo<NavigationItem[]>(() => {
+    const items: NavigationItem[] = [
+      {
+        key: 'dashboard',
+        label: 'Dashboard',
+        icon: React.createElement(Home, { size: 16 }),
+        path: '/',
+      },
+      {
+        key: 'settings',
+        label: 'Settings',
+        icon: React.createElement(Settings, { size: 16 }),
+        path: '/settings',
+      },
+    ];
+
+    for (const model of pluginNavModel) {
+      items.push({
+        key: `plugin-${model.pluginId}`,
+        label: model.displayName,
+        icon: getPluginIcon(model.pluginId),
+        children: model.routes.map(route => ({
+          key: route.key,
+          label: route.label,
+          path: route.path,
         })),
-      };
-      
-      items.push(pluginGroupItem);
+      });
     }
-    
+
     return items;
-  }, [registry.menus]);
-  
+  }, [pluginNavModel]);
+
+  React.useEffect(() => {
+    if (error) {
+      logger.error('Registry load failure in router', error);
+    }
+  }, [error, logger]);
+
   return (
     <KBPageLayout
       headerProps={{
         LinkComponent: Link as any,
         onLogout: () => {
           // TODO: Implement logout
-          console.log('Logout');
+          logger.info('Logout initiated');
         },
         userName: auth.role,
       }}
@@ -165,4 +169,74 @@ export const router = createBrowserRouter([
     element: <NotFoundPage />,
   },
 ]);
+
+function buildPluginNavModel(registry: StudioRegistry): PluginNavModel[] {
+  const groups = new Map<string, PluginNavModel>();
+
+  for (const menuEntry of registry.menus) {
+    const pluginId = menuEntry.plugin.id;
+    if (!groups.has(pluginId)) {
+      const plugin = registry.plugins.find(p => p.id === pluginId);
+      groups.set(pluginId, {
+        pluginId,
+        displayName: plugin?.displayName || pluginId,
+        routes: [],
+      });
+    }
+    const group = groups.get(pluginId)!;
+    group.routes.push({
+      key: menuEntry.id,
+      label: menuEntry.label,
+      path: menuEntry.target,
+      order: menuEntry.order,
+    });
+  }
+
+  for (const group of groups.values()) {
+    group.routes.sort((a, b) => {
+      if (a.order !== undefined && b.order !== undefined && a.order !== b.order) {
+        return a.order - b.order;
+      }
+      if (a.order !== undefined) {
+        return -1;
+      }
+      if (b.order !== undefined) {
+        return 1;
+      }
+      return a.label.localeCompare(b.label);
+    });
+  }
+
+  return Array.from(groups.values()).sort((a, b) => a.displayName.localeCompare(b.displayName));
+}
+
+function arePluginModelsEqual(a: PluginNavModel[], b: PluginNavModel[]): boolean {
+  if (a.length !== b.length) {
+    return false;
+  }
+  for (let i = 0; i < a.length; i++) {
+    const left = a[i];
+    const right = b[i];
+    if (!left || !right) {
+      return false;
+    }
+    if (left.pluginId !== right.pluginId || left.displayName !== right.displayName) {
+      return false;
+    }
+    if (left.routes.length !== right.routes.length) {
+      return false;
+    }
+    for (let j = 0; j < left.routes.length; j++) {
+      const lr = left.routes[j];
+      const rr = right.routes[j];
+      if (!lr || !rr) {
+        return false;
+      }
+      if (lr.key !== rr.key || lr.label !== rr.label || lr.path !== rr.path || lr.order !== rr.order) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
 

@@ -4,6 +4,9 @@
  */
 
 import type { StudioRegistry } from '@kb-labs/plugin-adapter-studio';
+import { createStudioLogger } from '../utils/logger.js';
+
+const registryLogger = createStudioLogger('registry-loader');
 
 const REGISTRY_PATHS = [
   '/registry.json',
@@ -23,11 +26,14 @@ export async function loadRegistry(): Promise<StudioRegistry | null> {
       }
     } catch (e) {
       // Continue to next path
-      console.warn(`Failed to load registry from ${path}:`, e);
+      registryLogger.warn('Failed to load registry path', {
+        path,
+        error: e instanceof Error ? e.message : String(e),
+      });
     }
   }
 
-  console.warn('Failed to load registry from all paths');
+  registryLogger.error('Failed to load registry from all paths');
   return null;
 }
 

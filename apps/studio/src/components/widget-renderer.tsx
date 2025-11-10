@@ -13,6 +13,7 @@ import { Skeleton } from './widgets/utils/index.js';
 import { ErrorState } from './widgets/utils/index.js';
 import { trackWidgetEvent } from '../utils/analytics.js';
 import { studioConfig } from '../config/studio.config.js';
+import { HeaderPolicyCallout } from './header-policy-callout.js';
 
 /**
  * Widget kind to component mapping
@@ -80,7 +81,7 @@ export function WidgetRenderer({
     if (registry.plugins && Array.isArray(registry.plugins)) {
       for (const plugin of registry.plugins) {
         const found = plugin.widgets.find((w: StudioRegistryEntry) => w.id === widgetId && w.plugin.id === pluginId);
-        if (found) return found;
+        if (found) {return found;}
       }
     }
     // Fallback to legacy format
@@ -113,13 +114,16 @@ export function WidgetRenderer({
     basePath = basePath.replace(/\/$/, '') + '/v1';
   }
   
-  const widgetData = useWidgetData(
+  const headerHints = widget?.data?.headers;
+
+  const widgetData = useWidgetData({
     widgetId,
-    manifestId,
-    widget?.data?.source || { type: 'mock', fixtureId: 'empty' },
-    widget?.pollingMs || 0,
-    basePath
-  );
+    pluginId: manifestId,
+    source: widget?.data?.source || { type: 'mock', fixtureId: 'empty' },
+    basePath,
+    pollingMs: widget?.pollingMs || 0,
+    headerHints,
+  });
 
   // Track widget error
   React.useEffect(() => {
@@ -151,7 +155,12 @@ export function WidgetRenderer({
       // Dynamic import
       import(componentPath)
         .then((module) => {
-          const Component = module.default || module[Object.keys(module)[0]];
+          const imported = module as Record<string, unknown>;
+          const keys = Object.keys(imported);
+          const fallbackKey = keys.length > 0 ? keys[0] : undefined;
+          const Component =
+            (imported.default as React.ComponentType<any> | undefined) ||
+            (fallbackKey ? (imported[fallbackKey] as React.ComponentType<any> | undefined) : undefined);
           if (!Component) {
             throw new Error(`Component not found in ${componentPath}`);
           }
@@ -200,7 +209,11 @@ export function WidgetRenderer({
     // Standard widget by kind
     if (widget.kind === 'chart') {
       // For chart, check options for chart type
-      const chartType = (widget.options as any)?.chartType || 'line';
+      const optionChartType = (widget.options as Record<string, unknown> | undefined)?.chartType;
+      const chartType =
+        typeof optionChartType === 'string' && optionChartType in CHART_COMPONENTS
+          ? (optionChartType as keyof typeof CHART_COMPONENTS)
+          : 'line';
       WidgetComponent = CHART_COMPONENTS[chartType] || WIDGET_COMPONENTS.chart || null;
     } else {
       WidgetComponent = WIDGET_COMPONENTS[widget.kind] || null;
@@ -232,17 +245,54 @@ export function WidgetRenderer({
     return <Skeleton variant="default" />;
   }
 
+  const rawHeaderOptions = (widget.options as any)?.headers as
+    | {
+        enabled?: boolean;
+        title?: string;
+        description?: string;
+        collapsible?: boolean;
+        expanded?: boolean;
+        showProvided?: boolean;
+      }
+    | undefined;
+
+  const missingHeadersCount = widgetData.headers?.missingRequired?.length ?? 0;
+  const headerNoticeEnabled =
+    !!headerHints &&
+    ((rawHeaderOptions?.enabled ?? studioConfig.headerNotices.enabled) || missingHeadersCount > 0);
+
+  const headerNotice = headerNoticeEnabled && headerHints ? (
+    <HeaderPolicyCallout
+      hints={headerHints}
+      status={widgetData.headers}
+      title={rawHeaderOptions?.title || 'Header policy'}
+      description={
+        rawHeaderOptions?.description ||
+        'Studio forwards headers that match this manifest-defined policy.'
+      }
+      collapsible={rawHeaderOptions?.collapsible ?? studioConfig.headerNotices.collapsible}
+      defaultExpanded={
+        rawHeaderOptions?.expanded ??
+        (missingHeadersCount > 0 || studioConfig.headerNotices.defaultExpanded)
+      }
+      showProvided={rawHeaderOptions?.showProvided ?? studioConfig.headerNotices.showProvided}
+    />
+  ) : null;
+
   // Render widget with data
   return (
-    <WidgetComponent
-      data={widgetData.data}
-      loading={widgetData.loading}
-      error={widgetData.error}
-      options={widget.options}
-      layoutHint={layoutHint || widget.layoutHint}
-      onInteraction={(event: string) => {
-        trackWidgetEvent('interaction', { widgetId, pluginId, event });
-      }}
-    />
+    <>
+      {headerNotice}
+      <WidgetComponent
+        data={widgetData.data}
+        loading={widgetData.loading}
+        error={widgetData.error}
+        options={widget.options}
+        layoutHint={layoutHint || widget.layoutHint}
+        onInteraction={(event: string) => {
+          trackWidgetEvent('interaction', { widgetId, pluginId, event });
+        }}
+      />
+    </>
   );
 }

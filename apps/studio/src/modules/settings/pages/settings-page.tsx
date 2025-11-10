@@ -24,14 +24,21 @@ export function SettingsPage() {
             ) : data ? (
               <List
                 dataSource={data.sources}
-                renderItem={(source) => (
-                  <KBListItem
-                    key={source.name}
-                    title={source.name}
-                    description={source.latency ? `${source.latency}ms` : undefined}
-                    action={<HealthIndicator status={source.ok ? 'ok' : 'down'} />}
-                  />
-                )}
+                renderItem={(source) => {
+                  const status = source.ok
+                    ? 'ok'
+                    : source.error === 'system_degraded'
+                    ? 'degraded'
+                    : 'down';
+                  return (
+                    <KBListItem
+                      key={source.name}
+                      title={source.name}
+                      description={source.latency ? `${source.latency}ms` : undefined}
+                      action={<HealthIndicator status={status} />}
+                    />
+                  );
+                }}
               />
             ) : (
               <p>No health data available</p>

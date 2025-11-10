@@ -8,7 +8,12 @@ import { Tree as AntTree } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import { Skeleton, EmptyState, ErrorState } from './utils/index.js';
 import type { BaseWidgetProps } from './types.js';
-import type { TreeNode } from '@kb-labs/api-contracts';
+export interface TreeNode {
+  id: string;
+  label: string;
+  icon?: React.ReactNode;
+  children?: TreeNode[];
+}
 
 export interface TreeOptions {
   expanded?: string[];

@@ -4,10 +4,12 @@
  */
 
 import * as React from 'react';
-import { Descriptions, Tag, Space } from 'antd';
+import { Descriptions, Tag, Space, Typography } from 'antd';
 import { Skeleton, EmptyState, ErrorState } from './utils/index.js';
 import type { BaseWidgetProps } from './types.js';
-import type { KeyValueData } from '@kb-labs/plugin-manifest/studio-widgets';
+import type { KeyValueData } from '@kb-labs/plugin-manifest';
+
+const { Text } = Typography;
 
 export interface KeyValueOptions {
   layout?: 'horizontal' | 'vertical';

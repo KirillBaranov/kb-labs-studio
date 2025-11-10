@@ -1,15 +1,16 @@
 /**
  * @module @kb-labs/studio-app/hooks/useWidgetData
- * Widget data hook with SWR, backoff, and race condition protection
+ * Widget data hook with policy-aware header handling, retry logic, and diagnostics.
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { usePolling } from './usePolling.js';
+import { useMemo, useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import type { DataSource } from '@kb-labs/plugin-manifest';
+import type { StudioHeaderHints } from '@kb-labs/plugin-adapter-studio';
+import { studioConfig } from '@/config/studio.config';
+import { useRegistry } from '../providers/registry-provider';
+import { createStudioLogger } from '../utils/logger.js';
 
-/**
- * Error envelope type
- */
 interface ErrorEnvelope {
   ok: false;
   error: {
@@ -18,130 +19,226 @@ interface ErrorEnvelope {
   };
 }
 
-/**
- * Widget data state
- */
+interface HeaderFilterResult {
+  headers: Record<string, string>;
+  missingRequired: string[];
+  provided: string[];
+}
+
+export interface HeaderStatus {
+  required: string[];
+  optional: string[];
+  autoInjected: string[];
+  deny: string[];
+  provided: string[];
+  missingRequired: string[];
+  patterns?: string[];
+}
+
 export interface WidgetDataState<T = unknown> {
   data?: T;
   loading: boolean;
   error: string | null;
+  headers: HeaderStatus | null;
   refetch: () => Promise<void>;
 }
 
-/**
- * SWR cache entry
- */
-interface CacheEntry<T> {
-  data: T;
-  timestamp: number;
+export interface UseWidgetDataParams {
+  widgetId: string;
+  pluginId: string;
+  source: DataSource;
+  basePath?: string;
+  pollingMs?: number;
+  headerHints?: StudioHeaderHints;
+  enabled?: boolean;
 }
 
-/**
- * Global SWR cache
- */
-const swrCache = new Map<string, CacheEntry<unknown>>();
+function headerCase(name: string): string {
+  return name
+    .toLowerCase()
+    .split('-')
+    .filter(Boolean)
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('-');
+}
 
-/**
- * Allowed header prefixes for allowlist
- */
-const ALLOWED_HEADER_PREFIXES = ['x-kb-'];
+function filterHeaders(
+  headers: Record<string, string> | undefined,
+  hints?: StudioHeaderHints
+): HeaderFilterResult {
+  const headerConfig = studioConfig.headers ?? {
+    allowedPrefixes: ['x-'],
+    allowAuthorization: false,
+  };
 
-/**
- * Filter headers by allowlist
- */
-function filterHeaders(headers?: Record<string, string>): Record<string, string> {
+  const requiredLower = new Set<string>((hints?.required ?? []).map((h: string) => h.toLowerCase()));
+  const optionalLower = new Set<string>((hints?.optional ?? []).map((h: string) => h.toLowerCase()));
+  const denyLower = new Set<string>((hints?.deny ?? []).map((h: string) => h.toLowerCase()));
+  const autoLower = new Set<string>((hints?.autoInjected ?? []).map((h: string) => h.toLowerCase()));
+  const allowedLower = new Set<string>([...requiredLower, ...optionalLower]);
+  const allowPrefixes = headerConfig.allowedPrefixes.map((prefix) => prefix.toLowerCase());
+
   if (!headers) {
-    return {};
+    const missingRequired = Array.from(requiredLower)
+      .filter((name) => !autoLower.has(name))
+      .map(headerCase);
+    return {
+      headers: {},
+      missingRequired,
+      provided: [],
+    };
   }
 
   const filtered: Record<string, string> = {};
+  const providedLower = new Set<string>();
+
   for (const [key, value] of Object.entries(headers)) {
     const lowerKey = key.toLowerCase();
-    if (ALLOWED_HEADER_PREFIXES.some((prefix) => lowerKey.startsWith(prefix))) {
+
+    if (denyLower.has(lowerKey)) {
+      console.warn(`[Studio] Dropping header "${key}" (denied by manifest policy)`);
+      continue;
+    }
+
+    if (allowedLower.size > 0) {
+      if (allowedLower.has(lowerKey)) {
+        filtered[key] = value;
+        providedLower.add(lowerKey);
+        continue;
+      }
+
+      if (allowPrefixes.some((prefix) => lowerKey.startsWith(prefix))) {
+        filtered[key] = value;
+        providedLower.add(lowerKey);
+        continue;
+      }
+
+      console.warn(`[Studio] Dropping header "${key}" (not included in manifest allow-list)`);
+      continue;
+    }
+
+    if (headerConfig.allowAuthorization && lowerKey === 'authorization') {
       filtered[key] = value;
+      providedLower.add(lowerKey);
+      continue;
+    }
+
+    if (allowPrefixes.some((prefix) => lowerKey.startsWith(prefix))) {
+      filtered[key] = value;
+      providedLower.add(lowerKey);
     }
   }
 
-  return filtered;
+  const missingRequired = Array.from(requiredLower)
+    .filter((name) => !providedLower.has(name) && !autoLower.has(name))
+    .map(headerCase);
+
+  const provided = Array.from(providedLower).map(headerCase);
+
+  return {
+    headers: filtered,
+    missingRequired,
+    provided,
+  };
 }
 
-/**
- * Calculate exponential backoff delay
- */
-function getBackoffDelay(attempt: number, maxDelay: number = 30000): number {
-  const baseDelay = 1000; // 1 second
-  const delay = Math.min(baseDelay * Math.pow(2, attempt), maxDelay);
-  return delay;
+function buildWidgetQueryKey(
+  pluginId: string,
+  widgetId: string,
+  params: DataSource,
+  registryVersion: string
+): (string | Record<string, unknown>)[] {
+  return ['widget-data', registryVersion, { pluginId, widgetId, params }];
 }
 
-/**
- * Fetch REST data
- */
+function getDefaultHeaders(): Record<string, string> {
+  return {
+    'Content-Type': 'application/json',
+  };
+}
+
 async function fetchRestData(
   source: Extract<DataSource, { type: 'rest' }>,
   basePath: string,
   manifestId: string,
-  abortController: AbortController
+  signal: AbortSignal,
+  traceId: string | undefined,
+  headerHints: StudioHeaderHints | undefined,
+  onHeadersFiltered?: (status: HeaderStatus) => void
 ): Promise<unknown> {
-  const { routeId, method = 'GET', headers } = source;
-  const filteredHeaders = filterHeaders(headers);
-  
-  // Extract package name from manifest.id (e.g., "@kb-labs/mind" -> "mind")
-  // REST API path format: /api/v1/plugins/{packageName}/{routeId}
-  // Example: /api/v1/plugins/mind/query
-  // Note: basePath already includes /api/v1, so we just need to add /plugins/{packageName}/{routeId}
-  const packageName = manifestId.includes('/') 
+  const { routeId, headers } = source;
+  const method: 'GET' | 'POST' = source.method ?? 'GET';
+  const filtered = filterHeaders(headers, headerHints);
+
+  if (headerHints && filtered.missingRequired.length > 0) {
+    console.warn(
+      `[Studio] Missing required headers for ${manifestId}:${routeId} -> ${filtered.missingRequired.join(', ')}`
+    );
+  }
+
+  if (onHeadersFiltered) {
+    onHeadersFiltered({
+      required: headerHints?.required ?? [],
+      optional: headerHints?.optional ?? [],
+      autoInjected: headerHints?.autoInjected ?? [],
+      deny: headerHints?.deny ?? [],
+      provided: filtered.provided,
+      missingRequired: filtered.missingRequired,
+      patterns: headerHints?.patterns,
+    });
+  }
+
+  const packageName = manifestId.includes('/')
     ? manifestId.split('/').pop() || manifestId
     : manifestId;
-  
-  // Ensure routeId doesn't start with / (it's relative to basePath)
+
   const cleanRouteId = routeId.startsWith('/') ? routeId.slice(1) : routeId;
   const url = `${basePath}/plugins/${packageName}/${cleanRouteId}`;
 
-  const options: RequestInit = {
+  const init: RequestInit = {
     method,
     headers: {
-      'Content-Type': 'application/json',
-      ...filteredHeaders,
+      ...getDefaultHeaders(),
+      ...filtered.headers,
     },
-    signal: abortController.signal,
+    signal,
   };
 
-  // Add body for POST/PUT/PATCH requests if provided
-  if ((method === 'POST' || method === 'PUT' || method === 'PATCH') && source.body) {
-    options.body = typeof source.body === 'string' 
-      ? source.body 
-      : JSON.stringify(source.body);
-  } else if ((method === 'POST' || method === 'PUT' || method === 'PATCH') && !source.body) {
-    // For POST requests without body, send empty object
-    options.body = JSON.stringify({});
+  if (traceId) {
+    (init.headers as Record<string, string>)['X-Trace-Id'] = traceId;
   }
 
-  const response = await fetch(url, options);
+  if (method === 'POST') {
+    const restSource = source as Extract<DataSource, { type: 'rest' }> & {
+      body?: unknown;
+    };
+    if (restSource.body !== undefined) {
+      init.body = typeof restSource.body === 'string'
+        ? restSource.body
+        : JSON.stringify(restSource.body);
+    } else {
+      init.body = JSON.stringify({});
+    }
+  }
 
+  const response = await fetch(url, init);
   if (!response.ok) {
-    let error: ErrorEnvelope | null = null;
-    let errorData: unknown = null;
+    let errorPayload: ErrorEnvelope | null = null;
     try {
-      const jsonData = await response.json();
-      errorData = jsonData;
-      // Check if it's an envelope format
-      if (jsonData && typeof jsonData === 'object' && 'ok' in jsonData && !jsonData.ok && 'error' in jsonData) {
-        error = jsonData as ErrorEnvelope;
-      } else if (jsonData && typeof jsonData === 'object' && 'error' in jsonData) {
-        error = jsonData as ErrorEnvelope;
+      const payload = await response.json();
+      if (payload && typeof payload === 'object' && 'error' in payload) {
+        errorPayload = payload as ErrorEnvelope;
       }
     } catch {
-      // Ignore parse errors
+      // ignore parse errors
     }
 
-    if (error && !error.ok && error.error) {
-      throw new Error(error.error.message || response.statusText);
+    if (errorPayload) {
+      throw new Error(errorPayload.error.message || response.statusText);
     }
 
-    // If 404, provide more helpful error message
     if (response.status === 404) {
-      throw new Error(`Route not found: ${method} ${url}. Check if the plugin is registered and the route exists.`);
+      throw new Error(`Route not found: ${method} ${url}. Check plugin configuration.`);
     }
 
     throw new Error(response.statusText || `HTTP ${response.status}`);
@@ -149,190 +246,258 @@ async function fetchRestData(
 
   const data = await response.json();
 
-  // Recursively unwrap envelope formats until we get the actual data
   let unwrapped = data;
-  let maxDepth = 5; // Prevent infinite loops
   let depth = 0;
+  const maxDepth = 5;
 
   while (depth < maxDepth && unwrapped && typeof unwrapped === 'object') {
-    // Handle envelope format: { status: 'ok', data: ..., meta: {...} }
     if ('status' in unwrapped && unwrapped.status === 'ok' && 'data' in unwrapped) {
       unwrapped = (unwrapped as any).data;
       depth++;
       continue;
     }
 
-    // Handle envelope format: { ok: true, data: ... }
     if ('ok' in unwrapped && unwrapped.ok === true && 'data' in unwrapped) {
       unwrapped = (unwrapped as any).data;
       depth++;
       continue;
     }
 
-    // No more envelope wrapping found, return what we have
     break;
   }
 
   return unwrapped;
 }
 
-/**
- * Fetch mock data
- */
 async function fetchMockData(
   source: Extract<DataSource, { type: 'mock' }>,
-  abortController: AbortController
+  signal: AbortSignal
 ): Promise<unknown> {
-  const { fixtureId } = source;
-  const response = await fetch(`/fixtures/${fixtureId}.json`, {
-    signal: abortController.signal,
-  });
-
+  const response = await fetch(`/fixtures/${source.fixtureId}.json`, { signal });
   if (!response.ok) {
-    throw new Error(`Failed to load fixture: ${response.statusText}`);
+    throw new Error(`Fixture ${source.fixtureId} not found`);
   }
-
-  const data = await response.json();
-
-  // Handle envelope format
-  if (data && typeof data === 'object' && 'ok' in data && data.ok === true && 'data' in data) {
-    return data.data;
-  }
-
-  return data;
+  return response.json();
 }
 
-/**
- * Use widget data hook
- * Implements SWR (stale-while-revalidate), exponential backoff, and race condition protection
- * 
- * @param widgetId - Widget ID (e.g., "mind.query")
- * @param manifestId - Plugin manifest ID (e.g., "mind") - used for REST API path construction
- * @param dataSource - Data source configuration
- * @param pollingMs - Polling interval in milliseconds
- * @param basePath - API base path (default: "/api/v1")
- */
-export function useWidgetData(
-  widgetId: string,
-  manifestId: string,
-  dataSource: DataSource,
-  pollingMs: number = 0,
-  basePath: string = '/api/v1'
-): WidgetDataState {
-  const cacheKey = `${manifestId}:${widgetId}`;
-  const [data, setData] = useState<unknown>(() => {
-    // Instant return from cache (SWR)
-    const cached = swrCache.get(cacheKey);
-    return cached ? cached.data : undefined;
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const abortControllerRef = useRef<AbortController | null>(null);
-  const retryAttemptRef = useRef(0);
-  const backoffTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+function generateTraceId(prefix: string): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return `${prefix}-${crypto.randomUUID()}`;
+  }
+  return `${prefix}-${Math.random().toString(36).slice(2)}`;
+}
 
-  // Fetch function with backoff
-  const fetchData = useCallback(
-    async (isRetry: boolean = false) => {
-      // Cancel previous request
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
+function computeWidgetRetryDelay(attemptIndex: number): number | null {
+  if (attemptIndex >= 6) {
+    return null;
+  }
+  const baseDelay = 200;
+  const maxDelay = 8_000;
+  const exponential = Math.min(baseDelay * 2 ** attemptIndex, maxDelay);
+  const jitter = Math.random() * exponential * 0.3;
+  return exponential + jitter;
+}
 
-      // Create new abort controller
-      const abortController = new AbortController();
-      abortControllerRef.current = abortController;
+interface QueryFactoryParams {
+  source: DataSource;
+  basePath: string;
+  manifestId: string;
+  traceId: string;
+  headerHints?: StudioHeaderHints;
+  onHeadersFiltered?: (status: HeaderStatus) => void;
+}
 
-      try {
-        setLoading(true);
-        setError(null);
+function createQueryFn({
+  source,
+  basePath,
+  manifestId,
+  traceId,
+  headerHints,
+  onHeadersFiltered,
+}: QueryFactoryParams): (ctx: { signal: AbortSignal }) => Promise<unknown> {
+  if (source.type === 'rest') {
+    return ({ signal }) =>
+      fetchRestData(
+        source,
+        basePath,
+        manifestId,
+        signal,
+        traceId,
+        headerHints,
+        onHeadersFiltered
+      );
+  }
 
-        let result: unknown;
+  if (source.type === 'mock') {
+    return ({ signal }) => fetchMockData(source, signal);
+  }
 
-        if (dataSource.type === 'rest') {
-          result = await fetchRestData(dataSource, basePath, manifestId, abortController);
-        } else {
-          result = await fetchMockData(dataSource, abortController);
-        }
+  throw new Error('Unsupported data source type');
+}
 
-        // Update cache and state
-        swrCache.set(cacheKey, {
-          data: result,
-          timestamp: Date.now(),
-        });
+export function useWidgetData<T = unknown>({
+  widgetId,
+  pluginId,
+  source,
+  basePath,
+  pollingMs = 0,
+  headerHints,
+  enabled = true,
+}: UseWidgetDataParams): WidgetDataState<T> {
+  const { registry } = useRegistry();
+  const routeId =
+    source.type === 'rest'
+      ? source.routeId
+      : source.type === 'mock'
+      ? source.fixtureId
+      : 'unknown';
 
-        setData(result);
-        retryAttemptRef.current = 0; // Reset retry attempt on success
-      } catch (err) {
-        if (abortController.signal.aborted) {
-          // Request was cancelled, ignore error
-          return;
-        }
-
-        const errorMessage = err instanceof Error ? err.message : String(err);
-        setError(errorMessage);
-
-        // Exponential backoff for 5xx errors or network errors
-        const shouldRetry =
-          isRetry &&
-          (errorMessage.includes('5') || errorMessage.includes('network') || errorMessage.includes('fetch'));
-
-        if (shouldRetry && retryAttemptRef.current < 5) {
-          retryAttemptRef.current += 1;
-          const delay = getBackoffDelay(retryAttemptRef.current);
-
-          backoffTimeoutRef.current = setTimeout(() => {
-            void fetchData(true);
-          }, delay);
-        }
-      } finally {
-        if (!abortController.signal.aborted) {
-          setLoading(false);
-        }
-      }
-    },
-    [cacheKey, dataSource, basePath, manifestId]
+  const traceIdRef = useRef<string>(
+    generateTraceId(`widget-${pluginId}-${widgetId}-${routeId}`)
   );
 
-  // Refetch function
-  const refetch = useCallback(async () => {
-    retryAttemptRef.current = 0; // Reset retry attempt
-    await fetchData(false);
-  }, [fetchData]);
+  const logger = useMemo(
+    () =>
+      createStudioLogger('useWidgetData', {
+        widgetId,
+        pluginId,
+        routeId,
+        traceId: traceIdRef.current,
+      }),
+    [widgetId, pluginId, routeId]
+  );
 
-  // Initial fetch
-  useEffect(() => {
-    // If we have cached data, return it immediately (SWR)
-    const cached = swrCache.get(cacheKey);
-    if (cached) {
-      setData(cached.data);
-      // Revalidate in background
-      void fetchData(false);
-    } else {
-      // No cache, fetch immediately
-      void fetchData(false);
+  const resolvedBasePath = useMemo(() => {
+    if (basePath && basePath.length > 0) {
+      return basePath.endsWith('/v1') ? basePath : `${basePath.replace(/\/$/, '')}/v1`;
     }
-  }, [cacheKey, fetchData]);
+    const configBase = studioConfig.apiBaseUrl || '/api/v1';
+    return configBase.endsWith('/v1')
+      ? configBase
+      : `${configBase.replace(/\/$/, '')}/v1`;
+  }, [basePath]);
 
-  // Polling
-  usePolling(refetch, pollingMs);
+  const queryKey = useMemo(
+    () =>
+      buildWidgetQueryKey(
+        pluginId,
+        widgetId,
+        source,
+        registry.registryVersion ?? '0'
+      ),
+    [pluginId, widgetId, source, registry.registryVersion]
+  );
 
-  // Cleanup
-  useEffect(() => {
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-      if (backoffTimeoutRef.current) {
-        clearTimeout(backoffTimeoutRef.current);
-      }
+  const initialHeaderStatus = useMemo<HeaderStatus | null>(() => {
+    if (!headerHints) {
+      return null;
+    }
+    const initial = filterHeaders(undefined, headerHints);
+    return {
+      required: headerHints.required ?? [],
+      optional: headerHints.optional ?? [],
+      autoInjected: headerHints.autoInjected ?? [],
+      deny: headerHints.deny ?? [],
+      provided: [],
+      missingRequired: initial.missingRequired,
+      patterns: headerHints.patterns,
     };
-  }, []);
+  }, [headerHints]);
 
-  return {
+  const [headerStatus, setHeaderStatus] = useState<HeaderStatus | null>(initialHeaderStatus);
+
+  useEffect(() => {
+    setHeaderStatus(initialHeaderStatus);
+  }, [initialHeaderStatus]);
+
+  const queryFn = useMemo(
+    () =>
+      createQueryFn({
+        source,
+        basePath: resolvedBasePath,
+        manifestId: pluginId,
+        traceId: traceIdRef.current,
+        headerHints,
+        onHeadersFiltered: headerHints ? setHeaderStatus : undefined,
+      }),
+    [source, resolvedBasePath, pluginId, headerHints]
+  );
+
+  const {
     data,
-    loading,
+    isLoading,
+    isFetching,
     error,
     refetch,
+    failureCount,
+  } = useQuery({
+    queryKey,
+    queryFn,
+    enabled,
+    staleTime: 5_000,
+    gcTime: 60_000,
+    refetchInterval: pollingMs > 0 ? pollingMs : undefined,
+    retry: attempt => computeWidgetRetryDelay(attempt - 1) !== null,
+    retryDelay: attempt => {
+      const delay = computeWidgetRetryDelay(attempt - 1);
+      if (delay !== null) {
+        logger.warn('Retrying widget fetch', {
+          attempt,
+          delay,
+          widgetId,
+          pluginId,
+          traceId: traceIdRef.current,
+        });
+        return delay;
+      }
+      return 0;
+    },
+    throwOnError: false,
+  });
+
+  const lastStatusRef = useRef<'idle' | 'success' | 'error'>('idle');
+
+  useEffect(() => {
+    if (error instanceof Error) {
+      if (lastStatusRef.current !== 'error') {
+        lastStatusRef.current = 'error';
+        const code = (error as Error & { code?: string }).code;
+        logger.error('Widget fetch failed', {
+          widgetId,
+          pluginId,
+          routeId,
+          retries: failureCount,
+          lastErrorCode: code,
+          message: error.message,
+          traceId: traceIdRef.current,
+        });
+      }
+    }
+  }, [error, failureCount, logger, widgetId, pluginId, routeId]);
+
+  useEffect(() => {
+    if (!error && data !== undefined && !isFetching) {
+      if (lastStatusRef.current !== 'success') {
+        lastStatusRef.current = 'success';
+        logger.info('Widget fetch succeeded', {
+          widgetId,
+          pluginId,
+          routeId,
+          retries: failureCount,
+          traceId: traceIdRef.current,
+        });
+      }
+    }
+  }, [data, error, failureCount, isFetching, logger, widgetId, pluginId, routeId]);
+
+  return {
+    data: data as T | undefined,
+    loading: isLoading || isFetching,
+    error: error instanceof Error ? error.message : null,
+    headers: headerStatus,
+    refetch: async () => {
+      lastStatusRef.current = 'idle';
+      await refetch();
+    },
   };
 }

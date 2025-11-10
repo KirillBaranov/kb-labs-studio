@@ -7,7 +7,7 @@ import * as React from 'react';
 import { Card, Tag, Space, Typography } from 'antd';
 import { Skeleton, EmptyState, ErrorState } from './utils/index.js';
 import type { BaseWidgetProps } from './types.js';
-import type { CardListData, CardData } from '@kb-labs/plugin-manifest/studio-widgets';
+import type { CardListData, CardData } from '@kb-labs/plugin-manifest';
 
 // Legacy format (backward compatibility)
 export interface CardItem {

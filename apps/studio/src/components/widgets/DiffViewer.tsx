@@ -7,7 +7,20 @@ import * as React from 'react';
 import { Collapse, Typography, Tag, Space } from 'antd';
 import { Skeleton, EmptyState, ErrorState } from './utils/index.js';
 import type { BaseWidgetProps } from './types.js';
-import type { DiffPayload } from '@kb-labs/api-contracts';
+
+export interface DiffHunk {
+  oldStart: number;
+  oldLines: number;
+  newStart: number;
+  newLines: number;
+  header?: string;
+  lines: string[];
+}
+
+export interface DiffPayload {
+  mode?: 'unified' | 'split';
+  hunks: DiffHunk[];
+}
 
 export interface DiffViewerOptions {
   mode?: 'unified' | 'split';

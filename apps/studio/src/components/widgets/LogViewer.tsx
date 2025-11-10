@@ -7,7 +7,12 @@ import * as React from 'react';
 import { Input, List, Typography, Space, Tag } from 'antd';
 import { Skeleton, EmptyState, ErrorState } from './utils/index.js';
 import type { BaseWidgetProps } from './types.js';
-import type { LogLine } from '@kb-labs/api-contracts';
+
+export interface LogLine {
+  ts: string | number | Date;
+  level: 'debug' | 'info' | 'warn' | 'error' | string;
+  msg: string;
+}
 
 export interface LogViewerOptions {
   showTimestamp?: boolean;

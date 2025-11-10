@@ -8,8 +8,53 @@ import {
   detectManifestVersion,
   checkDualManifest,
   migrateV1ToV2,
+  getDeprecationWarning,
 } from '@kb-labs/plugin-manifest';
-import { getDeprecationWarning } from '@kb-labs/plugin-manifest';
+import { createStudioLogger } from '../utils/logger.js';
+
+const discoveryLogger = createStudioLogger('plugin-discovery');
+
+type ManifestVariant = ManifestV1 | ManifestV2;
+type RegistryPayload =
+  | ManifestVariant
+  | {
+      manifest: ManifestVariant;
+      packageName?: string;
+      package?: string;
+    };
+
+function unwrapManifest(payload: RegistryPayload): ManifestVariant {
+  if (payload && typeof payload === 'object' && 'manifest' in payload) {
+    return (payload as { manifest: ManifestVariant }).manifest;
+  }
+  return payload as ManifestVariant;
+}
+
+function isManifestV2(manifest: ManifestVariant): manifest is ManifestV2 {
+  return (manifest as ManifestV2)?.schema === 'kb.plugin/2';
+}
+
+function resolvePackageName(
+  payload: RegistryPayload,
+  manifest: ManifestVariant
+): string {
+  const manifestWithId = manifest as { id?: string };
+  if (typeof manifestWithId.id === 'string' && manifestWithId.id.trim().length > 0) {
+    return manifestWithId.id;
+  }
+
+  if (payload && typeof payload === 'object') {
+    const candidate =
+      // Support registry payloads that include packageName/package metadata
+      (payload as { packageName?: string }).packageName ??
+      (payload as { package?: string }).package;
+    if (typeof candidate === 'string' && candidate.trim().length > 0) {
+      return candidate;
+    }
+  }
+
+  return 'unknown-plugin';
+}
 
 /**
  * Discovered plugin
@@ -24,7 +69,6 @@ export interface DiscoveredPlugin {
   /** Warning message if any */
   warning?: string;
 }
-
 /**
  * Discover plugins from API endpoint or static registry
  * Discovery order: API /v1/plugins/registry → static registry.json → auto-discovery
@@ -36,42 +80,42 @@ export async function discoverPlugins(
 
   // 1. Try to load from API endpoint
   try {
-    // Construct registry URL: ensure we use the correct path
-    // If apiBaseUrl is absolute (http://...), append /plugins/registry
-    // If apiBaseUrl is relative (/v1), we need to construct full URL or use proxy
     let registryUrl: string;
     if (apiBaseUrl.startsWith('http')) {
-      // Absolute URL: http://localhost:5050/api/v1 -> http://localhost:5050/api/v1/plugins/registry
       registryUrl = `${apiBaseUrl}/plugins/registry`;
     } else {
-      // Relative URL: /v1 -> /v1/plugins/registry (will be proxied by Vite)
       registryUrl = `${apiBaseUrl}/plugins/registry`;
     }
-    console.log('[Plugin Discovery] Fetching registry from:', registryUrl);
+    discoveryLogger.info('Fetching registry', { registryUrl });
     const response = await fetch(registryUrl);
     if (!response.ok) {
       throw new Error(`Failed to fetch registry: ${response.status} ${response.statusText}`);
     }
     if (response.ok) {
       const data = await response.json();
-      // API may return envelope format {ok: true, data: {manifests: [...]}} or direct {manifests: [...]}
       const manifests = data.manifests || (data.data && data.data.manifests) || [];
-      // API returns v2 manifests directly or in envelope
       if (Array.isArray(manifests)) {
-        for (const manifest of manifests) {
+        for (const manifestEntry of manifests as RegistryPayload[]) {
+          const manifest = unwrapManifest(manifestEntry);
           const version = detectManifestVersion(manifest);
-          if (version === 'v2') {
+          const packageName = resolvePackageName(manifestEntry, manifest);
+
+          if (version === 'v2' && isManifestV2(manifest)) {
             plugins.push({
-              packageName: manifest.id,
+              packageName,
               version: 'v2',
-              manifest: manifest as ManifestV2,
+              manifest,
             });
           } else if (version === 'v1') {
             plugins.push({
-              packageName: manifest.id || 'unknown',
+              packageName,
               version: 'v1',
               manifest: manifest as ManifestV1,
-              warning: getDeprecationWarning(manifest.id || 'unknown'),
+              warning: getDeprecationWarning(packageName),
+            });
+          } else {
+            discoveryLogger.warn('Unknown manifest version detected', {
+              packageName,
             });
           }
         }
@@ -79,12 +123,13 @@ export async function discoverPlugins(
       }
     }
   } catch (e) {
-    // API endpoint not available - continue to static registry
-    const registryUrl = apiBaseUrl.startsWith('http') 
+    const registryUrl = apiBaseUrl.startsWith('http')
       ? `${apiBaseUrl}/plugins/registry`
       : `${apiBaseUrl}/plugins/registry`;
-    console.warn('[Plugin Discovery] Failed to load from API endpoint:', e instanceof Error ? e.message : String(e));
-    console.warn('[Plugin Discovery] Attempted URL:', registryUrl);
+    discoveryLogger.warn('Failed to load registry from API endpoint', {
+      error: e instanceof Error ? e.message : String(e),
+      registryUrl,
+    });
   }
 
   // 2. Try to load from static registry.json
@@ -93,13 +138,20 @@ export async function discoverPlugins(
     if (response.ok) {
       const registry = await response.json();
       if (registry.manifests && Array.isArray(registry.manifests)) {
-        for (const manifest of registry.manifests) {
+        for (const manifestEntry of registry.manifests as RegistryPayload[]) {
+          const manifest = unwrapManifest(manifestEntry);
           const version = detectManifestVersion(manifest);
-          if (version === 'v2') {
+          const packageName = resolvePackageName(manifestEntry, manifest);
+
+          if (version === 'v2' && isManifestV2(manifest)) {
             plugins.push({
-              packageName: manifest.id,
+              packageName,
               version: 'v2',
-              manifest: manifest as ManifestV2,
+              manifest,
+            });
+          } else if (version === 'v1') {
+            discoveryLogger.warn('Registry manifest still on v1 schema', {
+              packageName,
             });
           }
         }
@@ -109,8 +161,6 @@ export async function discoverPlugins(
   } catch (e) {
     // Static registry not available
   }
-
-  // 3. Auto-discovery would scan build artifacts (optional, not implemented)
 
   return plugins;
 }
@@ -145,7 +195,10 @@ export function checkDualManifests(
         packageName
       );
       if (check.warning) {
-        console.warn(check.warning);
+        discoveryLogger.warn('Dual manifest detected', {
+          warning: check.warning,
+          packageName,
+        });
       }
       pluginMap.set(packageName, v2Plugin);
     } else if (v2Plugin) {

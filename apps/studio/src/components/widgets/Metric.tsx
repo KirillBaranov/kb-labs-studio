@@ -7,7 +7,7 @@ import * as React from 'react';
 import { Card } from 'antd';
 import { Skeleton, EmptyState, ErrorState } from './utils/index.js';
 import type { BaseWidgetProps } from './types.js';
-import type { KPIMetric } from '@kb-labs/api-contracts';
+import type { KPIMetric } from './KPIList.js';
 
 export interface MetricOptions {
   showDelta?: boolean;

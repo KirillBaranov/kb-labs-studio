@@ -5,25 +5,29 @@
 
 import * as React from 'react';
 import { Result, Button } from 'antd';
-import type { ErrorEnvelope } from '@kb-labs/api-contracts';
-
 export interface ErrorStateProps {
-  error: string | ErrorEnvelope | null;
+  error: string | { ok?: boolean; error?: Record<string, unknown> } | null;
   retryable?: boolean;
   hint?: string;
   onRetry?: () => void;
 }
 
 export function ErrorState({ error, retryable, hint, onRetry }: ErrorStateProps) {
+  const errorObject = (error && typeof error === 'object' && 'error' in error
+    ? (error as { error: Record<string, unknown> })
+    : null);
+
   const errorMessage =
     typeof error === 'string'
       ? error
-      : error && typeof error === 'object' && 'error' in error && typeof error.error === 'object' && 'message' in error.error
-        ? String(error.error.message)
+      : errorObject && typeof errorObject.error.message === 'string'
+        ? errorObject.error.message
         : 'An error occurred';
 
-  const isRetryable = retryable ?? (error && typeof error === 'object' && 'error' in error && typeof error.error === 'object' && 'ui' in error.error && typeof error.error.ui === 'object' && error.error.ui?.retryable) ?? false;
-  const errorHint = hint ?? (error && typeof error === 'object' && 'error' in error && typeof error.error === 'object' && 'ui' in error.error && typeof error.error.ui === 'object' && error.error.ui?.hint) ?? undefined;
+  const uiMeta = (errorObject?.error?.ui as { retryable?: boolean; hint?: string } | undefined) ?? undefined;
+
+  const isRetryable = retryable ?? Boolean(uiMeta?.retryable);
+  const errorHint = hint ?? uiMeta?.hint;
 
   // Check if error is "Not Found" and provide more helpful message
   const isNotFound = errorMessage.toLowerCase().includes('not found') || errorMessage.toLowerCase().includes('404');

@@ -7,7 +7,15 @@ import * as React from 'react';
 import { Card, Row, Col } from 'antd';
 import { Skeleton, EmptyState, ErrorState } from './utils/index.js';
 import type { BaseWidgetProps } from './types.js';
-import type { KPIMetric } from '@kb-labs/api-contracts';
+
+export interface KPIMetric {
+  id: string;
+  label: string;
+  value: number | string;
+  unit?: string;
+  status?: 'ok' | 'warn' | 'crit' | 'default';
+  delta?: number;
+}
 
 export interface KPIListOptions {
   columns?: number;

@@ -7,7 +7,14 @@ import * as React from 'react';
 import { Timeline as AntTimeline, Typography, Button } from 'antd';
 import { Skeleton, EmptyState, ErrorState } from './utils/index.js';
 import type { BaseWidgetProps } from './types.js';
-import type { TimelineEvent } from '@kb-labs/api-contracts';
+
+export interface TimelineEvent {
+  ts: string | number | Date;
+  title: string;
+  description?: string;
+  kind?: 'info' | 'success' | 'error' | string;
+  link?: string;
+}
 
 export interface TimelineOptions {
   showIcons?: boolean;
