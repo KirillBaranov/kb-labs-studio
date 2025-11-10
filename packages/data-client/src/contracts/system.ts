@@ -1,3 +1,4 @@
+import type { SystemHealthSnapshot } from '@kb-labs/api-contracts';
 import type { ISODate } from './common';
 
 export interface HealthStatus {
@@ -9,5 +10,6 @@ export interface HealthStatus {
     latency?: number;
     error?: string;
   }>;
+  snapshot?: SystemHealthSnapshot;
 }
 

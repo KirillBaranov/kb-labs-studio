@@ -5,16 +5,9 @@
 
 import { HttpClient } from '../client/http-client';
 import type { AuditDataSource } from './audit-source';
-import type {
-  GetAuditSummaryResponse,
-  GetAuditReportResponse,
-  CreateAuditRunRequest,
-  CreateAuditRunResponse,
-  JobResponse,
-} from '@kb-labs/api-contracts';
-import type { AuditSummary, AuditPackageReport } from '../contracts/audit';
 import type { ActionResult } from '../contracts/common';
 import type { HealthStatus } from '../contracts/system';
+import type { SystemHealthSnapshot } from '@kb-labs/api-contracts';
 
 /**
  * HTTP implementation of AuditDataSource
@@ -22,50 +15,42 @@ import type { HealthStatus } from '../contracts/system';
 export class HttpAuditSource implements AuditDataSource {
   constructor(private client: HttpClient) {}
 
-  async getSummary(): Promise<AuditSummary> {
-    // Return API response directly - already in api-contracts format
-    return this.client.fetch<GetAuditSummaryResponse['data']>('/audit/summary');
+  async getSummary(): Promise<unknown> {
+    return this.client.fetch<unknown>('/audit/summary');
   }
 
-  async getPackageReport(name: string): Promise<AuditPackageReport> {
-    // Return API response directly - already in api-contracts format
-    return this.client.fetch<GetAuditReportResponse['data']>('/audit/report/latest');
+  async getPackageReport(_name: string): Promise<unknown> {
+    return this.client.fetch<unknown>('/audit/report/latest');
   }
 
   async runAudit(scope?: string[]): Promise<ActionResult> {
-    const request: CreateAuditRunRequest = {
+    const request = {
       scope: scope?.join(',') || undefined,
     };
 
-    const response = await this.client.fetch<CreateAuditRunResponse['data']>(
-      '/audit/runs',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-      }
-    );
+    await this.client.fetch('/audit/runs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(request),
+    });
 
-    return {
-      ok: true,
-      runId: response.runId,
-    };
+    return { ok: true };
   }
 
   async getHealth(): Promise<HealthStatus> {
-    const response = await this.client.fetch<{ status: 'ok'; version: string; node: string; uptimeSec: number }>(
-      '/health/live'
-    );
+    const snapshot = await this.client.fetch<SystemHealthSnapshot>('/health');
     
     return {
-      ok: response.status === 'ok',
-      timestamp: new Date().toISOString(),
+      ok: snapshot.status === 'healthy',
+      timestamp: snapshot.ts,
       sources: [{
         name: 'audit',
-        ok: response.status === 'ok',
+        ok: snapshot.status === 'healthy',
+        error: snapshot.status === 'degraded' ? 'system_degraded' : undefined,
       }],
+      snapshot,
     };
   }
 }

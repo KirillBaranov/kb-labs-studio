@@ -38,64 +38,54 @@ function isErrorEnvelopeResponse(obj: unknown): obj is ErrorEnvelopeResponse {
 }
 
 export function mapFetchError(error: unknown, response?: Response): KBError {
-  if (error instanceof KBError) {
-    return error;
+  if (!response) {
+    if (error instanceof KBError) {
+      return error;
+    }
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      return new KBError(errorCodes.NETWORK_ERROR, 'Network request failed', undefined, error);
+    }
+    return new KBError(errorCodes.NETWORK_ERROR, 'Unknown error occurred', undefined, error);
   }
 
-  if (response) {
-    // Try to parse error envelope from response body
-    let errorEnvelope: ErrorEnvelopeResponse | null = null;
-    try {
-      const contentType = response.headers.get('content-type');
-      if (contentType?.includes('application/json')) {
-        // Note: response body might already be consumed
-        // In that case, we'll use status code mapping
-      }
-    } catch {
-      // Ignore parsing errors
-    }
+  const parsedBody = error;
+  const errorEnvelope =
+    parsedBody && typeof parsedBody === 'object' && isErrorEnvelopeResponse(parsedBody)
+      ? (parsedBody as ErrorEnvelopeResponse)
+      : null;
+  const httpError: ResponseError = {
+    status: response.status,
+    statusText: response.statusText,
+    data: parsedBody ?? null,
+  };
 
-    const httpError: ResponseError = {
-      status: response.status,
-      statusText: response.statusText,
-      data: errorEnvelope,
-    };
-
-    // Map error codes from api-contracts
-    const statusCode = response.status;
-    let errorMessage: string | undefined = undefined;
-    if (errorEnvelope !== null && isErrorEnvelopeResponse(errorEnvelope)) {
-      // TypeScript now knows errorEnvelope is ErrorEnvelopeResponse
-      const envelope: ErrorEnvelopeResponse = errorEnvelope;
-      errorMessage = envelope.error.message;
-    }
-    
-    if (statusCode === 404) {
-      return new KBError(errorCodes.NOT_FOUND, errorMessage || 'Resource not found', 404, httpError);
-    }
-    if (statusCode === 401) {
-      return new KBError(errorCodes.AUTH_ERROR, errorMessage || 'Authentication failed', 401, httpError);
-    }
-    if (statusCode === 403) {
-      return new KBError(errorCodes.AUTH_ERROR, errorMessage || 'Forbidden', 403, httpError);
-    }
-    if (statusCode === 409) {
-      return new KBError(errorCodes.CONFLICT, errorMessage || 'Conflict', 409, httpError);
-    }
-    if (statusCode === 429) {
-      return new KBError(errorCodes.RATE_LIMIT, errorMessage || 'Rate limit exceeded', 429, httpError);
-    }
-    if (statusCode >= 500) {
-      return new KBError(errorCodes.SERVER_ERROR, errorMessage || 'Server error', statusCode, httpError);
-    }
-    return new KBError(errorCodes.NETWORK_ERROR, errorMessage || httpError.statusText || 'Request failed', statusCode, httpError);
+  // Map error codes from api-contracts
+  const statusCode = response.status;
+  let errorMessage: string | undefined = undefined;
+  if (errorEnvelope !== null) {
+    const envelope: ErrorEnvelopeResponse = errorEnvelope;
+    errorMessage = envelope.error.message;
   }
-
-  if (error instanceof TypeError && error.message.includes('fetch')) {
-    return new KBError(errorCodes.NETWORK_ERROR, 'Network request failed', undefined, error);
+  
+  if (statusCode === 404) {
+    return new KBError(errorCodes.NOT_FOUND, errorMessage || 'Resource not found', 404, httpError);
   }
-
-  return new KBError(errorCodes.NETWORK_ERROR, 'Unknown error occurred', undefined, error);
+  if (statusCode === 401) {
+    return new KBError(errorCodes.AUTH_ERROR, errorMessage || 'Authentication failed', 401, httpError);
+  }
+  if (statusCode === 403) {
+    return new KBError(errorCodes.AUTH_ERROR, errorMessage || 'Forbidden', 403, httpError);
+  }
+  if (statusCode === 409) {
+    return new KBError(errorCodes.CONFLICT, errorMessage || 'Conflict', 409, httpError);
+  }
+  if (statusCode === 429) {
+    return new KBError(errorCodes.RATE_LIMIT, errorMessage || 'Rate limit exceeded', 429, httpError);
+  }
+  if (statusCode >= 500) {
+    return new KBError(errorCodes.SERVER_ERROR, errorMessage || 'Server error', statusCode, httpError);
+  }
+  return new KBError(errorCodes.NETWORK_ERROR, errorMessage || httpError.statusText || 'Request failed', statusCode, httpError);
 }
 
 /**

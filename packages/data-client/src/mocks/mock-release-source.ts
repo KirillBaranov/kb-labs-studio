@@ -1,5 +1,4 @@
 import type { ReleaseDataSource } from '../sources/release-source';
-import type { ReleasePreview } from '../contracts/release';
 import type { ActionResult } from '../contracts/common';
 import type { HealthStatus } from '../contracts/system';
 import releasePreviewFixture from './fixtures/release-preview.json';
@@ -9,9 +8,9 @@ function delay(ms: number): Promise<void> {
 }
 
 export class MockReleaseSource implements ReleaseDataSource {
-  async getPreview(range?: { from: string; to: string }): Promise<ReleasePreview> {
+  async getPreview(range?: { from: string; to: string }): Promise<unknown> {
     await delay(250);
-    return releasePreviewFixture as ReleasePreview;
+    return releasePreviewFixture;
   }
 
   async runRelease(confirm?: boolean): Promise<ActionResult> {

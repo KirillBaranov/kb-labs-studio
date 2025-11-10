@@ -4,10 +4,15 @@
  */
 
 import { HttpClient } from '../client/http-client';
+import { KBError } from '../errors/kb-error';
 import type { SystemDataSource } from './system-source';
 import type {
-  HealthResponse,
+  SystemHealthSnapshot,
   ReadyResponse,
+  NotReadyResponse,
+  SystemInfoPayload,
+  SystemCapabilitiesPayload,
+  SystemConfigPayload,
   InfoResponse,
   CapabilitiesResponse,
   ConfigResponse,
@@ -21,44 +26,65 @@ export class HttpSystemSource implements SystemDataSource {
   constructor(private client: HttpClient) {}
 
   async getHealth(): Promise<HealthStatus> {
-    const response = await this.client.fetch<HealthResponse['data']>('/health/live');
-    
+    const snapshot = await this.client.fetch<SystemHealthSnapshot>('/health');
+
     return {
-      ok: response.status === 'ok',
-      timestamp: new Date().toISOString(),
-      sources: [{
-        name: 'system',
-        ok: response.status === 'ok',
-      }],
+      ok: snapshot.status === 'healthy',
+      timestamp: snapshot.ts,
+      sources: [
+        {
+          name: 'system',
+          ok: snapshot.status === 'healthy',
+          error: snapshot.status === 'degraded' ? 'system_degraded' : undefined,
+        },
+      ],
+      snapshot,
     };
   }
 
   /**
    * Get ready status
    */
-  async getReady(): Promise<ReadyResponse['data']> {
-    return this.client.fetch<ReadyResponse['data']>('/health/ready');
+  async getReady(): Promise<ReadyResponse | NotReadyResponse> {
+    try {
+      return await this.client.fetch<ReadyResponse>('/ready');
+    } catch (error) {
+      if (error instanceof KBError && error.status === 503) {
+        const payload = (error.cause as { data?: unknown } | undefined)?.data;
+        if (payload && typeof payload === 'object' && 'ready' in payload) {
+          return payload as NotReadyResponse;
+        }
+        return {
+          ready: false,
+          reason: 'unknown',
+        };
+      }
+      throw error;
+    }
   }
 
   /**
    * Get info
    */
-  async getInfo(): Promise<InfoResponse['data']> {
-    return this.client.fetch<InfoResponse['data']>('/info');
+  async getInfo(): Promise<SystemInfoPayload> {
+    const response = await this.client.fetch<InfoResponse>('/info');
+    return response.data;
   }
 
   /**
    * Get capabilities
    */
-  async getCapabilities(): Promise<CapabilitiesResponse['data']> {
-    return this.client.fetch<CapabilitiesResponse['data']>('/info/capabilities');
+  async getCapabilities(): Promise<SystemCapabilitiesPayload> {
+    const response = await this.client.fetch<CapabilitiesResponse>('/info/capabilities');
+    return response.data;
   }
 
   /**
    * Get config (redacted)
    */
-  async getConfig(): Promise<ConfigResponse['data']> {
-    return this.client.fetch<ConfigResponse['data']>('/info/config');
+  async getConfig(): Promise<SystemConfigPayload> {
+    const response = await this.client.fetch<ConfigResponse>('/info/config');
+    return response.data;
   }
 }
 

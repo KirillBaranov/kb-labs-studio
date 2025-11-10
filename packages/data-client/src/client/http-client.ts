@@ -1,5 +1,5 @@
 import type { FetchOptions, RequestInterceptor, ResponseInterceptor, ErrorInterceptor } from './types';
-import { KBError, errorCodes } from '../errors/kb-error';
+import { KBError } from '../errors/kb-error';
 import { mapFetchError } from './error-mapper';
 import { createEnvelopeInterceptor } from './envelope-interceptor';
 import { ulid } from 'ulid';
@@ -42,8 +42,6 @@ export class HttpClient {
     try {
       let config: FetchOptions = options;
 
-      console.log('config', config);
-
       // Apply request interceptors
       for (const interceptor of this.requestInterceptors) {
         config = await interceptor(config);
@@ -52,20 +50,13 @@ export class HttpClient {
       // Normalize path: ensure no duplicate /api/v1
       // If baseUrl contains /api/v1, remove it from path (from start only)
       let normalizedPath = path;
-      console.log('🔍 [http-client] baseUrl:', this.baseUrl);
-      console.log('🔍 [http-client] original path:', path);
-      
       // Remove /api/v1 from the beginning of path if baseUrl already contains it
       if (this.baseUrl.includes('/api/v1')) {
         // Remove /api/v1 from start of path if present
         normalizedPath = path.replace(/^\/api\/v1/, '');
-        if (normalizedPath !== path) {
-          console.log('🔧 [http-client] Removed /api/v1 from path start. New path:', normalizedPath);
-        }
       }
       
       const url = normalizedPath.startsWith('http') ? normalizedPath : `${this.baseUrl}${normalizedPath}`;
-      console.log('✅ [http-client] Final URL:', url);
       const response = await fetch(url, config);
 
       // Apply response interceptors
@@ -75,25 +66,18 @@ export class HttpClient {
       }
 
       if (!processedResponse.ok) {
-        // Try to parse error envelope from response body
-        let errorEnvelope: any = null;
+        let parsedBody: unknown = null;
         try {
           const cloned = processedResponse.clone();
           const contentType = cloned.headers.get('content-type');
           if (contentType?.includes('application/json')) {
-            errorEnvelope = await cloned.json();
-            // Check if it's an error envelope
-            if (errorEnvelope && typeof errorEnvelope === 'object' && errorEnvelope.ok === false) {
-              // Use error envelope details for better error mapping
-              const error = mapFetchError(undefined, processedResponse);
-              throw await this.processError(error);
-            }
+            parsedBody = await cloned.json();
           }
-        } catch (parseError) {
-          // If parsing fails, continue with normal error handling
+        } catch {
+          // Ignore parse errors; fallback to default handling
         }
 
-        const error = mapFetchError(undefined, processedResponse);
+        const error = mapFetchError(parsedBody, processedResponse);
         throw await this.processError(error);
       }
 

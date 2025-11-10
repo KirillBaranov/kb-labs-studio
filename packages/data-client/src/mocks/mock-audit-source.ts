@@ -1,5 +1,4 @@
 import type { AuditDataSource } from '../sources/audit-source';
-import type { AuditSummary, AuditPackageReport } from '../contracts/audit';
 import type { ActionResult } from '../contracts/common';
 import type { HealthStatus } from '../contracts/system';
 import auditSummaryFixture from './fixtures/audit-summary.json';
@@ -10,43 +9,17 @@ function delay(ms: number): Promise<void> {
 }
 
 export class MockAuditSource implements AuditDataSource {
-  async getSummary(): Promise<AuditSummary> {
+  async getSummary(): Promise<unknown> {
     await delay(300);
-    return auditSummaryFixture as AuditSummary;
+    return auditSummaryFixture;
   }
 
-  async getPackageReport(name: string): Promise<AuditPackageReport> {
+  async getPackageReport(name: string): Promise<unknown> {
     await delay(200);
     if (name === '@kb-labs/cli') {
-      // Transform fixture to api-contracts format (GetAuditReportResponse['data'])
-      const fixture = auditPackageFixture as any;
-      return {
-        report: fixture,
-        createdAt: new Date().toISOString(),
-      };
+      return auditPackageFixture;
     }
-    // Return in api-contracts format
-    return {
-      report: {
-        pkg: { name, version: '1.0.0' },
-        lastRun: {
-          id: `run-${name}`,
-          startedAt: '2025-01-01T10:00:00.000Z',
-          endedAt: '2025-01-01T10:02:00.000Z',
-          status: 'ok',
-        },
-        checks: [
-          { id: 'style', ok: true },
-          { id: 'types', ok: true },
-          { id: 'tests', ok: true },
-          { id: 'build', ok: true },
-          { id: 'devlink', ok: true },
-          { id: 'mind', ok: true },
-        ],
-        artifacts: { json: '/tmp/audit.json', md: '/tmp/audit.md' },
-      },
-      createdAt: new Date().toISOString(),
-    };
+    return auditPackageFixture;
   }
 
   async runAudit(scope?: string[]): Promise<ActionResult> {

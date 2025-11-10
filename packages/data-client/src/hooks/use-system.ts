@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import type { SystemDataSource } from '../sources/system-source';
 import type { HealthStatus } from '../contracts/system';
 import { qk } from '../query-keys';
-import type { HealthResponse, ReadyResponse } from '@kb-labs/api-contracts';
 
 export function useHealthStatus(source: SystemDataSource) {
   return useQuery({
@@ -41,11 +40,7 @@ export function useReadyStatus(source: SystemDataSource) {
       }
       // Fallback for mock sources
       return {
-        status: 'ok' as const,
-        version: '1.0.0',
-        node: process.version,
-        uptimeSec: 0,
-        checks: {},
+        ready: true as const,
       };
     },
     refetchInterval: 30000,
