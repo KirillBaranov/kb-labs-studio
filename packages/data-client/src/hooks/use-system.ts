@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import type { SystemDataSource } from '../sources/system-source';
-import type { HealthStatus } from '../contracts/system';
 import { qk } from '../query-keys';
 
 export function useHealthStatus(source: SystemDataSource) {

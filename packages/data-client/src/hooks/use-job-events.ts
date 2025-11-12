@@ -4,7 +4,6 @@
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { qk } from '../query-keys';
 import type { JobEventType } from './types';
 
 // Type for job response data
@@ -134,7 +133,7 @@ export function useJobEvents(
           }
         };
 
-        eventSource.onerror = (err) => {
+        eventSource.onerror = (_event) => {
           // SSE failed, fallback to polling
           eventSource.close();
           eventSourceRef.current = null;
@@ -180,8 +179,9 @@ export function useJobEvents(
                 }
               }
             } catch (err) {
-              setError(err instanceof Error ? err : new Error('Polling failed'));
-              onError?.(err instanceof Error ? err : new Error('Polling failed'));
+              const errorInstance = err instanceof Error ? err : new Error('Polling failed');
+              setError(errorInstance);
+              onError?.(errorInstance);
             }
           };
 
@@ -260,8 +260,9 @@ export function useJobEvents(
           setIsConnected(true);
           setError(null);
         } catch (err) {
-          setError(err instanceof Error ? err : new Error('Polling failed'));
-          onError?.(err instanceof Error ? err : new Error('Polling failed'));
+          const errorInstance = err instanceof Error ? err : new Error('Polling failed');
+          setError(errorInstance);
+          onError?.(errorInstance);
           setIsConnected(false);
         }
       };

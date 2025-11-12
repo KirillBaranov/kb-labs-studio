@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { createBrowserRouter, Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { KBPageLayout, type NavigationItem } from '@kb-labs/ui-react';
-import { Home, Brain, Settings } from 'lucide-react';
+import { Home, Brain, Settings, GitBranch } from 'lucide-react';
 import type { StudioRegistry } from '@kb-labs/plugin-adapter-studio';
 import { useAuth } from './providers/auth-provider';
 import { useRegistry } from './providers/registry-provider';
@@ -9,6 +9,8 @@ import { HealthBanner } from './components/health-banner';
 import { NotFoundPage } from './pages/not-found-page';
 import { PluginPage } from './routes/plugin-page';
 import { SettingsPage } from './modules/settings/pages/settings-page';
+import { WorkflowsListPage } from './modules/workflows/pages/workflows-list-page';
+import { WorkflowRunPage } from './modules/workflows/pages/workflow-run-page';
 import { GalleryPage } from './pages/gallery-page';
 import { createStudioLogger } from './utils/logger.js';
 
@@ -89,6 +91,12 @@ function LayoutContent() {
         path: '/',
       },
       {
+        key: 'workflows',
+        label: 'Workflows',
+        icon: React.createElement(GitBranch, { size: 16 }),
+        path: '/workflows',
+      },
+      {
         key: 'settings',
         label: 'Settings',
         icon: React.createElement(Settings, { size: 16 }),
@@ -160,7 +168,15 @@ export const router = createBrowserRouter([
       },
       {
         path: '/settings',
-        element: <SettingsPage />,
+        element: <SettingsPage />, 
+      },
+      {
+        path: '/workflows',
+        element: <WorkflowsListPage />, 
+      },
+      {
+        path: '/workflows/:runId',
+        element: <WorkflowRunPage />, 
       },
     ],
   },

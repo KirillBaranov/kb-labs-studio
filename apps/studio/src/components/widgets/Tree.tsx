@@ -62,11 +62,11 @@ export function Tree({ data, loading, error, options, onNodeClick }: TreeProps) 
     if (onNodeClick && info.node) {
       // Find node by key
       const findNode = (node: TreeNode, key: string): TreeNode | null => {
-        if (node.id === key) return node;
+        if (node.id === key) {return node;}
         if (node.children) {
           for (const child of node.children) {
             const found = findNode(child, key);
-            if (found) return found;
+            if (found) {return found;}
           }
         }
         return null;

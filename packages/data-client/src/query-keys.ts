@@ -3,6 +3,8 @@
  * Query keys factory for TanStack Query
  */
 
+import type { WorkflowRunsFilters } from './sources/workflow-source';
+
 /**
  * Standardized query keys factory
  */
@@ -61,6 +63,11 @@ export const qk = {
     info: () => [...qk.system.all, 'info'] as const,
     capabilities: () => [...qk.system.all, 'capabilities'] as const,
     config: () => [...qk.system.all, 'config'] as const,
+  },
+  workflows: {
+    all: ['workflows'] as const,
+    list: (filters?: WorkflowRunsFilters) => [...qk.workflows.all, 'list', filters ?? {}] as const,
+    run: (runId: string) => [...qk.workflows.all, 'run', runId] as const,
   },
   
   // DevLink queries
