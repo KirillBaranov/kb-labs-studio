@@ -5,6 +5,7 @@
 
 import * as React from 'react';
 import { Skeleton, EmptyState, ErrorState } from './utils/index.js';
+import { WidgetCard } from './WidgetCard.js';
 import type { BaseWidgetProps } from './types.js';
 import { KBDataTable } from '@kb-labs/ui-react';
 import type { Column } from '@kb-labs/ui-react';
@@ -14,25 +15,60 @@ export interface TableOptions<T = unknown> {
   pageSize?: number;
   sortable?: boolean;
   stickyHeader?: boolean;
+  /** Show card wrapper (default: true) */
+  showCard?: boolean;
 }
 
 export interface TableProps<T = unknown> extends BaseWidgetProps<T[], TableOptions<T>> {
   onRowClick?: (row: T) => void;
 }
 
-export function Table<T extends Record<string, unknown>>({ data, loading, error, options, onRowClick }: TableProps<T>) {
+export function Table<T extends Record<string, unknown>>({ 
+  data, 
+  loading, 
+  error, 
+  options, 
+  onRowClick,
+  title,
+  description,
+  showTitle = false,
+  showDescription = false,
+}: TableProps<T>) {
+  const showCard = options?.showCard !== false;
+
   if (loading) {
-    return <Skeleton variant="table" rows={5} />;
+    const content = <Skeleton variant="table" rows={5} />;
+    return showCard ? (
+      <WidgetCard title={title} description={description} showTitle={showTitle} showDescription={showDescription}>
+        {content}
+      </WidgetCard>
+    ) : (
+      content
+    );
   }
 
   if (error) {
-    return <ErrorState error={error} />;
+    const content = <ErrorState error={error} />;
+    return showCard ? (
+      <WidgetCard title={title} description={description} showTitle={showTitle} showDescription={showDescription}>
+        {content}
+      </WidgetCard>
+    ) : (
+      content
+    );
   }
 
   const rows: T[] = Array.isArray(data) ? data : Array.isArray((data as any)?.rows) ? ((data as any).rows as T[]) : [];
 
   if (!rows || rows.length === 0) {
-    return <EmptyState title="No data" description="No table data available" />;
+    const content = <EmptyState title="No data" description="No table data available" />;
+    return showCard ? (
+      <WidgetCard title={title} description={description} showTitle={showTitle} showDescription={showDescription}>
+        {content}
+      </WidgetCard>
+    ) : (
+      content
+    );
   }
 
   const columns = options?.columns || [];
@@ -50,8 +86,18 @@ export function Table<T extends Record<string, unknown>>({ data, loading, error,
         render: (value: unknown) => String(value ?? ''),
       }));
 
-  return (
-    <div className="widget-table" data-sticky-header={stickyHeader}>
+  const tableContent = (
+    <div 
+      className="widget-table" 
+      data-sticky-header={stickyHeader} 
+      style={{ 
+        height: '100%', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        minHeight: 0,
+        overflow: 'auto', // Enable scrolling for table content
+      }}
+    >
       <KBDataTable<T>
         columns={tableColumns}
         data={rows}
@@ -70,6 +116,20 @@ export function Table<T extends Record<string, unknown>>({ data, loading, error,
         }
       `}</style>
     </div>
+  );
+
+  return showCard ? (
+    <WidgetCard 
+      title={title} 
+      description={description} 
+      showTitle={showTitle} 
+      showDescription={showDescription}
+      bodyStyle={{ padding: 0, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}
+    >
+      {tableContent}
+    </WidgetCard>
+  ) : (
+    tableContent
   );
 }
 

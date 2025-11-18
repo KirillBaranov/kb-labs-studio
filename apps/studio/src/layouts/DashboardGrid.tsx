@@ -49,10 +49,13 @@ export function DashboardGrid({ children, cols = { sm: 4, md: 8, lg: 12 }, rowHe
         } else if (height === 'auto' || height === undefined) {
           // Auto height: use grid rows but allow content to expand
           itemMinHeight = minH ? `${minH * rowHeight * 8}px` : `${h * rowHeight * 8}px`;
-          // Don't set maxHeight for auto - let content determine height
+          // Limit max height to prevent widgets from taking entire page
+          // Use viewport height minus header/footer/padding (approximately 200px)
+          itemMaxHeight = 'calc(100vh - 200px)';
         } else {
           // Fallback: use grid-based height calculation
           itemMinHeight = minH ? `${minH * rowHeight * 8}px` : `${h * rowHeight * 8}px`;
+          itemMaxHeight = 'calc(100vh - 200px)';
         }
 
         return (
@@ -96,12 +99,12 @@ export function DashboardGrid({ children, cols = { sm: 4, md: 8, lg: 12 }, rowHe
           min-height: var(--row-height);
           display: flex;
           flex-direction: column;
-          overflow: visible;
+          overflow: hidden; /* Changed to hidden to contain overflow */
         }
         .widget-dashboard-grid__item > * {
           flex: 1;
           min-height: 0;
-          overflow: visible;
+          overflow: hidden; /* Changed to hidden to contain overflow */
         }
       `}</style>
     </div>
