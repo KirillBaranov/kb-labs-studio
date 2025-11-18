@@ -57,7 +57,7 @@ export class HttpSystemSource implements SystemDataSource {
         return {
           ready: false,
           reason: 'unknown',
-        };
+        } as NotReadyResponse;
       }
       throw error;
     }
