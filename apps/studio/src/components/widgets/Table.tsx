@@ -97,23 +97,45 @@ export function Table<T extends Record<string, unknown>>({
       const container = tableContainerRef.current;
       if (!container) return;
       
-      // Get available height: container height minus pagination (~60px)
-      const containerHeight = container.clientHeight;
-      const paginationHeight = 60; // Approximate pagination height
-      const availableHeight = Math.max(200, containerHeight - paginationHeight);
-      setScrollHeight(availableHeight);
+      // Use requestAnimationFrame to ensure DOM is updated
+      requestAnimationFrame(() => {
+        const paginationElement = container.querySelector('.ant-pagination');
+        const paginationHeight = paginationElement 
+          ? paginationElement.getBoundingClientRect().height + 24 // Add padding/margin
+          : 80; // Fallback if pagination not found yet
+        
+        const containerHeight = container.clientHeight;
+        // Use more conservative calculation: subtract pagination height + extra margin
+        // This ensures pagination is always visible
+        const availableHeight = Math.max(200, containerHeight - paginationHeight - 16);
+        
+        // Only update if height changed significantly (avoid flickering)
+        setScrollHeight((prev) => {
+          if (typeof prev === 'number' && Math.abs(prev - availableHeight) < 10) {
+            return prev;
+          }
+          return availableHeight;
+        });
+      });
     };
 
+    // Initial calculation
     updateScrollHeight();
     
+    // Also try after a short delay to catch pagination rendering
+    const timeoutId = setTimeout(updateScrollHeight, 200);
+    
     // Update on resize
-    const resizeObserver = new ResizeObserver(updateScrollHeight);
+    const resizeObserver = new ResizeObserver(() => {
+      updateScrollHeight();
+    });
     resizeObserver.observe(tableContainerRef.current);
     
     return () => {
+      clearTimeout(timeoutId);
       resizeObserver.disconnect();
     };
-  }, []);
+  }, [rows.length, pageSize]); // Recalculate when data or page size changes
 
   const tableContent = (
     <div 
