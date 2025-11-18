@@ -51,6 +51,9 @@ export type { InfoPanelProps, InfoPanelOptions } from './InfoPanel.js';
 export { KeyValue } from './KeyValue.js';
 export type { KeyValueProps, KeyValueOptions } from './KeyValue.js';
 
+export { WidgetCard } from './WidgetCard.js';
+export type { WidgetCardProps } from './WidgetCard.js';
+
 export type { BaseWidgetProps, WidgetState } from './types.js';
 
 
