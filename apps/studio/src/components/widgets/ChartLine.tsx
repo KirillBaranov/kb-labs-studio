@@ -5,6 +5,7 @@
 
 import * as React from 'react';
 import { Skeleton, EmptyState, ErrorState } from './utils/index.js';
+import { WidgetCard } from './WidgetCard.js';
 import type { BaseWidgetProps } from './types.js';
 import { KBLineChart } from '@kb-labs/ui-react';
 
@@ -22,17 +23,37 @@ export interface ChartLineOptions {
   showLegend?: boolean;
   showTooltip?: boolean;
   height?: number;
+  /** Maximum height for flexible charts (default: 600px) */
+  maxHeight?: number;
+  /** Show card wrapper (default: true) */
+  showCard?: boolean;
 }
 
 export interface ChartLineProps extends BaseWidgetProps<ChartSeries[] | { series: ChartSeries[] }, ChartLineOptions> {}
 
-export function ChartLine({ data, loading, error, options }: ChartLineProps) {
+export function ChartLine({ data, loading, error, options, title, description, showTitle = true, showDescription = false }: ChartLineProps) {
+  const showCard = options?.showCard !== false;
+
   if (loading) {
-    return <Skeleton variant="chart" />;
+    const content = <Skeleton variant="chart" />;
+    return showCard ? (
+      <WidgetCard title={title} description={description} showTitle={showTitle} showDescription={showDescription}>
+        {content}
+      </WidgetCard>
+    ) : (
+      content
+    );
   }
 
   if (error) {
-    return <ErrorState error={error} />;
+    const content = <ErrorState error={error} />;
+    return showCard ? (
+      <WidgetCard title={title} description={description} showTitle={showTitle} showDescription={showDescription}>
+        {content}
+      </WidgetCard>
+    ) : (
+      content
+    );
   }
 
   const seriesArray: ChartSeries[] = Array.isArray(data)
@@ -42,12 +63,22 @@ export function ChartLine({ data, loading, error, options }: ChartLineProps) {
       : [];
 
   if (!seriesArray || seriesArray.length === 0) {
-    return <EmptyState title="No data" description="No chart data available" />;
+    const content = <EmptyState title="No data" description="No chart data available" />;
+    return showCard ? (
+      <WidgetCard title={title} description={description} showTitle={showTitle} showDescription={showDescription}>
+        {content}
+      </WidgetCard>
+    ) : (
+      content
+    );
   }
 
   const showLegend = options?.showLegend !== false;
   const showTooltip = options?.showTooltip !== false;
-  const height = options?.height || 300;
+  // Use fixed height if provided, otherwise use min-height for flexible sizing
+  const fixedHeight = options?.height;
+  const minHeight = fixedHeight || 300;
+  const maxHeight = options?.maxHeight || 600;
 
   const chartData = seriesArray.flatMap((series) =>
     series.points.map((point: { x: number | string; y: number }) => ({
@@ -57,18 +88,41 @@ export function ChartLine({ data, loading, error, options }: ChartLineProps) {
     }))
   );
 
-  return (
-    <div className="widget-chart-line">
-      <KBLineChart
-        data={chartData}
-        xField="x"
-        yField="y"
-        seriesField="series"
-        height={height}
-        legend={showLegend ? {} : false}
-        tooltip={showTooltip ? {} : false}
-      />
+  const chartContent = (
+    <div 
+      className="widget-chart-line" 
+      style={{ 
+        flex: 1, 
+        display: 'flex', 
+        flexDirection: 'column',
+        minHeight: `${minHeight}px`,
+        maxHeight: fixedHeight ? undefined : `${maxHeight}px`,
+        height: fixedHeight ? `${fixedHeight}px` : '100%',
+        width: '100%',
+        overflow: 'hidden',
+      }}
+    >
+      <div style={{ flex: 1, minHeight: 0, maxHeight: '100%', width: '100%', overflow: 'hidden' }}>
+        <KBLineChart
+          data={chartData}
+          xField="x"
+          yField="y"
+          seriesField="series"
+          height={fixedHeight || undefined}
+          autoFit={!fixedHeight}
+          legend={showLegend ? {} : false}
+          tooltip={showTooltip ? {} : false}
+        />
+      </div>
     </div>
+  );
+
+  return showCard ? (
+    <WidgetCard title={title} description={description} showTitle={showTitle} showDescription={showDescription}>
+      {chartContent}
+    </WidgetCard>
+  ) : (
+    chartContent
   );
 }
 
