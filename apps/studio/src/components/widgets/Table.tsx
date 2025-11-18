@@ -35,6 +35,35 @@ export function Table<T extends Record<string, unknown>>({
   showDescription = false,
 }: TableProps<T>) {
   const showCard = options?.showCard !== false;
+  
+  // Hooks must be called before early returns
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [scrollY, setScrollY] = React.useState<number>(400);
+
+  React.useLayoutEffect(() => {
+    if (!containerRef.current) {
+      return;
+    }
+    
+    const updateHeight = () => {
+      const container = containerRef.current;
+      if (!container) {
+        return;
+      }
+      
+      // Get container height
+      const height = container.clientHeight;
+      // Subtract pagination height (approximately 60-80px)
+      const tableHeight = Math.max(200, height - 80);
+      setScrollY(tableHeight);
+    };
+
+    updateHeight();
+    const resizeObserver = new ResizeObserver(updateHeight);
+    resizeObserver.observe(containerRef.current);
+    
+    return () => resizeObserver.disconnect();
+  }, []);
 
   if (loading) {
     const content = <Skeleton variant="table" rows={5} />;
@@ -74,7 +103,6 @@ export function Table<T extends Record<string, unknown>>({
   const columns = options?.columns || [];
   const pageSize = options?.pageSize || 20;
   const sortable = options?.sortable !== false;
-  const stickyHeader = options?.stickyHeader === true;
 
   // Convert data to columns if not provided
   const tableColumns: Column<T>[] = columns.length > 0
@@ -88,12 +116,14 @@ export function Table<T extends Record<string, unknown>>({
 
   const tableContent = (
     <div 
+      ref={containerRef}
       className="widget-table" 
       style={{ 
         height: '100%', 
         display: 'flex', 
         flexDirection: 'column', 
         minHeight: 0,
+        overflow: 'hidden',
       }}
     >
       <KBDataTable<T>
@@ -106,7 +136,7 @@ export function Table<T extends Record<string, unknown>>({
           showTotal: (total) => `Total ${total} items`,
         }}
         scroll={{
-          y: 'calc(100% - 60px)', // Subtract approximate pagination height
+          y: scrollY,
           x: 'max-content',
         }}
       />
