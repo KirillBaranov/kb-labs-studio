@@ -86,16 +86,44 @@ export function Table<T extends Record<string, unknown>>({
         render: (value: unknown) => String(value ?? ''),
       }));
 
+  // Use React ref to calculate available height dynamically
+  const tableContainerRef = React.useRef<HTMLDivElement>(null);
+  const [scrollHeight, setScrollHeight] = React.useState<number | string>(400);
+
+  React.useLayoutEffect(() => {
+    if (!tableContainerRef.current) return;
+    
+    const updateScrollHeight = () => {
+      const container = tableContainerRef.current;
+      if (!container) return;
+      
+      // Get available height: container height minus pagination (~60px)
+      const containerHeight = container.clientHeight;
+      const paginationHeight = 60; // Approximate pagination height
+      const availableHeight = Math.max(200, containerHeight - paginationHeight);
+      setScrollHeight(availableHeight);
+    };
+
+    updateScrollHeight();
+    
+    // Update on resize
+    const resizeObserver = new ResizeObserver(updateScrollHeight);
+    resizeObserver.observe(tableContainerRef.current);
+    
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
   const tableContent = (
     <div 
+      ref={tableContainerRef}
       className="widget-table" 
-      data-sticky-header={stickyHeader} 
       style={{ 
         height: '100%', 
         display: 'flex', 
         flexDirection: 'column', 
         minHeight: 0,
-        overflow: 'auto', // Enable scrolling for table content
       }}
     >
       <KBDataTable<T>
@@ -107,14 +135,11 @@ export function Table<T extends Record<string, unknown>>({
           showSizeChanger: true,
           showTotal: (total) => `Total ${total} items`,
         }}
+        scroll={{
+          y: scrollHeight,
+          x: 'max-content',
+        }}
       />
-      <style>{`
-        .widget-table[data-sticky-header="true"] {
-          position: sticky;
-          top: 0;
-          z-index: 10;
-        }
-      `}</style>
     </div>
   );
 

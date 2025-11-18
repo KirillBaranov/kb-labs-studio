@@ -19,6 +19,8 @@ export function KBDataTable<T extends Record<string, unknown>>({
   columns,
   data,
   onRowClick,
+  pagination,
+  scroll,
   ...props
 }: KBDataTableProps<T>) {
   const tableColumns = columns.map((col) => ({
@@ -49,7 +51,8 @@ export function KBDataTable<T extends Record<string, unknown>>({
         onClick: () => onRowClick?.(record),
         style: onRowClick ? { cursor: 'pointer' } : undefined,
       })}
-      pagination={false}
+      pagination={pagination !== undefined ? pagination : false}
+      scroll={scroll}
       showSorterTooltip={false}
       {...props}
     />
