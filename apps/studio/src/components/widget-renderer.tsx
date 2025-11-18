@@ -14,6 +14,9 @@ import { ErrorState } from './widgets/utils/index.js';
 import { trackWidgetEvent } from '../utils/analytics.js';
 import { studioConfig } from '../config/studio.config.js';
 import { HeaderPolicyCallout } from './header-policy-callout.js';
+import { WidgetErrorBoundary } from './widget-error-boundary.js';
+// eslint-disable-next-line import/extensions
+import { useWidgetEvents } from '../hooks/useWidgetEvents.js';
 
 /**
  * Widget kind to component mapping
@@ -90,6 +93,31 @@ export function WidgetRenderer({
     }
     return undefined;
   }, [registry, widgetId, pluginId]);
+
+  // Event bus for widget communication
+  const { subscribe, emit } = useWidgetEvents();
+
+  // Auto-subscribe to events from manifest
+  React.useEffect(() => {
+    if (!widget?.events?.subscribe) {
+      return;
+    }
+
+    const unsubscribes: Array<() => void> = [];
+
+    for (const eventName of widget.events.subscribe) {
+      const unsubscribe = subscribe(eventName, (payload) => {
+        // Emit event to widget component if it has onEvent prop
+        // This allows widgets to handle events declaratively
+        console.log(`Widget ${widgetId} received event ${eventName}:`, payload);
+      });
+      unsubscribes.push(unsubscribe);
+    }
+
+    return () => {
+      unsubscribes.forEach((unsub) => unsub());
+    };
+  }, [widget?.events?.subscribe, subscribe, widgetId]);
 
   // Track widget mount
   React.useEffect(() => {
@@ -279,20 +307,34 @@ export function WidgetRenderer({
     />
   ) : null;
 
-  // Render widget with data
+  // Extract showTitle and showDescription from options
+  // Default: showTitle=true for charts, false for others
+  const widgetOptions = widget.options as Record<string, unknown> | undefined;
+  const showTitle = widgetOptions?.showTitle as boolean | undefined;
+  const showDescription = widgetOptions?.showDescription as boolean | undefined;
+
+  // Render widget with data, wrapped in error boundary
   return (
     <>
       {headerNotice}
-      <WidgetComponent
-        data={widgetData.data}
-        loading={widgetData.loading}
-        error={widgetData.error}
-        options={widget.options}
-        layoutHint={layoutHint || widget.layoutHint}
-        onInteraction={(event: string) => {
-          trackWidgetEvent('interaction', { widgetId, pluginId, event });
-        }}
-      />
+      <WidgetErrorBoundary widgetId={widgetId} pluginId={pluginId}>
+        <WidgetComponent
+          data={widgetData.data}
+          loading={widgetData.loading}
+          error={widgetData.error}
+          options={widget.options}
+          title={widget.title}
+          description={widget.description}
+          showTitle={showTitle}
+          showDescription={showDescription}
+          layoutHint={layoutHint || widget.layoutHint}
+          emitEvent={emit}
+          subscribeToEvent={subscribe}
+          onInteraction={(event: string) => {
+            trackWidgetEvent('interaction', { widgetId, pluginId, event });
+          }}
+        />
+      </WidgetErrorBoundary>
     </>
   );
 }
