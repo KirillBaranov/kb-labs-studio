@@ -19,12 +19,12 @@ export interface HeaderPolicyCalloutProps {
 
 const toneStyles = {
   info: {
-    background: 'var(--kb-color-info-muted, rgba(32, 129, 226, 0.08))',
-    border: 'var(--kb-color-info-border, rgba(32, 129, 226, 0.35))',
+    background: 'color-mix(in srgb, var(--info) 8%, var(--bg-secondary))',
+    border: 'color-mix(in srgb, var(--info) 35%, transparent)',
   },
   danger: {
-    background: 'var(--kb-color-danger-muted, rgba(224, 36, 94, 0.08))',
-    border: 'var(--kb-color-danger-border, rgba(224, 36, 94, 0.35))',
+    background: 'color-mix(in srgb, var(--error) 8%, var(--bg-secondary))',
+    border: 'color-mix(in srgb, var(--error) 35%, transparent)',
   },
 } as const;
 
@@ -38,17 +38,17 @@ function Pill({
   const palette =
     tone === 'danger'
       ? {
-          background: 'rgba(224, 36, 94, 0.12)',
-          color: 'var(--kb-color-danger, #e0245e)',
+          background: 'color-mix(in srgb, var(--error) 12%, transparent)',
+          color: 'var(--error)',
         }
       : tone === 'info'
       ? {
-          background: 'rgba(32, 129, 226, 0.12)',
-          color: 'var(--kb-color-info, #2081e2)',
+          background: 'color-mix(in srgb, var(--info) 12%, transparent)',
+          color: 'var(--info)',
         }
       : {
-          background: 'rgba(110, 118, 129, 0.12)',
-          color: 'var(--kb-color-text-muted, #6e7681)',
+          background: 'color-mix(in srgb, var(--text-secondary) 12%, transparent)',
+          color: 'var(--text-secondary)',
         };
 
   return (
@@ -88,7 +88,7 @@ function ListRow({
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
         <span style={{ fontWeight: 600, fontSize: '0.82rem' }}>{title}</span>
-        <span style={{ fontSize: '0.8rem', color: 'var(--kb-color-text-muted)' }}>{emptyFallback}</span>
+        <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{emptyFallback}</span>
       </div>
     );
   }
@@ -134,8 +134,8 @@ export function HeaderPolicyCallout({
         borderRadius: 'var(--kb-radius-md, 10px)',
         border: `1px solid ${toneStyles[tone].border}`,
         background: toneStyles[tone].background,
-        color: 'var(--kb-color-text, #1f2328)',
-        boxShadow: '0 1px 2px rgba(15, 23, 42, 0.08)',
+        color: 'var(--text-primary)',
+        boxShadow: 'var(--shadow)',
       }}
     >
       <div
@@ -150,13 +150,13 @@ export function HeaderPolicyCallout({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>{title}</div>
           {description ? (
-            <div style={{ fontSize: '0.8rem', color: 'var(--kb-color-text-muted)' }}>{description}</div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{description}</div>
           ) : null}
           {missingRequired.length > 0 ? (
             <div
               style={{
                 fontSize: '0.82rem',
-                color: 'var(--kb-color-danger, #d9304c)',
+                color: 'var(--error)',
                 fontWeight: 600,
               }}
             >
@@ -166,7 +166,7 @@ export function HeaderPolicyCallout({
             <div
               style={{
                 fontSize: '0.82rem',
-                color: 'var(--kb-color-text-muted)',
+                color: 'var(--text-secondary)',
               }}
             >
               Studio enforces the manifest policy before issuing this request.
@@ -184,10 +184,10 @@ export function HeaderPolicyCallout({
               type="button"
               onClick={() => setExpanded(!expanded)}
               style={{
-                border: '1px solid rgba(31, 35, 40, 0.2)',
+                border: '1px solid var(--border-primary)',
                 borderRadius: '6px',
                 padding: '4px 10px',
-                background: 'white',
+                background: 'var(--bg-secondary)',
                 fontSize: '0.75rem',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -221,7 +221,7 @@ export function HeaderPolicyCallout({
               <span style={{ fontWeight: 600, fontSize: '0.82rem' }}>Allowed patterns</span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.78rem' }}>
                 {hints.patterns.map((pattern) => (
-                  <code key={pattern} style={{ background: 'rgba(15, 23, 42, 0.06)', padding: '2px 4px', borderRadius: '4px' }}>
+                  <code key={pattern} style={{ background: 'var(--bg-tertiary)', padding: '2px 4px', borderRadius: '4px' }}>
                     {pattern}
                   </code>
                 ))}
@@ -252,7 +252,7 @@ export function HeaderPolicyCallout({
           style={{
             marginTop: '12px',
             fontSize: '0.78rem',
-            color: 'var(--kb-color-danger, #d9304c)',
+            color: 'var(--error)',
             fontWeight: 600,
           }}
         >

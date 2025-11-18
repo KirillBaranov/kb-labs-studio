@@ -31,7 +31,7 @@ export function EmptyState({ title, description, icon, action }: EmptyStateProps
       description={
         <div>
           {title && <h3 style={{ marginBottom: 8, fontSize: 18, fontWeight: 600 }}>{title}</h3>}
-          {description && <p style={{ margin: 0, color: '#666' }}>{description}</p>}
+          {description && <p style={{ margin: 0, color: 'var(--text-secondary)' }}>{description}</p>}
         </div>
       }
     >

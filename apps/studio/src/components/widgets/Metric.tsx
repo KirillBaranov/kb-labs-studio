@@ -35,19 +35,19 @@ export function Metric({ data, loading, error, options }: MetricProps) {
   const compact = options?.compact === true;
 
   const valueStyle: React.CSSProperties = {};
-  if (status === 'ok') valueStyle.color = '#52c41a';
-  else if (status === 'warn') valueStyle.color = '#faad14';
-  else if (status === 'crit') valueStyle.color = '#f5222d';
+  if (status === 'ok') valueStyle.color = 'var(--success)';
+  else if (status === 'warn') valueStyle.color = 'var(--warning)';
+  else if (status === 'crit') valueStyle.color = 'var(--error)';
 
   return (
     <Card size={compact ? 'small' : 'default'} style={{ height: '100%' }}>
-      <div style={{ fontSize: '0.875rem', color: '#666', marginBottom: '0.5rem' }}>{label}</div>
+      <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>{label}</div>
       <div style={{ fontSize: '1.5rem', fontWeight: 700, lineHeight: 1.2, ...valueStyle }}>
         {value}
         {unit && <span style={{ fontSize: '1rem', fontWeight: 400, marginLeft: '0.5rem' }}>{unit}</span>}
       </div>
       {showDelta && delta !== undefined && (
-        <div style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: delta >= 0 ? '#52c41a' : '#f5222d' }}>
+        <div style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: delta >= 0 ? 'var(--success)' : 'var(--error)' }}>
           {delta >= 0 ? '↑' : '↓'} {Math.abs(delta)}
         </div>
       )}

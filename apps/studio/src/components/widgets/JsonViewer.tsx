@@ -24,11 +24,11 @@ function JsonNode({ value, path = '', level = 0, collapsed = false }: { value: u
   }
 
   if (typeof value === 'string') {
-    return <Typography.Text style={{ color: '#52c41a' }}>"{value}"</Typography.Text>;
+    return <Typography.Text style={{ color: 'var(--success)' }}>"{value}"</Typography.Text>;
   }
 
   if (typeof value === 'number' || typeof value === 'boolean') {
-    return <Typography.Text style={{ color: '#1890ff' }}>{String(value)}</Typography.Text>;
+    return <Typography.Text style={{ color: 'var(--info)' }}>{String(value)}</Typography.Text>;
   }
 
   if (Array.isArray(value)) {
@@ -122,7 +122,7 @@ export function JsonViewer({ data, loading, error, options }: JsonViewerProps) {
           overflow: 'auto',
           fontFamily: 'monospace',
           fontSize: '0.875rem',
-          backgroundColor: '#f5f5f5',
+          backgroundColor: 'var(--bg-tertiary)',
         }}
       >
         <JsonNode value={data} collapsed={collapsed} />

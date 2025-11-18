@@ -73,7 +73,11 @@ export function DiffViewer({ data, loading, error, options }: DiffViewerProps) {
                 style={{
                   display: 'flex',
                   padding: '0 0.5rem',
-                  backgroundColor: isOld ? '#fff1f0' : isNew ? '#f6ffed' : 'transparent',
+                  backgroundColor: isOld 
+                    ? 'color-mix(in srgb, var(--error) 10%, transparent)' 
+                    : isNew 
+                    ? 'color-mix(in srgb, var(--success) 10%, transparent)' 
+                    : 'transparent',
                 }}
               >
                 <Typography.Text

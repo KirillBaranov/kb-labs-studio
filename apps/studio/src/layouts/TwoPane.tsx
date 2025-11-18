@@ -95,18 +95,18 @@ export function TwoPane({
         .widget-two-pane__left {
           flex-shrink: 0;
           overflow: auto;
-          border-right: 1px solid var(--color-border, #ddd);
+          border-right: 1px solid var(--border-primary);
         }
         .widget-two-pane__resizer {
           width: 4px;
-          background: var(--color-border, #ddd);
+          background: var(--border-primary);
           cursor: col-resize;
           flex-shrink: 0;
           transition: background 0.2s;
         }
         .widget-two-pane__resizer:hover,
         .widget-two-pane__resizer[data-resizing="true"] {
-          background: var(--color-primary, #1890ff);
+          background: var(--link);
         }
         .widget-two-pane__right {
           flex: 1;

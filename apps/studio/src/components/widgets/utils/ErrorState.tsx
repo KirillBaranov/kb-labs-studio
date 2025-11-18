@@ -48,7 +48,7 @@ export function ErrorState({ error, retryable, hint, onRetry }: ErrorStateProps)
         ) : undefined
       }
     >
-      {errorHint && <p style={{ fontSize: '0.875rem', color: '#666', margin: 0 }}>{errorHint}</p>}
+      {errorHint && <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: 0 }}>{errorHint}</p>}
     </Result>
   );
 }

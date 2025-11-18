@@ -53,7 +53,7 @@ export function GalleryPage(): React.ReactElement {
     <div style={{ padding: '2rem' }}>
       <h1>Widget Gallery</h1>
       <p>Showcase of all available widgets</p>
-      <p style={{ color: '#666', fontSize: '0.875rem' }}>
+      <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
         Click on a widget in the sidebar to view it. Widgets are not loaded here to avoid unnecessary API calls.
       </p>
       <div style={{ marginTop: '2rem' }}>
@@ -72,7 +72,7 @@ export function GalleryPage(): React.ReactElement {
               <li key={`${widget.pluginId}:${widget.widgetId}`} style={{ marginBottom: '0.5rem' }}>
                 <a 
                   href={widgetPath}
-                  style={{ color: '#1890ff', textDecoration: 'none' }}
+                  style={{ color: 'var(--link)', textDecoration: 'none' }}
                   onClick={(e) => {
                     e.preventDefault();
                     window.location.href = widgetPath;

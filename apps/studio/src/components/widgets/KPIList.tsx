@@ -41,9 +41,10 @@ export function KPIList({ data, loading, error, options }: KPIListProps) {
   const compact = options?.compact === true;
 
   const statusColors: Record<string, string> = {
-    ok: '#52c41a',
-    warn: '#faad14',
-    crit: '#f5222d',
+    ok: 'var(--success)',
+    warn: 'var(--warning)',
+    crit: 'var(--error)',
+    default: 'var(--text-primary)',
   };
 
   const span = 24 / columns;
@@ -53,13 +54,13 @@ export function KPIList({ data, loading, error, options }: KPIListProps) {
       {data.map((kpi) => (
         <Col key={kpi.id} span={span}>
           <Card size={compact ? 'small' : 'default'} style={{ height: '100%' }}>
-            <div style={{ fontSize: '0.875rem', color: '#666', marginBottom: '0.5rem' }}>{kpi.label}</div>
-            <div style={{ fontSize: '1.25rem', fontWeight: 700, color: statusColors[kpi.status || 'default'] || '#333' }}>
+            <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>{kpi.label}</div>
+            <div style={{ fontSize: '1.25rem', fontWeight: 700, color: statusColors[kpi.status || 'default'] }}>
               {kpi.value}
               {kpi.unit && <span style={{ fontSize: '0.875rem', fontWeight: 400, marginLeft: '0.5rem' }}>{kpi.unit}</span>}
             </div>
             {kpi.delta !== undefined && (
-              <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: kpi.delta >= 0 ? '#52c41a' : '#f5222d' }}>
+              <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: kpi.delta >= 0 ? 'var(--success)' : 'var(--error)' }}>
                 {kpi.delta >= 0 ? '↑' : '↓'} {Math.abs(kpi.delta)}
               </div>
             )}

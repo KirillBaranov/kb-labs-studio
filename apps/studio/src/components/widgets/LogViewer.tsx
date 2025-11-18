@@ -74,8 +74,8 @@ export function LogViewer({ data, loading, error, options }: LogViewerProps) {
               key={index}
               style={{
                 padding: '0.5rem 0',
-                borderBottom: '1px solid #f0f0f0',
-                color: line.level === 'error' ? '#f5222d' : line.level === 'warn' ? '#faad14' : '#333',
+                borderBottom: '1px solid var(--border-primary)',
+                color: line.level === 'error' ? 'var(--error)' : line.level === 'warn' ? 'var(--warning)' : 'var(--text-primary)',
               }}
             >
               <Space split="|" style={{ width: '100%' }}>

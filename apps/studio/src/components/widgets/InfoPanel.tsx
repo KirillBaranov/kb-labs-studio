@@ -59,7 +59,7 @@ export function InfoPanel({ data, loading, error, options }: InfoPanelProps) {
 
     if (sectionData === null || sectionData === undefined) {
       return (
-        <Paragraph style={{ margin: 0, color: '#666' }}>
+        <Paragraph style={{ margin: 0, color: 'var(--text-secondary)' }}>
           No data provided.
         </Paragraph>
       );

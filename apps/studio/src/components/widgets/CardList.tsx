@@ -76,11 +76,11 @@ export function CardList({ data, loading, error, options, onCardClick }: CardLis
   const layout = options?.layout || 'grid';
 
   const statusColors: Record<string, string> = {
-    ok: '#52c41a',
-    warn: '#faad14',
-    crit: '#f5222d',
-    error: '#f5222d',
-    info: '#1890ff',
+    ok: 'var(--success)',
+    warn: 'var(--warning)',
+    crit: 'var(--error)',
+    error: 'var(--error)',
+    info: 'var(--info)',
   };
 
   const isNewFormat = (card: CardData | CardItem): card is CardData => {
@@ -140,7 +140,7 @@ export function CardList({ data, loading, error, options, onCardClick }: CardLis
             onClick={() => onCardClick?.(card)}
             style={{
               ...cardStyle,
-              borderLeft: status ? `4px solid ${statusColors[status] || '#d9d9d9'}` : undefined,
+              borderLeft: status ? `4px solid ${statusColors[status] || 'var(--border-primary)'}` : undefined,
             }}
           >
             <Card.Meta

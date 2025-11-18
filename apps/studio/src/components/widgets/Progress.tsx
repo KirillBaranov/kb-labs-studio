@@ -44,7 +44,7 @@ export function Progress({ data, loading, error, options }: ProgressProps) {
   if (stacked) {
     const segments = data.map((item) => ({
       percent: ((item.value / (item.max || 100)) * 100),
-      color: item.color || '#1890ff',
+      color: item.color || 'var(--info)',
     }));
 
     return (
@@ -84,7 +84,7 @@ export function Progress({ data, loading, error, options }: ProgressProps) {
             )}
             <AntProgress
               percent={percent}
-              strokeColor={item.color || '#1890ff'}
+              strokeColor={item.color || 'var(--info)'}
               showInfo={showValues}
             />
           </div>
