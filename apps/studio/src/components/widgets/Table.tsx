@@ -51,19 +51,35 @@ export function Table<T extends Record<string, unknown>>({
         return;
       }
       
-      // Get container height
-      const height = container.clientHeight;
-      // Subtract pagination height (approximately 60-80px)
-      const tableHeight = Math.max(200, height - 80);
-      setScrollY(tableHeight);
+      // Wait for table to render, then measure actual pagination height
+      requestAnimationFrame(() => {
+        const paginationElement = container.querySelector('.ant-pagination');
+        const paginationHeight = paginationElement 
+          ? paginationElement.getBoundingClientRect().height + 24 // Add extra margin/padding to ensure visibility
+          : 80; // Fallback
+        
+        // Get container height
+        const containerHeight = container.clientHeight;
+        // Subtract actual pagination height with extra margin
+        const tableHeight = Math.max(200, containerHeight - paginationHeight);
+        setScrollY(tableHeight);
+      });
     };
 
+    // Initial calculation after a short delay to ensure table is rendered
+    const timeoutId = setTimeout(updateHeight, 100);
     updateHeight();
-    const resizeObserver = new ResizeObserver(updateHeight);
+    
+    const resizeObserver = new ResizeObserver(() => {
+      updateHeight();
+    });
     resizeObserver.observe(containerRef.current);
     
-    return () => resizeObserver.disconnect();
-  }, []);
+    return () => {
+      clearTimeout(timeoutId);
+      resizeObserver.disconnect();
+    };
+  }, []); // ResizeObserver handles size changes automatically
 
   if (loading) {
     const content = <Skeleton variant="table" rows={5} />;
