@@ -86,60 +86,8 @@ export function Table<T extends Record<string, unknown>>({
         render: (value: unknown) => String(value ?? ''),
       }));
 
-  // Use React ref to calculate available height dynamically
-  const tableContainerRef = React.useRef<HTMLDivElement>(null);
-  const [scrollHeight, setScrollHeight] = React.useState<number | string>(400);
-
-  React.useLayoutEffect(() => {
-    if (!tableContainerRef.current) return;
-    
-    const updateScrollHeight = () => {
-      const container = tableContainerRef.current;
-      if (!container) return;
-      
-      // Use requestAnimationFrame to ensure DOM is updated
-      requestAnimationFrame(() => {
-        const paginationElement = container.querySelector('.ant-pagination');
-        const paginationHeight = paginationElement 
-          ? paginationElement.getBoundingClientRect().height + 24 // Add padding/margin
-          : 80; // Fallback if pagination not found yet
-        
-        const containerHeight = container.clientHeight;
-        // Use more conservative calculation: subtract pagination height + extra margin
-        // This ensures pagination is always visible
-        const availableHeight = Math.max(200, containerHeight - paginationHeight - 16);
-        
-        // Only update if height changed significantly (avoid flickering)
-        setScrollHeight((prev) => {
-          if (typeof prev === 'number' && Math.abs(prev - availableHeight) < 10) {
-            return prev;
-          }
-          return availableHeight;
-        });
-      });
-    };
-
-    // Initial calculation
-    updateScrollHeight();
-    
-    // Also try after a short delay to catch pagination rendering
-    const timeoutId = setTimeout(updateScrollHeight, 200);
-    
-    // Update on resize
-    const resizeObserver = new ResizeObserver(() => {
-      updateScrollHeight();
-    });
-    resizeObserver.observe(tableContainerRef.current);
-    
-    return () => {
-      clearTimeout(timeoutId);
-      resizeObserver.disconnect();
-    };
-  }, [rows.length, pageSize]); // Recalculate when data or page size changes
-
   const tableContent = (
     <div 
-      ref={tableContainerRef}
       className="widget-table" 
       style={{ 
         height: '100%', 
@@ -158,7 +106,7 @@ export function Table<T extends Record<string, unknown>>({
           showTotal: (total) => `Total ${total} items`,
         }}
         scroll={{
-          y: scrollHeight,
+          y: 'calc(100% - 60px)', // Subtract approximate pagination height
           x: 'max-content',
         }}
       />
