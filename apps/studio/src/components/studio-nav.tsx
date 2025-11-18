@@ -31,11 +31,29 @@ export function StudioNav() {
                   key={item.name}
                   to={item.to}
                   className={cn(
-                    'flex items-center space-x-2 px-3 py-4 text-sm font-medium transition-colors',
+                    'flex items-center space-x-2 px-3 py-4 text-sm font-medium transition-colors border-b-2',
                     isActive
-                      ? 'border-b-2 border-blue-500 text-blue-600 dark:text-blue-400'
-                      : 'text-gray-500 hover:text-gray-900 hover:border-b-2 hover:border-gray-300 border-b-2 border-transparent dark:text-gray-400 dark:hover:text-white'
+                      ? ''
+                      : 'border-transparent'
                   )}
+                  style={isActive ? {
+                    borderBottomColor: 'var(--link)',
+                    color: 'var(--link)',
+                  } : {
+                    color: 'var(--text-secondary)',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.color = 'var(--text-primary)';
+                      e.currentTarget.style.borderBottomColor = 'var(--border-primary)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.color = 'var(--text-secondary)';
+                      e.currentTarget.style.borderBottomColor = 'transparent';
+                    }
+                  }}
                 >
                   <Icon className="h-5 w-5" />
                   <span>{item.name}</span>

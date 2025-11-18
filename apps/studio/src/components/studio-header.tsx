@@ -16,7 +16,13 @@ export function StudioHeader() {
         <div className="flex items-center gap-4">
           <KBThemeToggle />
           
-          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400">
+          <div 
+            className="flex items-center justify-center w-8 h-8 rounded-full"
+            style={{
+              backgroundColor: 'color-mix(in srgb, var(--link) 15%, var(--bg-secondary))',
+              color: 'var(--link)',
+            }}
+          >
             <User className="h-5 w-5" />
           </div>
         </div>

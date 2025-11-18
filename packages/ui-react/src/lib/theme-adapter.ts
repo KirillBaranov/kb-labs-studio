@@ -101,8 +101,8 @@ export function getAntDesignTokens(theme: 'light' | 'dark' | 'auto' = 'light'): 
 
     // ============ Fill Colors (for input backgrounds, etc.) ============
     colorFill: 'var(--bg-tertiary, #F3F4F6)', // Fill uses tertiary background
-    colorFillSecondary: 'var(--bg-tertiary, #F3F4F6)',
-    colorFillTertiary: 'var(--bg-primary, #F9FAFB)',
+    colorFillSecondary: 'var(--bg-tertiary, #F3F4F6)', // Used for table row hover
+    colorFillTertiary: 'var(--bg-primary, #F9FAFB)', // Used for table header backgrounds
     colorFillQuaternary: 'var(--bg-primary, #F9FAFB)',
 
     // ============ Neutral Colors ============
@@ -177,6 +177,61 @@ export function getAntDesignTokens(theme: 'light' | 'dark' | 'auto' = 'light'): 
     screenLG: 992,
     screenXL: 1200,
     screenXXL: 1600,
+  };
+}
+
+/**
+ * Gets component-specific theme configurations
+ * Uses Ant Design's components API for proper theming without CSS overrides
+ */
+export function getAntDesignComponents(): ThemeConfig['components'] {
+  return {
+    Table: {
+      headerBg: 'var(--bg-tertiary)',
+      headerColor: 'var(--text-primary)',
+      rowHoverBg: 'var(--bg-tertiary)',
+      borderColor: 'var(--border-primary)',
+      colorText: 'var(--text-primary)',
+      colorTextHeading: 'var(--text-primary)',
+    },
+    Tag: {
+      defaultBg: 'var(--bg-tertiary)',
+      defaultColor: 'var(--text-primary)',
+      colorBorder: 'var(--border-primary)',
+      // Color variants will use their respective color tokens
+      colorSuccess: 'var(--success)',
+      colorError: 'var(--error)',
+      colorWarning: 'var(--warning)',
+      colorInfo: 'var(--info)',
+    },
+    Badge: {
+      colorError: 'var(--error)',
+      colorSuccess: 'var(--success)',
+      colorWarning: 'var(--warning)',
+      colorInfo: 'var(--info)',
+      colorText: 'var(--text-primary)',
+    },
+    Alert: {
+      colorSuccess: 'var(--success)',
+      colorError: 'var(--error)',
+      colorWarning: 'var(--warning)',
+      colorInfo: 'var(--info)',
+      colorText: 'var(--text-primary)',
+      colorTextHeading: 'var(--text-primary)',
+      colorBgContainer: 'var(--bg-secondary)',
+      colorBorder: 'var(--border-primary)',
+    },
+    Card: {
+      colorText: 'var(--text-primary)',
+      colorTextHeading: 'var(--text-primary)',
+      colorBorderSecondary: 'var(--border-primary)',
+      colorBgContainer: 'var(--bg-secondary)',
+    },
+    Descriptions: {
+      colorText: 'var(--text-primary)',
+      colorTextLabel: 'var(--text-secondary)',
+      colorBorder: 'var(--border-primary)',
+    },
   };
 }
 

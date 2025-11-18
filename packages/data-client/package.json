@@ -17,12 +17,13 @@
     "clean": "rimraf dist && find src -name '*.js' -type f ! -path '*/node_modules/*' -delete && find src -name '*.js.map' -type f ! -path '*/node_modules/*' -delete",
     "build": "pnpm clean && tsup",
     "type-check": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
     "lint": "eslint . --max-warnings=0",
     "prebuild": "pnpm clean"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.62.23",
-    "@kb-labs/api-contracts": "link:../../../kb-labs-api-contracts/packages/api-contracts",
+    "@kb-labs/api-contracts": "link:../../../kb-labs-rest-api/packages/api-contracts",
     "zod": "^3.24.1",
     "ulid": "^2.3.0"
   },
@@ -34,7 +35,8 @@
     "react": "^18.3.1",
     "rimraf": "^6",
     "tsup": "^8",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.4"
   },
   "peerDependencies": {
     "react": "^18.3.1"

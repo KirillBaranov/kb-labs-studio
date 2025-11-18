@@ -4,10 +4,6 @@ export default [
   ...reactPreset,
   {
     ignores: [
-      '**/dist/**',
-      '**/coverage/**',
-      '**/node_modules/**',
-      '**/*.d.ts',
       '**/tsup.config.ts',
       '**/vitest.config.ts'
     ]

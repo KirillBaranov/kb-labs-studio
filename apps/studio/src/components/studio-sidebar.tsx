@@ -112,7 +112,7 @@ export function StudioSidebar() {
                       className={cn(
                         'flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors flex-1',
                         isActive
-                          ? 'bg-blue-50 text-blue-600 border-l-2 border-blue-500 dark:bg-blue-900/50 dark:text-blue-400'
+                          ? 'border-l-2 menu-item-active'
                           : 'hover:bg-theme-secondary'
                       )}
                     >

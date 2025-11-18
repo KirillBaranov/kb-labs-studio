@@ -187,25 +187,21 @@ a:hover {
   color: var(--text-tertiary);
 }
 
-/* Ant Design Table overrides to use CSS variables */
-.kb-table .ant-table,
-.kb-table .ant-table-thead > tr > th {
-  background-color: var(--bg-secondary) !important;
-  color: var(--text-primary) !important;
-  border-bottom: 1px solid var(--border-primary) !important;
+/* Ant Design component styles are now handled via ThemeConfig.components API */
+/* This ensures proper theming without CSS overrides */
+
+/* Active menu item styles */
+.menu-item-active {
+  background-color: var(--accent-subtle) !important;
+  color: var(--link) !important;
+  border-left-color: var(--link) !important;
 }
 
-.kb-table .ant-table-tbody > tr > td {
-  background-color: var(--bg-secondary) !important;
-  color: var(--text-primary) !important;
-  border-bottom: 1px solid var(--border-primary) !important;
-}
-
-.kb-table .ant-table-tbody > tr:hover > td {
-  background-color: var(--bg-tertiary) !important;
-}
-
-.kb-table .ant-table-thead > tr > th.ant-table-column-sort {
-  background-color: var(--bg-tertiary) !important;
+/* Ensure better visibility in dark theme - use more visible blue */
+.dark .menu-item-active {
+  /* Use rgba with link color at 20% opacity on tertiary background */
+  background-color: rgba(59, 130, 246, 0.2) !important; /* var(--link) #3B82F6 with 20% opacity */
+  color: var(--link-hover) !important; /* Use lighter blue for text */
+  border-left-color: var(--link) !important;
 }
 

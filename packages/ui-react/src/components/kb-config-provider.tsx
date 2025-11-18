@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ConfigProvider } from 'antd';
 import type { ConfigProviderProps, ThemeConfig } from 'antd';
-import { getAntDesignTokens, getThemeAlgorithm } from '../lib/theme-adapter';
+import { getAntDesignTokens, getAntDesignComponents, getThemeAlgorithm } from '../lib/theme-adapter';
 
 export type ThemeMode = 'light' | 'dark' | 'auto';
 
@@ -65,6 +65,7 @@ export function KBConfigProvider({
 
   // Tokens now use CSS variables via var() - no need to recompute
   const tokens = React.useMemo(() => getAntDesignTokens(actualTheme), [actualTheme]);
+  const components = React.useMemo(() => getAntDesignComponents(), []);
   // Don't use algorithm - it would invert colors again
   // CSS variables already handle theme switching via .light/.dark classes
   // const algorithm = React.useMemo(() => getThemeAlgorithm(theme), [theme]);
@@ -74,9 +75,10 @@ export function KBConfigProvider({
   const themeConfig: ThemeConfig = React.useMemo(
     () => ({
       token: tokens,
+      components: components,
       // algorithm: algorithm, // Disabled - CSS variables handle theme
     }),
-    [tokens]
+    [tokens, components]
   );
 
   return (

@@ -17,6 +17,7 @@
     "clean": "rimraf dist",
     "build": "tsup",
     "type-check": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
     "lint": "eslint . --max-warnings=0"
   },
   "devDependencies": {
@@ -24,7 +25,8 @@
     "eslint": "^9",
     "rimraf": "^6",
     "tsup": "^8",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.4"
   },
   "peerDependencies": {}
 }
