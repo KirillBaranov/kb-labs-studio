@@ -79,9 +79,8 @@ export function KBSidebar({
           key: menuKey,
           icon: item.icon,
           label: item.label,
-          // Make all items with path selectable (including children)
-          // This ensures onClick/onSelect will fire for nested items
-          selectable: hasPath,
+          // Note: selectable is not a valid Menu.Item prop in Ant Design
+          // Items are selectable by default if they have a key
         };
 
         if (hasChildren && item.children) {

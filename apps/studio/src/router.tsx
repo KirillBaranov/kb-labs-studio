@@ -12,6 +12,7 @@ import { SettingsPage } from './modules/settings/pages/settings-page';
 import { WorkflowsListPage } from './modules/workflows/pages/workflows-list-page';
 import { WorkflowRunPage } from './modules/workflows/pages/workflow-run-page';
 import { GalleryPage } from './pages/gallery-page';
+import { WidgetModalManager } from './components/widget-modal';
 import { createStudioLogger } from './utils/logger.js';
 
 type PluginNavRoute = {
@@ -146,6 +147,7 @@ function LayoutContent() {
     >
       <HealthBanner />
       <Outlet />
+      <WidgetModalManager />
     </KBPageLayout>
   );
 }
