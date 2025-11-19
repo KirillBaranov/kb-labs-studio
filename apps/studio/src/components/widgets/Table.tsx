@@ -35,51 +35,6 @@ export function Table<T extends Record<string, unknown>>({
   showDescription = false,
 }: TableProps<T>) {
   const showCard = options?.showCard !== false;
-  
-  // Hooks must be called before early returns
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const [scrollY, setScrollY] = React.useState<number>(400);
-
-  React.useLayoutEffect(() => {
-    if (!containerRef.current) {
-      return;
-    }
-    
-    const updateHeight = () => {
-      const container = containerRef.current;
-      if (!container) {
-        return;
-      }
-      
-      // Wait for table to render, then measure actual pagination height
-      requestAnimationFrame(() => {
-        const paginationElement = container.querySelector('.ant-pagination');
-        const paginationHeight = paginationElement 
-          ? paginationElement.getBoundingClientRect().height + 24 // Add extra margin/padding to ensure visibility
-          : 80; // Fallback
-        
-        // Get container height
-        const containerHeight = container.clientHeight;
-        // Subtract actual pagination height with extra margin
-        const tableHeight = Math.max(200, containerHeight - paginationHeight);
-        setScrollY(tableHeight);
-      });
-    };
-
-    // Initial calculation after a short delay to ensure table is rendered
-    const timeoutId = setTimeout(updateHeight, 100);
-    updateHeight();
-    
-    const resizeObserver = new ResizeObserver(() => {
-      updateHeight();
-    });
-    resizeObserver.observe(containerRef.current);
-    
-    return () => {
-      clearTimeout(timeoutId);
-      resizeObserver.disconnect();
-    };
-  }, []); // ResizeObserver handles size changes automatically
 
   if (loading) {
     const content = <Skeleton variant="table" rows={5} />;
@@ -120,6 +75,23 @@ export function Table<T extends Record<string, unknown>>({
   const pageSize = options?.pageSize || 20;
   const sortable = options?.sortable !== false;
 
+  // Helper function to render cell values properly
+  const renderCellValue = (value: unknown): React.ReactNode => {
+    if (value === null || value === undefined) {
+      return '';
+    }
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      return String(value);
+    }
+    if (Array.isArray(value)) {
+      return value.length > 0 ? JSON.stringify(value) : '';
+    }
+    if (typeof value === 'object') {
+      return JSON.stringify(value);
+    }
+    return String(value);
+  };
+
   // Convert data to columns if not provided
   const tableColumns: Column<T>[] = columns.length > 0
     ? columns
@@ -127,19 +99,17 @@ export function Table<T extends Record<string, unknown>>({
         id: key,
         label: key,
         sortable,
-        render: (value: unknown) => String(value ?? ''),
+        render: renderCellValue,
       }));
 
   const tableContent = (
     <div 
-      ref={containerRef}
       className="widget-table" 
       style={{ 
         height: '100%', 
         display: 'flex', 
         flexDirection: 'column', 
         minHeight: 0,
-        overflow: 'hidden',
       }}
     >
       <KBDataTable<T>
@@ -152,7 +122,6 @@ export function Table<T extends Record<string, unknown>>({
           showTotal: (total) => `Total ${total} items`,
         }}
         scroll={{
-          y: scrollY,
           x: 'max-content',
         }}
       />
@@ -165,7 +134,7 @@ export function Table<T extends Record<string, unknown>>({
       description={description} 
       showTitle={showTitle} 
       showDescription={showDescription}
-      bodyStyle={{ padding: 0, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}
+      bodyStyle={{ padding: 0, display: 'flex', flexDirection: 'column', minHeight: 0 }}
     >
       {tableContent}
     </WidgetCard>

@@ -394,3 +394,5 @@ function validateLayout(layout: StudioLayoutDecl, widgets: StudioWidgetDecl[]) {
 
 Это сделает подход более удобным для разработчиков без кардинальных изменений архитектуры.
 
+
+

@@ -47,4 +47,51 @@ export interface BaseWidgetProps<T = unknown, O = unknown> extends WidgetState<T
   onInteraction?: (event: string) => void;
 }
 
+/**
+ * Form field types
+ */
+export type FormFieldType = 'text' | 'textarea' | 'select' | 'number' | 'checkbox';
+
+/**
+ * Form field configuration
+ */
+export interface FormField {
+  name: string;
+  type: FormFieldType;
+  label: string;
+  placeholder?: string;
+  required?: boolean;
+  defaultValue?: string | number | boolean;
+  options?: Array<{ label: string; value: string | number }>; // For select fields
+  rows?: number; // For textarea
+}
+
+/**
+ * Form widget options
+ */
+export interface FormWidgetOptions {
+  fields: FormField[];
+  submitLabel?: string;
+  onSuccess?: {
+    emitEvent?: string;
+    eventPayloadFactory?: (data: unknown, formData: Record<string, unknown>) => unknown;
+  };
+}
+
+/**
+ * Input display widget options
+ */
+export interface InputDisplayWidgetOptions {
+  input: {
+    type: 'text' | 'textarea';
+    placeholder?: string;
+    submitLabel?: string;
+    rows?: number;
+  };
+  display?: {
+    kind?: string; // Widget kind for displaying results
+    subscribeTo?: string; // Event name to subscribe to
+  };
+}
+
 

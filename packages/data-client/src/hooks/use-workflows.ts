@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { qk } from '../query-keys'
-import type { WorkflowDataSource, WorkflowRunsFilters } from '../sources/workflow-source'
+import type { WorkflowDataSource, WorkflowRunsFilters, WorkflowRunParams } from '../sources/workflow-source'
 import type { WorkflowLogEvent, WorkflowPresenterEvent } from '../contracts/workflows'
 
 export function useWorkflowRuns(
@@ -35,6 +35,24 @@ export function useCancelWorkflowRun(source: WorkflowDataSource) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (runId: string) => source.cancelRun(runId),
+    onSuccess: (run) => {
+      void queryClient.invalidateQueries({ queryKey: qk.workflows.all, exact: false })
+      if (run?.id) {
+        void queryClient.invalidateQueries({ queryKey: qk.workflows.run(run.id) })
+      }
+    },
+  })
+}
+
+export function useRunWorkflow(source: WorkflowDataSource) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (params: WorkflowRunParams) => {
+      if (!source.runWorkflow) {
+        throw new Error('Workflow source does not support running workflows')
+      }
+      return await source.runWorkflow(params)
+    },
     onSuccess: (run) => {
       void queryClient.invalidateQueries({ queryKey: qk.workflows.all, exact: false })
       if (run?.id) {

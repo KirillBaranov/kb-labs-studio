@@ -79,23 +79,60 @@ export function InfoPanel({ data, loading, error, options }: InfoPanelProps) {
     if (format === 'keyvalue') {
       // Convert object to KeyValue format
       if (typeof sectionData === 'object' && sectionData !== null && !Array.isArray(sectionData)) {
-        const items: KeyValueData['items'] = Object.entries(sectionData).map(([key, value]) => ({
-          key,
-          value: String(value ?? ''),
-          type:
-            typeof value === 'number'
-              ? 'number'
-              : typeof value === 'boolean'
-              ? 'boolean'
-              : 'string',
-        }));
+        const items: KeyValueData['items'] = Object.entries(sectionData).map(([key, value]) => {
+          // Properly convert value to string
+          let stringValue: string;
+          if (value === null || value === undefined) {
+            stringValue = '';
+          } else if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+            stringValue = String(value);
+          } else if (Array.isArray(value)) {
+            stringValue = JSON.stringify(value);
+          } else if (typeof value === 'object') {
+            stringValue = JSON.stringify(value);
+          } else {
+            stringValue = String(value);
+          }
+
+          return {
+            key,
+            value: stringValue,
+            type:
+              typeof value === 'number'
+                ? 'number'
+                : typeof value === 'boolean'
+                ? 'boolean'
+                : 'string',
+          };
+        });
         return <KeyValue data={{ items }} loading={false} error={null} />;
       }
       // If already in KeyValue format
       if (typeof sectionData === 'object' && 'items' in sectionData) {
+        const keyValueData = sectionData as KeyValueData;
+        // Ensure all values are properly converted to strings
+        const normalizedItems: KeyValueData['items'] = keyValueData.items.map((item) => {
+          let stringValue: string;
+          const value = item.value;
+          if (value === null || value === undefined) {
+            stringValue = '';
+          } else if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+            stringValue = String(value);
+          } else if (Array.isArray(value)) {
+            stringValue = JSON.stringify(value);
+          } else if (typeof value === 'object') {
+            stringValue = JSON.stringify(value);
+          } else {
+            stringValue = String(value);
+          }
+          return {
+            ...item,
+            value: stringValue,
+          };
+        });
         return (
           <KeyValue
-            data={sectionData as KeyValueData}
+            data={{ items: normalizedItems }}
             loading={false}
             error={null}
           />

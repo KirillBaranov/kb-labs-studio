@@ -51,9 +51,15 @@ export type { InfoPanelProps, InfoPanelOptions } from './InfoPanel.js';
 export { KeyValue } from './KeyValue.js';
 export type { KeyValueProps, KeyValueOptions } from './KeyValue.js';
 
+export { Form } from './Form.js';
+export type { FormProps, FormWidgetOptions } from './Form.js';
+
+export { InputDisplay } from './InputDisplay.js';
+export type { InputDisplayProps, InputDisplayWidgetOptions } from './InputDisplay.js';
+
 export { WidgetCard } from './WidgetCard.js';
 export type { WidgetCardProps } from './WidgetCard.js';
 
-export type { BaseWidgetProps, WidgetState } from './types.js';
+export type { BaseWidgetProps, WidgetState, FormField, FormFieldType } from './types.js';
 
 

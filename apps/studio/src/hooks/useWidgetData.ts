@@ -62,7 +62,7 @@ function headerCase(name: string): string {
     .join('-');
 }
 
-function filterHeaders(
+export function filterHeaders(
   headers: Record<string, string> | undefined,
   hints?: StudioHeaderHints
 ): HeaderFilterResult {
@@ -423,6 +423,13 @@ export function useWidgetData<T = unknown>({
     [source, resolvedBasePath, pluginId, headerHints]
   );
 
+  // Don't auto-fetch POST requests without explicit body (they should use mutations)
+  const isPostWithoutBody = source.type === 'rest' 
+    && (source.method === 'POST' || source.method === 'PUT' || source.method === 'PATCH')
+    && !('body' in source && source.body !== undefined);
+  
+  const effectiveEnabled = enabled && !isPostWithoutBody;
+
   const {
     data,
     isLoading,
@@ -433,7 +440,7 @@ export function useWidgetData<T = unknown>({
   } = useQuery({
     queryKey,
     queryFn,
-    enabled,
+    enabled: effectiveEnabled,
     staleTime: 5_000,
     gcTime: 60_000,
     refetchInterval: pollingMs > 0 ? pollingMs : undefined,

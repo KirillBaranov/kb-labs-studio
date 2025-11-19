@@ -37,6 +37,8 @@ const WIDGET_COMPONENTS: Record<string, React.ComponentType<any>> = {
   progress: Widgets.Progress,
   infopanel: Widgets.InfoPanel, // Universal info panel widget
   keyvalue: Widgets.KeyValue, // Universal key-value widget
+  form: Widgets.Form, // Form widget for interactive forms
+  'input-display': Widgets.InputDisplay, // Input + display widget
 };
 
 /**
@@ -333,6 +335,10 @@ export function WidgetRenderer({
           onInteraction={(event: string) => {
             trackWidgetEvent('interaction', { widgetId, pluginId, event });
           }}
+          widgetId={widgetId}
+          pluginId={manifestId}
+          source={widget?.data?.source}
+          headerHints={headerHints}
         />
       </WidgetErrorBoundary>
     </>
