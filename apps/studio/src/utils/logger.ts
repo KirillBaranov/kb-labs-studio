@@ -1,3 +1,11 @@
+/**
+ * @module Studio Logger
+ * Browser-compatible logger for Studio application
+ * 
+ * Uses console.log for browser compatibility while maintaining structured logging format.
+ * For production, consider integrating with @kb-labs/core-sys/logging if browser support is added.
+ */
+
 type Fields = Record<string, unknown>;
 
 export interface StudioLogger {
@@ -10,6 +18,12 @@ export interface StudioLogger {
 const sessionTraceId = resolveTraceId();
 const sessionReqId = resolveReqId();
 
+/**
+ * Create Studio logger with scope and context
+ * 
+ * Note: Studio runs in browser, so we use console.log directly.
+ * The structured format is maintained for consistency with the new logging system.
+ */
 export function createStudioLogger(scope: string, context: Fields = {}): StudioLogger {
   const baseFields: Fields = {
     scope,
@@ -43,6 +57,10 @@ export function createStudioLogger(scope: string, context: Fields = {}): StudioL
   };
 }
 
+/**
+ * Emit structured log to console
+ * Maintains compatibility with new logging system format
+ */
 function emit(
   level: 'debug' | 'info' | 'warn' | 'error',
   scope: string,
@@ -53,18 +71,24 @@ function emit(
   const combinedFields = { ...base, ...(extra ?? {}) };
   const { traceId: fieldTraceId, reqId: fieldReqId, layer, ...rest } = combinedFields;
 
+  // Structured payload matching LogRecord format from @kb-labs/core-sys/logging
   const payload = {
-    ts: new Date().toISOString(),
+    time: new Date().toISOString(),
     level,
+    category: `studio:${scope}`,
+    msg: message,
     traceId: (fieldTraceId as string | undefined) ?? sessionTraceId,
     reqId: (fieldReqId as string | undefined) ?? sessionReqId,
-    layer: typeof layer === 'string' ? layer : 'studio',
-    msg: `[${scope}] ${message}`,
-    ...(Object.keys(rest).length > 0 ? { fields: rest } : {}),
+    meta: {
+      layer: typeof layer === 'string' ? layer : 'studio',
+      scope,
+      ...rest,
+    },
   };
 
   const serialized = JSON.stringify(payload);
 
+  // Use appropriate console method
   if (level === 'error') {
     console.error(serialized);
   } else if (level === 'warn') {
