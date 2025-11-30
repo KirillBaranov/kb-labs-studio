@@ -6,8 +6,8 @@
 import * as React from 'react';
 import { Modal as AntModal } from 'antd';
 import type { ModalProps } from 'antd';
-import { WidgetRenderer } from './widget-renderer.js';
-import { useWidgetEvents } from '../hooks/useWidgetEvents.js';
+import { WidgetRenderer } from './widget-renderer';
+import { useWidgetEvents } from '../hooks/useWidgetEvents';
 
 export interface WidgetModalConfig {
   modalId: string;

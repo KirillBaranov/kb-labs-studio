@@ -6,8 +6,8 @@
 import * as React from 'react';
 import { Button, Typography, Space, Card } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
-import { Skeleton, EmptyState, ErrorState } from './utils/index.js';
-import type { BaseWidgetProps } from './types.js';
+import { Skeleton, EmptyState, ErrorState } from './utils/index';
+import type { BaseWidgetProps } from './types';
 
 export interface JsonViewerOptions {
   collapsed?: boolean;

@@ -3,13 +3,13 @@
  * Widget utility components
  */
 
-export { EmptyState } from './EmptyState.js';
-export type { EmptyStateProps } from './EmptyState.js';
+export { EmptyState } from './EmptyState';
+export type { EmptyStateProps } from './EmptyState';
 
-export { ErrorState } from './ErrorState.js';
-export type { ErrorStateProps } from './ErrorState.js';
+export { ErrorState } from './ErrorState';
+export type { ErrorStateProps } from './ErrorState';
 
-export { Skeleton } from './Skeleton.js';
-export type { SkeletonProps, SkeletonVariant } from './Skeleton.js';
+export { Skeleton } from './Skeleton';
+export type { SkeletonProps, SkeletonVariant } from './Skeleton';
 
 

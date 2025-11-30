@@ -5,7 +5,7 @@
 
 import * as React from 'react';
 import { Button, Card } from 'antd';
-import { trackWidgetEvent } from '../utils/analytics.js';
+import { trackWidgetEvent } from '../utils/analytics';
 
 export interface WidgetErrorBoundaryProps {
   /** Widget ID for tracking */

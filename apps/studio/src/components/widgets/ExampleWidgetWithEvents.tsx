@@ -5,8 +5,8 @@
 
 import * as React from 'react';
 import { Button, Card } from 'antd';
-import { useWidgetEvents } from '../../hooks/useWidgetEvents.js';
-import type { BaseWidgetProps } from './types.js';
+import { useWidgetEvents } from '../../hooks/useWidgetEvents';
+import type { BaseWidgetProps } from './types';
 
 export interface ExampleWidgetWithEventsProps extends BaseWidgetProps<{ count: number }, Record<string, unknown>> {}
 

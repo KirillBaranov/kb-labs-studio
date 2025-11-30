@@ -7,8 +7,8 @@ import * as React from 'react';
 import { Button, Dropdown, Space, Tooltip } from 'antd';
 import type { MenuProps } from 'antd';
 import * as Icons from '@ant-design/icons';
-import type { WidgetAction } from '../types/actions.js';
-import { useWidgetActions } from '../hooks/useWidgetActions.js';
+import type { WidgetAction } from '../types/actions';
+import { useWidgetActions } from '../hooks/useWidgetActions';
 import { Modal } from 'antd';
 
 export interface ActionToolbarProps {

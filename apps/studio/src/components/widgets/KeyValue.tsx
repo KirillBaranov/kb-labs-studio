@@ -5,8 +5,8 @@
 
 import * as React from 'react';
 import { Descriptions, Tag, Space, Typography } from 'antd';
-import { Skeleton, EmptyState, ErrorState } from './utils/index.js';
-import type { BaseWidgetProps } from './types.js';
+import { Skeleton, EmptyState, ErrorState } from './utils/index';
+import type { BaseWidgetProps } from './types';
 import type { KeyValueData } from '@kb-labs/plugin-manifest';
 
 const { Text } = Typography;

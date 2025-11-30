@@ -5,11 +5,11 @@
 
 import * as React from 'react';
 import { Card, Collapse, Tabs, Typography } from 'antd';
-import { Skeleton, EmptyState, ErrorState } from './utils/index.js';
-import type { BaseWidgetProps } from './types.js';
+import { Skeleton, EmptyState, ErrorState } from './utils/index';
+import type { BaseWidgetProps } from './types';
 import type { InfoPanelData, KeyValueData } from '@kb-labs/plugin-manifest';
-import { JsonViewer } from './JsonViewer.js';
-import { KeyValue } from './KeyValue.js';
+import { JsonViewer } from './JsonViewer';
+import { KeyValue } from './KeyValue';
 
 const { Panel } = Collapse;
 const { Paragraph, Text } = Typography;

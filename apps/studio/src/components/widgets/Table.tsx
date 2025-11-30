@@ -4,9 +4,9 @@
  */
 
 import * as React from 'react';
-import { Skeleton, EmptyState, ErrorState } from './utils/index.js';
-import { WidgetCard } from './WidgetCard.js';
-import type { BaseWidgetProps } from './types.js';
+import { Skeleton, EmptyState, ErrorState } from './utils/index';
+import { WidgetCard } from './WidgetCard';
+import type { BaseWidgetProps } from './types';
 import { KBDataTable } from '@kb-labs/ui-react';
 import type { Column } from '@kb-labs/ui-react';
 

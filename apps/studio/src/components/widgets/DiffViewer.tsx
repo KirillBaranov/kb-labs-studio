@@ -5,8 +5,8 @@
 
 import * as React from 'react';
 import { Collapse, Typography, Tag, Space } from 'antd';
-import { Skeleton, EmptyState, ErrorState } from './utils/index.js';
-import type { BaseWidgetProps } from './types.js';
+import { Skeleton, EmptyState, ErrorState } from './utils/index';
+import type { BaseWidgetProps } from './types';
 
 export interface DiffHunk {
   oldStart: number;

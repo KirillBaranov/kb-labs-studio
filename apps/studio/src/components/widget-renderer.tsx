@@ -4,19 +4,19 @@
  */
 
 import * as React from 'react';
-import { useRegistry } from '../providers/registry-provider.js';
-import { useWidgetData } from '../hooks/useWidgetData.js';
+import { useRegistry } from '../providers/registry-provider';
+import { useWidgetData } from '../hooks/useWidgetData';
 import { resolveComponentPath } from '@kb-labs/plugin-adapter-studio';
 import type { StudioRegistryEntry } from '@kb-labs/plugin-adapter-studio';
-import * as Widgets from './widgets/index.js';
-import { Skeleton } from './widgets/utils/index.js';
-import { ErrorState } from './widgets/utils/index.js';
-import { trackWidgetEvent } from '../utils/analytics.js';
-import { studioConfig } from '../config/studio.config.js';
-import { HeaderPolicyCallout } from './header-policy-callout.js';
-import { WidgetErrorBoundary } from './widget-error-boundary.js';
+import * as Widgets from './widgets/index';
+import { Skeleton } from './widgets/utils/index';
+import { ErrorState } from './widgets/utils/index';
+import { trackWidgetEvent } from '../utils/analytics';
+import { studioConfig } from '../config/studio.config';
+import { HeaderPolicyCallout } from './header-policy-callout';
+import { WidgetErrorBoundary } from './widget-error-boundary';
 // eslint-disable-next-line import/extensions
-import { useWidgetEvents } from '../hooks/useWidgetEvents.js';
+import { useWidgetEvents } from '../hooks/useWidgetEvents';
 
 /**
  * Widget kind to component mapping

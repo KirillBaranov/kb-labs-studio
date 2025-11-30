@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { HeaderPolicyCallout } from '../header-policy-callout.js';
+import { HeaderPolicyCallout } from '../header-policy-callout';
 import type { StudioHeaderHints } from '@kb-labs/plugin-adapter-studio';
-import type { HeaderStatus } from '../../hooks/useWidgetData.js';
+import type { HeaderStatus } from '../../hooks/useWidgetData';
 
 const baseHints: StudioHeaderHints = {
   required: ['x-api-key'],

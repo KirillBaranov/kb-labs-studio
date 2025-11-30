@@ -5,9 +5,9 @@
 
 import * as React from 'react';
 import { Form as AntForm, Input, Button, Select, InputNumber, Checkbox, message } from 'antd';
-import type { BaseWidgetProps, FormWidgetOptions, FormField } from './types.js';
-import { useWidgetMutation } from '../../hooks/useWidgetMutation.js';
-import { studioConfig } from '../../config/studio.config.js';
+import type { BaseWidgetProps, FormWidgetOptions, FormField } from './types';
+import { useWidgetMutation } from '../../hooks/useWidgetMutation';
+import { studioConfig } from '../../config/studio.config';
 import type { DataSource } from '@kb-labs/plugin-manifest';
 import type { StudioHeaderHints } from '@kb-labs/plugin-adapter-studio';
 

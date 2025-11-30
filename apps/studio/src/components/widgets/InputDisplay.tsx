@@ -5,13 +5,13 @@
 
 import * as React from 'react';
 import { Input, Button, message } from 'antd';
-import type { BaseWidgetProps, InputDisplayWidgetOptions } from './types.js';
-import { useWidgetMutation } from '../../hooks/useWidgetMutation.js';
-import { studioConfig } from '../../config/studio.config.js';
+import type { BaseWidgetProps, InputDisplayWidgetOptions } from './types';
+import { useWidgetMutation } from '../../hooks/useWidgetMutation';
+import { studioConfig } from '../../config/studio.config';
 import type { DataSource } from '@kb-labs/plugin-manifest';
 import type { StudioHeaderHints } from '@kb-labs/plugin-adapter-studio';
-import { InfoPanel } from './InfoPanel.js';
-import { WidgetCard } from './WidgetCard.js';
+import { InfoPanel } from './InfoPanel';
+import { WidgetCard } from './WidgetCard';
 
 const { TextArea } = Input;
 

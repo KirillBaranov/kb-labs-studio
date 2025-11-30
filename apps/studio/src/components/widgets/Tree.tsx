@@ -6,8 +6,8 @@
 import * as React from 'react';
 import { Tree as AntTree } from 'antd';
 import type { DataNode } from 'antd/es/tree';
-import { Skeleton, EmptyState, ErrorState } from './utils/index.js';
-import type { BaseWidgetProps } from './types.js';
+import { Skeleton, EmptyState, ErrorState } from './utils/index';
+import type { BaseWidgetProps } from './types';
 export interface TreeNode {
   id: string;
   label: string;
