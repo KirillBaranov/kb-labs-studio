@@ -3,6 +3,6 @@
  * Re-export useWidgetModal hook
  */
 
-export { useWidgetModal, WidgetModalManager } from '../components/widget-modal.js';
-export type { WidgetModalConfig } from '../components/widget-modal.js';
+export { useWidgetModal, WidgetModalManager } from '../components/widget-modal';
+export type { WidgetModalConfig } from '../components/widget-modal';
 

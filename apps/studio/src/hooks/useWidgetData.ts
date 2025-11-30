@@ -9,7 +9,7 @@ import type { DataSource } from '@kb-labs/plugin-manifest';
 import type { StudioHeaderHints } from '@kb-labs/plugin-adapter-studio';
 import { studioConfig } from '@/config/studio.config';
 import { useRegistry } from '../providers/registry-provider';
-import { createStudioLogger } from '../utils/logger.js';
+import { createStudioLogger } from '../utils/logger';
 
 interface ErrorEnvelope {
   ok: false;

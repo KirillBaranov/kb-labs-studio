@@ -7,9 +7,9 @@ import { useMemo, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { StudioHeaderHints } from '@kb-labs/plugin-adapter-studio';
 import { studioConfig } from '@/config/studio.config';
-import { createStudioLogger } from '../utils/logger.js';
-import { useWidgetEvents } from './useWidgetEvents.js';
-import { filterHeaders } from './useWidgetData.js';
+import { createStudioLogger } from '../utils/logger';
+import { useWidgetEvents } from './useWidgetEvents';
+import { filterHeaders } from './useWidgetData';
 
 interface ErrorEnvelope {
   ok: false;

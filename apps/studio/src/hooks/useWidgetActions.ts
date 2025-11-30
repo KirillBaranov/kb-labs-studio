@@ -5,9 +5,9 @@
 
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { WidgetAction, ActionExecutionResult } from '../types/actions.js';
+import type { WidgetAction, ActionExecutionResult } from '../types/actions';
 // eslint-disable-next-line import/extensions
-import { useWidgetEvents } from './useWidgetEvents.js';
+import { useWidgetEvents } from './useWidgetEvents';
 
 export interface UseWidgetActionsOptions {
   /** Widget ID */

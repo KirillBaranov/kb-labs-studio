@@ -4,7 +4,7 @@
  */
 
 import { useCallback } from 'react';
-import { exportToCSV, exportToJSON, exportToPNG, generateFilename } from '../utils/export.js';
+import { exportToCSV, exportToJSON, exportToPNG, generateFilename } from '../utils/export';
 
 export interface UseExportOptions {
   /** Widget ID for filename generation */

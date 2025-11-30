@@ -3,6 +3,6 @@
  * Re-export usePageContext hook for convenience
  */
 
-export { usePageContext } from '../providers/page-context.js';
-export type { PageContextValue } from '../providers/page-context.js';
+export { usePageContext } from '../providers/page-context';
+export type { PageContextValue } from '../providers/page-context';
 
