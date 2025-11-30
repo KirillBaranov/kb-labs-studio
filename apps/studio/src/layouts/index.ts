@@ -3,10 +3,10 @@
  * Layout components
  */
 
-export { DashboardGrid } from './DashboardGrid.js';
-export type { DashboardGridProps } from './DashboardGrid.js';
+export { DashboardGrid } from './DashboardGrid';
+export type { DashboardGridProps } from './DashboardGrid';
 
-export { TwoPane } from './TwoPane.js';
-export type { TwoPaneProps } from './TwoPane.js';
+export { TwoPane } from './TwoPane';
+export type { TwoPaneProps } from './TwoPane';
 
 

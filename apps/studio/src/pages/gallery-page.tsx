@@ -4,9 +4,9 @@
  */
 
 import * as React from 'react';
-import { useRegistry } from '../providers/registry-provider.js';
-import { WidgetRenderer } from '../components/widget-renderer.js';
-import { DashboardGrid } from '../layouts/DashboardGrid.js';
+import { useRegistry } from '../providers/registry-provider';
+import { WidgetRenderer } from '../components/widget-renderer';
+import { DashboardGrid } from '../layouts/DashboardGrid';
 
 export function GalleryPage(): React.ReactElement {
   const { registry } = useRegistry();
