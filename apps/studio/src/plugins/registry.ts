@@ -5,7 +5,7 @@
 
 import type { ManifestV2 } from '@kb-labs/plugin-manifest';
 import { toRegistry, combineRegistries, type StudioRegistry } from '@kb-labs/plugin-adapter-studio';
-import { discoverPlugins, checkDualManifests } from './discovery.js';
+import { discoverPlugins, checkDualManifests } from './discovery';
 
 /**
  * Load registry from discovered plugins
