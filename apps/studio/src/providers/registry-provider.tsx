@@ -5,12 +5,12 @@
 
 import * as React from 'react';
 import type { StudioRegistry } from '@kb-labs/plugin-adapter-studio';
-import { loadRegistry } from '../plugins/registry.js';
+import { loadRegistry } from '../plugins/registry';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { createStudioLogger } from '../utils/logger.js';
+import { createStudioLogger } from '../utils/logger';
 import { studioConfig } from '../config/studio.config';
-import { Skeleton } from '../components/widgets/utils/Skeleton.js';
-import { ErrorState } from '../components/widgets/utils/ErrorState.js';
+import { Skeleton } from '../components/widgets/utils/Skeleton';
+import { ErrorState } from '../components/widgets/utils/ErrorState';
 
 interface RegistryContextValue {
   registry: StudioRegistry;

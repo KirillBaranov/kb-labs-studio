@@ -3,7 +3,7 @@
  * Analytics helpers for widget events, page views, and performance tracking
  */
 
-import { createStudioLogger } from './logger.js';
+import { createStudioLogger } from './logger';
 
 const analyticsLogger = createStudioLogger('analytics');
 

@@ -4,7 +4,7 @@
  */
 
 import type { StudioRegistry } from '@kb-labs/plugin-adapter-studio';
-import { createStudioLogger } from '../utils/logger.js';
+import { createStudioLogger } from '../utils/logger';
 
 const registryLogger = createStudioLogger('registry-loader');
 

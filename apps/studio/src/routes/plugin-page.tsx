@@ -5,10 +5,10 @@
 
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
-import { WidgetRenderer } from '../components/widget-renderer.js';
-import { useRegistry } from '../providers/registry-provider.js';
-import { DashboardGrid } from '../layouts/DashboardGrid.js';
-import { PageHeader } from '../components/page-header.js';
+import { WidgetRenderer } from '../components/widget-renderer';
+import { useRegistry } from '../providers/registry-provider';
+import { DashboardGrid } from '../layouts/DashboardGrid';
+import { PageHeader } from '../components/page-header';
 import type { StudioRegistryEntry } from '@kb-labs/plugin-adapter-studio';
 
 /**
