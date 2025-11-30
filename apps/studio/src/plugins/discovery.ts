@@ -10,7 +10,7 @@ import {
   migrateV1ToV2,
   getDeprecationWarning,
 } from '@kb-labs/plugin-manifest';
-import { createStudioLogger } from '../utils/logger.js';
+import { createStudioLogger } from '../utils/logger';
 
 const discoveryLogger = createStudioLogger('plugin-discovery');
 
