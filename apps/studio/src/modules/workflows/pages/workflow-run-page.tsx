@@ -2,15 +2,15 @@ import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { Button, Descriptions, Table, Typography, Alert, List } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import { KBPageContainer, KBPageHeader, KBSection } from '@kb-labs/ui-react'
+import { KBPageContainer, KBPageHeader, KBSection } from '@kb-labs/studio-ui-react'
 import { useDataSources } from '@/providers/data-sources-provider'
 import {
   useWorkflowRun,
   useWorkflowLogs,
   useWorkflowEvents,
   useCancelWorkflowRun,
-} from '@kb-labs/data-client'
-import type { WorkflowRun, JobRun, WorkflowPresenterEvent } from '@kb-labs/data-client'
+} from '@kb-labs/studio-data-client'
+import type { WorkflowRun, JobRun, WorkflowPresenterEvent } from '@kb-labs/studio-data-client'
 import { WorkflowStatusBadge } from '@/components/workflow-status-badge'
 
 const { Paragraph, Text, Title } = Typography

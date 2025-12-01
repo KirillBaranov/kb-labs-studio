@@ -2,10 +2,10 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Table, Button, Modal, Form, Input, message } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import { KBPageContainer, KBPageHeader, KBSection } from '@kb-labs/ui-react'
+import { KBPageContainer, KBPageHeader, KBSection } from '@kb-labs/studio-ui-react'
 import { useDataSources } from '@/providers/data-sources-provider'
-import { useWorkflowRuns, useRunWorkflow } from '@kb-labs/data-client'
-import type { WorkflowRun, WorkflowSpec } from '@kb-labs/data-client'
+import { useWorkflowRuns, useRunWorkflow } from '@kb-labs/studio-data-client'
+import type { WorkflowRun, WorkflowSpec } from '@kb-labs/studio-data-client'
 import { WorkflowStatusBadge } from '@/components/workflow-status-badge'
 
 export function WorkflowsListPage() {

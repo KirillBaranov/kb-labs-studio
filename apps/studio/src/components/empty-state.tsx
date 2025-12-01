@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Empty } from 'antd';
-import { KBButton } from '@kb-labs/ui-react';
+import { KBButton } from '@kb-labs/studio-ui-react';
 
 export interface EmptyStateProps {
   icon?: React.ReactNode;

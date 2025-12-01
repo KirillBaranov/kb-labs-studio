@@ -1,5 +1,5 @@
 import { createContext, useContext, type ReactNode } from 'react';
-import { createDataSources, type DataSources } from '@kb-labs/data-client';
+import { createDataSources, type DataSources } from '@kb-labs/studio-data-client';
 import { studioConfig } from '@/config/studio.config';
 
 const DataSourcesContext = createContext<DataSources | null>(null);

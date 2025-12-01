@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Result, Space } from 'antd';
 import { HomeOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import { KBButton } from '@kb-labs/ui-react';
+import { KBButton } from '@kb-labs/studio-ui-react';
 
 export function NotFoundPage() {
   const navigate = useNavigate();

@@ -1,4 +1,4 @@
-import { KBPageContainer, KBPageHeader, KBSection } from '@kb-labs/ui-react';
+import { KBPageContainer, KBPageHeader, KBSection } from '@kb-labs/studio-ui-react';
 import { DashboardKpis } from '../components/dashboard-kpis';
 import { DashboardChart } from '../components/dashboard-chart';
 

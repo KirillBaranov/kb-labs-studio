@@ -1,4 +1,4 @@
-import { KBBadge } from '@kb-labs/ui-react';
+import { KBBadge } from '@kb-labs/studio-ui-react';
 
 export function RunBadge({ status }: { status: 'pending' | 'ok' | 'warn' | 'fail' }) {
   const variantMap = {

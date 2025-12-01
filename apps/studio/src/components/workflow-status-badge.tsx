@@ -1,5 +1,5 @@
-import { KBBadge } from '@kb-labs/ui-react'
-import type { WorkflowRun, JobRun } from '@kb-labs/data-client'
+import { KBBadge } from '@kb-labs/studio-ui-react'
+import type { WorkflowRun, JobRun } from '@kb-labs/studio-data-client'
 
 type WorkflowLikeStatus = WorkflowRun['status'] | JobRun['status']
 

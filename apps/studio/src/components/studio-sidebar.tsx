@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, ShieldCheck, Rocket, Link2, Brain, BarChart3, Settings, ChevronRight, ChevronLeft, ChevronDown } from 'lucide-react';
-import { cn, KBBadge } from '@kb-labs/ui-react';
+import { cn, KBBadge } from '@kb-labs/studio-ui-react';
 import { useSidebar } from './sidebar-context';
 
 const navigation = [

@@ -1,4 +1,4 @@
-import { KBPageContainer, KBPageHeader } from '@kb-labs/ui-react';
+import { KBPageContainer, KBPageHeader } from '@kb-labs/studio-ui-react';
 import { EmptyState } from '@/components/empty-state';
 import { BarChart3 } from 'lucide-react';
 

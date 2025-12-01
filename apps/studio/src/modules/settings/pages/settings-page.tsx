@@ -1,7 +1,7 @@
 import { List } from 'antd';
 import { useDataSources } from '@/providers/data-sources-provider';
-import { useHealthStatus } from '@kb-labs/data-client';
-import { KBPageContainer, KBPageHeader, KBSection, KBCard, KBSkeleton, KBListItem, KBStack } from '@kb-labs/ui-react';
+import { useHealthStatus } from '@kb-labs/studio-data-client';
+import { KBPageContainer, KBPageHeader, KBSection, KBCard, KBSkeleton, KBListItem, KBStack } from '@kb-labs/studio-ui-react';
 import { HealthIndicator } from '@/components/health-indicator';
 
 export function SettingsPage() {

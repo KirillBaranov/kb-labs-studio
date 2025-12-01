@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Home, ShieldCheck, Rocket, Link2, Brain, BarChart3, Settings } from 'lucide-react';
-import { cn, KBThemeToggle } from '@kb-labs/ui-react';
+import { cn, KBThemeToggle } from '@kb-labs/studio-ui-react';
 
 const navigation = [
   { name: 'Dashboard', to: '/', icon: Home },

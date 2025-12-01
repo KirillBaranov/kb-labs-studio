@@ -1,5 +1,5 @@
 import { useDataSources } from '@/providers/data-sources-provider';
-import { useHealthStatus, useReadyStatus } from '@kb-labs/data-client';
+import { useHealthStatus, useReadyStatus } from '@kb-labs/studio-data-client';
 import { studioConfig } from '@/config/studio.config';
 import { Alert } from 'antd';
 import { AlertTriangle, RefreshCw } from 'lucide-react';

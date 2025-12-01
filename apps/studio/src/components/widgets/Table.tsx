@@ -7,8 +7,8 @@ import * as React from 'react';
 import { Skeleton, EmptyState, ErrorState } from './utils/index';
 import { WidgetCard } from './WidgetCard';
 import type { BaseWidgetProps } from './types';
-import { KBDataTable } from '@kb-labs/ui-react';
-import type { Column } from '@kb-labs/ui-react';
+import { KBDataTable } from '@kb-labs/studio-ui-react';
+import type { Column } from '@kb-labs/studio-ui-react';
 
 export interface TableOptions<T = unknown> {
   columns?: Column<T>[];

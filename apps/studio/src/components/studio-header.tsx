@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { User } from 'lucide-react';
-import { KBThemeToggle } from '@kb-labs/ui-react';
+import { KBThemeToggle } from '@kb-labs/studio-ui-react';
 
 export function StudioHeader() {
   return (

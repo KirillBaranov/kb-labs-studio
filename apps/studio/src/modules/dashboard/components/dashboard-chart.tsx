@@ -1,4 +1,4 @@
-import { KBCard, KBLineChart } from '@kb-labs/ui-react';
+import { KBCard, KBLineChart } from '@kb-labs/studio-ui-react';
 
 // Пример данных для графика
 const chartData = [

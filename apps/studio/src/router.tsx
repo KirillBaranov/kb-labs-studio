@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { createBrowserRouter, Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { KBPageLayout, type NavigationItem } from '@kb-labs/ui-react';
+import { KBPageLayout, type NavigationItem } from '@kb-labs/studio-ui-react';
 import { Home, Brain, Settings, GitBranch } from 'lucide-react';
 import type { StudioRegistry } from '@kb-labs/plugin-adapter-studio';
 import { useAuth } from './providers/auth-provider';

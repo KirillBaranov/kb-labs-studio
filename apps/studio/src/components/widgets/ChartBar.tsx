@@ -7,7 +7,7 @@ import * as React from 'react';
 import { Skeleton, EmptyState, ErrorState } from './utils/index';
 import { WidgetCard } from './WidgetCard';
 import type { BaseWidgetProps } from './types';
-import { KBColumnChart } from '@kb-labs/ui-react';
+import { KBColumnChart } from '@kb-labs/studio-ui-react';
 
 export interface ChartSeriesPoint {
   x: number | string;

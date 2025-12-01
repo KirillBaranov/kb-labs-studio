@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { RouterProvider } from 'react-router-dom';
-import { KBConfigProvider } from '@kb-labs/ui-react';
+import { KBConfigProvider } from '@kb-labs/studio-ui-react';
 import { DataSourcesProvider } from './providers/data-sources-provider';
 import { AuthProvider } from './providers/auth-provider';
 import { RegistryProvider } from './providers/registry-provider';
