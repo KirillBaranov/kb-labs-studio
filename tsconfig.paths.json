@@ -3,18 +3,6 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@kb-labs/api-contracts": [
-        "../kb-labs-rest-api/packages/api-contracts/src/index.ts"
-      ],
-      "@kb-labs/api-contracts/*": [
-        "../kb-labs-rest-api/packages/api-contracts/src/*"
-      ],
-      "@kb-labs/data-client": [
-        "packages/data-client/src/index.ts"
-      ],
-      "@kb-labs/data-client/*": [
-        "packages/data-client/src/*"
-      ],
       "@kb-labs/mind-cli": [
         "../kb-labs-mind/packages/mind-cli/src/index.ts"
       ],
@@ -28,22 +16,34 @@
         "../kb-labs-plugin/packages/adapters/studio/src/*"
       ],
       "@kb-labs/plugin-manifest": [
-        "../kb-labs-plugin/packages/manifest/src/index.ts"
+        "../kb-labs-plugin/packages/plugin-manifest/src/index.ts"
       ],
       "@kb-labs/plugin-manifest/*": [
-        "../kb-labs-plugin/packages/manifest/src/*"
+        "../kb-labs-plugin/packages/plugin-manifest/src/*"
       ],
-      "@kb-labs/ui-core": [
-        "packages/ui-core/src/index.ts"
+      "@kb-labs/rest-api-contracts": [
+        "../kb-labs-rest-api/packages/rest-api-contracts/src/index.ts"
       ],
-      "@kb-labs/ui-core/*": [
-        "packages/ui-core/src/*"
+      "@kb-labs/rest-api-contracts/*": [
+        "../kb-labs-rest-api/packages/rest-api-contracts/src/*"
       ],
-      "@kb-labs/ui-react": [
-        "packages/ui-react/src/index.ts"
+      "@kb-labs/studio-data-client": [
+        "packages/studio-data-client/src/index.ts"
       ],
-      "@kb-labs/ui-react/*": [
-        "packages/ui-react/src/*"
+      "@kb-labs/studio-data-client/*": [
+        "packages/studio-data-client/src/*"
+      ],
+      "@kb-labs/studio-ui-core": [
+        "packages/studio-ui-core/src/index.ts"
+      ],
+      "@kb-labs/studio-ui-core/*": [
+        "packages/studio-ui-core/src/*"
+      ],
+      "@kb-labs/studio-ui-react": [
+        "packages/studio-ui-react/src/index.ts"
+      ],
+      "@kb-labs/studio-ui-react/*": [
+        "packages/studio-ui-react/src/*"
       ]
     }
   }

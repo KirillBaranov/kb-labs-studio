@@ -1,0 +1,34 @@
+{
+  "name": "@kb-labs/studio-ui-core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "KB Labs design system foundation — design tokens, themes, CSS variables (framework-agnostic)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsup",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint . --max-warnings=0"
+  },
+  "devDependencies": {
+    "@kb-labs/devkit": "github:KirillBaranov/kb-labs-devkit#main",
+    "eslint": "^9",
+    "rimraf": "^6.0.1",
+    "tsup": "^8.5.0",
+    "typescript": "^5.6.3",
+    "vitest": "^3.2.4"
+  },
+  "peerDependencies": {}
+}
