@@ -10,10 +10,10 @@
         "../kb-labs-mind/packages/mind-cli/src/*"
       ],
       "@kb-labs/plugin-adapter-studio": [
-        "../kb-labs-plugin/packages/adapters/studio/src/index.ts"
+        "../kb-labs-plugin/packages/plugin-adapters/studio/src/index.ts"
       ],
       "@kb-labs/plugin-adapter-studio/*": [
-        "../kb-labs-plugin/packages/adapters/studio/src/*"
+        "../kb-labs-plugin/packages/plugin-adapters/studio/src/*"
       ],
       "@kb-labs/plugin-manifest": [
         "../kb-labs-plugin/packages/plugin-manifest/src/index.ts"
