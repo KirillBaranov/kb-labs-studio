@@ -72,3 +72,4 @@ analytics/
 # These should only exist in dist/ directories
 **/src/**/*.js
 **/src/**/*.js.map.env.local
+.npmrc
