@@ -9,7 +9,7 @@ import { WidgetRenderer } from '../components/widget-renderer';
 import { useRegistry } from '../providers/registry-provider';
 import { DashboardGrid } from '../layouts/DashboardGrid';
 import { PageHeader } from '../components/page-header';
-import type { StudioRegistryEntry } from '@kb-labs/plugin-adapter-studio';
+import type { StudioRegistryEntry } from '@kb-labs/rest-api-contracts';
 
 /**
  * Plugin page component

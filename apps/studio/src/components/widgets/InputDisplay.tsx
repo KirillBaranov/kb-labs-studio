@@ -8,8 +8,7 @@ import { Input, Button, message } from 'antd';
 import type { BaseWidgetProps, InputDisplayWidgetOptions } from './types';
 import { useWidgetMutation } from '../../hooks/useWidgetMutation';
 import { studioConfig } from '../../config/studio.config';
-import type { DataSource } from '@kb-labs/plugin-manifest';
-import type { StudioHeaderHints } from '@kb-labs/plugin-adapter-studio';
+import type { DataSource, StudioHeaderHints } from '@kb-labs/rest-api-contracts';
 import { InfoPanel } from './InfoPanel';
 import { WidgetCard } from './WidgetCard';
 

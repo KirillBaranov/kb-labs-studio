@@ -3,7 +3,7 @@
  * Registry loader - loads registry.json from multiple locations
  */
 
-import type { StudioRegistry } from '@kb-labs/plugin-adapter-studio';
+import type { StudioRegistry } from '@kb-labs/rest-api-contracts';
 import { createStudioLogger } from '../utils/logger';
 
 const registryLogger = createStudioLogger('registry-loader');

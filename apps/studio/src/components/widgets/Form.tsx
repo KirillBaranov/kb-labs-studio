@@ -8,8 +8,7 @@ import { Form as AntForm, Input, Button, Select, InputNumber, Checkbox, message 
 import type { BaseWidgetProps, FormWidgetOptions, FormField } from './types';
 import { useWidgetMutation } from '../../hooks/useWidgetMutation';
 import { studioConfig } from '../../config/studio.config';
-import type { DataSource } from '@kb-labs/plugin-manifest';
-import type { StudioHeaderHints } from '@kb-labs/plugin-adapter-studio';
+import type { DataSource, StudioHeaderHints } from '@kb-labs/rest-api-contracts';
 
 const { TextArea } = Input;
 

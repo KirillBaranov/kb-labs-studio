@@ -5,7 +5,7 @@
 
 import { useMemo, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { StudioHeaderHints } from '@kb-labs/plugin-adapter-studio';
+import type { StudioHeaderHints } from '@kb-labs/rest-api-contracts';
 import { studioConfig } from '@/config/studio.config';
 import { createStudioLogger } from '../utils/logger';
 import { useWidgetEvents } from './useWidgetEvents';

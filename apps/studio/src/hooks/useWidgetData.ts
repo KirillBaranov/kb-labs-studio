@@ -5,8 +5,7 @@
 
 import { useMemo, useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import type { DataSource } from '@kb-labs/plugin-manifest';
-import type { StudioHeaderHints } from '@kb-labs/plugin-adapter-studio';
+import type { DataSource, StudioHeaderHints } from '@kb-labs/rest-api-contracts';
 import { studioConfig } from '@/config/studio.config';
 import { useRegistry } from '../providers/registry-provider';
 import { createStudioLogger } from '../utils/logger';

@@ -4,7 +4,7 @@
  */
 
 import * as React from 'react';
-import type { StudioHeaderHints } from '@kb-labs/plugin-adapter-studio';
+import type { StudioHeaderHints } from '@kb-labs/rest-api-contracts';
 import type { HeaderStatus } from '../hooks/useWidgetData';
 
 export interface HeaderPolicyCalloutProps {

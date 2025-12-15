@@ -4,7 +4,7 @@
  */
 
 import * as React from 'react';
-import type { StudioRegistry } from '@kb-labs/plugin-adapter-studio';
+import type { StudioRegistry } from '@kb-labs/rest-api-contracts';
 import { loadRegistry } from '../plugins/registry';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createStudioLogger } from '../utils/logger';

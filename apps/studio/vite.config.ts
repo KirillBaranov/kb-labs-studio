@@ -15,9 +15,9 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
-        '@kb-labs/studio-ui-core': path.resolve(__dirname, '../../packages/ui-core/src'),
-        '@kb-labs/studio-ui-react': path.resolve(__dirname, '../../packages/ui-react/src'),
-        '@kb-labs/studio-data-client': path.resolve(__dirname, '../../packages/data-client/src'),
+        '@kb-labs/studio-ui-core': path.resolve(__dirname, '../../packages/studio-ui-core/src'),
+        '@kb-labs/studio-ui-react': path.resolve(__dirname, '../../packages/studio-ui-react/src'),
+        '@kb-labs/studio-data-client': path.resolve(__dirname, '../../packages/studio-data-client/src'),
       },
     },
     server: {

@@ -7,7 +7,7 @@ import * as React from 'react';
 import { Card, Collapse, Tabs, Typography } from 'antd';
 import { Skeleton, EmptyState, ErrorState } from './utils/index';
 import type { BaseWidgetProps } from './types';
-import type { InfoPanelData, KeyValueData } from '@kb-labs/plugin-manifest';
+import type { InfoPanelData, KeyValueData } from '@kb-labs/rest-api-contracts';
 import { JsonViewer } from './JsonViewer';
 import { KeyValue } from './KeyValue';
 

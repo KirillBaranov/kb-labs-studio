@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { HeaderPolicyCallout } from '../header-policy-callout';
-import type { StudioHeaderHints } from '@kb-labs/plugin-adapter-studio';
+import type { StudioHeaderHints } from '@kb-labs/rest-api-contracts';
 import type { HeaderStatus } from '../../hooks/useWidgetData';
 
 const baseHints: StudioHeaderHints = {

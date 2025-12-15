@@ -3,24 +3,6 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@kb-labs/mind-cli": [
-        "../kb-labs-mind/packages/mind-cli/src/index.ts"
-      ],
-      "@kb-labs/mind-cli/*": [
-        "../kb-labs-mind/packages/mind-cli/src/*"
-      ],
-      "@kb-labs/plugin-adapter-studio": [
-        "../kb-labs-plugin/packages/plugin-adapters/studio/src/index.ts"
-      ],
-      "@kb-labs/plugin-adapter-studio/*": [
-        "../kb-labs-plugin/packages/plugin-adapters/studio/src/*"
-      ],
-      "@kb-labs/plugin-manifest": [
-        "../kb-labs-plugin/packages/plugin-manifest/src/index.ts"
-      ],
-      "@kb-labs/plugin-manifest/*": [
-        "../kb-labs-plugin/packages/plugin-manifest/src/*"
-      ],
       "@kb-labs/rest-api-contracts": [
         "../kb-labs-rest-api/packages/rest-api-contracts/src/index.ts"
       ],

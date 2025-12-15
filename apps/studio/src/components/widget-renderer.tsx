@@ -6,8 +6,7 @@
 import * as React from 'react';
 import { useRegistry } from '../providers/registry-provider';
 import { useWidgetData } from '../hooks/useWidgetData';
-import { resolveComponentPath } from '@kb-labs/plugin-adapter-studio';
-import type { StudioRegistryEntry } from '@kb-labs/plugin-adapter-studio';
+import type { StudioRegistryEntry } from '@kb-labs/rest-api-contracts';
 import * as Widgets from './widgets/index';
 import { Skeleton } from './widgets/utils/index';
 import { ErrorState } from './widgets/utils/index';
@@ -180,8 +179,12 @@ export function WidgetRenderer({
     setComponentError(null);
 
     try {
-      const componentPath = resolveComponentPath(widget);
-      
+      // Use component path from registry (set by server or manifest)
+      const componentPath = widget.component;
+      if (!componentPath) {
+        throw new Error(`Widget ${widget.id} has no component path`);
+      }
+
       // Dynamic import
       import(componentPath)
         .then((module) => {

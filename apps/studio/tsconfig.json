@@ -5,9 +5,9 @@
     "noEmit": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@kb-labs/studio-ui-core": ["../../packages/ui-core/src"],
-      "@kb-labs/studio-ui-react": ["../../packages/ui-react/src"],
-      "@kb-labs/studio-data-client": ["../../packages/data-client/src"]
+      "@kb-labs/studio-ui-core": ["../../packages/studio-ui-core/src"],
+      "@kb-labs/studio-ui-react": ["../../packages/studio-ui-react/src"],
+      "@kb-labs/studio-data-client": ["../../packages/studio-data-client/src"]
     }
   },
   "include": ["src", "vite.config.ts"]
