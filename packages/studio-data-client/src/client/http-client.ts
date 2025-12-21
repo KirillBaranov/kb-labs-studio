@@ -47,15 +47,10 @@ export class HttpClient {
         config = await interceptor(config);
       }
 
-      // Normalize path: ensure no duplicate /api/v1
-      // If baseUrl contains /api/v1, remove it from path (from start only)
+      // Normalize path: ensure no duplicate /v1
+      // If baseUrl is '/api' and path starts with '/v1', construct full path correctly
       let normalizedPath = path;
-      // Remove /api/v1 from the beginning of path if baseUrl already contains it
-      if (this.baseUrl.includes('/api/v1')) {
-        // Remove /api/v1 from start of path if present
-        normalizedPath = path.replace(/^\/api\/v1/, '');
-      }
-      
+
       const url = normalizedPath.startsWith('http') ? normalizedPath : `${this.baseUrl}${normalizedPath}`;
       const response = await fetch(url, config);
 
