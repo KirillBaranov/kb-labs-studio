@@ -1,5 +1,5 @@
 {
-  "name": "kb-labs-studio",
+  "name": "@kb-labs/studio",
   "version": "0.1.0",
   "private": true,
   "description": "KB Labs Studio — unified web dashboard for observing and managing the KB Labs ecosystem.",
@@ -11,9 +11,12 @@
   "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kirill-baranov/kb-labs.git",
-    "directory": "kb-labs-studio"
+    "url": "https://github.com/kirill-baranov/kb-labs-studio.git"
   },
+  "bugs": {
+    "url": "https://github.com/kirill-baranov/kb-labs-studio/issues"
+  },
+  "homepage": "https://github.com/kirill-baranov/kb-labs-studio#readme",
   "workspaces": [
     "apps/*",
     "packages/*"

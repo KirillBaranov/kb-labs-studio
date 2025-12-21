@@ -1,0 +1,10 @@
+{
+  "extends": "@kb-labs/devkit/tsconfig/base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "outDir": "dist",
+    "declaration": true,
+    "declarationMap": true
+  },
+  "include": ["src"]
+}
