@@ -1,6 +1,6 @@
 /**
  * @module @kb-labs/studio-app/routes/plugin-page
- * Plugin page for rendering plugin widgets and layouts
+ * Plugin page for rendering plugin layouts
  */
 
 import * as React from 'react';
@@ -13,9 +13,7 @@ import type { StudioRegistryEntry } from '@kb-labs/rest-api-contracts';
 
 /**
  * Plugin page component
- * Supports both:
- * 1. Layout-first approach: /plugins/{pluginId}/{pageName} → layout {pluginId}.{pageName}
- * 2. Widget-first approach: /plugins/{pluginId}/{widgetName} → widget {pluginId}.{widgetName} (fallback)
+ * Layout-first approach: /plugins/{pluginId}/{pageName} → layout {pluginId}.{pageName}
  */
 export function PluginPage(): React.ReactElement {
   const { pluginId: urlPluginId, widgetName } = useParams<{ pluginId: string; widgetName: string }>();
@@ -201,7 +199,7 @@ export function PluginPage(): React.ReactElement {
     // For other layout kinds (two-pane, etc.), render widgets in a simple list for now
     return (
       <div style={{ padding: '24px' }}>
-        <PageHeader 
+        <PageHeader
           title={layout.title || layout.name || layoutId}
           description={layout.description}
         />
@@ -214,53 +212,13 @@ export function PluginPage(): React.ReactElement {
     );
   }
 
-  // Fallback to widget-first approach (backward compatibility)
-  // Construct widget ID: {pluginName}.{widgetName}
-  const widgetId = `${pluginName}.${widgetName}`;
-  
-  // Find widget in registry
-  const widget = registry.widgets.find((w) => w.id === widgetId);
-  if (!widget) {
-    // Try to find by plugin ID and widget name separately
-    const plugin = registry.plugins.find((p) => {
-      const pName = p.id.includes('/') ? p.id.split('/').pop() || p.id : p.id;
-      return pName === pluginName;
-    });
-    
-    if (plugin) {
-      const widgetInPlugin = plugin.widgets.find((w) => {
-        // Widget ID might be just the name or full ID
-        return w.id === widgetId || w.id === widgetName || w.id.endsWith(`.${widgetName}`);
-      });
-      
-      if (widgetInPlugin) {
-        return (
-          <div style={{ padding: '24px' }}>
-            <PageHeader title={widgetInPlugin.id} />
-            <WidgetRenderer widgetId={widgetInPlugin.id} pluginId={plugin.id} />
-          </div>
-        );
-      }
-    }
-    
-    return (
-      <div style={{ padding: '24px' }}>
-        <div>Widget or layout {widgetId} not found in registry.</div>
-        <div style={{ marginTop: '16px' }}>
-          <div>Available layouts: {registry.layouts.map(l => l.id).join(', ')}</div>
-          <div style={{ marginTop: '8px' }}>Available widgets: {registry.widgets.map(w => w.id).join(', ')}</div>
-        </div>
-      </div>
-    );
-  }
-
-  // Extract pluginId from widget
-  const pluginId = widget.plugin.id;
-
+  // Layout not found
   return (
     <div style={{ padding: '24px' }}>
-      <PageHeader title={widget.id} />
-      <WidgetRenderer widgetId={widgetId} pluginId={pluginId} />
+      <div>Layout {layoutId} not found in registry.</div>
+      <div style={{ marginTop: '16px' }}>
+        <div>Available layouts: {registry.layouts.map(l => l.id).join(', ') || 'none'}</div>
+      </div>
     </div>
   );
 }

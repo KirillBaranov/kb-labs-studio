@@ -9,8 +9,7 @@ import { loadRegistry } from '../plugins/registry';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createStudioLogger } from '../utils/logger';
 import { studioConfig } from '../config/studio.config';
-import { Skeleton } from '../components/widgets/utils/Skeleton';
-import { ErrorState } from '../components/widgets/utils/ErrorState';
+import { Skeleton, ErrorState } from '../components/widgets/shared/index';
 
 interface RegistryContextValue {
   registry: StudioRegistry;

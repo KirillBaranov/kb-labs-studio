@@ -8,8 +8,7 @@ import { useRegistry } from '../providers/registry-provider';
 import { useWidgetData } from '../hooks/useWidgetData';
 import type { StudioRegistryEntry } from '@kb-labs/rest-api-contracts';
 import * as Widgets from './widgets/index';
-import { Skeleton } from './widgets/utils/index';
-import { ErrorState } from './widgets/utils/index';
+import { Skeleton, ErrorState } from './widgets/shared/index';
 import { trackWidgetEvent } from '../utils/analytics';
 import { studioConfig } from '../config/studio.config';
 import { HeaderPolicyCallout } from './header-policy-callout';
@@ -18,35 +17,54 @@ import { WidgetErrorBoundary } from './widget-error-boundary';
 import { useWidgetEvents } from '../hooks/useWidgetEvents';
 
 /**
- * Widget kind to component mapping
+ * Widget kind to component mapping (29 widgets across 5 categories)
+ *
+ * Display (14): metric, metric-group, table, card, cardlist, chart-line, chart-bar, chart-pie, chart-area, timeline, tree, json, diff, logs
+ * Form (6): form, input, select, checkbox-group, switch, date-picker
+ * Layout (5): section, grid, stack, tabs, modal
+ * Navigation (3): breadcrumb, stepper, menu
+ * Feedback (2): alert, confirm
  */
 const WIDGET_COMPONENTS: Record<string, React.ComponentType<any>> = {
-  metric: Widgets.Metric,
-  panel: Widgets.CardList, // Panel uses CardList as base
-  card: Widgets.CardList,
-  cardlist: Widgets.CardList, // Universal card list widget
-  table: Widgets.Table,
-  chart: Widgets.ChartLine, // Default chart is line
-  tree: Widgets.Tree,
-  timeline: Widgets.Timeline,
-  logs: Widgets.LogViewer,
-  json: Widgets.JsonViewer,
-  diff: Widgets.DiffViewer,
-  status: Widgets.StatusBadges,
-  progress: Widgets.Progress,
-  infopanel: Widgets.InfoPanel, // Universal info panel widget
-  keyvalue: Widgets.KeyValue, // Universal key-value widget
-  form: Widgets.Form, // Form widget for interactive forms
-  'input-display': Widgets.InputDisplay, // Input + display widget
-};
+  // Display widgets (14)
+  'metric': Widgets.Metric,
+  'metric-group': Widgets.MetricGroup,
+  'table': Widgets.Table,
+  'card': Widgets.Card,
+  'cardlist': Widgets.CardList,
+  'chart-line': Widgets.ChartLine,
+  'chart-bar': Widgets.ChartBar,
+  'chart-pie': Widgets.ChartPie,
+  'chart-area': Widgets.ChartArea,
+  'timeline': Widgets.Timeline,
+  'tree': Widgets.Tree,
+  'json': Widgets.Json,
+  'diff': Widgets.Diff,
+  'logs': Widgets.Logs,
 
-/**
- * Chart kind to component mapping
- */
-const CHART_COMPONENTS: Record<string, React.ComponentType<any>> = {
-  line: Widgets.ChartLine,
-  bar: Widgets.ChartBar,
-  pie: Widgets.ChartPie,
+  // Form widgets (6)
+  'form': Widgets.Form,
+  'input': Widgets.Input,
+  'select': Widgets.Select,
+  'checkbox-group': Widgets.CheckboxGroup,
+  'switch': Widgets.Switch,
+  'date-picker': Widgets.DatePicker,
+
+  // Layout widgets (5) - composite with children
+  'section': Widgets.Section,
+  'grid': Widgets.Grid,
+  'stack': Widgets.Stack,
+  'tabs': Widgets.Tabs,
+  'modal': Widgets.Modal,
+
+  // Navigation widgets (3)
+  'breadcrumb': Widgets.Breadcrumb,
+  'stepper': Widgets.Stepper,
+  'menu': Widgets.Menu,
+
+  // Feedback widgets (2)
+  'alert': Widgets.Alert,
+  'confirm': Widgets.Confirm,
 };
 
 /**
@@ -81,16 +99,14 @@ export function WidgetRenderer({
 
   // Find widget in registry
   const widget = React.useMemo(() => {
-    // Try new format first
-    if (registry.plugins && Array.isArray(registry.plugins)) {
-      for (const plugin of registry.plugins) {
-        const found = plugin.widgets.find((w: StudioRegistryEntry) => w.id === widgetId && w.plugin.id === pluginId);
-        if (found) {return found;}
-      }
+    if (!registry.plugins || !Array.isArray(registry.plugins)) {
+      return undefined;
     }
-    // Fallback to legacy format
-    if (registry.widgets && Array.isArray(registry.widgets)) {
-      return registry.widgets.find((w: StudioRegistryEntry) => w.id === widgetId);
+    for (const plugin of registry.plugins) {
+      const found = plugin.widgets.find((w: StudioRegistryEntry) => w.id === widgetId && w.plugin.id === pluginId);
+      if (found) {
+        return found;
+      }
     }
     return undefined;
   }, [registry, widgetId, pluginId]);
@@ -185,8 +201,8 @@ export function WidgetRenderer({
         throw new Error(`Widget ${widget.id} has no component path`);
       }
 
-      // Dynamic import
-      import(componentPath)
+      // Dynamic import - path comes from server registry, not user input
+      import(/* @vite-ignore */ componentPath)
         .then((module) => {
           const imported = module as Record<string, unknown>;
           const keys = Object.keys(imported);
@@ -239,18 +255,8 @@ export function WidgetRenderer({
     // Custom component loaded
     WidgetComponent = component;
   } else if (!widget.component) {
-    // Standard widget by kind
-    if (widget.kind === 'chart') {
-      // For chart, check options for chart type
-      const optionChartType = (widget.options as Record<string, unknown> | undefined)?.chartType;
-      const chartType =
-        typeof optionChartType === 'string' && optionChartType in CHART_COMPONENTS
-          ? (optionChartType as keyof typeof CHART_COMPONENTS)
-          : 'line';
-      WidgetComponent = CHART_COMPONENTS[chartType] || WIDGET_COMPONENTS.chart || null;
-    } else {
-      WidgetComponent = WIDGET_COMPONENTS[widget.kind] || null;
-    }
+    // Standard widget by kind (29 widgets + legacy aliases)
+    WidgetComponent = WIDGET_COMPONENTS[widget.kind] || null;
   }
 
   // Component not found

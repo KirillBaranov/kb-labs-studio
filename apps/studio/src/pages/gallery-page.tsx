@@ -14,8 +14,7 @@ export function GalleryPage(): React.ReactElement {
   // Collect all widgets from registry
   const widgets = React.useMemo(() => {
     const allWidgets: Array<{ widgetId: string; pluginId: string; layoutHint?: any }> = [];
-    
-    // Try new format first
+
     for (const plugin of registry.plugins || []) {
       for (const widget of plugin.widgets) {
         allWidgets.push({
@@ -25,18 +24,7 @@ export function GalleryPage(): React.ReactElement {
         });
       }
     }
-    
-    // Fallback to legacy format
-    if (allWidgets.length === 0 && registry.widgets) {
-      for (const widget of registry.widgets) {
-        allWidgets.push({
-          widgetId: widget.id,
-          pluginId: widget.plugin.id,
-          layoutHint: widget.layoutHint,
-        });
-      }
-    }
-    
+
     return allWidgets;
   }, [registry]);
 

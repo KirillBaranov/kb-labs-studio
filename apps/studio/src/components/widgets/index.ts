@@ -1,65 +1,32 @@
 /**
  * @module @kb-labs/studio-app/components/widgets
- * Widget components
+ * Widget components (29 total across 5 categories)
+ *
+ * Categories:
+ * - Display (14): metric, metric-group, table, card, cardlist, chart-line, chart-bar, chart-pie, chart-area, timeline, tree, json, diff, logs
+ * - Form (6): form, input, select, checkbox-group, switch, date-picker
+ * - Layout (5): section, grid, stack, tabs, modal
+ * - Navigation (3): breadcrumb, stepper, menu
+ * - Feedback (2): alert, confirm
  */
 
-export { Metric } from './Metric';
-export type { MetricProps, MetricOptions } from './Metric';
+// Display widgets (14)
+export * from './display/index';
 
-export { KPIList } from './KPIList';
-export type { KPIListProps, KPIListOptions } from './KPIList';
+// Form widgets (6)
+export * from './form/index';
 
-export { Table } from './Table';
-export type { TableProps, TableOptions } from './Table';
+// Layout widgets (5)
+export * from './layout/index';
 
-export { CardList } from './CardList';
-export type { CardListProps, CardListOptions } from './CardList';
+// Navigation widgets (3)
+export * from './navigation/index';
 
-export { Timeline } from './Timeline';
-export type { TimelineProps, TimelineOptions } from './Timeline';
+// Feedback widgets (2)
+export * from './feedback/index';
 
-export { Tree } from './Tree';
-export type { TreeProps, TreeOptions } from './Tree';
+// Shared components
+export * from './shared/index';
 
-export { LogViewer } from './LogViewer';
-export type { LogViewerProps, LogViewerOptions } from './LogViewer';
-
-export { JsonViewer } from './JsonViewer';
-export type { JsonViewerProps, JsonViewerOptions } from './JsonViewer';
-
-export { DiffViewer } from './DiffViewer';
-export type { DiffViewerProps, DiffViewerOptions } from './DiffViewer';
-
-export { ChartLine } from './ChartLine';
-export type { ChartLineProps, ChartLineOptions } from './ChartLine';
-
-export { ChartBar } from './ChartBar';
-export type { ChartBarProps, ChartBarOptions } from './ChartBar';
-
-export { ChartPie } from './ChartPie';
-export type { ChartPieProps, ChartPieOptions } from './ChartPie';
-
-export { StatusBadges } from './StatusBadges';
-export type { StatusBadgesProps, StatusBadgesOptions } from './StatusBadges';
-
-export { Progress } from './Progress';
-export type { ProgressProps, ProgressOptions } from './Progress';
-
-export { InfoPanel } from './InfoPanel';
-export type { InfoPanelProps, InfoPanelOptions } from './InfoPanel';
-
-export { KeyValue } from './KeyValue';
-export type { KeyValueProps, KeyValueOptions } from './KeyValue';
-
-export { Form } from './Form';
-export type { FormProps, FormWidgetOptions } from './Form';
-
-export { InputDisplay } from './InputDisplay';
-export type { InputDisplayProps, InputDisplayWidgetOptions } from './InputDisplay';
-
-export { WidgetCard } from './WidgetCard';
-export type { WidgetCardProps } from './WidgetCard';
-
-export type { BaseWidgetProps, WidgetState, FormField, FormFieldType } from './types';
-
-
+// Types
+export type { BaseWidgetProps, WidgetState, LayoutHint, FormField, FormFieldType, FormWidgetOptions } from './types';
