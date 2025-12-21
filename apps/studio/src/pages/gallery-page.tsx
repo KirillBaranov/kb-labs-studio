@@ -11,21 +11,14 @@ import { DashboardGrid } from '../layouts/DashboardGrid';
 export function GalleryPage(): React.ReactElement {
   const { registry } = useRegistry();
 
-  // Collect all widgets from registry
+  // Collect all widgets from registry (using flattened widgets array)
   const widgets = React.useMemo(() => {
-    const allWidgets: Array<{ widgetId: string; pluginId: string; layoutHint?: any }> = [];
-
-    for (const plugin of registry.plugins || []) {
-      for (const widget of plugin.widgets) {
-        allWidgets.push({
-          widgetId: widget.id,
-          pluginId: widget.plugin.id,
-          layoutHint: widget.layoutHint,
-        });
-      }
-    }
-
-    return allWidgets;
+    // Use flattened widgets array for O(n) instead of O(n*m)
+    return (registry.widgets ?? []).map(widget => ({
+      widgetId: widget.id,
+      pluginId: widget.plugin?.id ?? 'unknown',
+      layoutHint: widget.layoutHint,
+    }));
   }, [registry]);
 
   if (widgets.length === 0) {

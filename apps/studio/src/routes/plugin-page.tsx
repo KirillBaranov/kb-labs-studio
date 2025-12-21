@@ -38,7 +38,7 @@ export function PluginPage(): React.ReactElement {
   
   // Try layout-first approach: look for layout with ID {pluginName}.{widgetName}
   const layoutId = `${pluginName}.${widgetName}`;
-  const layout = registry.layouts.find((l) => l.id === layoutId);
+  const layout = (registry.layouts ?? []).find((l) => l.id === layoutId);
   
   if (layout && layout.widgets && layout.widgets.length > 0) {
     // Found layout with explicit widget list - render layout with widgets
@@ -62,7 +62,7 @@ export function PluginPage(): React.ReactElement {
         widgetsToRender.push({ widget, pluginId: plugin.id });
       } else {
         // Try to find in global registry as fallback
-        const globalWidget = registry.widgets.find((w) => w.id === widgetId);
+        const globalWidget = (registry.widgets ?? []).find((w) => w.id === widgetId);
         if (globalWidget) {
           widgetsToRender.push({ widget: globalWidget, pluginId: globalWidget.plugin.id });
         } else {
@@ -76,7 +76,7 @@ export function PluginPage(): React.ReactElement {
       // Show helpful error with suggestions
       const availableWidgets = [
         ...plugin.widgets.map(w => w.id),
-        ...registry.widgets.filter(w => w.plugin.id === plugin.id).map(w => w.id),
+        ...(registry.widgets ?? []).filter(w => w.plugin.id === plugin.id).map(w => w.id),
       ];
       
       // Find similar widget IDs (simple fuzzy match)
@@ -217,7 +217,7 @@ export function PluginPage(): React.ReactElement {
     <div style={{ padding: '24px' }}>
       <div>Layout {layoutId} not found in registry.</div>
       <div style={{ marginTop: '16px' }}>
-        <div>Available layouts: {registry.layouts.map(l => l.id).join(', ') || 'none'}</div>
+        <div>Available layouts: {(registry.layouts ?? []).map(l => l.id).join(', ') || 'none'}</div>
       </div>
     </div>
   );

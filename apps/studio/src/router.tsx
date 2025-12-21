@@ -11,6 +11,7 @@ import { PluginPage } from './routes/plugin-page';
 import { SettingsPage } from './modules/settings/pages/settings-page';
 import { WorkflowsListPage } from './modules/workflows/pages/workflows-list-page';
 import { WorkflowRunPage } from './modules/workflows/pages/workflow-run-page';
+import { DashboardPage } from './modules/dashboard/pages/dashboard-page';
 import { GalleryPage } from './pages/gallery-page';
 import { WidgetModalManager } from './components/widget-modal';
 import { createStudioLogger } from './utils/logger';
@@ -162,6 +163,10 @@ export const router = createBrowserRouter([
     children: [
       {
         path: '/',
+        element: <DashboardPage />,
+      },
+      {
+        path: '/gallery',
         element: <GalleryPage />,
       },
       {
@@ -170,7 +175,7 @@ export const router = createBrowserRouter([
       },
       {
         path: '/settings',
-        element: <SettingsPage />, 
+        element: <SettingsPage />,
       },
       {
         path: '/workflows',
@@ -188,26 +193,34 @@ export const router = createBrowserRouter([
   },
 ]);
 
-function buildPluginNavModel(registry: StudioRegistry): PluginNavModel[] {
+function buildPluginNavModel(registry: StudioRegistry & { menus?: any[] }): PluginNavModel[] {
   const groups = new Map<string, PluginNavModel>();
 
-  for (const menuEntry of registry.menus) {
-    const pluginId = menuEntry.plugin.id;
+  // Use nested structure since menus don't have pluginId after flatten
+  // Iterate through plugins to preserve plugin metadata
+  for (const plugin of registry.plugins ?? []) {
+    if (!plugin.menus || plugin.menus.length === 0) {
+      continue;
+    }
+
+    const pluginId = plugin.pluginId;
     if (!groups.has(pluginId)) {
-      const plugin = registry.plugins.find(p => p.id === pluginId);
       groups.set(pluginId, {
         pluginId,
-        displayName: plugin?.displayName || pluginId,
+        displayName: pluginId, // Could be enhanced with plugin.displayName if available
         routes: [],
       });
     }
+
     const group = groups.get(pluginId)!;
-    group.routes.push({
-      key: menuEntry.id,
-      label: menuEntry.label,
-      path: menuEntry.target,
-      order: menuEntry.order,
-    });
+    for (const menuEntry of plugin.menus) {
+      group.routes.push({
+        key: menuEntry.id,
+        label: menuEntry.label,
+        path: menuEntry.target,
+        order: menuEntry.order,
+      });
+    }
   }
 
   for (const group of groups.values()) {

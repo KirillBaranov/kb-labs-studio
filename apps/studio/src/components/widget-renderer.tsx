@@ -97,8 +97,13 @@ export function WidgetRenderer({
   const [componentError, setComponentError] = React.useState<Error | null>(null);
   const [loadingComponent, setLoadingComponent] = React.useState(false);
 
-  // Find widget in registry
+  // Find widget in registry using O(1) Map lookup (from flattened registry)
   const widget = React.useMemo(() => {
+    // Use widgetMap for instant lookup instead of nested loop
+    if (registry.widgetMap) {
+      return registry.widgetMap.get(widgetId);
+    }
+    // Fallback to linear search if widgetMap not available
     if (!registry.plugins || !Array.isArray(registry.plugins)) {
       return undefined;
     }

@@ -4,15 +4,37 @@
  */
 
 import * as React from 'react';
-import type { StudioRegistry } from '@kb-labs/rest-api-contracts';
+import type {
+  StudioRegistry,
+  StudioWidgetDecl,
+  StudioLayoutDecl,
+  StudioMenuDecl,
+} from '@kb-labs/rest-api-contracts';
+import { flattenRegistry } from '@kb-labs/rest-api-contracts';
 import { loadRegistry } from '../plugins/registry';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createStudioLogger } from '../utils/logger';
 import { studioConfig } from '../config/studio.config';
 import { Skeleton, ErrorState } from '../components/widgets/shared/index';
 
+/**
+ * Registry context value with both nested and flattened structures.
+ *
+ * The registry includes:
+ * - Nested format: plugins[] array preserves plugin metadata
+ * - Flat format: widgets[], menus[], layouts[] for convenient iteration
+ * - Lookup maps: widgetMap, layoutMap for O(1) access
+ */
 interface RegistryContextValue {
-  registry: StudioRegistry;
+  registry: StudioRegistry & {
+    // Flat arrays from flattenRegistry()
+    widgets?: StudioWidgetDecl[];
+    menus?: StudioMenuDecl[];
+    layouts?: StudioLayoutDecl[];
+    // Lookup maps for fast access
+    widgetMap?: Map<string, StudioWidgetDecl>;
+    layoutMap?: Map<string, StudioLayoutDecl>;
+  };
   loading: boolean;
   error: Error | null;
   retrying: boolean;
@@ -294,26 +316,50 @@ export function RegistryProvider({
     };
   }, [apiBaseUrl, logger, queryClient]);
 
-  const value: RegistryContextValue = React.useMemo(() => ({
-    registry:
-      data ?? {
-        registryVersion: '0',
-        generatedAt: new Date().toISOString(),
-        plugins: [],
-        widgets: [],
-        menus: [],
-        layouts: [],
+  const value: RegistryContextValue = React.useMemo(() => {
+    // Flatten the registry to provide both nested and flat formats
+    const flattened = data ? flattenRegistry(data) : null;
+
+    const registry = data
+      ? {
+          // Preserve nested structure
+          schema: data.schema,
+          schemaVersion: data.schemaVersion,
+          generatedAt: data.generatedAt,
+          plugins: data.plugins,
+          // Add flat arrays for convenience
+          widgets: flattened?.widgets ?? [],
+          menus: flattened?.menus ?? [],
+          layouts: flattened?.layouts ?? [],
+          // Add lookup maps for O(1) access
+          widgetMap: flattened?.widgetMap,
+          layoutMap: flattened?.layoutMap,
+        }
+      : {
+          schema: 'kb.studio/1' as const,
+          schemaVersion: 1 as const,
+          generatedAt: new Date().toISOString(),
+          plugins: [],
+          widgets: [],
+          menus: [],
+          layouts: [],
+          widgetMap: new Map<string, StudioWidgetDecl>(),
+          layoutMap: new Map<string, StudioLayoutDecl>(),
+        };
+
+    return {
+      registry,
+      loading: isLoading || isFetching,
+      error: error instanceof Error ? error : null,
+      retrying: failureCount > 0 && !hasData(data),
+      hasData: hasData(data),
+      refresh: async () => {
+        await refetch();
       },
-    loading: isLoading || isFetching,
-    error: error instanceof Error ? error : null,
-    retrying: failureCount > 0 && !hasData(data),
-    hasData: hasData(data),
-    refresh: async () => {
-      await refetch();
-    },
-    health: healthState,
-    registryMeta,
-  }), [data, error, failureCount, healthState, isFetching, isLoading, refetch, registryMeta]);
+      health: healthState,
+      registryMeta,
+    };
+  }, [data, error, failureCount, healthState, isFetching, isLoading, refetch, registryMeta]);
 
   return (
     <RegistryContext.Provider value={value}>
