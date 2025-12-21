@@ -11,8 +11,7 @@ export function KBContent({ children, ...props }: KBContentProps) {
   return (
     <AntContent
       style={{
-        margin: '16px',
-        padding: 16,
+        padding: '8px 16px',
         minHeight: 280,
       }}
       {...props}

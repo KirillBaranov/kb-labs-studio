@@ -14,6 +14,7 @@ export * from './components/kb-button';
 export * from './components/kb-card';
 export * from './components/kb-badge';
 export * from './components/kb-grid';
+export * from './components/kb-grid-layout';
 export * from './components/kb-skeleton';
 export * from './components/kb-tabs';
 export * from './components/kb-list';
