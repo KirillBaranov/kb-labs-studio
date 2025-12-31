@@ -6,6 +6,7 @@ import { DataSourcesProvider } from './providers/data-sources-provider';
 import { AuthProvider } from './providers/auth-provider';
 import { RegistryProvider } from './providers/registry-provider';
 import { SettingsProvider } from './providers/settings-provider';
+import { CommandPaletteProvider } from './providers/command-palette-provider';
 import { router } from './router';
 // Ant Design 5.x styles are optional - components use CSS-in-JS
 // If needed, uncomment: import 'antd/dist/reset.css';
@@ -27,8 +28,10 @@ export function App() {
           <QueryClientProvider client={queryClient}>
             <DataSourcesProvider>
               <RegistryProvider apiBaseUrl={import.meta.env.VITE_API_BASE_URL || '/api/v1'}>
-                <RouterProvider router={router} />
-                <ReactQueryDevtools initialIsOpen={false} />
+                <CommandPaletteProvider>
+                  <RouterProvider router={router} />
+                  <ReactQueryDevtools initialIsOpen={false} />
+                </CommandPaletteProvider>
               </RegistryProvider>
             </DataSourcesProvider>
           </QueryClientProvider>
