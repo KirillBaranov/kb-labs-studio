@@ -88,7 +88,7 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
         description: cmd.description,
         category: cmd.category as SearchableItem['category'],
         path: cmd.path,
-        icon: cmd.icon,
+        icon: undefined, // Explicitly set to undefined - icons will be rendered based on category
         badge: cmd.shortcut,
       };
 
