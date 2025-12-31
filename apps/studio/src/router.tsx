@@ -14,6 +14,11 @@ import { DashboardPage } from './modules/dashboard/pages/dashboard-page';
 import { GalleryPage } from './pages/gallery-page';
 import { StateBrokerPage } from './modules/observability/pages/state-broker-page';
 import { DevKitPage } from './modules/observability/pages/devkit-page';
+import { PrometheusMetricsPage } from './modules/observability/pages/prometheus-metrics-page';
+import { SystemEventsPage } from './modules/observability/pages/system-events-page';
+import { AnalyticsOverviewPage } from './modules/analytics/pages/analytics-overview-page';
+import { AnalyticsEventsPage } from './modules/analytics/pages/analytics-events-page';
+import { AnalyticsLLMPage } from './modules/analytics/pages/analytics-llm-page';
 import { WidgetModalManager } from './components/widget-modal';
 import { createStudioLogger } from './utils/logger';
 import { ErrorBoundary } from './components/error-boundary';
@@ -90,6 +95,38 @@ function LayoutContent() {
         path: '/workflows',
       },
       {
+        key: 'analytics',
+        label: 'Analytics',
+        icon: renderPluginIcon('BarChartOutlined'),
+        children: [
+          {
+            key: 'analytics-overview',
+            label: 'Overview',
+            path: '/analytics/overview',
+            icon: renderPluginIcon('DashboardOutlined'),
+          },
+          {
+            key: 'analytics-events',
+            label: 'Events',
+            path: '/analytics/events',
+            icon: renderPluginIcon('ThunderboltOutlined'),
+          },
+          {
+            key: 'analytics-adapters',
+            label: 'Adapters',
+            icon: renderPluginIcon('ApiOutlined'),
+            children: [
+              {
+                key: 'analytics-llm',
+                label: 'LLM Usage',
+                path: '/analytics/llm',
+                icon: renderPluginIcon('RobotOutlined'),
+              },
+            ],
+          },
+        ],
+      },
+      {
         key: 'observability',
         label: 'Observability',
         icon: renderPluginIcon('LineChartOutlined'),
@@ -105,6 +142,18 @@ function LayoutContent() {
             label: 'DevKit Health',
             path: '/observability/devkit',
             icon: renderPluginIcon('CheckCircleOutlined'),
+          },
+          {
+            key: 'prometheus-metrics',
+            label: 'Prometheus Metrics',
+            path: '/observability/prometheus-metrics',
+            icon: renderPluginIcon('ApiOutlined'),
+          },
+          {
+            key: 'system-events',
+            label: 'System Events',
+            path: '/observability/system-events',
+            icon: renderPluginIcon('ThunderboltOutlined'),
           },
         ],
       },
@@ -207,6 +256,21 @@ export const router = createBrowserRouter([
         errorElement: <ErrorBoundary />,
       },
       {
+        path: '/analytics/overview',
+        element: <AnalyticsOverviewPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/analytics/events',
+        element: <AnalyticsEventsPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/analytics/llm',
+        element: <AnalyticsLLMPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
         path: '/observability/state-broker',
         element: <StateBrokerPage />,
         errorElement: <ErrorBoundary />,
@@ -214,6 +278,16 @@ export const router = createBrowserRouter([
       {
         path: '/observability/devkit',
         element: <DevKitPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/observability/prometheus-metrics',
+        element: <PrometheusMetricsPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/observability/system-events',
+        element: <SystemEventsPage />,
         errorElement: <ErrorBoundary />,
       },
     ],
