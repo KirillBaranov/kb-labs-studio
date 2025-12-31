@@ -3,6 +3,7 @@ import { Layout as AntLayout } from 'antd';
 import { KBHeader, type KBHeaderProps } from './kb-header';
 import { KBSidebar, type KBSidebarProps, type NavigationItem } from './kb-sidebar';
 import { KBContent, type KBContentProps } from './kb-content';
+import { KBStatusBar } from './kb-status-bar';
 
 export interface KBPageLayoutProps {
   headerProps?: KBHeaderProps;
@@ -10,6 +11,8 @@ export interface KBPageLayoutProps {
   contentProps?: KBContentProps;
   sidebarCollapsed?: boolean;
   onSidebarCollapse?: (collapsed: boolean) => void;
+  /** Custom status bar content (if not provided, no status bar is shown) */
+  statusBar?: React.ReactNode;
   children?: React.ReactNode;
 }
 
@@ -19,6 +22,7 @@ export function KBPageLayout({
   contentProps,
   sidebarCollapsed,
   onSidebarCollapse,
+  statusBar,
   children,
 }: KBPageLayoutProps) {
   const [internalCollapsed, setInternalCollapsed] = React.useState(false);
@@ -44,11 +48,13 @@ export function KBPageLayout({
             marginLeft: collapsed ? sidebarProps.collapsedWidth || 80 : sidebarProps.width || 200,
             transition: 'margin-left 0.2s',
             minHeight: 'calc(100vh - 64px)',
+            paddingBottom: statusBar ? 28 : 0, // Add padding for status bar
           }}
         >
           <KBContent {...contentProps}>{children}</KBContent>
         </AntLayout>
       </AntLayout>
+      {statusBar}
     </AntLayout>
   );
 }

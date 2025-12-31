@@ -2,6 +2,7 @@ import * as React from 'react';
 import { ConfigProvider } from 'antd';
 import type { ConfigProviderProps, ThemeConfig } from 'antd';
 import { getAntDesignTokens, getAntDesignComponents, getThemeAlgorithm } from '../lib/theme-adapter';
+import { ThemeTransitionOverlay } from './theme-transition-overlay';
 
 export type ThemeMode = 'light' | 'dark' | 'auto';
 
@@ -33,11 +34,14 @@ export function KBConfigProvider({
   };
 
   const [theme, setThemeState] = React.useState<ThemeMode>(getInitialTheme);
+  const [showOverlay, setShowOverlay] = React.useState(false);
+  const [overlayTheme, setOverlayTheme] = React.useState<ThemeMode>(theme);
+  const [isInitialMount, setIsInitialMount] = React.useState(true);
 
   // Get actual theme for tokens (auto -> system preference)
   const actualTheme = React.useMemo(() => {
     if (typeof window === 'undefined') return theme === 'auto' ? 'light' : theme;
-    return theme === 'auto' 
+    return theme === 'auto'
       ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
       : theme;
   }, [theme]);
@@ -59,9 +63,34 @@ export function KBConfigProvider({
     localStorage.setItem(storageKey, theme);
   }, [theme, storageKey]);
 
-  const setTheme = React.useCallback((newTheme: ThemeMode) => {
-    setThemeState(newTheme);
+  // Mark initial mount as complete after first render
+  React.useEffect(() => {
+    setIsInitialMount(false);
   }, []);
+
+  const setTheme = React.useCallback((newTheme: ThemeMode) => {
+    // Skip overlay on initial mount
+    if (isInitialMount) {
+      setThemeState(newTheme);
+      return;
+    }
+
+    // Show overlay with new theme label
+    setOverlayTheme(newTheme);
+    setShowOverlay(true);
+
+    // Wait for overlay to slide down (300ms)
+    setTimeout(() => {
+      // Change theme while overlay covers the screen
+      setThemeState(newTheme);
+
+      // Hold overlay to let color transition finish (150ms transition + 100ms buffer)
+      setTimeout(() => {
+        // Slide overlay back up
+        setShowOverlay(false);
+      }, 250);
+    }, 300);
+  }, [isInitialMount]);
 
   // Tokens now use CSS variables via var() - no need to recompute
   const tokens = React.useMemo(() => getAntDesignTokens(actualTheme), [actualTheme]);
@@ -85,6 +114,7 @@ export function KBConfigProvider({
     <KBConfigProviderContext.Provider value={value}>
       <ConfigProvider theme={themeConfig} {...configProps}>
         {children}
+        <ThemeTransitionOverlay show={showOverlay} theme={overlayTheme} />
       </ConfigProvider>
     </KBConfigProviderContext.Provider>
   );

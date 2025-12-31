@@ -73,7 +73,21 @@ export function KBSystemHealthIndicator({
 
   // Build dropdown content
   const dropdownContent = React.useMemo(() => {
-    if (!health) return null;
+    if (!health) {
+      return (
+        <div style={{
+          padding: '12px 16px',
+          minWidth: 280,
+          backgroundColor: 'var(--bg-primary)',
+          borderRadius: 8,
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+        }}>
+          <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+            No health data available
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div style={{
@@ -179,26 +193,36 @@ export function KBSystemHealthIndicator({
     health?.registryStale ||
     health?.registryPartial;
 
+  const buttonElement = (
+    <Button
+      type="text"
+      onClick={onClick}
+      icon={<StatusIcon size={18} color={config.color} strokeWidth={2} />}
+      style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+    >
+      System
+    </Button>
+  );
+
   return (
     <Dropdown
       dropdownRender={() => dropdownContent}
       placement="bottomRight"
       trigger={['click']}
     >
-      <Badge
-        dot={showBadge}
-        status={config.badgeStatus}
-        offset={[-2, 2]}
-      >
-        <Button
-          type="text"
-          onClick={onClick}
-          icon={<StatusIcon size={18} color={config.color} strokeWidth={2} />}
-          style={{ display: 'flex', alignItems: 'center', gap: 4 }}
-        >
-          System
-        </Button>
-      </Badge>
+      <span>
+        {showBadge ? (
+          <Badge
+            dot
+            status={config.badgeStatus}
+            offset={[-2, 2]}
+          >
+            <span>{buttonElement}</span>
+          </Badge>
+        ) : (
+          buttonElement
+        )}
+      </span>
     </Dropdown>
   );
 }
