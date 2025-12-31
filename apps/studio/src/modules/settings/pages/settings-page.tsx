@@ -8,7 +8,8 @@ import {
   BellOutlined,
   ToolOutlined,
   ReloadOutlined,
-  DeleteOutlined
+  DeleteOutlined,
+  ExperimentOutlined,
 } from '@ant-design/icons';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useHealthStatus } from '@kb-labs/studio-data-client';
@@ -20,6 +21,7 @@ import { AppearanceSettings } from '../components/appearance-settings';
 import { DataPrivacySettings } from '../components/data-privacy-settings';
 import { DashboardSettings } from '../components/dashboard-settings';
 import { NotificationsSettings } from '../components/notifications-settings';
+import { ExperimentalSettings } from '../components/experimental-settings';
 
 const { Text, Paragraph, Title } = Typography;
 
@@ -58,7 +60,7 @@ export function SettingsPage() {
     {
       key: 'appearance',
       label: (
-        <span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <BgColorsOutlined />
           Appearance
         </span>
@@ -74,7 +76,7 @@ export function SettingsPage() {
     {
       key: 'dashboard',
       label: (
-        <span style={{ opacity: 0.6 }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6, opacity: 0.6 }}>
           <DashboardOutlined />
           Dashboard 🚧
         </span>
@@ -90,7 +92,7 @@ export function SettingsPage() {
     {
       key: 'notifications',
       label: (
-        <span style={{ opacity: 0.6 }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6, opacity: 0.6 }}>
           <BellOutlined />
           Notifications 🚧
         </span>
@@ -106,7 +108,7 @@ export function SettingsPage() {
     {
       key: 'privacy',
       label: (
-        <span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <LockOutlined />
           Data & Privacy
         </span>
@@ -122,7 +124,7 @@ export function SettingsPage() {
     {
       key: 'system',
       label: (
-        <span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <DatabaseOutlined />
           System Info
         </span>
@@ -199,9 +201,25 @@ export function SettingsPage() {
       ),
     },
     {
+      key: 'experimental',
+      label: (
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <ExperimentOutlined />
+          Experimental
+        </span>
+      ),
+      children: (
+        <KBSection>
+          <KBCard>
+            <ExperimentalSettings />
+          </KBCard>
+        </KBSection>
+      ),
+    },
+    {
       key: 'developer',
       label: (
-        <span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <ToolOutlined />
           Developer
         </span>
