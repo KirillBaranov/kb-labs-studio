@@ -16,6 +16,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createStudioLogger } from '../utils/logger';
 import { studioConfig } from '../config/studio.config';
 import { Skeleton, ErrorState } from '../components/widgets/shared/index';
+import { KBFullPageLoader } from '@kb-labs/studio-ui-react';
 
 /**
  * Registry context value with both nested and flattened structures.
@@ -363,11 +364,12 @@ export function RegistryProvider({
 
   return (
     <RegistryContext.Provider value={value}>
-      {value.loading && !value.hasData ? (
-        <div className="registry-loading" style={{ padding: '2rem' }}>
-          <Skeleton variant="text" rows={4} />
-        </div>
-      ) : value.error && !value.hasData ? (
+      <KBFullPageLoader
+        show={value.loading && !value.hasData}
+        message="Loading Studio Registry..."
+        tip="Initializing plugins and widgets"
+      />
+      {value.error && !value.hasData ? (
         <div className="registry-error" style={{ padding: '2rem' }}>
           <ErrorState
             error={value.error.message}
