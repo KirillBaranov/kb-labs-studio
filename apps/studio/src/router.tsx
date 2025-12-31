@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { createBrowserRouter, Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { KBPageLayout, type NavigationItem, AVAILABLE_ICONS, getAvailableIconNames } from '@kb-labs/studio-ui-react';
+import { KBPageLayout, type NavigationItem, AVAILABLE_ICONS, getAvailableIconNames, KBQuickSearch, type SearchableItem } from '@kb-labs/studio-ui-react';
 import type { StudioRegistry } from '@kb-labs/rest-api-contracts';
 import { useAuth } from './providers/auth-provider';
 import { useRegistry } from './providers/registry-provider';
@@ -19,6 +19,10 @@ import { SystemEventsPage } from './modules/observability/pages/system-events-pa
 import { AnalyticsOverviewPage } from './modules/analytics/pages/analytics-overview-page';
 import { AnalyticsEventsPage } from './modules/analytics/pages/analytics-events-page';
 import { AnalyticsLLMPage } from './modules/analytics/pages/analytics-llm-page';
+import { AnalyticsEmbeddingsPage } from './modules/analytics/pages/analytics-embeddings-page';
+import { AnalyticsVectorStorePage } from './modules/analytics/pages/analytics-vectorstore-page';
+import { AnalyticsCachePage } from './modules/analytics/pages/analytics-cache-page';
+import { AnalyticsStoragePage } from './modules/analytics/pages/analytics-storage-page';
 import { WidgetModalManager } from './components/widget-modal';
 import { createStudioLogger } from './utils/logger';
 import { ErrorBoundary } from './components/error-boundary';
@@ -61,6 +65,7 @@ function LayoutContent() {
   const { registry, loading, error, retrying, hasData, refresh, registryMeta, health } = useRegistry();
 
   const [pluginNavModel, setPluginNavModel] = React.useState<PluginNavModel[]>([]);
+  const [searchOpen, setSearchOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (!hasData) {
@@ -121,6 +126,30 @@ function LayoutContent() {
                 label: 'LLM Usage',
                 path: '/analytics/llm',
                 icon: renderPluginIcon('RobotOutlined'),
+              },
+              {
+                key: 'analytics-embeddings',
+                label: 'Embeddings Usage',
+                path: '/analytics/embeddings',
+                icon: renderPluginIcon('FileTextOutlined'),
+              },
+              {
+                key: 'analytics-vectorstore',
+                label: 'VectorStore Usage',
+                path: '/analytics/vectorstore',
+                icon: renderPluginIcon('DatabaseOutlined'),
+              },
+              {
+                key: 'analytics-cache',
+                label: 'Cache Usage',
+                path: '/analytics/cache',
+                icon: renderPluginIcon('ThunderboltOutlined'),
+              },
+              {
+                key: 'analytics-storage',
+                label: 'Storage Usage',
+                path: '/analytics/storage',
+                icon: renderPluginIcon('SaveOutlined'),
               },
             ],
           },
@@ -191,28 +220,200 @@ function LayoutContent() {
     }
   }, [error, logger]);
 
+  // Build searchable items from navigation
+  const searchableItems = React.useMemo<SearchableItem[]>(() => {
+    const items: SearchableItem[] = [];
+
+    // Add main pages
+    items.push(
+      {
+        id: 'page-dashboard',
+        title: 'Dashboard',
+        description: 'Main dashboard with widgets',
+        category: 'page',
+        path: '/',
+      },
+      {
+        id: 'page-workflows',
+        title: 'Workflows',
+        description: 'View and manage workflows',
+        category: 'page',
+        path: '/workflows',
+      },
+      {
+        id: 'page-settings',
+        title: 'Settings',
+        description: 'Application settings',
+        category: 'page',
+        path: '/settings',
+      }
+    );
+
+    // Add Analytics pages
+    items.push(
+      {
+        id: 'page-analytics-overview',
+        title: 'Analytics Overview',
+        description: 'Analytics dashboard and insights',
+        category: 'page',
+        path: '/analytics/overview',
+      },
+      {
+        id: 'page-analytics-events',
+        title: 'Analytics Events',
+        description: 'Event tracking and analytics',
+        category: 'page',
+        path: '/analytics/events',
+      },
+      {
+        id: 'page-analytics-llm',
+        title: 'LLM Usage Analytics',
+        description: 'LLM adapter usage metrics',
+        category: 'page',
+        path: '/analytics/llm',
+      },
+      {
+        id: 'page-analytics-embeddings',
+        title: 'Embeddings Analytics',
+        description: 'Embeddings adapter usage metrics',
+        category: 'page',
+        path: '/analytics/embeddings',
+      },
+      {
+        id: 'page-analytics-vectorstore',
+        title: 'VectorStore Analytics',
+        description: 'VectorStore adapter usage metrics',
+        category: 'page',
+        path: '/analytics/vectorstore',
+      },
+      {
+        id: 'page-analytics-cache',
+        title: 'Cache Analytics',
+        description: 'Cache adapter usage metrics',
+        category: 'page',
+        path: '/analytics/cache',
+      },
+      {
+        id: 'page-analytics-storage',
+        title: 'Storage Analytics',
+        description: 'Storage adapter usage metrics',
+        category: 'page',
+        path: '/analytics/storage',
+      }
+    );
+
+    // Add Observability pages
+    items.push(
+      {
+        id: 'page-state-broker',
+        title: 'State Broker',
+        description: 'State management and caching',
+        category: 'page',
+        path: '/observability/state-broker',
+      },
+      {
+        id: 'page-devkit',
+        title: 'DevKit Health',
+        description: 'Development tools health check',
+        category: 'page',
+        path: '/observability/devkit',
+      },
+      {
+        id: 'page-prometheus',
+        title: 'Prometheus Metrics',
+        description: 'System metrics and monitoring',
+        category: 'page',
+        path: '/observability/prometheus-metrics',
+      },
+      {
+        id: 'page-system-events',
+        title: 'System Events',
+        description: 'System event logs',
+        category: 'page',
+        path: '/observability/system-events',
+      }
+    );
+
+    // Add plugin widgets
+    if (hasData && registry.widgets) {
+      for (const widget of registry.widgets) {
+        items.push({
+          id: `widget-${widget.id}`,
+          title: widget.displayName,
+          description: widget.description || `Widget from ${widget.pluginId}`,
+          category: 'widget',
+          path: `/plugins/${widget.pluginId}/${widget.widgetName}`,
+        });
+      }
+    }
+
+    return items;
+  }, [hasData, registry.widgets]);
+
+  // Handle Cmd+K / Ctrl+K hotkey for search
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   return (
-    <KBPageLayout
-      headerProps={{
-        LinkComponent: Link as any,
-        onLogout: () => {
-          // TODO: Implement logout
-          logger.info('Logout initiated');
-        },
-        userName: auth.role,
-      }}
+    <>
+      <KBPageLayout
+        headerProps={{
+          LinkComponent: Link as any,
+          onLogout: () => {
+            // TODO: Implement logout
+            logger.info('Logout initiated');
+          },
+          userName: auth.role,
+          systemHealth: health
+            ? {
+                status: health.status as 'healthy' | 'degraded' | 'down' | 'unknown',
+                ready: health.ready,
+                reason: health.reason,
+                pluginsMounted: health.pluginsMounted,
+                pluginsFailed: health.pluginsFailed,
+                registryRev: registryMeta.rev,
+                registryGeneratedAt: registryMeta.generatedAt,
+                registryStale: registryMeta.stale,
+                registryPartial: registryMeta.partial,
+                redisEnabled: health.redisEnabled,
+                redisHealthy: health.redisHealthy,
+              }
+            : undefined,
+          systemHealthLoading: loading && !hasData,
+          onSearchClick: () => setSearchOpen(true),
+        }}
       sidebarProps={{
         items: allNavigationItems,
-        width: 200,
+        width: 240,
         collapsedWidth: 80,
         currentPath: location.pathname,
         onNavigate: (path) => navigate(path),
       }}
     >
-      <HealthBanner />
-      <Outlet />
-      <WidgetModalManager />
-    </KBPageLayout>
+        <HealthBanner />
+        <Outlet />
+        <WidgetModalManager />
+      </KBPageLayout>
+
+      <KBQuickSearch
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        items={searchableItems}
+        onNavigate={(path) => {
+          navigate(path);
+          setSearchOpen(false);
+        }}
+      />
+    </>
   );
 }
 
@@ -268,6 +469,26 @@ export const router = createBrowserRouter([
       {
         path: '/analytics/llm',
         element: <AnalyticsLLMPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/analytics/embeddings',
+        element: <AnalyticsEmbeddingsPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/analytics/vectorstore',
+        element: <AnalyticsVectorStorePage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/analytics/cache',
+        element: <AnalyticsCachePage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/analytics/storage',
+        element: <AnalyticsStoragePage />,
         errorElement: <ErrorBoundary />,
       },
       {
