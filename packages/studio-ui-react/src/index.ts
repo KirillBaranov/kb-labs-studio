@@ -29,10 +29,13 @@ export * from './components/kb-sheet';
 // Theme components
 export * from './components/kb-config-provider';
 export * from './components/kb-theme-toggle';
+export * from './components/theme-transition-overlay';
 
 // Utility components
 export * from './components/kb-system-health-indicator';
 export * from './components/kb-quick-search';
+export * from './components/kb-full-page-loader';
+export * from './components/kb-status-bar';
 
 // Chart components
 export * from './components/kb-chart';
