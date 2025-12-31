@@ -3,14 +3,17 @@
  * Custom error boundary for React Router with friendly UI
  */
 
+import * as React from 'react';
 import { useRouteError, isRouteErrorResponse, Link } from 'react-router-dom';
-import { Result, Button, Card, Typography, Space } from 'antd';
-import { HomeOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Result, Button, Card, Typography, Space, Collapse, Tag, message } from 'antd';
+import { HomeOutlined, ReloadOutlined, BugOutlined, CodeOutlined, CopyOutlined, CheckOutlined } from '@ant-design/icons';
 
 const { Paragraph, Text } = Typography;
+const { Panel } = Collapse;
 
 export function ErrorBoundary() {
   const error = useRouteError();
+  const [copied, setCopied] = React.useState(false);
 
   let title = 'Упс! Что-то пошло не так';
   let description = 'Произошла непредвиденная ошибка';
@@ -52,6 +55,13 @@ export function ErrorBoundary() {
     }
   }
 
+  // Extract error details
+  const errorDetails = error instanceof Error ? {
+    name: error.name,
+    message: error.message,
+    stack: error.stack,
+  } : null;
+
   return (
     <div style={{
       display: 'flex',
@@ -63,7 +73,7 @@ export function ErrorBoundary() {
     }}>
       <Card
         style={{
-          maxWidth: '600px',
+          maxWidth: '800px',
           width: '100%',
           borderRadius: '16px',
           boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
@@ -84,19 +94,118 @@ export function ErrorBoundary() {
             </Space>
           }
           extra={
-            <Space size="middle" style={{ marginTop: '1.5rem' }}>
-              <Link to="/">
-                <Button type="primary" size="large" icon={<HomeOutlined />}>
-                  На главную
+            <Space direction="vertical" size="large" style={{ width: '100%', marginTop: '1.5rem' }}>
+              <Space size="middle">
+                <Link to="/">
+                  <Button type="primary" size="large" icon={<HomeOutlined />}>
+                    На главную
+                  </Button>
+                </Link>
+                <Button
+                  size="large"
+                  icon={<ReloadOutlined />}
+                  onClick={() => window.location.reload()}
+                >
+                  Перезагрузить
                 </Button>
-              </Link>
-              <Button
-                size="large"
-                icon={<ReloadOutlined />}
-                onClick={() => window.location.reload()}
-              >
-                Перезагрузить
-              </Button>
+              </Space>
+
+              {/* Error Details Collapse */}
+              {errorDetails && (
+                <Collapse
+                  ghost
+                  style={{ width: '100%', textAlign: 'left' }}
+                  items={[
+                    {
+                      key: 'details',
+                      label: (
+                        <Space>
+                          <BugOutlined />
+                          <Text strong>Детали ошибки (для разработчиков)</Text>
+                        </Space>
+                      ),
+                      children: (
+                        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                          {/* Error Type */}
+                          <div>
+                            <Text type="secondary" style={{ fontSize: '0.75rem' }}>Тип ошибки:</Text>
+                            <div style={{ marginTop: 4 }}>
+                              <Tag color="red" icon={<CodeOutlined />}>
+                                {errorDetails.name}
+                              </Tag>
+                            </div>
+                          </div>
+
+                          {/* Error Message */}
+                          <div>
+                            <Text type="secondary" style={{ fontSize: '0.75rem' }}>Сообщение:</Text>
+                            <div
+                              style={{
+                                marginTop: 4,
+                                padding: '12px',
+                                background: 'var(--bg-secondary)',
+                                borderRadius: '8px',
+                                fontFamily: 'monospace',
+                                fontSize: '0.875rem',
+                                wordBreak: 'break-word',
+                              }}
+                            >
+                              <Text code>{errorDetails.message}</Text>
+                            </div>
+                          </div>
+
+                          {/* Stack Trace */}
+                          {errorDetails.stack && (
+                            <div>
+                              <Text type="secondary" style={{ fontSize: '0.75rem' }}>Stack Trace:</Text>
+                              <div
+                                style={{
+                                  marginTop: 4,
+                                  padding: '12px',
+                                  background: '#1e1e1e',
+                                  borderRadius: '8px',
+                                  maxHeight: '300px',
+                                  overflow: 'auto',
+                                }}
+                              >
+                                <pre
+                                  style={{
+                                    margin: 0,
+                                    fontFamily: 'Monaco, Menlo, "Courier New", monospace',
+                                    fontSize: '0.75rem',
+                                    lineHeight: 1.5,
+                                    color: '#d4d4d4',
+                                    whiteSpace: 'pre-wrap',
+                                    wordBreak: 'break-word',
+                                  }}
+                                >
+                                  {errorDetails.stack}
+                                </pre>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Copy to Clipboard */}
+                          <Button
+                            size="small"
+                            type={copied ? 'primary' : 'default'}
+                            icon={copied ? <CheckOutlined /> : <CopyOutlined />}
+                            onClick={() => {
+                              const text = `${errorDetails.name}: ${errorDetails.message}\n\n${errorDetails.stack || 'No stack trace'}`;
+                              navigator.clipboard.writeText(text);
+                              setCopied(true);
+                              message.success('Ошибка скопирована в буфер обмена');
+                              setTimeout(() => setCopied(false), 2000);
+                            }}
+                          >
+                            {copied ? 'Скопировано!' : 'Скопировать в буфер обмена'}
+                          </Button>
+                        </Space>
+                      ),
+                    },
+                  ]}
+                />
+              )}
             </Space>
           }
         />
