@@ -10,6 +10,7 @@ import {
   ReloadOutlined,
   DeleteOutlined,
   ExperimentOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useHealthStatus } from '@kb-labs/studio-data-client';
@@ -22,6 +23,7 @@ import { DataPrivacySettings } from '../components/data-privacy-settings';
 import { DashboardSettings } from '../components/dashboard-settings';
 import { NotificationsSettings } from '../components/notifications-settings';
 import { ExperimentalSettings } from '../components/experimental-settings';
+import { RoleSwitcher } from '@/components/role-switcher';
 
 const { Text, Paragraph, Title } = Typography;
 
@@ -217,6 +219,22 @@ export function SettingsPage() {
       ),
     },
     {
+      key: 'authentication',
+      label: (
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <UserOutlined />
+          Authentication
+        </span>
+      ),
+      children: (
+        <KBSection>
+          <KBCard>
+            <RoleSwitcher />
+          </KBCard>
+        </KBSection>
+      ),
+    },
+    {
       key: 'developer',
       label: (
         <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -276,12 +294,14 @@ export function SettingsPage() {
         description="Configure your preferences, manage data, and customize your experience"
       />
 
-      <Tabs
-        defaultActiveKey="appearance"
-        items={tabItems}
-        size="large"
-        style={{ marginTop: 24 }}
-      />
+      <div style={{ paddingLeft: 24, paddingRight: 24 }}>
+        <Tabs
+          defaultActiveKey="appearance"
+          items={tabItems}
+          size="large"
+          style={{ marginTop: 24 }}
+        />
+      </div>
     </KBPageContainer>
   );
 }
