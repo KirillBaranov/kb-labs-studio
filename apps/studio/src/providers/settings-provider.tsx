@@ -1,10 +1,15 @@
 import * as React from 'react';
+import type { FeatureId } from '@/config/feature-flags';
 
 export interface UserSettings {
   appearance: {
     theme: 'light' | 'dark' | 'auto';
     compactMode: boolean;
     fontSize: 'small' | 'medium' | 'large';
+  };
+  experimental: {
+    /** User-enabled feature flags */
+    enabledFeatures: FeatureId[];
   };
 }
 
@@ -13,6 +18,9 @@ const DEFAULT_SETTINGS: UserSettings = {
     theme: 'light',
     compactMode: false,
     fontSize: 'medium',
+  },
+  experimental: {
+    enabledFeatures: [],
   },
 };
 
@@ -34,7 +42,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
-        return { ...DEFAULT_SETTINGS, ...parsed };
+        // Deep merge to ensure new fields (like experimental) are properly initialized
+        return {
+          appearance: { ...DEFAULT_SETTINGS.appearance, ...(parsed.appearance || {}) },
+          experimental: { ...DEFAULT_SETTINGS.experimental, ...(parsed.experimental || {}) },
+        };
       }
     } catch (error) {
       console.error('Failed to load settings:', error);
@@ -74,6 +86,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       appearance: {
         ...prev.appearance,
         ...(updates.appearance || {}),
+      },
+      experimental: {
+        ...prev.experimental,
+        ...(updates.experimental || {}),
       },
     }));
   }, []);
