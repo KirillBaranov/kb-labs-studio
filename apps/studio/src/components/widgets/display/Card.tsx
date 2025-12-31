@@ -8,6 +8,7 @@ import { Card as AntCard, Typography, Tag, Space, Avatar } from 'antd';
 import { Skeleton, EmptyState, ErrorState } from '../shared/index';
 import type { BaseWidgetProps } from '../types';
 import type { CardOptions as ContractOptions, CardData } from '@kb-labs/studio-contracts';
+import { ActionToolbar } from '../../action-toolbar';
 
 const { Text, Paragraph } = Typography;
 
@@ -17,7 +18,7 @@ export interface CardProps extends BaseWidgetProps<CardData, CardOptions> {
   onClick?: () => void;
 }
 
-export function Card({ data, loading, error, options, onClick }: CardProps) {
+export function Card({ data, loading, error, options, actions, widgetId, pluginId, onClick }: CardProps) {
   if (loading || options?.loading) {
     return (
       <AntCard>
@@ -72,12 +73,23 @@ export function Card({ data, loading, error, options, onClick }: CardProps) {
     }
   };
 
+  const cardExtra = actions && actions.length > 0 ? (
+    <ActionToolbar
+      actions={actions}
+      widgetData={data}
+      widgetId={widgetId}
+      pluginId={pluginId}
+      size="small"
+    />
+  ) : undefined;
+
   return (
     <AntCard
       style={cardStyle}
       hoverable={clickable || !!href}
       onClick={handleClick}
       cover={cover && coverPosition === 'top' ? <img alt={title} src={cover} style={{ objectFit: 'cover', maxHeight: 200 }} /> : undefined}
+      extra={cardExtra}
       bodyStyle={{ padding: paddingMap[padding] }}
     >
       {showHeader && (avatar || title) && (

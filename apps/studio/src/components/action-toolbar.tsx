@@ -7,13 +7,15 @@ import * as React from 'react';
 import { Button, Dropdown, Space, Tooltip } from 'antd';
 import type { MenuProps } from 'antd';
 import * as Icons from '@ant-design/icons';
-import type { WidgetAction } from '../types/actions';
+import type { WidgetAction } from '@kb-labs/studio-contracts';
 import { useWidgetActions } from '../hooks/useWidgetActions';
 import { Modal } from 'antd';
 
 export interface ActionToolbarProps {
   /** Actions to display */
   actions: WidgetAction[];
+  /** Widget data for bodyMap */
+  widgetData?: unknown;
   /** Widget ID */
   widgetId?: string;
   /** Plugin ID */
@@ -35,6 +37,7 @@ export interface ActionToolbarProps {
  */
 export function ActionToolbar({
   actions,
+  widgetData,
   widgetId,
   pluginId,
   basePath,
@@ -56,9 +59,20 @@ export function ActionToolbar({
   const visibleActions = React.useMemo(() => {
     return actions
       .filter((action) => {
-        if (action.visible === false) return false;
-        if (action.visible === true) return true;
-        // TODO: Evaluate JSONLogic expression if string
+        // Boolean visibility (MVP)
+        if (typeof action.visible === 'boolean') {
+          return action.visible;
+        }
+
+        // JSONLogic expression (future)
+        if (typeof action.visible === 'string') {
+          // TODO: Implement JSONLogic evaluator when needed
+          // return evaluateCondition(action.visible, widgetData);
+          console.warn(`[ActionToolbar] JSONLogic not yet supported for action.visible: ${action.visible}`);
+          return true; // Fail open for future compatibility
+        }
+
+        // Default: visible
         return true;
       })
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
@@ -67,7 +81,17 @@ export function ActionToolbar({
   const handleActionClick = React.useCallback(
     async (action: WidgetAction) => {
       // Check disabled state
-      if (action.disabled === true) {
+      let isDisabled = false;
+      if (typeof action.disabled === 'boolean') {
+        isDisabled = action.disabled;
+      } else if (typeof action.disabled === 'string') {
+        // TODO: Implement JSONLogic evaluator when needed
+        // isDisabled = evaluateCondition(action.disabled, widgetData);
+        console.warn(`[ActionToolbar] JSONLogic not yet supported for action.disabled: ${action.disabled}`);
+        isDisabled = false; // Fail open for future compatibility
+      }
+
+      if (isDisabled) {
         return;
       }
 
@@ -84,7 +108,7 @@ export function ActionToolbar({
           onOk: async () => {
             setLoadingActions((prev) => new Set(prev).add(action.id));
             try {
-              await handleAction(action);
+              await handleAction(action, widgetData);
             } finally {
               setLoadingActions((prev) => {
                 const next = new Set(prev);
@@ -97,7 +121,7 @@ export function ActionToolbar({
       } else {
         setLoadingActions((prev) => new Set(prev).add(action.id));
         try {
-          await handleAction(action);
+          await handleAction(action, widgetData);
         } finally {
           setLoadingActions((prev) => {
             const next = new Set(prev);
@@ -107,7 +131,7 @@ export function ActionToolbar({
         }
       }
     },
-    [handleAction]
+    [handleAction, widgetData]
   );
 
   // Render icon

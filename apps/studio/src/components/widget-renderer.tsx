@@ -7,6 +7,7 @@ import * as React from 'react';
 import { useRegistry } from '../providers/registry-provider';
 import { useWidgetData } from '../hooks/useWidgetData';
 import type { StudioRegistryEntry } from '@kb-labs/rest-api-contracts';
+import { isCompositeWidget } from '@kb-labs/rest-api-contracts';
 import * as Widgets from './widgets/index';
 import { Skeleton, ErrorState } from './widgets/shared/index';
 import { trackWidgetEvent } from '../utils/analytics';
@@ -119,6 +120,12 @@ export function WidgetRenderer({
   // Event bus for widget communication
   const { subscribe, emit } = useWidgetEvents();
 
+  // State for dynamic query parameters from events
+  const [eventParams, setEventParams] = React.useState<Record<string, string | number | boolean>>({});
+
+  // State for complex data from events (like plan objects)
+  const [eventData, setEventData] = React.useState<unknown | null>(null);
+
   // Auto-subscribe to events from manifest
   React.useEffect(() => {
     if (!widget?.events?.subscribe) {
@@ -127,11 +134,58 @@ export function WidgetRenderer({
 
     const unsubscribes: Array<() => void> = [];
 
-    for (const eventName of widget.events.subscribe) {
+    for (const eventConfig of widget.events.subscribe) {
+      const eventName = typeof eventConfig === 'string' ? eventConfig : eventConfig.name;
+      const paramsMap = typeof eventConfig === 'object' ? eventConfig.paramsMap : undefined;
+
       const unsubscribe = subscribe(eventName, (payload) => {
-        // Emit event to widget component if it has onEvent prop
-        // This allows widgets to handle events declaratively
-        console.log(`Widget ${widgetId} received event ${eventName}:`, payload);
+        if (!payload || typeof payload !== 'object') {
+          return;
+        }
+
+        // Map event payload to query params and/or direct data
+        const newParams: Record<string, string | number | boolean> = {};
+        const mappedData: Record<string, unknown> = {};
+
+        if (paramsMap) {
+          // Use explicit mapping: paramsMap = { workspace: 'workspace', cards: 'cards' }
+          for (const [paramKey, payloadKey] of Object.entries(paramsMap)) {
+            const value = (payload as Record<string, unknown>)[payloadKey];
+            if (value !== undefined && value !== null) {
+              // If it's a primitive, add to params
+              if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+                newParams[paramKey] = value;
+              } else {
+                // If it's a complex object, store as direct data
+                mappedData[paramKey] = value;
+              }
+            }
+          }
+        } else {
+          // No mapping - copy all payload fields directly
+          for (const [key, value] of Object.entries(payload)) {
+            if (value !== undefined && value !== null) {
+              if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+                newParams[key] = value;
+              } else {
+                mappedData[key] = value;
+              }
+            }
+          }
+        }
+
+        // Update params if any
+        if (Object.keys(newParams).length > 0) {
+          setEventParams(prev => ({
+            ...prev,
+            ...newParams,
+          }));
+        }
+
+        // Update data if we received complex objects
+        if (Object.keys(mappedData).length > 0) {
+          setEventData(mappedData);
+        }
       });
       unsubscribes.push(unsubscribe);
     }
@@ -166,10 +220,28 @@ export function WidgetRenderer({
   
   const headerHints = widget?.data?.headers;
 
+  // Merge event params with source params
+  const sourceWithParams = React.useMemo(() => {
+    const source = widget?.data?.source || { type: 'mock', fixtureId: 'empty' };
+
+    if (source.type === 'rest' && Object.keys(eventParams).length > 0) {
+      const merged = {
+        ...source,
+        params: {
+          ...(source.params || {}),
+          ...eventParams,
+        },
+      };
+      return merged;
+    }
+
+    return source;
+  }, [widget?.data?.source, eventParams, widgetId]);
+
   const widgetData = useWidgetData({
     widgetId,
     pluginId: manifestId,
-    source: widget?.data?.source || { type: 'mock', fixtureId: 'empty' },
+    source: sourceWithParams,
     basePath,
     pollingMs: widget?.pollingMs || 0,
     headerHints,
@@ -329,31 +401,126 @@ export function WidgetRenderer({
   const showTitle = widgetOptions?.showTitle as boolean | undefined;
   const showDescription = widgetOptions?.showDescription as boolean | undefined;
 
+  // Create onChange handler for form widgets that auto-emits events
+  const handleChange = React.useCallback(
+    (value: unknown) => {
+
+      // Auto-emit events declared in manifest
+      if (!widget?.events?.emit || widget.events.emit.length === 0) {
+        return;
+      }
+
+      const eventConfig = widget.events.emit[0]; // Use first event config
+      const eventName = typeof eventConfig === 'string' ? eventConfig : eventConfig.name;
+      const payloadMap = typeof eventConfig === 'object' ? eventConfig.payloadMap : undefined;
+
+
+      // Build payload using payloadMap or default { value }
+      const payload: Record<string, unknown> = {};
+
+      if (payloadMap) {
+        // Use explicit mapping: payloadMap = { workspace: 'value' }
+        for (const [payloadKey, dataKey] of Object.entries(payloadMap)) {
+          if (dataKey === 'value') {
+            payload[payloadKey] = value;
+          } else if (widgetData.data && typeof widgetData.data === 'object') {
+            payload[payloadKey] = (widgetData.data as Record<string, unknown>)[dataKey];
+          }
+        }
+      } else {
+        // Default: emit { value }
+        payload.value = value;
+      }
+
+      emit(eventName, payload);
+    },
+    [widget?.events?.emit, widgetData.data, emit, widgetId]
+  );
+
+  // Render children for composite widgets (section, grid, stack, tabs, modal)
+  // Tracks visited widget IDs to prevent circular dependencies
+  const visitedWidgets = React.useRef<Set<string>>(new Set());
+
+  const renderChildren = React.useCallback((childrenIds: string[] | undefined): React.ReactNode => {
+    if (!childrenIds || !Array.isArray(childrenIds) || childrenIds.length === 0) {
+      return null;
+    }
+
+    // Clear visited set before rendering children (prevents false circular dependency warnings on re-renders)
+    visitedWidgets.current.clear();
+
+    return childrenIds.map((childId) => {
+      // Circular dependency protection
+      if (visitedWidgets.current.has(childId)) {
+        console.warn(`[WidgetRenderer] Circular dependency detected: ${childId} already in render tree`);
+        return null;
+      }
+
+      // Find child widget in registry to get its pluginId
+      const childWidget = registry.widgetMap?.get(childId);
+      if (!childWidget) {
+        console.warn(`[WidgetRenderer] Child widget not found: ${childId}`);
+        return null;
+      }
+
+      // Get pluginId from widget's plugin metadata
+      const childPluginId = childWidget.plugin?.id || pluginId;
+
+      // Mark as visited before recursing
+      visitedWidgets.current.add(childId);
+
+      return (
+        <WidgetRenderer
+          key={childId}
+          widgetId={childId}
+          pluginId={childPluginId}
+        />
+      );
+    });
+  }, [registry.widgetMap, pluginId]);
+
+  // Check if widget is composite and render children
+  const isComposite = widget && isCompositeWidget(widget);
+  const childrenNodes = isComposite ? renderChildren(widget.children) : null;
+
+  // Merge eventData with widgetData - eventData takes precedence
+  const finalData = React.useMemo(() => {
+    if (eventData) {
+      // If we have event data, use it (overrides fetched data)
+      return eventData;
+    }
+    return widgetData.data;
+  }, [eventData, widgetData.data]);
+
   // Render widget with data, wrapped in error boundary
   return (
     <>
       {headerNotice}
       <WidgetErrorBoundary widgetId={widgetId} pluginId={pluginId}>
         <WidgetComponent
-          data={widgetData.data}
+          data={finalData}
           loading={widgetData.loading}
           error={widgetData.error}
           options={widget.options}
           title={widget.title}
           description={widget.description}
+          actions={widget.actions}
+          widgetId={widgetId}
+          pluginId={manifestId}
           showTitle={showTitle}
           showDescription={showDescription}
           layoutHint={layoutHint || widget.layoutHint}
           emitEvent={emit}
           subscribeToEvent={subscribe}
+          onChange={handleChange}
           onInteraction={(event: string) => {
             trackWidgetEvent('interaction', { widgetId, pluginId, event });
           }}
-          widgetId={widgetId}
-          pluginId={manifestId}
           source={widget?.data?.source}
           headerHints={headerHints}
-        />
+        >
+          {childrenNodes}
+        </WidgetComponent>
       </WidgetErrorBoundary>
     </>
   );
