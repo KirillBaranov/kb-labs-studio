@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { Modal, Input, List, Empty, Badge } from 'antd';
-import { Search, Command, FileText, Box, Settings, BarChart, Activity } from 'lucide-react';
+import { Search, Command, FileText, Box, Settings, BarChart, Activity, Navigation, Zap } from 'lucide-react';
 
 export interface SearchableItem {
   id: string;
   title: string;
   description?: string;
-  category: 'page' | 'plugin' | 'widget' | 'workflow' | 'setting';
+  category: 'page' | 'plugin' | 'widget' | 'workflow' | 'setting' | 'navigation' | 'action';
   path: string;
   icon?: React.ReactNode;
   badge?: string;
@@ -25,6 +25,16 @@ const CATEGORY_CONFIG = {
     icon: FileText,
     color: '#1890ff',
     label: 'Page',
+  },
+  navigation: {
+    icon: Navigation,
+    color: '#13c2c2',
+    label: 'Navigation',
+  },
+  action: {
+    icon: Zap,
+    color: '#fa8c16',
+    label: 'Action',
   },
   plugin: {
     icon: Box,
