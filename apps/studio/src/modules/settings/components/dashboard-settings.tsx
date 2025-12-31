@@ -1,56 +1,41 @@
 import * as React from 'react';
-import { Form, Select, Switch, Space, Alert } from 'antd';
-import { RocketOutlined } from '@ant-design/icons';
+import { Form, Select, Switch, Space, Typography, Divider } from 'antd';
+import { ThunderboltOutlined } from '@ant-design/icons';
+import { useSettings } from '@/providers/settings-provider';
+
+const { Text } = Typography;
 
 export function DashboardSettings() {
+  const { settings, updateSettings } = useSettings();
+
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <Alert
-        message="Coming Soon"
-        description="Dashboard customization features will be available in the next release. Stay tuned!"
-        type="info"
-        showIcon
-        icon={<RocketOutlined />}
-      />
+      <Form layout="vertical">
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          <ThunderboltOutlined style={{ marginRight: 6 }} />
+          Customize your dashboard experience
+        </Text>
 
-      <div style={{ opacity: 0.5, pointerEvents: 'none' }}>
-        <Form layout="vertical">
-          <Form.Item label="Default Landing Page" help="Choose which page to show on login">
-            <Select
-              disabled
-              defaultValue="dashboard"
-              style={{ width: '100%' }}
-              options={[
-                { label: 'Dashboard', value: 'dashboard' },
-                { label: 'Analytics', value: 'analytics' },
-                { label: 'Workflows', value: 'workflows' },
-              ]}
-            />
-          </Form.Item>
+        <Divider style={{ margin: '16px 0' }} />
 
-          <Form.Item label="Auto-refresh Interval" help="How often to refresh dashboard data">
-            <Select
-              disabled
-              defaultValue={30}
-              style={{ width: '100%' }}
-              options={[
-                { label: '10 seconds', value: 10 },
-                { label: '30 seconds', value: 30 },
-                { label: '1 minute', value: 60 },
-                { label: 'Manual only', value: 0 },
-              ]}
-            />
-          </Form.Item>
-
-          <Form.Item label="Show Widget Borders">
-            <Switch disabled defaultChecked />
-          </Form.Item>
-
-          <Form.Item label="Enable Widget Animations">
-            <Switch disabled defaultChecked />
-          </Form.Item>
-        </Form>
-      </div>
+        <Form.Item
+          label="Page Transitions"
+          help="Animations when navigating between pages (requires 'page-transitions' feature flag)"
+        >
+          <Select
+            value={settings.appearance.pageTransition}
+            onChange={(value) => updateSettings({
+              appearance: { ...settings.appearance, pageTransition: value }
+            })}
+            style={{ width: '100%' }}
+            options={[
+              { label: 'None (instant)', value: 'none' },
+              { label: 'Fade (subtle)', value: 'fade' },
+              { label: 'Slide (dynamic)', value: 'slide' },
+            ]}
+          />
+        </Form.Item>
+      </Form>
     </Space>
   );
 }
