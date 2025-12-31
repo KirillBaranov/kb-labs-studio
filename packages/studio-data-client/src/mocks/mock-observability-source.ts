@@ -4,7 +4,7 @@
  */
 
 import type { ObservabilityDataSource } from '../sources/observability-source';
-import type { StateBrokerStats, DevKitHealth } from '../contracts/observability';
+import type { StateBrokerStats, DevKitHealth, PrometheusMetrics, SystemEvent } from '../contracts/observability';
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -64,6 +64,175 @@ export class MockObservabilitySource implements ObservabilityDataSource {
       },
       packages: 91,
       avgTypeCoverage: 91.1,
+    };
+  }
+
+  async getPrometheusMetrics(): Promise<PrometheusMetrics> {
+    await delay(180);
+
+    const now = Date.now();
+    const startTime = now - 7_200_000; // 2 hours ago
+
+    return {
+      requests: {
+        total: 1542,
+        success: 1489,
+        clientErrors: 38,
+        serverErrors: 15,
+      },
+      latency: {
+        average: 47.3,
+        min: 3.2,
+        max: 892.5,
+        p50: 38.1,
+        p95: 125.7,
+        p99: 287.4,
+      },
+      perPlugin: [
+        {
+          pluginId: 'workflow',
+          requests: 523,
+          errors: 12,
+          latency: {
+            average: 52.1,
+            min: 5.3,
+            max: 345.2,
+          },
+        },
+        {
+          pluginId: 'mind',
+          requests: 387,
+          errors: 8,
+          latency: {
+            average: 68.5,
+            min: 12.1,
+            max: 892.5,
+          },
+        },
+        {
+          pluginId: 'commit',
+          requests: 142,
+          errors: 3,
+          latency: {
+            average: 35.2,
+            min: 8.7,
+            max: 156.3,
+          },
+        },
+      ],
+      perTenant: [
+        {
+          tenantId: 'default',
+          requests: 1542,
+          errors: 53,
+          latency: {
+            average: 47.3,
+          },
+        },
+      ],
+      errors: {
+        byStatusCode: {
+          400: 12,
+          404: 18,
+          422: 8,
+          500: 10,
+          503: 5,
+        },
+        recent: [
+          {
+            timestamp: now - 120_000,
+            statusCode: 500,
+            errorCode: 'INTERNAL_ERROR',
+            message: 'Database connection timeout',
+          },
+          {
+            timestamp: now - 300_000,
+            statusCode: 404,
+            message: 'Resource not found',
+          },
+          {
+            timestamp: now - 450_000,
+            statusCode: 422,
+            errorCode: 'VALIDATION_ERROR',
+            message: 'Invalid request payload',
+          },
+        ],
+      },
+      timestamps: {
+        startTime,
+        lastRequest: now - 2_500,
+      },
+      redis: {
+        updates: 342,
+        healthyTransitions: 2,
+        unhealthyTransitions: 1,
+        lastStatus: {
+          healthy: true,
+          state: 'ready',
+          role: 'master',
+        },
+      },
+      pluginMounts: {
+        total: 8,
+        succeeded: 7,
+        failed: 1,
+        elapsedMs: 1247,
+      },
+      uptime: {
+        seconds: 7200,
+        startTime: new Date(startTime).toISOString(),
+        lastRequest: new Date(now - 2_500).toISOString(),
+      },
+    };
+  }
+
+  subscribeToSystemEvents(
+    onEvent: (event: SystemEvent) => void,
+    _onError: (error: Error) => void
+  ): () => void {
+    // Simulate periodic events in mock mode
+    const interval = setInterval(() => {
+      const now = Date.now();
+
+      // Alternate between health and registry events
+      if (Math.random() > 0.5) {
+        onEvent({
+          type: 'health',
+          status: 'healthy',
+          ts: new Date(now).toISOString(),
+          ready: true,
+          reason: null,
+          registryPartial: false,
+          registryStale: false,
+          registryLoaded: true,
+          pluginMountInProgress: false,
+          pluginRoutesMounted: true,
+          pluginsMounted: 7,
+          pluginsFailed: 1,
+          lastPluginMountTs: new Date(now - 60000).toISOString(),
+          pluginRoutesLastDurationMs: 1247,
+          redisEnabled: true,
+          redisHealthy: true,
+        });
+      } else {
+        onEvent({
+          type: 'registry',
+          rev: Math.random().toString(36).substring(7),
+          generatedAt: new Date(now).toISOString(),
+          partial: false,
+          stale: false,
+          expiresAt: new Date(now + 300000).toISOString(),
+          ttlMs: 300000,
+          checksum: Math.random().toString(36).substring(2, 15),
+          checksumAlgorithm: 'sha256',
+          previousChecksum: null,
+        });
+      }
+    }, 3000); // Event every 3 seconds
+
+    // Return cleanup function
+    return () => {
+      clearInterval(interval);
     };
   }
 }

@@ -4,7 +4,9 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
 import type { ObservabilityDataSource } from '../sources/observability-source';
+import type { SystemEvent } from '../contracts/observability';
 
 /**
  * Hook to fetch State Broker statistics
@@ -34,4 +36,52 @@ export function useDevKitHealth(source: ObservabilityDataSource) {
     gcTime: 300000, // Keep in cache for 5 minutes (React Query v5)
     retry: 1, // DevKit can be slow, only retry once
   });
+}
+
+/**
+ * Hook to fetch Prometheus metrics from REST API
+ *
+ * Auto-refreshes every 10 seconds to show near real-time metrics
+ */
+export function usePrometheusMetrics(source: ObservabilityDataSource) {
+  return useQuery({
+    queryKey: ['observability', 'prometheus-metrics'],
+    queryFn: () => source.getPrometheusMetrics(),
+    refetchInterval: 10000, // Auto-refresh every 10s
+    staleTime: 8000, // Consider data stale after 8s
+    retry: 2, // Retry failed requests twice
+  });
+}
+
+/**
+ * Hook to connect to system events SSE stream
+ *
+ * Uses ObservabilityDataSource to subscribe to real-time system events
+ */
+export function useSystemEvents(source: ObservabilityDataSource) {
+  const [events, setEvents] = useState<SystemEvent[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    setIsConnected(true);
+    setError(null);
+
+    const cleanup = source.subscribeToSystemEvents(
+      (event) => {
+        setEvents((prev) => [event, ...prev].slice(0, 100)); // Keep last 100 events
+      },
+      (err) => {
+        setIsConnected(false);
+        setError(err);
+      }
+    );
+
+    return () => {
+      cleanup();
+      setIsConnected(false);
+    };
+  }, [source]);
+
+  return { events, isConnected, error };
 }

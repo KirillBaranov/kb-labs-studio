@@ -26,6 +26,7 @@
   "dependencies": {
     "@tanstack/react-query": "^5.0.0",
     "@kb-labs/rest-api-contracts": "link:../../../kb-labs-rest-api/packages/rest-api-contracts",
+    "@kb-labs/core-platform": "link:../../../kb-labs-core/packages/core-platform",
     "zod": "^3.23.8",
     "ulid": "^2.3.0"
   },

@@ -6,7 +6,7 @@
 import { HttpClient } from '../client/http-client';
 import { KBError } from '../errors/kb-error';
 import type { ObservabilityDataSource } from './observability-source';
-import type { StateBrokerStats, DevKitHealth } from '../contracts/observability';
+import type { StateBrokerStats, DevKitHealth, PrometheusMetrics, SystemEvent } from '../contracts/observability';
 
 /**
  * HTTP implementation of ObservabilityDataSource
@@ -46,5 +46,58 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
         error
       );
     }
+  }
+
+  async getPrometheusMetrics(): Promise<PrometheusMetrics> {
+    try {
+      const response = await this.client.fetch<PrometheusMetrics>(
+        '/metrics/json'
+      );
+
+      return response;
+    } catch (error) {
+      throw new KBError(
+        'PROMETHEUS_METRICS_FETCH_FAILED',
+        'Failed to fetch Prometheus metrics',
+        500,
+        error
+      );
+    }
+  }
+
+  subscribeToSystemEvents(
+    onEvent: (event: SystemEvent) => void,
+    onError: (error: Error) => void
+  ): () => void {
+    const baseUrl = this.client['baseUrl'] || 'http://localhost:5050';
+    const eventSource = new EventSource(`${baseUrl}/events/registry`);
+
+    eventSource.addEventListener('registry', (e) => {
+      try {
+        const event = JSON.parse(e.data) as SystemEvent;
+        onEvent(event);
+      } catch (err) {
+        console.error('Failed to parse registry event:', err);
+      }
+    });
+
+    eventSource.addEventListener('health', (e) => {
+      try {
+        const event = JSON.parse(e.data) as SystemEvent;
+        onEvent(event);
+      } catch (err) {
+        console.error('Failed to parse health event:', err);
+      }
+    });
+
+    eventSource.onerror = () => {
+      onError(new Error('Connection to event stream failed'));
+      eventSource.close();
+    };
+
+    // Return cleanup function
+    return () => {
+      eventSource.close();
+    };
   }
 }

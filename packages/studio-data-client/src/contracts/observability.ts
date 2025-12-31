@@ -72,3 +72,144 @@ export interface DevKitHealth {
   /** Average type coverage percentage */
   avgTypeCoverage?: number;
 }
+
+/**
+ * Prometheus metrics from REST API
+ */
+export interface PrometheusMetrics {
+  /** Request statistics */
+  requests: {
+    total: number;
+    success: number;
+    clientErrors: number;
+    serverErrors: number;
+  };
+
+  /** Latency statistics */
+  latency: {
+    average: number;
+    min: number;
+    max: number;
+    p50: number;
+    p95: number;
+    p99: number;
+  };
+
+  /** Per-plugin metrics */
+  perPlugin: Array<{ pluginId: string } & PluginMetrics>;
+
+  /** Per-tenant metrics */
+  perTenant: Array<{ tenantId: string } & TenantMetrics>;
+
+  /** Error breakdown */
+  errors: {
+    byStatusCode: Record<number, number>;
+    recent: Array<{
+      timestamp: number;
+      statusCode: number;
+      errorCode?: string;
+      message: string;
+    }>;
+  };
+
+  /** Timestamps */
+  timestamps: {
+    startTime: number;
+    lastRequest: number | null;
+  };
+
+  /** Redis statistics */
+  redis: {
+    updates: number;
+    healthyTransitions: number;
+    unhealthyTransitions: number;
+    lastStatus: {
+      healthy: boolean;
+      state: string;
+      role: string;
+    } | null;
+  };
+
+  /** Plugin mount snapshot */
+  pluginMounts: {
+    total: number;
+    succeeded: number;
+    failed: number;
+    elapsedMs: number;
+  } | null;
+
+  /** Uptime information */
+  uptime: {
+    seconds: number;
+    startTime: string;
+    lastRequest: string | null;
+  };
+}
+
+/**
+ * Plugin-level metrics
+ */
+export interface PluginMetrics {
+  requests: number;
+  errors: number;
+  latency: {
+    average: number;
+    min: number;
+    max: number;
+  };
+}
+
+/**
+ * Tenant-level metrics
+ */
+export interface TenantMetrics {
+  requests: number;
+  errors: number;
+  latency: {
+    average: number;
+  };
+}
+
+/**
+ * System event from /events/registry SSE stream
+ */
+export type SystemEvent = RegistryEvent | HealthEvent;
+
+/**
+ * Registry snapshot event
+ */
+export interface RegistryEvent {
+  type: 'registry';
+  rev: string;
+  generatedAt: string;
+  partial: boolean;
+  stale: boolean;
+  expiresAt: string | null;
+  ttlMs: number | null;
+  checksum?: string;
+  checksumAlgorithm?: 'sha256';
+  previousChecksum: string | null;
+}
+
+/**
+ * Health status event
+ */
+export interface HealthEvent {
+  type: 'health';
+  status: 'healthy' | 'unhealthy';
+  ts: string;
+  ready: boolean;
+  reason: string | null;
+  registryPartial: boolean;
+  registryStale: boolean;
+  registryLoaded: boolean;
+  pluginMountInProgress: boolean;
+  pluginRoutesMounted: boolean;
+  pluginsMounted: number;
+  pluginsFailed: number;
+  lastPluginMountTs: string | null;
+  pluginRoutesLastDurationMs: number | null;
+  redisEnabled: boolean;
+  redisHealthy: boolean;
+  redisStates?: Array<{ role: string; state: string }>;
+}
