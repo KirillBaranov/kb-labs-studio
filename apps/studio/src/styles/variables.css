@@ -7,33 +7,36 @@
   --bg-primary: #F9FAFB;
   --bg-secondary: #FFFFFF;
   --bg-tertiary: #F3F4F6;
-  
+  --bg-hover: #F3F4F6;        /* Same as tertiary for hover state */
+
   /* Text */
   --text-primary: #111827;
   --text-secondary: #6B7280;
   --text-tertiary: #6B7280;
   --text-inverse: #FFFFFF;
-  
+
   /* Borders */
   --border-primary: #E5E7EB;
   --border-secondary: #D4D4D4;
-  
+
   /* Interactive */
   --link: #2563EB;
   --link-hover: #1E40AF;
   --accent-subtle: #DBEAFE;
-  
+
   /* Status */
   --success: #16A34A;
   --warning: #F59E0B;
   --error: #DC2626;
   --info: #0EA5E9;
-  
+
   /* States */
   --disabled: #9CA3AF;
-  
+
   /* Effects */
   --shadow: rgba(0, 0, 0, 0.05);
+  --shadow-hover: rgba(0, 0, 0, 0.1);     /* Darker on hover */
+  --shadow-elevated: rgba(0, 0, 0, 0.08); /* Elevated cards */
 }
 
 .dark {
@@ -41,32 +44,35 @@
   --bg-primary: #0D0D0F;
   --bg-secondary: #1A1A1C;
   --bg-tertiary: #27272A;
-  
+  --bg-hover: #2E2E32;        /* Lighter hover state for tables/cards */
+
   /* Text */
   --text-primary: #F5F5F7;
   --text-secondary: #A1A1AA;
   --text-tertiary: #A1A1AA;
   --text-inverse: #1A1A1C;
-  
+
   /* Borders */
   --border-primary: #3F3F46;
   --border-secondary: #52525B;
-  
+
   /* Interactive */
-  --link: #3B82F6;
-  --link-hover: #60A5FA;
-  --accent-subtle: #1E3A8A;
-  
+  --link: #60A5FA;            /* Brighter blue for better contrast */
+  --link-hover: #93C5FD;      /* Even lighter on hover */
+  --accent-subtle: #1E3A8A33; /* 20% opacity blue overlay */
+
   /* Status */
   --success: #22C55E;
   --warning: #EAB308;
   --error: #EF4444;
   --info: #38BDF8;
-  
+
   /* States */
   --disabled: #52525B;
-  
+
   /* Effects */
-  --shadow: rgba(0, 0, 0, 0.4);
+  --shadow: rgba(0, 0, 0, 0.6);           /* Darker base shadow */
+  --shadow-hover: rgba(0, 0, 0, 0.8);     /* Even darker on hover */
+  --shadow-elevated: rgba(255, 255, 255, 0.05); /* Subtle white glow for elevation */
 }
 

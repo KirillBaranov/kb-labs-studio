@@ -191,17 +191,126 @@ a:hover {
 /* This ensures proper theming without CSS overrides */
 
 /* Active menu item styles */
-.menu-item-active {
+.menu-item-active,
+.ant-menu-item-selected {
   background-color: var(--accent-subtle) !important;
   color: var(--link) !important;
-  border-left-color: var(--link) !important;
+}
+
+.ant-menu-item-selected > .ant-menu-title-content {
+  color: var(--link) !important;
+}
+
+/* Submenu title should stay normal when child is selected */
+.ant-menu-submenu-selected > .ant-menu-submenu-title {
+  background-color: transparent !important;
+  color: var(--text-primary) !important;
+}
+
+/* But allow hover on submenu title even when child is selected */
+.ant-menu-submenu-selected > .ant-menu-submenu-title:hover {
+  background-color: var(--bg-hover) !important;
+  color: var(--text-primary) !important;
 }
 
 /* Ensure better visibility in dark theme - use more visible blue */
-.dark .menu-item-active {
-  /* Use rgba with link color at 20% opacity on tertiary background */
-  background-color: rgba(59, 130, 246, 0.2) !important; /* var(--link) #3B82F6 with 20% opacity */
-  color: var(--link-hover) !important; /* Use lighter blue for text */
-  border-left-color: var(--link) !important;
+.dark .menu-item-active,
+.dark .ant-menu-item-selected {
+  /* Use more opaque blue background for better visibility */
+  background-color: rgba(96, 165, 250, 0.25) !important; /* var(--link) #60A5FA with 25% opacity */
+  color: var(--link) !important; /* Brighter blue #60A5FA */
+}
+
+.dark .ant-menu-item-selected > .ant-menu-title-content {
+  color: var(--link) !important; /* Brighter blue #60A5FA */
+}
+
+/* Submenu title should stay normal in dark theme when child is selected */
+.dark .ant-menu-submenu-selected > .ant-menu-submenu-title {
+  background-color: transparent !important;
+  color: var(--text-primary) !important;
+}
+
+/* But allow hover on submenu title in dark theme even when child is selected */
+.dark .ant-menu-submenu-selected > .ant-menu-submenu-title:hover {
+  background-color: var(--bg-hover) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Fix radio button text color when checked */
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+  color: var(--text-inverse) !important;
+}
+
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) span {
+  color: var(--text-inverse) !important;
+}
+
+/* Fix dropdown menu selected item (e.g., theme toggle dropdown) */
+.ant-dropdown-menu-item-selected,
+.ant-dropdown-menu-submenu-title-selected {
+  background-color: var(--accent-subtle) !important;
+  color: var(--link) !important;
+}
+
+.ant-dropdown-menu-item-selected .ant-dropdown-menu-title-content,
+.ant-dropdown-menu-submenu-title-selected .ant-dropdown-menu-title-content {
+  color: var(--link) !important;
+}
+
+/* Dark theme for dropdown selected items */
+.dark .ant-dropdown-menu-item-selected,
+.dark .ant-dropdown-menu-submenu-title-selected {
+  background-color: rgba(96, 165, 250, 0.15) !important;
+  color: var(--link-hover) !important;
+}
+
+.dark .ant-dropdown-menu-item-selected .ant-dropdown-menu-title-content,
+.dark .ant-dropdown-menu-submenu-title-selected .ant-dropdown-menu-title-content {
+  color: var(--link-hover) !important;
+}
+
+/* Dark theme improvements */
+.dark {
+  /* Better card shadows with subtle white glow for elevation */
+  .ant-card {
+    box-shadow: 0 1px 3px var(--shadow), 0 0 0 1px var(--shadow-elevated);
+  }
+
+  .ant-card:hover {
+    box-shadow: 0 2px 8px var(--shadow-hover), 0 0 0 1px var(--shadow-elevated);
+  }
+
+  /* Better dropdown shadows */
+  .ant-dropdown,
+  .ant-popover,
+  .ant-select-dropdown {
+    box-shadow: 0 4px 16px var(--shadow), 0 0 0 1px var(--shadow-elevated) !important;
+  }
+
+  /* Better button hover states */
+  .ant-btn:not(.ant-btn-primary):not(.ant-btn-text):hover {
+    background-color: var(--bg-hover) !important;
+    border-color: var(--border-secondary) !important;
+  }
+
+  /* Fix table row hover being too dark (only body rows, not header) */
+  .ant-table-tbody > tr.ant-table-row:hover > td {
+    background-color: var(--bg-hover) !important;
+  }
+
+  /* Fix table header hover - should stay same color */
+  .ant-table-thead > tr > th:hover {
+    background-color: var(--bg-tertiary) !important;
+  }
+
+  /* Better link contrast */
+  a:not(.ant-btn) {
+    color: var(--link);
+  }
+
+  a:not(.ant-btn):hover {
+    color: var(--link-hover);
+  }
 }
 
