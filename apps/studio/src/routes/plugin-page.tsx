@@ -43,7 +43,7 @@ export function PluginPage(): React.ReactElement {
   if (layout && layout.widgets && layout.widgets.length > 0) {
     // Found layout with explicit widget list - render layout with widgets
     const plugin = registry.plugins.find((p) => {
-      const pName = p.id.includes('/') ? p.id.split('/').pop() || p.id : p.id;
+      const pName = p.pluginId.includes('/') ? p.pluginId.split('/').pop() || p.pluginId : p.pluginId;
       return pName === pluginName;
     });
     
@@ -59,12 +59,12 @@ export function PluginPage(): React.ReactElement {
       // Try to find widget in plugin's widgets
       const widget = plugin.widgets.find((w) => w.id === widgetId);
       if (widget) {
-        widgetsToRender.push({ widget, pluginId: plugin.id });
+        widgetsToRender.push({ widget, pluginId: plugin.pluginId });
       } else {
         // Try to find in global registry as fallback
         const globalWidget = (registry.widgets ?? []).find((w) => w.id === widgetId);
         if (globalWidget) {
-          widgetsToRender.push({ widget: globalWidget, pluginId: globalWidget.plugin.id });
+          widgetsToRender.push({ widget: globalWidget, pluginId: globalWidget.plugin?.id || plugin.pluginId });
         } else {
           // Widget not found - collect for error message
           missingWidgets.push(widgetId);
@@ -76,7 +76,7 @@ export function PluginPage(): React.ReactElement {
       // Show helpful error with suggestions
       const availableWidgets = [
         ...plugin.widgets.map(w => w.id),
-        ...(registry.widgets ?? []).filter(w => w.plugin.id === plugin.id).map(w => w.id),
+        ...(registry.widgets ?? []).filter(w => w.plugin?.id === plugin.pluginId).map(w => w.id),
       ];
       
       // Find similar widget IDs (simple fuzzy match)
@@ -122,7 +122,7 @@ export function PluginPage(): React.ReactElement {
               </>
             )}
             <p style={{ color: 'var(--warning)', marginTop: '12px', marginBottom: 0 }}>
-              <strong>Available widgets in plugin "{plugin.id}":</strong>
+              <strong>Available widgets in plugin "{plugin.pluginId}":</strong>
             </p>
             <ul style={{ marginTop: '8px' }}>
               {availableWidgets.slice(0, 20).map(id => (
