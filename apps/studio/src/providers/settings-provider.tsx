@@ -6,6 +6,7 @@ export interface UserSettings {
     theme: 'light' | 'dark' | 'auto';
     compactMode: boolean;
     fontSize: 'small' | 'medium' | 'large';
+    pageTransition: 'none' | 'fade' | 'slide';
   };
   experimental: {
     /** User-enabled feature flags */
@@ -18,6 +19,7 @@ const DEFAULT_SETTINGS: UserSettings = {
     theme: 'light',
     compactMode: false,
     fontSize: 'medium',
+    pageTransition: 'none',
   },
   experimental: {
     enabledFeatures: [],
