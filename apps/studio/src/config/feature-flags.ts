@@ -6,6 +6,7 @@
 export type FeatureId =
   // UI/UX Features
   | 'command-palette'
+  | 'page-transitions'
   | 'toast-notifications'
   | 'bulk-actions'
   | 'context-menu'
@@ -73,6 +74,18 @@ export const FEATURE_FLAGS: Record<FeatureId, FeatureFlag> = {
     details: 'Global keyboard shortcut (Cmd/Ctrl+K) to search and execute commands quickly. Includes fuzzy search, recent actions, and keyboard navigation.',
     group: 'ui-ux',
     status: 'alpha',
+    risk: 'low',
+    enabled: false,
+    defaultEnabled: false,
+    addedAt: '2025-12-31',
+  },
+  'page-transitions': {
+    id: 'page-transitions',
+    name: 'Page Transitions',
+    description: 'Smooth animations when switching between pages',
+    details: 'Subtle page transition animations (fade, slide) when navigating between routes. Can be customized or disabled in Dashboard settings.',
+    group: 'ui-ux',
+    status: 'beta',
     risk: 'low',
     enabled: false,
     defaultEnabled: false,
