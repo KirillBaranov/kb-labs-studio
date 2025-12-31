@@ -5,7 +5,13 @@
 
 import type { HttpClient } from '../client/http-client';
 import type { AdaptersDataSource } from './adapters-source';
-import type { LLMUsageStats } from '../contracts/adapters';
+import type {
+  LLMUsageStats,
+  EmbeddingsUsageStats,
+  VectorStoreUsageStats,
+  CacheUsageStats,
+  StorageUsageStats,
+} from '../contracts/adapters';
 
 /**
  * HTTP implementation of AdaptersDataSource
@@ -16,5 +22,21 @@ export class HttpAdaptersSource implements AdaptersDataSource {
 
   async getLLMUsage(): Promise<LLMUsageStats> {
     return await this.client.fetch<LLMUsageStats>('/adapters/llm/usage');
+  }
+
+  async getEmbeddingsUsage(): Promise<EmbeddingsUsageStats> {
+    return await this.client.fetch<EmbeddingsUsageStats>('/adapters/embeddings/usage');
+  }
+
+  async getVectorStoreUsage(): Promise<VectorStoreUsageStats> {
+    return await this.client.fetch<VectorStoreUsageStats>('/adapters/vectorstore/usage');
+  }
+
+  async getCacheUsage(): Promise<CacheUsageStats> {
+    return await this.client.fetch<CacheUsageStats>('/adapters/cache/usage');
+  }
+
+  async getStorageUsage(): Promise<StorageUsageStats> {
+    return await this.client.fetch<StorageUsageStats>('/adapters/storage/usage');
   }
 }

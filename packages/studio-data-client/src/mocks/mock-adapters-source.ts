@@ -4,7 +4,13 @@
  */
 
 import type { AdaptersDataSource } from '../sources/adapters-source';
-import type { LLMUsageStats } from '../contracts/adapters';
+import type {
+  LLMUsageStats,
+  EmbeddingsUsageStats,
+  VectorStoreUsageStats,
+  CacheUsageStats,
+  StorageUsageStats,
+} from '../contracts/adapters';
 
 /**
  * Mock adapters data source for testing
@@ -46,6 +52,56 @@ export class MockAdaptersSource implements AdaptersDataSource {
         from: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
         to: new Date().toISOString(),
       },
+    };
+  }
+
+  async getEmbeddingsUsage(): Promise<EmbeddingsUsageStats> {
+    return {
+      totalRequests: 3456,
+      totalTextLength: 1_234_567,
+      totalCost: 2.47,
+      errors: 8,
+      avgDurationMs: 234,
+      batchRequests: 456,
+      singleRequests: 3000,
+      avgBatchSize: 15.3,
+    };
+  }
+
+  async getVectorStoreUsage(): Promise<VectorStoreUsageStats> {
+    return {
+      searchQueries: 2345,
+      upsertOperations: 567,
+      deleteOperations: 89,
+      avgSearchDuration: 45.6,
+      avgSearchScore: 0.87,
+      avgResultsCount: 12.4,
+      totalVectorsUpserted: 45_678,
+      totalVectorsDeleted: 1234,
+    };
+  }
+
+  async getCacheUsage(): Promise<CacheUsageStats> {
+    return {
+      totalGets: 15_678,
+      hits: 13_456,
+      misses: 2222,
+      hitRate: 85.8,
+      sets: 3456,
+      avgGetDuration: 2.3,
+      avgSetDuration: 5.7,
+    };
+  }
+
+  async getStorageUsage(): Promise<StorageUsageStats> {
+    return {
+      readOperations: 8765,
+      writeOperations: 2345,
+      deleteOperations: 234,
+      totalBytesRead: 123_456_789,
+      totalBytesWritten: 45_678_901,
+      avgReadDuration: 12.4,
+      avgWriteDuration: 34.5,
     };
   }
 }

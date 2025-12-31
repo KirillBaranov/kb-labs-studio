@@ -1,31 +1,10 @@
 /**
  * @module @kb-labs/studio-data-client/contracts/adapters
- * Platform adapter analytics contracts
+ * Platform adapter analytics contracts - barrel export
  */
 
-/**
- * LLM usage statistics by model
- */
-export interface LLMModelStats {
-  requests: number;
-  promptTokens: number;
-  completionTokens: number;
-  totalTokens: number;
-  cost: number;
-  avgDurationMs: number;
-}
-
-/**
- * LLM usage statistics response
- */
-export interface LLMUsageStats {
-  totalRequests: number;
-  totalTokens: number;
-  totalCost: number;
-  byModel: Record<string, LLMModelStats>;
-  errors: number;
-  timeRange: {
-    from: string;
-    to: string;
-  };
-}
+export type { LLMUsageStats, LLMModelStats } from './adapters-llm.js';
+export type { EmbeddingsUsageStats } from './adapters-embeddings.js';
+export type { VectorStoreUsageStats } from './adapters-vectorstore.js';
+export type { CacheUsageStats } from './adapters-cache.js';
+export type { StorageUsageStats } from './adapters-storage.js';
