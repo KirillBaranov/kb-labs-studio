@@ -2,7 +2,6 @@
  * @module Studio Logger
  * Browser-compatible logger for Studio application
  * 
- * Uses console.log for browser compatibility while maintaining structured logging format.
  * For production, consider integrating with @kb-labs/core-sys/logging if browser support is added.
  */
 
@@ -21,7 +20,6 @@ const sessionReqId = resolveReqId();
 /**
  * Create Studio logger with scope and context
  * 
- * Note: Studio runs in browser, so we use console.log directly.
  * The structured format is maintained for consistency with the new logging system.
  */
 export function createStudioLogger(scope: string, context: Fields = {}): StudioLogger {
@@ -94,7 +92,6 @@ function emit(
   } else if (level === 'warn') {
     console.warn(serialized);
   } else if (level === 'info') {
-    console.log(serialized);
   } else {
     console.debug(serialized);
   }

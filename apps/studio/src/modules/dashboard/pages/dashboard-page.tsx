@@ -49,7 +49,6 @@ export function DashboardPage() {
 
   const handleAddWidget = () => {
     // TODO: Open widget gallery modal
-    console.log('Add widget clicked');
   };
 
   return (
