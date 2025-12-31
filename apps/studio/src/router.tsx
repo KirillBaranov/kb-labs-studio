@@ -5,8 +5,6 @@ import {
   type NavigationItem,
   AVAILABLE_ICONS,
   getAvailableIconNames,
-  KBQuickSearch,
-  type SearchableItem,
   KBStatusBar,
   StatusBarItem,
   StatusBarPresets,
@@ -14,6 +12,7 @@ import {
 import type { StudioRegistry } from '@kb-labs/rest-api-contracts';
 import { useAuth } from './providers/auth-provider';
 import { useRegistry } from './providers/registry-provider';
+import { CommandPaletteProvider, useCommandPalette } from './providers/command-palette-provider';
 import { HealthBanner } from './components/health-banner';
 import { NotFoundPage } from './pages/not-found-page';
 import { PluginPage } from './routes/plugin-page';
@@ -34,6 +33,7 @@ import { AnalyticsVectorStorePage } from './modules/analytics/pages/analytics-ve
 import { AnalyticsCachePage } from './modules/analytics/pages/analytics-cache-page';
 import { AnalyticsStoragePage } from './modules/analytics/pages/analytics-storage-page';
 import { WidgetModalManager } from './components/widget-modal';
+import { PageTransition } from './components/page-transition';
 import { createStudioLogger } from './utils/logger';
 import { ErrorBoundary } from './components/error-boundary';
 
@@ -73,9 +73,9 @@ function LayoutContent() {
   const location = useLocation();
   const navigate = useNavigate();
   const { registry, loading, error, retrying, hasData, refresh, registryMeta, health } = useRegistry();
+  const commandPalette = useCommandPalette();
 
   const [pluginNavModel, setPluginNavModel] = React.useState<PluginNavModel[]>([]);
-  const [searchOpen, setSearchOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (!hasData) {
@@ -230,149 +230,6 @@ function LayoutContent() {
     }
   }, [error, logger]);
 
-  // Build searchable items from navigation
-  const searchableItems = React.useMemo<SearchableItem[]>(() => {
-    const items: SearchableItem[] = [];
-
-    // Add main pages
-    items.push(
-      {
-        id: 'page-dashboard',
-        title: 'Dashboard',
-        description: 'Main dashboard with widgets',
-        category: 'page',
-        path: '/',
-      },
-      {
-        id: 'page-workflows',
-        title: 'Workflows',
-        description: 'View and manage workflows',
-        category: 'page',
-        path: '/workflows',
-      },
-      {
-        id: 'page-settings',
-        title: 'Settings',
-        description: 'Application settings',
-        category: 'page',
-        path: '/settings',
-      }
-    );
-
-    // Add Analytics pages
-    items.push(
-      {
-        id: 'page-analytics-overview',
-        title: 'Analytics Overview',
-        description: 'Analytics dashboard and insights',
-        category: 'page',
-        path: '/analytics/overview',
-      },
-      {
-        id: 'page-analytics-events',
-        title: 'Analytics Events',
-        description: 'Event tracking and analytics',
-        category: 'page',
-        path: '/analytics/events',
-      },
-      {
-        id: 'page-analytics-llm',
-        title: 'LLM Usage Analytics',
-        description: 'LLM adapter usage metrics',
-        category: 'page',
-        path: '/analytics/llm',
-      },
-      {
-        id: 'page-analytics-embeddings',
-        title: 'Embeddings Analytics',
-        description: 'Embeddings adapter usage metrics',
-        category: 'page',
-        path: '/analytics/embeddings',
-      },
-      {
-        id: 'page-analytics-vectorstore',
-        title: 'VectorStore Analytics',
-        description: 'VectorStore adapter usage metrics',
-        category: 'page',
-        path: '/analytics/vectorstore',
-      },
-      {
-        id: 'page-analytics-cache',
-        title: 'Cache Analytics',
-        description: 'Cache adapter usage metrics',
-        category: 'page',
-        path: '/analytics/cache',
-      },
-      {
-        id: 'page-analytics-storage',
-        title: 'Storage Analytics',
-        description: 'Storage adapter usage metrics',
-        category: 'page',
-        path: '/analytics/storage',
-      }
-    );
-
-    // Add Observability pages
-    items.push(
-      {
-        id: 'page-state-broker',
-        title: 'State Broker',
-        description: 'State management and caching',
-        category: 'page',
-        path: '/observability/state-broker',
-      },
-      {
-        id: 'page-devkit',
-        title: 'DevKit Health',
-        description: 'Development tools health check',
-        category: 'page',
-        path: '/observability/devkit',
-      },
-      {
-        id: 'page-prometheus',
-        title: 'Prometheus Metrics',
-        description: 'System metrics and monitoring',
-        category: 'page',
-        path: '/observability/prometheus-metrics',
-      },
-      {
-        id: 'page-system-events',
-        title: 'System Events',
-        description: 'System event logs',
-        category: 'page',
-        path: '/observability/system-events',
-      }
-    );
-
-    // Add plugin widgets
-    if (hasData && registry.widgets) {
-      for (const widget of registry.widgets) {
-        items.push({
-          id: `widget-${widget.id}`,
-          title: widget.displayName,
-          description: widget.description || `Widget from ${widget.pluginId}`,
-          category: 'widget',
-          path: `/plugins/${widget.pluginId}/${widget.widgetName}`,
-        });
-      }
-    }
-
-    return items;
-  }, [hasData, registry.widgets]);
-
-  // Handle Cmd+K / Ctrl+K hotkey for search
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setSearchOpen(true);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
   return (
     <>
       <KBPageLayout
@@ -399,7 +256,7 @@ function LayoutContent() {
               }
             : undefined,
           systemHealthLoading: loading && !hasData,
-          onSearchClick: () => setSearchOpen(true),
+          onSearchClick: () => commandPalette.open(),
         }}
         sidebarProps={{
           items: allNavigationItems,
@@ -445,25 +302,21 @@ function LayoutContent() {
         }
       >
         <HealthBanner />
-        <Outlet />
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
         <WidgetModalManager />
       </KBPageLayout>
-
-      <KBQuickSearch
-        open={searchOpen}
-        onClose={() => setSearchOpen(false)}
-        items={searchableItems}
-        onNavigate={(path) => {
-          navigate(path);
-          setSearchOpen(false);
-        }}
-      />
     </>
   );
 }
 
 function Layout() {
-  return <LayoutContent />;
+  return (
+    <CommandPaletteProvider>
+      <LayoutContent />
+    </CommandPaletteProvider>
+  );
 }
 
 export const router = createBrowserRouter([
