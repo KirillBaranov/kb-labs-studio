@@ -3,6 +3,8 @@
  * Widget type definitions
  */
 
+import type { WidgetAction } from '@kb-labs/studio-contracts';
+
 /**
  * Widget state
  */
@@ -33,6 +35,12 @@ export interface BaseWidgetProps<T = unknown, O = unknown> extends WidgetState<T
   title?: string;
   /** Widget description from manifest */
   description?: string;
+  /** Widget actions from manifest */
+  actions?: WidgetAction[];
+  /** Widget ID */
+  widgetId?: string;
+  /** Plugin ID */
+  pluginId?: string;
   /** Show title in widget card (default: true for charts, false for others) */
   showTitle?: boolean;
   /** Show description in widget card (default: false) */

@@ -49,14 +49,12 @@ export function createEnvelopeInterceptor(): ResponseInterceptor {
     try {
       const envelope = await clonedResponse.json() as EnvelopeResponse;
 
-      console.log('📦 [envelope-interceptor] Received envelope:', envelope);
 
       // Check if response is an envelope
       if (envelope && typeof envelope === 'object' && 'ok' in envelope) {
         if (envelope.ok === true && 'data' in envelope) {
           // Success envelope: unwrap data
           const unwrappedData = envelope.data;
-          console.log('✅ [envelope-interceptor] Unwrapping envelope, data:', unwrappedData);
           
           // Create new headers with Content-Type explicitly set
           const headers = new Headers(response.headers);
@@ -69,21 +67,17 @@ export function createEnvelopeInterceptor(): ResponseInterceptor {
             headers,
           });
           
-          console.log('🔧 [envelope-interceptor] Created new response with unwrapped data');
           return newResponse;
         } else if (envelope.ok === false && 'error' in envelope) {
           // Error envelope: leave as is for error handler
-          console.log('❌ [envelope-interceptor] Error envelope, leaving as is');
           return response;
         }
       }
 
       // Not an envelope, return as is
-      console.log('ℹ️ [envelope-interceptor] Not an envelope, returning as is');
       return response;
     } catch (error) {
       // If parsing fails, return original response
-      console.error('⚠️ [envelope-interceptor] Failed to parse response:', error);
       return response;
     }
   };

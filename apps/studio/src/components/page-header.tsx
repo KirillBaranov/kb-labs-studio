@@ -6,7 +6,7 @@
 import * as React from 'react';
 import { Typography } from 'antd';
 import type { ReactNode } from 'react';
-import type { WidgetAction } from '../types/actions';
+import type { WidgetAction } from '@kb-labs/studio-contracts';
 import { ActionToolbar } from './action-toolbar';
 
 const { Title, Text } = Typography;

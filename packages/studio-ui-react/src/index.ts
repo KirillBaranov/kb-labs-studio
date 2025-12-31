@@ -35,4 +35,5 @@ export * from './components/kb-chart';
 
 // Utils
 export * from './lib/utils';
+export * from './lib/icons';
 
