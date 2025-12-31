@@ -8,12 +8,7 @@ import { Tree as AntTree } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import { Skeleton, EmptyState, ErrorState } from '../shared/index';
 import type { BaseWidgetProps } from '../types';
-export interface TreeNode {
-  id: string;
-  label: string;
-  icon?: React.ReactNode;
-  children?: TreeNode[];
-}
+import type { TreeNode, TreeData } from '@kb-labs/studio-contracts';
 
 export interface TreeOptions {
   expanded?: string[];
@@ -21,7 +16,7 @@ export interface TreeOptions {
   expandable?: boolean;
 }
 
-export interface TreeProps extends BaseWidgetProps<TreeNode, TreeOptions> {
+export interface TreeProps extends BaseWidgetProps<TreeData, TreeOptions> {
   onNodeClick?: (node: TreeNode) => void;
 }
 
@@ -39,7 +34,9 @@ function convertToAntTreeData(node: TreeNode, showIcons?: boolean): DataNode {
 }
 
 export function Tree({ data, loading, error, options, onNodeClick }: TreeProps) {
-  const [expandedKeys, setExpandedKeys] = React.useState<React.Key[]>(options?.expanded || []);
+  const [expandedKeys, setExpandedKeys] = React.useState<React.Key[]>(
+    options?.expanded || data?.expandedIds || []
+  );
 
   if (loading) {
     return <Skeleton variant="text" rows={5} />;
@@ -49,18 +46,19 @@ export function Tree({ data, loading, error, options, onNodeClick }: TreeProps) 
     return <ErrorState error={error} />;
   }
 
-  if (!data) {
+  if (!data || !data.nodes || data.nodes.length === 0) {
     return <EmptyState title="No data" description="No tree data available" />;
   }
 
   const showIcons = options?.showIcons !== false;
   const expandable = options?.expandable !== false;
 
-  const treeData = [convertToAntTreeData(data, showIcons)];
+  // Convert all root nodes to Ant Design format
+  const treeData = data.nodes.map((node: TreeNode) => convertToAntTreeData(node, showIcons));
 
   const handleSelect = (selectedKeys: React.Key[], info: any) => {
     if (onNodeClick && info.node) {
-      // Find node by key
+      // Find node by key in all root nodes
       const findNode = (node: TreeNode, key: string): TreeNode | null => {
         if (node.id === key) {return node;}
         if (node.children) {
@@ -71,7 +69,13 @@ export function Tree({ data, loading, error, options, onNodeClick }: TreeProps) 
         }
         return null;
       };
-      const foundNode = findNode(data, String(selectedKeys[0]));
+
+      let foundNode: TreeNode | null = null;
+      for (const rootNode of data.nodes) {
+        foundNode = findNode(rootNode, String(selectedKeys[0]));
+        if (foundNode) break;
+      }
+
       if (foundNode) {
         onNodeClick(foundNode);
       }

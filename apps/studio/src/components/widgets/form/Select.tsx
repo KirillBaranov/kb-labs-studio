@@ -14,7 +14,7 @@ export interface SelectProps extends BaseWidgetProps<SelectData, SelectOptions> 
   onChange?: (value: string | number | (string | number)[]) => void;
 }
 
-export function Select({ data, options, onChange }: SelectProps) {
+export function Select({ data, options, onChange, emitEvent }: SelectProps) {
   const {
     label,
     placeholder,
@@ -37,6 +37,27 @@ export function Select({ data, options, onChange }: SelectProps) {
     md: 'middle',
     lg: 'large',
   };
+
+  // Local state for controlled component
+  const [selectedValue, setSelectedValue] = React.useState<string | number | (string | number)[] | undefined>(
+    data?.value
+  );
+
+  // Sync with data.value when it changes externally
+  React.useEffect(() => {
+    if (data?.value !== undefined) {
+      setSelectedValue(data.value);
+    }
+  }, [data?.value]);
+
+  // Handle change: update local state + call onChange
+  const handleChange = React.useCallback((value: string | number | (string | number)[]) => {
+    setSelectedValue(value);
+    if (onChange) {
+      onChange(value);
+    } else {
+    }
+  }, [onChange]);
 
   // Merge options from data and static options
   const selectOptions = data?.options || options?.options || [];
@@ -100,8 +121,8 @@ export function Select({ data, options, onChange }: SelectProps) {
 
   const selectComponent = (
     <AntSelect
-      value={data?.value}
-      onChange={onChange}
+      value={selectedValue}
+      onChange={handleChange}
       placeholder={placeholder}
       disabled={disabled}
       size={sizeMap[size]}

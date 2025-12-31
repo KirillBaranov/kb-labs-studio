@@ -6,7 +6,7 @@
 import * as React from 'react';
 import { Card, Typography } from 'antd';
 import type { CardProps } from 'antd';
-import type { WidgetAction } from '../../../types/actions';
+import type { WidgetAction } from '@kb-labs/studio-contracts';
 import { ActionToolbar } from '../../action-toolbar';
 
 const { Title, Text } = Typography;
