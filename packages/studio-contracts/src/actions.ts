@@ -17,6 +17,20 @@ export interface RestActionHandler {
   routeId: string;
   /** HTTP method (default: POST) */
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  /**
+   * Body mapping - maps widget data fields to request body fields
+   * Example: { workspace: 'workspace' } takes widget.data.workspace and sends as body.workspace
+   */
+  bodyMap?: Record<string, string>;
+  /**
+   * Success callback - what to do after successful request
+   */
+  onSuccess?: {
+    /** Event to emit on success */
+    emitEvent?: string;
+    /** Payload to send with event (can use response data) */
+    eventPayload?: unknown;
+  };
 }
 
 /**
@@ -74,10 +88,24 @@ export interface WidgetAction {
   handler: ActionHandler;
   /** Confirmation dialog (optional) */
   confirm?: ActionConfirm;
-  /** Disabled state (MVP: boolean only) */
-  disabled?: boolean;
-  /** Visibility (MVP: boolean only) */
-  visible?: boolean;
+  /**
+   * Disabled state
+   * - boolean: static disabled state (MVP)
+   * - string: JSONLogic expression evaluated against widget data (future)
+   * @example
+   * disabled: true
+   * disabled: '{"==": [{"var": "status"}, "pending"]}'
+   */
+  disabled?: boolean | string;
+  /**
+   * Visibility
+   * - boolean: static visibility (MVP)
+   * - string: JSONLogic expression evaluated against widget data (future)
+   * @example
+   * visible: false
+   * visible: '{"exists": [{"var": "plan"}]}'
+   */
+  visible?: boolean | string;
   /** Render order */
   order?: number;
 }

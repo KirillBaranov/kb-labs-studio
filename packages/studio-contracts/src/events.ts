@@ -4,13 +4,39 @@
  */
 
 /**
+ * Configuration for emitting an event
+ */
+export interface EventEmitConfig {
+  /** Event name to emit */
+  name: string;
+  /**
+   * Payload mapping: maps widget data fields to event payload fields
+   * Example: { workspace: 'value' } means payload.workspace = widgetData.value
+   */
+  payloadMap?: Record<string, string>;
+}
+
+/**
+ * Configuration for subscribing to an event
+ */
+export interface EventSubscribeConfig {
+  /** Event name to subscribe to */
+  name: string;
+  /**
+   * Params mapping: maps event payload fields to REST query params
+   * Example: { workspace: 'workspace' } means params.workspace = eventPayload.workspace
+   */
+  paramsMap?: Record<string, string>;
+}
+
+/**
  * Event bus configuration for a widget.
  */
 export interface WidgetEventConfig {
-  /** Events this widget can emit */
-  emit?: string[];
-  /** Events this widget subscribes to */
-  subscribe?: string[];
+  /** Events this widget can emit (simple strings for backward compat, or full config) */
+  emit?: Array<string | EventEmitConfig>;
+  /** Events this widget subscribes to (simple strings for backward compat, or full config) */
+  subscribe?: Array<string | EventSubscribeConfig>;
 }
 
 /**

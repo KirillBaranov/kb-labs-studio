@@ -25,6 +25,8 @@ export interface RestDataSource {
   method?: 'GET' | 'POST';
   /** Request body for POST (optional) */
   body?: Record<string, unknown>;
+  /** Query parameters (e.g., { workspace: 'my-pkg' }) */
+  params?: Record<string, string | number | boolean>;
 }
 
 /**

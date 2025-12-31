@@ -22,6 +22,8 @@ export const STUDIO_SCHEMA_VERSION_NUMBER = 1;
 export interface StudioPluginEntry {
   /** Plugin ID */
   pluginId: string;
+  /** Human-readable plugin name (e.g., "Mind" instead of "@kb-labs/mind") */
+  displayName?: string;
   /** Plugin version */
   pluginVersion?: string;
   /** All widget declarations from this plugin */
