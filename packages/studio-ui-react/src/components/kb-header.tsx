@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { Layout, Dropdown, Avatar, Button } from 'antd';
+import { Layout, Dropdown, Avatar, Button, Tooltip } from 'antd';
 import type { MenuProps } from 'antd';
-import { User } from 'lucide-react';
+import { User, Search } from 'lucide-react';
 import { KBThemeToggle } from './kb-theme-toggle';
+import { KBSystemHealthIndicator, type SystemHealthData } from './kb-system-health-indicator';
 
 const { Header: AntHeader } = Layout;
 
@@ -14,6 +15,9 @@ export interface KBHeaderProps {
   profileMenuItems?: MenuProps['items'];
   userAvatar?: string;
   userName?: string;
+  systemHealth?: SystemHealthData;
+  systemHealthLoading?: boolean;
+  onSearchClick?: () => void;
 }
 
 export function KBHeader({
@@ -24,6 +28,9 @@ export function KBHeader({
   profileMenuItems,
   userAvatar,
   userName = 'User',
+  systemHealth,
+  systemHealthLoading = false,
+  onSearchClick,
 }: KBHeaderProps) {
   const profileItems: MenuProps['items'] = profileMenuItems || [
     ...(onLogout
@@ -74,6 +81,20 @@ export function KBHeader({
       )}
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <KBSystemHealthIndicator
+          health={systemHealth}
+          loading={systemHealthLoading}
+        />
+
+        {onSearchClick && (
+          <Button
+            type="text"
+            icon={<Search size={18} />}
+            onClick={onSearchClick}
+            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+          />
+        )}
+
         <KBThemeToggle />
 
         <Dropdown menu={{ items: profileItems }} placement="bottomRight">

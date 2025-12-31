@@ -30,6 +30,10 @@ export * from './components/kb-sheet';
 export * from './components/kb-config-provider';
 export * from './components/kb-theme-toggle';
 
+// Utility components
+export * from './components/kb-system-health-indicator';
+export * from './components/kb-quick-search';
+
 // Chart components
 export * from './components/kb-chart';
 
