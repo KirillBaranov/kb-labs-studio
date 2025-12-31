@@ -165,7 +165,7 @@ async function fetchRestData(
   headerHints: StudioHeaderHints | undefined,
   onHeadersFiltered?: (status: HeaderStatus) => void
 ): Promise<unknown> {
-  const { routeId, headers } = source;
+  const { routeId, headers, params } = source;
   const method: 'GET' | 'POST' = source.method ?? 'GET';
   const filtered = filterHeaders(headers, headerHints);
 
@@ -192,7 +192,16 @@ async function fetchRestData(
     : manifestId;
 
   const cleanRouteId = routeId.startsWith('/') ? routeId.slice(1) : routeId;
-  const url = `${basePath}/plugins/${packageName}/${cleanRouteId}`;
+
+  // Build URL with query parameters
+  let url = `${basePath}/plugins/${packageName}/${cleanRouteId}`;
+  if (params && Object.keys(params).length > 0) {
+    const searchParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+      searchParams.append(key, String(value));
+    }
+    url = `${url}?${searchParams.toString()}`;
+  }
 
   const init: RequestInit = {
     method,
@@ -331,6 +340,12 @@ function createQueryFn({
     return ({ signal }) => fetchMockData(source, signal);
   }
 
+  if (source.type === 'static') {
+    // Static data sources return their value immediately (null for composite widgets without value)
+    const staticSource = source as Extract<DataSource, { type: 'static' }>;
+    return async () => staticSource.value ?? null;
+  }
+
   throw new Error('Unsupported data source type');
 }
 
@@ -349,6 +364,8 @@ export function useWidgetData<T = unknown>({
       ? source.routeId
       : source.type === 'mock'
       ? source.fixtureId
+      : source.type === 'static'
+      ? 'static'
       : 'unknown';
 
   const traceIdRef = useRef<string>(

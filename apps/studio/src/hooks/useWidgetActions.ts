@@ -5,9 +5,19 @@
 
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { WidgetAction, ActionExecutionResult } from '../types/actions';
+import type { WidgetAction } from '@kb-labs/studio-contracts';
 // eslint-disable-next-line import/extensions
 import { useWidgetEvents } from './useWidgetEvents';
+import { studioConfig } from '../config/studio.config';
+
+/**
+ * Action execution result
+ */
+export interface ActionExecutionResult {
+  success: boolean;
+  error?: string;
+  data?: unknown;
+}
 
 export interface UseWidgetActionsOptions {
   /** Widget ID */
@@ -24,12 +34,15 @@ export interface UseWidgetActionsOptions {
  * Hook for handling widget actions
  */
 export function useWidgetActions(options: UseWidgetActionsOptions = {}) {
-  const { pluginId, basePath = '/api/v1', callbacks = {} } = options;
+  const { pluginId, basePath, callbacks = {} } = options;
   const navigate = useNavigate();
   const { emit } = useWidgetEvents();
 
+  // Use studioConfig.apiBaseUrl as default, just like WidgetRenderer does
+  const effectiveBasePath = basePath || studioConfig.apiBaseUrl;
+
   const executeAction = useCallback(
-    async (action: WidgetAction): Promise<ActionExecutionResult> => {
+    async (action: WidgetAction, widgetData?: unknown): Promise<ActionExecutionResult> => {
       if (!action.handler) {
         return { success: false, error: 'No handler defined for action' };
       }
@@ -37,60 +50,66 @@ export function useWidgetActions(options: UseWidgetActionsOptions = {}) {
       try {
         switch (action.handler.type) {
           case 'rest': {
-            const { routeId, method = 'GET', body, headers = {} } = action.handler.config;
-            
+            const { routeId, method = 'POST', bodyMap, onSuccess } = action.handler;
+
             // Extract package name from pluginId (e.g., "@kb-labs/mind" -> "mind")
             const packageName = pluginId?.includes('/')
               ? pluginId.split('/').pop() || pluginId
               : pluginId || '';
 
-            const url = `${basePath}/plugins/${packageName}/${routeId}`;
+            // Build request body from bodyMap if provided
+            let body: unknown = undefined;
+            if (bodyMap && widgetData) {
+              body = {};
+              for (const [targetKey, sourceKey] of Object.entries(bodyMap)) {
+                const value = (widgetData as Record<string, unknown>)[sourceKey];
+                if (value !== undefined) {
+                  (body as Record<string, unknown>)[targetKey] = value;
+                }
+              }
+            }
+
+            const url = `${effectiveBasePath}/plugins/${packageName}/${routeId}`;
             const response = await fetch(url, {
               method,
               headers: {
                 'Content-Type': 'application/json',
-                ...headers,
               },
-              body: body ? JSON.stringify(body) : undefined,
+              ...(body && { body: JSON.stringify(body) }),
             });
 
             if (!response.ok) {
               throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
-            const data = await response.json();
-            return { success: true, data };
+            const responseData = await response.json();
+
+            // Emit event on success if configured
+            if (onSuccess?.emitEvent) {
+              let payload = onSuccess.eventPayload !== undefined
+                ? onSuccess.eventPayload
+                : responseData;
+
+              // Unwrap envelope if present (ok: true, data: {...}) -> use data field
+              if (payload && typeof payload === 'object' && 'ok' in payload && 'data' in payload) {
+                payload = (payload as any).data;
+              }
+
+              emit(onSuccess.emitEvent, payload);
+            }
+
+            return { success: true, data: responseData };
           }
 
           case 'navigate': {
-            const { path, target = '_self' } = action.handler.config;
-            if (target === '_blank') {
-              window.open(path, '_blank');
-            } else {
-              navigate(path);
-            }
+            const { target } = action.handler;
+            navigate(target);
             return { success: true };
           }
 
-          case 'callback': {
-            const { callbackId, args } = action.handler.config;
-            const callback = callbacks[callbackId];
-            if (!callback) {
-              throw new Error(`Callback ${callbackId} not found`);
-            }
-            const data = await callback(args);
-            return { success: true, data };
-          }
-
-          case 'event': {
-            const { eventName, payload } = action.handler.config;
-            emit(eventName, payload);
-            return { success: true };
-          }
-
-          case 'modal': {
-            // Modal handling will be done by Modal manager
-            emit('modal:open', action.handler.config);
+          case 'emit': {
+            const { event, payload } = action.handler;
+            emit(event, payload);
             return { success: true };
           }
 
@@ -102,18 +121,18 @@ export function useWidgetActions(options: UseWidgetActionsOptions = {}) {
         return { success: false, error: errorMessage };
       }
     },
-    [pluginId, basePath, callbacks, navigate, emit]
+    [pluginId, effectiveBasePath, callbacks, navigate, emit]
   );
 
   const handleAction = useCallback(
-    async (action: WidgetAction): Promise<ActionExecutionResult> => {
+    async (action: WidgetAction, widgetData?: unknown): Promise<ActionExecutionResult> => {
       // Check if action is disabled
       if (action.disabled === true) {
         return { success: false, error: 'Action is disabled' };
       }
 
       // Execute action
-      return executeAction(action);
+      return executeAction(action, widgetData);
     },
     [executeAction]
   );

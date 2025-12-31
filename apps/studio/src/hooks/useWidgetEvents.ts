@@ -43,12 +43,12 @@ class WidgetEventBus {
    */
   emit(eventName: string, payload?: unknown): void {
     const callbacks = this.listeners.get(eventName);
-    if (callbacks) {
+    if (callbacks && callbacks.size > 0) {
       callbacks.forEach((callback) => {
         try {
           callback(payload);
         } catch (error) {
-          console.error(`Error in event listener for ${eventName}:`, error);
+          console.error(`[EventBus] Error in event handler for ${eventName}:`, error);
         }
       });
     }
@@ -83,10 +83,8 @@ export function useWidgetEvents() {
   const pageId = `${location.pathname}${location.search}`;
   const eventBusRef = useRef<WidgetEventBus | null>(null);
 
-  // Initialize event bus for this page
-  if (!eventBusRef.current) {
-    eventBusRef.current = getEventBus(pageId);
-  }
+  // Initialize event bus for this page - update if pageId changes
+  eventBusRef.current = getEventBus(pageId);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -99,29 +97,24 @@ export function useWidgetEvents() {
   // Cleanup old event buses when page changes
   useEffect(() => {
     return () => {
-      // Cleanup after a delay to allow widgets to unmount
-      setTimeout(() => {
-        const oldBus = eventBuses.get(pageId);
-        if (oldBus) {
-          oldBus.clear();
-          eventBuses.delete(pageId);
-        }
-      }, 1000);
+      // Don't auto-cleanup - EventBus should persist for the entire page lifecycle
+      // Cleanup only happens when pageId actually changes (navigating away)
+      // The eventBuses Map will naturally hold one instance per unique pageId
     };
   }, [pageId]);
 
   const subscribe = useCallback(
     (eventName: string, callback: (payload?: unknown) => void) => {
-      return eventBusRef.current!.subscribe(eventName, callback);
+      return getEventBus(pageId).subscribe(eventName, callback);
     },
-    []
+    [pageId]
   );
 
   const emit = useCallback(
     (eventName: string, payload?: unknown) => {
-      eventBusRef.current!.emit(eventName, payload);
+      getEventBus(pageId).emit(eventName, payload);
     },
-    []
+    [pageId]
   );
 
   return {
