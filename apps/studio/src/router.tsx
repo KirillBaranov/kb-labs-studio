@@ -1,6 +1,16 @@
 import * as React from 'react';
 import { createBrowserRouter, Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { KBPageLayout, type NavigationItem, AVAILABLE_ICONS, getAvailableIconNames, KBQuickSearch, type SearchableItem } from '@kb-labs/studio-ui-react';
+import {
+  KBPageLayout,
+  type NavigationItem,
+  AVAILABLE_ICONS,
+  getAvailableIconNames,
+  KBQuickSearch,
+  type SearchableItem,
+  KBStatusBar,
+  StatusBarItem,
+  StatusBarPresets,
+} from '@kb-labs/studio-ui-react';
 import type { StudioRegistry } from '@kb-labs/rest-api-contracts';
 import { useAuth } from './providers/auth-provider';
 import { useRegistry } from './providers/registry-provider';
@@ -391,14 +401,49 @@ function LayoutContent() {
           systemHealthLoading: loading && !hasData,
           onSearchClick: () => setSearchOpen(true),
         }}
-      sidebarProps={{
-        items: allNavigationItems,
-        width: 240,
-        collapsedWidth: 80,
-        currentPath: location.pathname,
-        onNavigate: (path) => navigate(path),
-      }}
-    >
+        sidebarProps={{
+          items: allNavigationItems,
+          width: 240,
+          collapsedWidth: 80,
+          currentPath: location.pathname,
+          onNavigate: (path) => navigate(path),
+        }}
+        statusBar={
+          <KBStatusBar
+            leftItems={
+              <>
+                <StatusBarPresets.ApiConnection
+                  connected={health?.ready ?? false}
+                  onClick={() => navigate('/observability/system-events')}
+                />
+                {health?.pluginsMounted !== undefined && (
+                  <StatusBarItem
+                    label={`${health.pluginsMounted} plugin${health.pluginsMounted === 1 ? '' : 's'}`}
+                    tooltip={`${health.pluginsMounted} plugins mounted${health.pluginsFailed ? `, ${health.pluginsFailed} failed` : ''}`}
+                    status={health.pluginsFailed ? 'warning' : 'success'}
+                    onClick={() => navigate('/settings')}
+                    clickable
+                  />
+                )}
+                {registryMeta.rev !== null && (
+                  <StatusBarItem
+                    label={`Registry #${registryMeta.rev}`}
+                    tooltip={`Registry revision ${registryMeta.rev}${registryMeta.stale ? ' (stale)' : ''}${registryMeta.partial ? ' (partial)' : ''}`}
+                    status={registryMeta.stale || registryMeta.partial ? 'warning' : undefined}
+                  />
+                )}
+              </>
+            }
+            rightItems={
+              <>
+                <StatusBarPresets.User email={auth.role} onClick={() => navigate('/settings')} />
+                <StatusBarPresets.Version version="0.1.0" />
+                <StatusBarPresets.Help onClick={() => window.open('https://github.com/kb-labs', '_blank')} />
+              </>
+            }
+          />
+        }
+      >
         <HealthBanner />
         <Outlet />
         <WidgetModalManager />
