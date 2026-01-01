@@ -10,6 +10,7 @@ import {
   DeleteOutlined,
   ExperimentOutlined,
   UserOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useHealthStatus } from '@kb-labs/studio-data-client';
@@ -21,6 +22,7 @@ import { AppearanceSettings } from '../components/appearance-settings';
 import { DataPrivacySettings } from '../components/data-privacy-settings';
 import { NotificationsSettings } from '../components/notifications-settings';
 import { ExperimentalSettings } from '../components/experimental-settings';
+import { ConfigurationSettings } from '../components/configuration-settings';
 import { RoleSwitcher } from '@/components/role-switcher';
 
 const { Text, Paragraph, Title } = Typography;
@@ -182,6 +184,22 @@ export function SettingsPage() {
             </KBCard>
           </KBSection>
         </>
+      ),
+    },
+    {
+      key: 'configuration',
+      label: (
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <SettingOutlined />
+          Configuration
+        </span>
+      ),
+      children: (
+        <KBSection>
+          <KBCard>
+            <ConfigurationSettings />
+          </KBCard>
+        </KBSection>
       ),
     },
     {
