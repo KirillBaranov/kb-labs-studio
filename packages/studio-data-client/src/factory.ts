@@ -7,6 +7,7 @@ import type { MetricsDataSource } from './sources/metrics-source';
 import type { ObservabilityDataSource } from './sources/observability-source';
 import type { AnalyticsDataSource } from './sources/analytics-source';
 import type { AdaptersDataSource } from './sources/adapters-source';
+import type { PlatformDataSource } from './sources/platform-source';
 import { MockAuditSource } from './mocks/mock-audit-source';
 import { MockReleaseSource } from './mocks/mock-release-source';
 import { MockSystemSource } from './mocks/mock-system-source';
@@ -16,6 +17,7 @@ import { MockMetricsSource } from './mocks/mock-metrics-source';
 import { MockObservabilitySource } from './mocks/mock-observability-source';
 import { MockAnalyticsSource } from './mocks/mock-analytics-source';
 import { MockAdaptersSource } from './mocks/mock-adapters-source';
+import { MockPlatformSource } from './mocks/mock-platform-source';
 import { HttpAuditSource } from './sources/http-audit-source';
 import { HttpReleaseSource } from './sources/http-release-source';
 import { HttpSystemSource } from './sources/http-system-source';
@@ -25,6 +27,7 @@ import { HttpMetricsSource } from './sources/http-metrics-source';
 import { HttpObservabilitySource } from './sources/http-observability-source';
 import { HttpAnalyticsSource } from './sources/http-analytics-source';
 import { HttpAdaptersSource } from './sources/http-adapters-source';
+import { HttpPlatformSource } from './sources/http-platform-source';
 import { HttpClient } from './client/http-client';
 
 export interface DataSourcesConfig {
@@ -42,6 +45,7 @@ export interface DataSources {
   observability: ObservabilityDataSource;
   analytics: AnalyticsDataSource;
   adapters: AdaptersDataSource;
+  platform: PlatformDataSource;
 }
 
 export function createDataSources(config: DataSourcesConfig): DataSources {
@@ -56,6 +60,7 @@ export function createDataSources(config: DataSourcesConfig): DataSources {
       observability: new MockObservabilitySource(),
       analytics: new MockAnalyticsSource(),
       adapters: new MockAdaptersSource(),
+      platform: new MockPlatformSource(),
     };
   }
 
@@ -72,6 +77,7 @@ export function createDataSources(config: DataSourcesConfig): DataSources {
     observability: new HttpObservabilitySource(client),
     analytics: new HttpAnalyticsSource(client),
     adapters: new HttpAdaptersSource(client),
+    platform: new HttpPlatformSource(client),
   };
 }
 

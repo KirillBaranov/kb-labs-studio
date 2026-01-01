@@ -86,8 +86,14 @@ export const qk = {
   // Analytics queries
   analytics: {
     all: ['analytics'] as const,
-    summary: (params?: { start?: string; end?: string }) => 
+    summary: (params?: { start?: string; end?: string }) =>
       [...qk.analytics.all, 'summary', params] as const,
+  },
+
+  // Platform queries
+  platform: {
+    all: ['platform'] as const,
+    config: () => [...qk.platform.all, 'config'] as const,
   },
 } as const;
 

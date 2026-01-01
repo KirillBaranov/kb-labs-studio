@@ -1,4 +1,4 @@
-import type { StateBrokerStats, DevKitHealth, PrometheusMetrics, SystemEvent, LogRecord, LogQuery, LogQueryResponse, LogEvent } from '../contracts/observability';
+import type { StateBrokerStats, DevKitHealth, PrometheusMetrics, SystemEvent, LogRecord, LogQuery, LogQueryResponse, LogEvent, LogSummarizeRequest, LogSummarizeResponse } from '../contracts/observability';
 
 /**
  * Observability data source interface
@@ -35,4 +35,9 @@ export interface ObservabilityDataSource {
    * Returns cleanup function
    */
   subscribeToLogs(onLog: (log: LogRecord) => void, onError: (error: Error) => void, filters?: LogQuery): () => void;
+
+  /**
+   * Get AI-powered log summarization
+   */
+  summarizeLogs(request: LogSummarizeRequest): Promise<LogSummarizeResponse>;
 }

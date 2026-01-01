@@ -283,3 +283,72 @@ export interface LogEvent {
   tenantId?: string;
   [key: string]: unknown;
 }
+
+/**
+ * Context options for AI summarization
+ */
+export interface LogSummarizeContext {
+  errors?: boolean;
+  warnings?: boolean;
+  info?: boolean;
+  metadata?: boolean;
+  stackTraces?: boolean;
+}
+
+/**
+ * Log summarization request
+ */
+export interface LogSummarizeRequest {
+  /** User's question about the logs */
+  question: string;
+  /** Context inclusion options */
+  includeContext?: LogSummarizeContext;
+  /** Time range filter */
+  timeRange?: { from?: string; to?: string };
+  /** Log filters */
+  filters?: {
+    level?: string;
+    plugin?: string;
+    traceId?: string;
+    executionId?: string;
+  };
+  /** Group logs by field */
+  groupBy?: 'trace' | 'execution' | 'plugin';
+}
+
+/**
+ * Log statistics for AI context
+ */
+export interface LogStats {
+  total: number;
+  byLevel: Record<string, number>;
+  byPlugin: Record<string, number>;
+  topErrors: Array<{ message: string; count: number }>;
+  timeRange: {
+    from: string | null;
+    to: string | null;
+  };
+}
+
+/**
+ * Log summarization response
+ */
+export interface LogSummarizeResponse {
+  ok: boolean;
+  data: {
+    summary: {
+      question: string;
+      timeRange: {
+        from: string | null;
+        to: string | null;
+      };
+      total: number;
+      stats: LogStats;
+      groups: Record<string, any[]> | null;
+    };
+    /** AI-generated summary (null if LLM unavailable) */
+    aiSummary: string | null;
+    /** Info message if AI not available */
+    message?: string | null;
+  };
+}

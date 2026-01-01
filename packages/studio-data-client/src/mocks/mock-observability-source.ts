@@ -4,7 +4,7 @@
  */
 
 import type { ObservabilityDataSource } from '../sources/observability-source';
-import type { StateBrokerStats, DevKitHealth, PrometheusMetrics, SystemEvent } from '../contracts/observability';
+import type { StateBrokerStats, DevKitHealth, PrometheusMetrics, SystemEvent, LogSummarizeRequest, LogSummarizeResponse } from '../contracts/observability';
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -233,6 +233,65 @@ export class MockObservabilitySource implements ObservabilityDataSource {
     // Return cleanup function
     return () => {
       clearInterval(interval);
+    };
+  }
+
+  async summarizeLogs(request: LogSummarizeRequest): Promise<LogSummarizeResponse> {
+    await delay(1500); // Simulate LLM processing time
+
+    return {
+      ok: true,
+      data: {
+        summary: {
+          question: request.question,
+          timeRange: {
+            from: request.timeRange?.from || null,
+            to: request.timeRange?.to || null,
+          },
+          total: 42,
+          stats: {
+            total: 42,
+            byLevel: {
+              error: 3,
+              warn: 5,
+              info: 34,
+            },
+            byPlugin: {
+              'rest-api': 20,
+              'workflow': 15,
+              'mind': 7,
+            },
+            topErrors: [
+              { message: 'Connection timeout', count: 2 },
+              { message: 'Invalid parameter', count: 1 },
+            ],
+            timeRange: {
+              from: request.timeRange?.from || null,
+              to: request.timeRange?.to || null,
+            },
+          },
+          groups: null,
+        },
+        aiSummary: `## Mock AI Summary
+
+Based on the analysis of ${42} log entries:
+
+**Key Findings:**
+- Total of 3 errors and 5 warnings detected
+- Most active component: rest-api (20 logs)
+- Primary issue: Connection timeouts (2 occurrences)
+
+**Timeline:**
+The system has been mostly stable with info-level logs. Two connection timeout errors were observed, likely related to external service availability.
+
+**Recommendations:**
+1. Investigate network connectivity to external services
+2. Consider implementing retry logic with exponential backoff
+3. Monitor timeout patterns over next 24 hours
+
+*Note: This is mock data from MockObservabilitySource*`,
+        message: null,
+      },
     };
   }
 }

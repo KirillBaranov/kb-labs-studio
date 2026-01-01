@@ -6,7 +6,7 @@
 import { HttpClient } from '../client/http-client';
 import { KBError } from '../errors/kb-error';
 import type { ObservabilityDataSource } from './observability-source';
-import type { StateBrokerStats, DevKitHealth, PrometheusMetrics, SystemEvent, LogQuery, LogQueryResponse, LogRecord } from '../contracts/observability';
+import type { StateBrokerStats, DevKitHealth, PrometheusMetrics, SystemEvent, LogQuery, LogQueryResponse, LogRecord, LogSummarizeRequest, LogSummarizeResponse } from '../contracts/observability';
 
 /**
  * HTTP implementation of ObservabilityDataSource
@@ -170,5 +170,26 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
     return () => {
       eventSource.close();
     };
+  }
+
+  async summarizeLogs(request: LogSummarizeRequest): Promise<LogSummarizeResponse> {
+    try {
+      const response = await this.client.fetch<LogSummarizeResponse>('/logs/summarize', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      });
+
+      return response;
+    } catch (error) {
+      throw new KBError(
+        'LOG_SUMMARIZATION_FAILED',
+        'Failed to summarize logs',
+        500,
+        error
+      );
+    }
   }
 }
