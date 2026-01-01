@@ -6,7 +6,7 @@
 import { HttpClient } from '../client/http-client';
 import { KBError } from '../errors/kb-error';
 import type { ObservabilityDataSource } from './observability-source';
-import type { StateBrokerStats, DevKitHealth, PrometheusMetrics, SystemEvent } from '../contracts/observability';
+import type { StateBrokerStats, DevKitHealth, PrometheusMetrics, SystemEvent, LogQuery, LogQueryResponse, LogRecord } from '../contracts/observability';
 
 /**
  * HTTP implementation of ObservabilityDataSource
@@ -92,6 +92,77 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
 
     eventSource.onerror = () => {
       onError(new Error('Connection to event stream failed'));
+      eventSource.close();
+    };
+
+    // Return cleanup function
+    return () => {
+      eventSource.close();
+    };
+  }
+
+  async queryLogs(filters: LogQuery): Promise<LogQueryResponse> {
+    try {
+      const params = new URLSearchParams();
+
+      if (filters.from) params.append('from', filters.from);
+      if (filters.to) params.append('to', filters.to);
+      if (filters.level) params.append('level', filters.level);
+      if (filters.plugin) params.append('plugin', filters.plugin);
+      if (filters.executionId) params.append('executionId', filters.executionId);
+      if (filters.tenantId) params.append('tenantId', filters.tenantId);
+      if (filters.search) params.append('search', filters.search);
+      if (filters.limit !== undefined) params.append('limit', String(filters.limit));
+      if (filters.offset !== undefined) params.append('offset', String(filters.offset));
+
+      const queryString = params.toString();
+      const url = queryString ? `/logs?${queryString}` : '/logs';
+
+      const response = await this.client.fetch<LogQueryResponse>(url);
+
+      return response;
+    } catch (error) {
+      throw new KBError(
+        'LOGS_QUERY_FAILED',
+        'Failed to query logs',
+        500,
+        error
+      );
+    }
+  }
+
+  subscribeToLogs(
+    onLog: (log: LogRecord) => void,
+    onError: (error: Error) => void,
+    filters?: LogQuery
+  ): () => void {
+    const baseUrl = this.client['baseUrl'] || 'http://localhost:5050';
+
+    // Build query string from filters
+    const params = new URLSearchParams();
+    if (filters?.level) params.append('level', filters.level);
+    if (filters?.plugin) params.append('plugin', filters.plugin);
+    if (filters?.executionId) params.append('executionId', filters.executionId);
+    if (filters?.tenantId) params.append('tenantId', filters.tenantId);
+
+    const queryString = params.toString();
+    const url = queryString
+      ? `${baseUrl}/logs/stream?${queryString}`
+      : `${baseUrl}/logs/stream`;
+
+    const eventSource = new EventSource(url);
+
+    eventSource.addEventListener('log', (e) => {
+      try {
+        const log = JSON.parse(e.data) as LogRecord;
+        onLog(log);
+      } catch (err) {
+        console.error('Failed to parse log event:', err);
+      }
+    });
+
+    eventSource.onerror = () => {
+      onError(new Error('Connection to log stream failed'));
       eventSource.close();
     };
 

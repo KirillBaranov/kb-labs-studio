@@ -6,7 +6,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import type { ObservabilityDataSource } from '../sources/observability-source';
-import type { SystemEvent } from '../contracts/observability';
+import type { SystemEvent, LogRecord, LogQuery } from '../contracts/observability';
 
 /**
  * Hook to fetch State Broker statistics
@@ -84,4 +84,45 @@ export function useSystemEvents(source: ObservabilityDataSource) {
   }, [source]);
 
   return { events, isConnected, error };
+}
+
+/**
+ * Hook to connect to live log stream
+ *
+ * Uses ObservabilityDataSource to subscribe to real-time logs
+ *
+ * @param source - Observability data source
+ * @param filters - Optional log filters
+ */
+export function useLogStream(source: ObservabilityDataSource, filters?: LogQuery) {
+  const [logs, setLogs] = useState<LogRecord[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    setIsConnected(true);
+    setError(null);
+
+    const cleanup = source.subscribeToLogs(
+      (log) => {
+        // Add log to beginning (most recent first)
+        // Keep max 500 logs in memory for performance
+        setLogs((prev) => [log, ...prev].slice(0, 500));
+      },
+      (err) => {
+        setIsConnected(false);
+        setError(err);
+      },
+      filters
+    );
+
+    return () => {
+      cleanup();
+      setIsConnected(false);
+    };
+  }, [source, filters]);
+
+  const clearLogs = () => setLogs([]);
+
+  return { logs, isConnected, error, clearLogs };
 }

@@ -1,4 +1,4 @@
-import type { StateBrokerStats, DevKitHealth, PrometheusMetrics, SystemEvent } from '../contracts/observability';
+import type { StateBrokerStats, DevKitHealth, PrometheusMetrics, SystemEvent, LogRecord, LogQuery, LogQueryResponse, LogEvent } from '../contracts/observability';
 
 /**
  * Observability data source interface
@@ -24,4 +24,15 @@ export interface ObservabilityDataSource {
    * Returns cleanup function
    */
   subscribeToSystemEvents(onEvent: (event: SystemEvent) => void, onError: (error: Error) => void): () => void;
+
+  /**
+   * Query logs with filters
+   */
+  queryLogs(filters: LogQuery): Promise<LogQueryResponse>;
+
+  /**
+   * Subscribe to live log stream
+   * Returns cleanup function
+   */
+  subscribeToLogs(onLog: (log: LogRecord) => void, onError: (error: Error) => void, filters?: LogQuery): () => void;
 }

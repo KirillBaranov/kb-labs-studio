@@ -213,3 +213,73 @@ export interface HealthEvent {
   redisHealthy: boolean;
   redisStates?: Array<{ role: string; state: string }>;
 }
+
+/**
+ * Log record (matches backend LogRecord interface)
+ */
+export interface LogRecord {
+  time: string; // ISO 8601 timestamp
+  level: 'trace' | 'debug' | 'info' | 'warn' | 'error';
+  msg?: string;
+  plugin?: string;
+  command?: string;
+  executionId?: string;
+  tenantId?: string;
+  trace?: string; // OpenTelemetry trace ID
+  span?: string; // OpenTelemetry span ID
+  err?: {
+    name: string;
+    message: string;
+    stack?: string;
+    code?: string;
+  };
+  meta?: Record<string, unknown>;
+  [key: string]: unknown; // Additional fields from Pino
+}
+
+/**
+ * Log query filters
+ */
+export interface LogQuery {
+  from?: string; // ISO timestamp
+  to?: string; // ISO timestamp
+  level?: string; // trace|debug|info|warn|error (comma-separated)
+  plugin?: string;
+  executionId?: string;
+  tenantId?: string;
+  search?: string; // Text search in msg field
+  limit?: number; // Max records (default 100, max 1000)
+  offset?: number; // Pagination offset
+}
+
+/**
+ * Log query response
+ */
+export interface LogQueryResponse {
+  ok: boolean;
+  data: {
+    logs: LogRecord[];
+    total: number;
+    filters: LogQuery;
+    bufferStats: {
+      size: number;
+      maxSize: number;
+      oldest?: string;
+      newest?: string;
+    };
+  };
+}
+
+/**
+ * Log event from /logs/stream SSE
+ */
+export interface LogEvent {
+  type: 'log';
+  time: string;
+  level: LogRecord['level'];
+  msg?: string;
+  plugin?: string;
+  executionId?: string;
+  tenantId?: string;
+  [key: string]: unknown;
+}
