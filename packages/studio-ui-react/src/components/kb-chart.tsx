@@ -7,9 +7,11 @@ import { theme as antdTheme } from 'antd';
  */
 function useChartTheme() {
   const { token } = antdTheme.useToken();
-  
+
   return React.useMemo(() => ({
     defaultColor: typeof token.colorPrimary === 'string' ? token.colorPrimary : '#2563EB',
+    colors10: ['#1890ff', '#52c41a', '#faad14', '#f5222d', '#722ed1', '#13c2c2', '#eb2f96', '#fa8c16', '#a0d911', '#2f54eb'],
+    colors20: ['#1890ff', '#52c41a', '#faad14', '#f5222d', '#722ed1', '#13c2c2', '#eb2f96', '#fa8c16', '#a0d911', '#2f54eb'],
     styleSheet: {
       backgroundColor: typeof token.colorBgContainer === 'string' ? token.colorBgContainer : '#FFFFFF',
       fontFamily: token.fontFamily || 'inherit',
