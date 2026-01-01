@@ -4,7 +4,6 @@ import {
   BgColorsOutlined,
   DatabaseOutlined,
   LockOutlined,
-  DashboardOutlined,
   BellOutlined,
   ToolOutlined,
   ReloadOutlined,
@@ -20,7 +19,6 @@ import { useRegistry } from '@/providers/registry-provider';
 import { formatTimestamp } from '@/utils/format-date';
 import { AppearanceSettings } from '../components/appearance-settings';
 import { DataPrivacySettings } from '../components/data-privacy-settings';
-import { DashboardSettings } from '../components/dashboard-settings';
 import { NotificationsSettings } from '../components/notifications-settings';
 import { ExperimentalSettings } from '../components/experimental-settings';
 import { RoleSwitcher } from '@/components/role-switcher';
@@ -71,22 +69,6 @@ export function SettingsPage() {
         <KBSection>
           <KBCard>
             <AppearanceSettings />
-          </KBCard>
-        </KBSection>
-      ),
-    },
-    {
-      key: 'dashboard',
-      label: (
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6, opacity: 0.6 }}>
-          <DashboardOutlined />
-          Dashboard 🚧
-        </span>
-      ),
-      children: (
-        <KBSection>
-          <KBCard>
-            <DashboardSettings />
           </KBCard>
         </KBSection>
       ),
