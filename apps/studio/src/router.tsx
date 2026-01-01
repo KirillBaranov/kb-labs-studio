@@ -26,6 +26,7 @@ import { StateBrokerPage } from './modules/observability/pages/state-broker-page
 import { DevKitPage } from './modules/observability/pages/devkit-page';
 import { PrometheusMetricsPage } from './modules/observability/pages/prometheus-metrics-page';
 import { SystemEventsPage } from './modules/observability/pages/system-events-page';
+import { LogsPage } from './modules/observability/pages/logs-page';
 import { AnalyticsOverviewPage } from './modules/analytics/pages/analytics-overview-page';
 import { AnalyticsEventsPage } from './modules/analytics/pages/analytics-events-page';
 import { AnalyticsLLMPage } from './modules/analytics/pages/analytics-llm-page';
@@ -202,6 +203,12 @@ function LayoutContent() {
             label: 'System Events',
             path: '/observability/system-events',
             icon: renderPluginIcon('ThunderboltOutlined'),
+          },
+          {
+            key: 'logs',
+            label: 'Live Logs',
+            path: '/observability/logs',
+            icon: renderPluginIcon('FileTextOutlined'),
           },
         ],
       },
@@ -418,6 +425,11 @@ export const router = createBrowserRouter([
       {
         path: '/observability/system-events',
         element: <SystemEventsPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/observability/logs',
+        element: <LogsPage />,
         errorElement: <ErrorBoundary />,
       },
     ],
