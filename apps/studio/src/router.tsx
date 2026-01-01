@@ -13,6 +13,8 @@ import type { StudioRegistry } from '@kb-labs/rest-api-contracts';
 import { useAuth } from './providers/auth-provider';
 import { useRegistry } from './providers/registry-provider';
 import { CommandPaletteProvider, useCommandPalette } from './providers/command-palette-provider';
+import { useNotifications } from '@kb-labs/studio-data-client';
+import { useDataSources } from './providers/data-sources-provider';
 import { HealthBanner } from './components/health-banner';
 import { NotFoundPage } from './pages/not-found-page';
 import { LoginPage } from './pages/login-page';
@@ -76,6 +78,17 @@ function LayoutContent() {
   const navigate = useNavigate();
   const { registry, loading, error, retrying, hasData, refresh, registryMeta, health } = useRegistry();
   const commandPalette = useCommandPalette();
+  const sources = useDataSources();
+
+  // Notifications hook
+  const {
+    notifications,
+    unreadCount,
+    markAsRead,
+    markAllAsRead,
+    clearAll,
+    clearNotification,
+  } = useNotifications(sources.observability);
 
   const handleLogout = React.useCallback(() => {
     logger.info('User logout initiated');
@@ -270,6 +283,13 @@ function LayoutContent() {
             : undefined,
           systemHealthLoading: loading && !hasData,
           onSearchClick: () => commandPalette.open(),
+          // Notifications
+          notifications,
+          unreadNotificationsCount: unreadCount,
+          onMarkNotificationAsRead: markAsRead,
+          onMarkAllNotificationsAsRead: markAllAsRead,
+          onClearAllNotifications: clearAll,
+          onClearNotification: clearNotification,
         }}
         sidebarProps={{
           items: allNavigationItems,
