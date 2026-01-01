@@ -4,6 +4,8 @@ import type { MenuProps } from 'antd';
 import { User, Search } from 'lucide-react';
 import { KBThemeToggle } from './kb-theme-toggle';
 import { KBSystemHealthIndicator, type SystemHealthData } from './kb-system-health-indicator';
+import { KBNotificationBell } from './kb-notification-bell';
+import type { LogNotification } from '@kb-labs/studio-data-client';
 
 const { Header: AntHeader } = Layout;
 
@@ -18,6 +20,13 @@ export interface KBHeaderProps {
   systemHealth?: SystemHealthData;
   systemHealthLoading?: boolean;
   onSearchClick?: () => void;
+  // Notifications
+  notifications?: LogNotification[];
+  unreadNotificationsCount?: number;
+  onMarkNotificationAsRead?: (id: string) => void;
+  onMarkAllNotificationsAsRead?: () => void;
+  onClearAllNotifications?: () => void;
+  onClearNotification?: (id: string) => void;
 }
 
 export function KBHeader({
@@ -31,6 +40,12 @@ export function KBHeader({
   systemHealth,
   systemHealthLoading = false,
   onSearchClick,
+  notifications = [],
+  unreadNotificationsCount = 0,
+  onMarkNotificationAsRead,
+  onMarkAllNotificationsAsRead,
+  onClearAllNotifications,
+  onClearNotification,
 }: KBHeaderProps) {
   const profileItems: MenuProps['items'] = profileMenuItems || [
     ...(onLogout
@@ -94,6 +109,21 @@ export function KBHeader({
             style={{ display: 'flex', alignItems: 'center', gap: 4 }}
           />
         )}
+
+        {/* Notification Bell */}
+        {onMarkNotificationAsRead &&
+          onMarkAllNotificationsAsRead &&
+          onClearAllNotifications &&
+          onClearNotification && (
+            <KBNotificationBell
+              notifications={notifications}
+              unreadCount={unreadNotificationsCount}
+              onMarkAsRead={onMarkNotificationAsRead}
+              onMarkAllAsRead={onMarkAllNotificationsAsRead}
+              onClearAll={onClearAllNotifications}
+              onClearNotification={onClearNotification}
+            />
+          )}
 
         <KBThemeToggle />
 
