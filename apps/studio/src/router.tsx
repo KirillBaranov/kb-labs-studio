@@ -15,6 +15,7 @@ import { useRegistry } from './providers/registry-provider';
 import { CommandPaletteProvider, useCommandPalette } from './providers/command-palette-provider';
 import { HealthBanner } from './components/health-banner';
 import { NotFoundPage } from './pages/not-found-page';
+import { LoginPage } from './pages/login-page';
 import { PluginPage } from './routes/plugin-page';
 import { SettingsPage } from './modules/settings/pages/settings-page';
 import { WorkflowsListPage } from './modules/workflows/pages/workflows-list-page';
@@ -74,6 +75,14 @@ function LayoutContent() {
   const navigate = useNavigate();
   const { registry, loading, error, retrying, hasData, refresh, registryMeta, health } = useRegistry();
   const commandPalette = useCommandPalette();
+
+  const handleLogout = React.useCallback(() => {
+    logger.info('User logout initiated');
+    // Clear user role
+    localStorage.removeItem('studio-user-role');
+    // Redirect to login
+    navigate('/login');
+  }, [logger, navigate]);
 
   const [pluginNavModel, setPluginNavModel] = React.useState<PluginNavModel[]>([]);
 
@@ -235,10 +244,7 @@ function LayoutContent() {
       <KBPageLayout
         headerProps={{
           LinkComponent: Link as any,
-          onLogout: () => {
-            // TODO: Implement logout
-            logger.info('Logout initiated');
-          },
+          onLogout: handleLogout,
           userName: auth.role,
           systemHealth: health
             ? {
@@ -320,6 +326,11 @@ function Layout() {
 }
 
 export const router = createBrowserRouter([
+  {
+    path: '/login',
+    element: <LoginPage />,
+    errorElement: <ErrorBoundary />,
+  },
   {
     element: <Layout />,
     errorElement: <ErrorBoundary />,
