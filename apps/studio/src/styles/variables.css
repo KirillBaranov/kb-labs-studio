@@ -20,9 +20,9 @@
   --border-secondary: #D4D4D4;
 
   /* Interactive */
-  --link: #2563EB;
-  --link-hover: #1E40AF;
-  --accent-subtle: #DBEAFE;
+  --link: #5b57d6;
+  --link-hover: #4338ca;
+  --accent-subtle: #ddd6fe;
 
   /* Status */
   --success: #16A34A;
@@ -57,9 +57,9 @@
   --border-secondary: #52525B;
 
   /* Interactive */
-  --link: #60A5FA;            /* Brighter blue for better contrast */
-  --link-hover: #93C5FD;      /* Even lighter on hover */
-  --accent-subtle: #1E3A8A33; /* 20% opacity blue overlay */
+  --link: #a78bfa;            /* Brighter purple for better contrast */
+  --link-hover: #c4b5fd;      /* Even lighter on hover */
+  --accent-subtle: #4c1d9533; /* 20% opacity purple overlay */
 
   /* Status */
   --success: #22C55E;
