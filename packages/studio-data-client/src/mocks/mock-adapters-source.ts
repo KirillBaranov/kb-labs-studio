@@ -3,7 +3,7 @@
  * Mock implementation of AdaptersDataSource
  */
 
-import type { AdaptersDataSource } from '../sources/adapters-source';
+import type { AdaptersDataSource, DateRangeOptions, DailyStats } from '../sources/adapters-source';
 import type {
   LLMUsageStats,
   EmbeddingsUsageStats,
@@ -16,7 +16,7 @@ import type {
  * Mock adapters data source for testing
  */
 export class MockAdaptersSource implements AdaptersDataSource {
-  async getLLMUsage(): Promise<LLMUsageStats> {
+  async getLLMUsage(options?: DateRangeOptions): Promise<LLMUsageStats> {
     return {
       totalRequests: 1247,
       totalTokens: 3_456_789,
@@ -55,7 +55,7 @@ export class MockAdaptersSource implements AdaptersDataSource {
     };
   }
 
-  async getEmbeddingsUsage(): Promise<EmbeddingsUsageStats> {
+  async getEmbeddingsUsage(options?: DateRangeOptions): Promise<EmbeddingsUsageStats> {
     return {
       totalRequests: 3456,
       totalTextLength: 1_234_567,
@@ -68,7 +68,7 @@ export class MockAdaptersSource implements AdaptersDataSource {
     };
   }
 
-  async getVectorStoreUsage(): Promise<VectorStoreUsageStats> {
+  async getVectorStoreUsage(options?: DateRangeOptions): Promise<VectorStoreUsageStats> {
     return {
       searchQueries: 2345,
       upsertOperations: 567,
@@ -81,7 +81,7 @@ export class MockAdaptersSource implements AdaptersDataSource {
     };
   }
 
-  async getCacheUsage(): Promise<CacheUsageStats> {
+  async getCacheUsage(options?: DateRangeOptions): Promise<CacheUsageStats> {
     return {
       totalGets: 15_678,
       hits: 13_456,
@@ -93,7 +93,7 @@ export class MockAdaptersSource implements AdaptersDataSource {
     };
   }
 
-  async getStorageUsage(): Promise<StorageUsageStats> {
+  async getStorageUsage(options?: DateRangeOptions): Promise<StorageUsageStats> {
     return {
       readOperations: 8765,
       writeOperations: 2345,
@@ -103,5 +103,75 @@ export class MockAdaptersSource implements AdaptersDataSource {
       avgReadDuration: 12.4,
       avgWriteDuration: 34.5,
     };
+  }
+
+  async getLLMDailyStats(options?: DateRangeOptions): Promise<DailyStats[]> {
+    return this.generateMockDailyStats({
+      totalTokens: [10000, 60000],
+      totalCost: [1, 6],
+      avgDurationMs: [500, 2500],
+    });
+  }
+
+  async getEmbeddingsDailyStats(options?: DateRangeOptions): Promise<DailyStats[]> {
+    return this.generateMockDailyStats({
+      totalTokens: [5000, 30000],
+      totalCost: [0.1, 0.5],
+      avgDurationMs: [100, 500],
+    });
+  }
+
+  async getVectorStoreDailyStats(options?: DateRangeOptions): Promise<DailyStats[]> {
+    return this.generateMockDailyStats({
+      totalSearches: [100, 500],
+      totalUpserts: [50, 200],
+      totalDeletes: [10, 50],
+      avgDurationMs: [30, 150],
+    });
+  }
+
+  async getCacheDailyStats(options?: DateRangeOptions): Promise<DailyStats[]> {
+    return this.generateMockDailyStats({
+      totalHits: [500, 2000],
+      totalMisses: [100, 500],
+      totalSets: [200, 800],
+      hitRate: [70, 95],
+    });
+  }
+
+  async getStorageDailyStats(options?: DateRangeOptions): Promise<DailyStats[]> {
+    return this.generateMockDailyStats({
+      totalBytesRead: [1000000, 10000000],
+      totalBytesWritten: [500000, 5000000],
+      avgDurationMs: [10, 50],
+    });
+  }
+
+  /**
+   * Helper to generate mock daily stats
+   */
+  private generateMockDailyStats(metricsRanges: Record<string, [number, number]>): DailyStats[] {
+    const days = 7;
+    const stats: DailyStats[] = [];
+    const now = new Date();
+
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0]!;
+
+      const metrics: Record<string, number> = {};
+      for (const [key, [min, max]] of Object.entries(metricsRanges)) {
+        metrics[key] = Math.floor(Math.random() * (max - min)) + min;
+      }
+
+      stats.push({
+        date: dateStr,
+        count: Math.floor(Math.random() * 100) + 50, // 50-150 requests
+        metrics,
+      });
+    }
+
+    return stats;
   }
 }
