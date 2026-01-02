@@ -312,5 +312,22 @@ a:hover {
   a:not(.ant-btn):hover {
     color: var(--link-hover);
   }
+
+  /* Fix link button visibility in dark theme */
+  .ant-btn-link {
+    color: var(--link) !important;
+  }
+
+  .ant-btn-link:hover {
+    color: var(--link-hover) !important;
+  }
+
+  .ant-btn-link:not(:disabled):not(.ant-btn-disabled) {
+    color: var(--link) !important;
+  }
+
+  .ant-btn-link:not(:disabled):not(.ant-btn-disabled):hover {
+    color: var(--link-hover) !important;
+  }
 }
 
