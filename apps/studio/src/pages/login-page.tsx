@@ -33,7 +33,7 @@ export function LoginPage() {
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        backgroundColor: 'var(--bg-tertiary)',
         padding: '2rem',
       }}
     >
@@ -78,15 +78,15 @@ export function LoginPage() {
           <div
             style={{
               padding: '16px',
-              background: '#f0f5ff',
+              backgroundColor: 'var(--bg-tertiary)',
               borderRadius: '8px',
-              border: '1px solid #adc6ff',
+              border: '1px solid var(--border-primary)',
             }}
           >
             <Space direction="vertical" size="small" style={{ width: '100%' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <LockOutlined style={{ color: '#1890ff' }} />
-                <Text strong style={{ color: '#1890ff' }}>
+                <LockOutlined style={{ color: '#667eea' }} />
+                <Text strong style={{ color: '#667eea' }}>
                   Режим разработки
                 </Text>
               </div>
