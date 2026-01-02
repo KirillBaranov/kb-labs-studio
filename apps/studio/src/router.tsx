@@ -36,6 +36,7 @@ import { AnalyticsEmbeddingsPage } from './modules/analytics/pages/analytics-emb
 import { AnalyticsVectorStorePage } from './modules/analytics/pages/analytics-vectorstore-page';
 import { AnalyticsCachePage } from './modules/analytics/pages/analytics-cache-page';
 import { AnalyticsStoragePage } from './modules/analytics/pages/analytics-storage-page';
+import { AssistantPage } from './pages/assistant-page';
 import { WidgetModalManager } from './components/widget-modal';
 import { PageTransition } from './components/page-transition';
 import { createStudioLogger } from './utils/logger';
@@ -58,7 +59,7 @@ type PluginNavModel = {
 
 // Helper function to render icon from available icons registry
 function renderPluginIcon(iconName?: string): React.ReactElement | undefined {
-  if (!iconName) return undefined;
+  if (!iconName) {return undefined;}
 
   const IconComponent = AVAILABLE_ICONS[iconName];
 
@@ -131,6 +132,12 @@ function LayoutContent() {
         label: 'Workflows',
         icon: renderPluginIcon('BranchesOutlined'),
         path: '/workflows',
+      },
+      {
+        key: 'assistant',
+        label: 'AI Assistant',
+        icon: renderPluginIcon('RobotOutlined'),
+        path: '/assistant',
       },
       {
         key: 'analytics',
@@ -266,22 +273,6 @@ function LayoutContent() {
           LinkComponent: Link as any,
           onLogout: handleLogout,
           userName: auth.role,
-          systemHealth: health
-            ? {
-                status: health.status as 'healthy' | 'degraded' | 'down' | 'unknown',
-                ready: health.ready,
-                reason: health.reason,
-                pluginsMounted: health.pluginsMounted,
-                pluginsFailed: health.pluginsFailed,
-                registryRev: registryMeta.rev,
-                registryGeneratedAt: registryMeta.generatedAt,
-                registryStale: registryMeta.stale,
-                registryPartial: registryMeta.partial,
-                redisEnabled: health.redisEnabled,
-                redisHealthy: health.redisHealthy,
-              }
-            : undefined,
-          systemHealthLoading: loading && !hasData,
           onSearchClick: () => commandPalette.open(),
           // Notifications
           notifications,
@@ -336,7 +327,9 @@ function LayoutContent() {
       >
         <HealthBanner />
         <PageTransition>
-          <Outlet />
+          <div style={{ paddingBottom: '20px' }}>
+            <Outlet />
+          </div>
         </PageTransition>
         <WidgetModalManager />
       </KBPageLayout>
@@ -383,6 +376,11 @@ export const router = createBrowserRouter([
         errorElement: <ErrorBoundary />,
       },
       {
+        path: '/settings/:tab',
+        element: <SettingsPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
         path: '/workflows',
         element: <WorkflowsListPage />,
         errorElement: <ErrorBoundary />,
@@ -390,6 +388,11 @@ export const router = createBrowserRouter([
       {
         path: '/workflows/:runId',
         element: <WorkflowRunPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/assistant',
+        element: <AssistantPage />,
         errorElement: <ErrorBoundary />,
       },
       {
