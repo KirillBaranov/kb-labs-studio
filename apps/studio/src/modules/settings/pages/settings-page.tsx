@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Tabs, List, Button, Space, Typography, message, Divider } from 'antd';
 import {
   BgColorsOutlined,
@@ -28,10 +29,18 @@ import { RoleSwitcher } from '@/components/role-switcher';
 const { Text, Paragraph, Title } = Typography;
 
 export function SettingsPage() {
+  const params = useParams<{ tab?: string }>();
+  const navigate = useNavigate();
   const sources = useDataSources();
   const { data, isLoading } = useHealthStatus(sources.system);
   const { registryMeta, refresh } = useRegistry();
   const [invalidating, setInvalidating] = React.useState(false);
+
+  const activeTab = params.tab || 'appearance';
+
+  const handleTabChange = (key: string) => {
+    navigate(`/settings/${key}`);
+  };
 
   const handleInvalidateCache = async () => {
     setInvalidating(true);
@@ -294,14 +303,13 @@ export function SettingsPage() {
         description="Configure your preferences, manage data, and customize your experience"
       />
 
-      <div style={{ paddingLeft: 24, paddingRight: 24 }}>
-        <Tabs
-          defaultActiveKey="appearance"
-          items={tabItems}
-          size="large"
-          style={{ marginTop: 24 }}
-        />
-      </div>
+      <Tabs
+        activeKey={activeTab}
+        onChange={handleTabChange}
+        items={tabItems}
+        size="large"
+        style={{ marginTop: 24 }}
+      />
     </KBPageContainer>
   );
 }
