@@ -2,9 +2,26 @@ import * as React from 'react';
 import { Badge, Dropdown, Button, List, Typography, Tag, Empty, Divider, Space, Tooltip } from 'antd';
 import type { MenuProps } from 'antd';
 import { Bell, AlertTriangle, XCircle, X, CheckCheck } from 'lucide-react';
-import type { LogNotification } from '@kb-labs/studio-data-client';
 
 const { Text, Paragraph } = Typography;
+
+/**
+ * Log notification interface
+ * Matches LogNotification from @kb-labs/studio-data-client
+ */
+export interface LogNotification {
+  id: string;
+  timestamp: string;
+  level: 'warn' | 'error';
+  message: string;
+  plugin?: string;
+  executionId?: string;
+  error?: {
+    name: string;
+    message: string;
+  };
+  read: boolean;
+}
 
 export interface KBNotificationBellProps {
   notifications: LogNotification[];
@@ -65,7 +82,10 @@ export function KBNotificationBell({
         maxHeight: 500,
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: 'var(--bg-primary)',
+        backgroundColor: 'var(--bg-secondary)',
+        border: '1px solid var(--border-primary)',
+        borderRadius: '8px',
+        boxShadow: '0 4px 16px var(--shadow)',
       }}
     >
       {/* Header */}
@@ -137,7 +157,7 @@ export function KBNotificationBell({
                   borderBottom: '1px solid var(--border-primary)',
                   backgroundColor: notification.read
                     ? 'transparent'
-                    : 'var(--bg-secondary)',
+                    : 'var(--bg-tertiary)',
                   cursor: 'pointer',
                   transition: 'background-color 0.2s',
                 }}
@@ -152,7 +172,7 @@ export function KBNotificationBell({
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = notification.read
                     ? 'transparent'
-                    : 'var(--bg-secondary)';
+                    : 'var(--bg-tertiary)';
                 }}
               >
                 <div style={{ display: 'flex', gap: 8 }}>
@@ -186,9 +206,9 @@ export function KBNotificationBell({
                       }}
                       ellipsis={{ rows: 2 }}
                     >
-                      {notification.error
-                        ? `${notification.error.name}: ${notification.error.message}`
-                        : notification.message}
+                      {notification.error && typeof notification.error === 'object'
+                        ? `${notification.error.name || 'Error'}: ${notification.error.message || 'Unknown error'}`
+                        : notification.message || 'No message'}
                     </Paragraph>
 
                     {notification.executionId && (

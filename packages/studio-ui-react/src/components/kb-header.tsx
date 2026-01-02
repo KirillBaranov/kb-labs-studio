@@ -4,8 +4,7 @@ import type { MenuProps } from 'antd';
 import { User, Search } from 'lucide-react';
 import { KBThemeToggle } from './kb-theme-toggle';
 import { KBSystemHealthIndicator, type SystemHealthData } from './kb-system-health-indicator';
-import { KBNotificationBell } from './kb-notification-bell';
-import type { LogNotification } from '@kb-labs/studio-data-client';
+import { KBNotificationBell, type LogNotification } from './kb-notification-bell';
 
 const { Header: AntHeader } = Layout;
 
@@ -61,6 +60,9 @@ export function KBHeader({
   ];
 
   const logoStyle: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
     fontSize: 18,
     fontWeight: 'bold',
     color: 'var(--text-primary)',
@@ -96,11 +98,6 @@ export function KBHeader({
       )}
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <KBSystemHealthIndicator
-          health={systemHealth}
-          loading={systemHealthLoading}
-        />
-
         {onSearchClick && (
           <Button
             type="text"

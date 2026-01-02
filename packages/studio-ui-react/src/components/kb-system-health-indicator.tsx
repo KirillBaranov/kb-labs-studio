@@ -210,14 +210,14 @@ export function KBSystemHealthIndicator({
       placement="bottomRight"
       trigger={['click']}
     >
-      <span>
+      <span style={{ display: 'inline-flex', alignItems: 'center' }}>
         {showBadge ? (
           <Badge
             dot
             status={config.badgeStatus}
             offset={[-2, 2]}
           >
-            <span>{buttonElement}</span>
+            {buttonElement}
           </Badge>
         ) : (
           buttonElement
