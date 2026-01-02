@@ -55,17 +55,23 @@ export function useNotifications(
           return;
         }
 
+        // Safely extract message (handle objects being passed as message)
+        let messageText = 'No message';
+        if (log.msg) {
+          messageText = typeof log.msg === 'string' ? log.msg : JSON.stringify(log.msg);
+        }
+
         const notification: LogNotification = {
           id: `${log.time}-${Math.random().toString(36).slice(2, 9)}`,
           timestamp: log.time,
           level: log.level,
-          message: log.msg || 'No message',
+          message: messageText,
           plugin: log.plugin,
           executionId: log.executionId,
           error: log.err
             ? {
-                name: log.err.name,
-                message: log.err.message,
+                name: String(log.err.name || 'Error'),
+                message: String(log.err.message || 'Unknown error'),
               }
             : undefined,
           read: false,
