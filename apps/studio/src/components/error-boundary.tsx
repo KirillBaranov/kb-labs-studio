@@ -69,7 +69,7 @@ export function ErrorBoundary() {
       justifyContent: 'center',
       minHeight: '100vh',
       padding: '2rem',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      backgroundColor: 'var(--bg-tertiary)',
     }}>
       <Card
         style={{
@@ -77,6 +77,7 @@ export function ErrorBoundary() {
           width: '100%',
           borderRadius: '16px',
           boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+          backgroundColor: 'var(--bg-secondary)',
         }}
         bodyStyle={{ padding: '3rem' }}
       >

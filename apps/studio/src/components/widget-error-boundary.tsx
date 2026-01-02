@@ -77,7 +77,9 @@ export class WidgetErrorBoundary extends React.Component<
         <Card
           style={{
             borderColor: 'var(--error)',
-            backgroundColor: 'color-mix(in srgb, var(--error) 5%, var(--bg-secondary))',
+            backgroundColor: 'var(--bg-secondary)',
+            borderWidth: '1px',
+            borderStyle: 'solid',
           }}
         >
           <div style={{ textAlign: 'center', padding: '16px' }}>
