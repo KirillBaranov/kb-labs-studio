@@ -35,11 +35,11 @@ import {
   RobotOutlined,
   ThunderboltOutlined,
 } from '@ant-design/icons';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { KBPageContainer, KBPageHeader } from '@kb-labs/studio-ui-react';
 import { useLogStream } from '@kb-labs/studio-data-client';
 import { useDataSources } from '../../../providers/data-sources-provider';
-import type { LogRecord } from '@kb-labs/studio-data-client';
+import type { LogRecord, LogSummarizeResponse } from '@kb-labs/studio-data-client';
 import dayjs, { Dayjs } from 'dayjs';
 
 const { Text, Paragraph } = Typography;
@@ -194,7 +194,21 @@ function calculateLogStats(logs: LogRecord[]) {
  */
 export function LogsPage() {
   const sources = useDataSources();
-  const { logs, isConnected, error, clearLogs } = useLogStream(sources.observability);
+  const { logs: streamLogs, isConnected, error, clearLogs } = useLogStream(sources.observability);
+
+  // Pause/Resume state
+  const [isPaused, setIsPaused] = useState(false);
+  const [frozenLogs, setFrozenLogs] = useState<LogRecord[]>([]);
+
+  // Update frozen logs when not paused
+  useEffect(() => {
+    if (!isPaused) {
+      setFrozenLogs(streamLogs);
+    }
+  }, [streamLogs, isPaused]);
+
+  // Use frozen logs when paused, stream logs when not
+  const logs = isPaused ? frozenLogs : streamLogs;
 
   // Filters
   const [levelFilter, setLevelFilter] = useState<string | null>(null);
@@ -214,7 +228,7 @@ export function LogsPage() {
     stackTraces: true,
   });
   const [summarizing, setSummarizing] = useState(false);
-  const [summaryResult, setSummaryResult] = useState<string | null>(null);
+  const [summaryResult, setSummaryResult] = useState<LogSummarizeResponse['data'] | null>(null);
 
   // Calculate filtered logs
   const filteredLogs = useMemo(() => {
@@ -260,7 +274,7 @@ export function LogsPage() {
 
     switch (groupBy) {
       case 'trace':
-        return groupLogsByField(filteredLogs, 'trace');
+        return groupLogsByField(filteredLogs, 'traceId');
       case 'execution':
         return groupLogsByField(filteredLogs, 'executionId');
       case 'plugin':
@@ -273,129 +287,90 @@ export function LogsPage() {
   /**
    * Render single log item with expandable details
    */
-  const renderLogItem = (log: LogRecord, index: number) => (
-    <Collapse
-      ghost
-      key={`${log.time}-${index}`}
-      items={[
+  const renderLogItem = (log: LogRecord, index: number) => {
+    // Build clean JSON representation for expansion
+    const logData = { ...log };
+
+    // Safe JSON stringify (handles circular refs and errors)
+    let jsonString: string;
+    try {
+      jsonString = JSON.stringify(logData, null, 2);
+    } catch (err) {
+      // Fallback if JSON.stringify fails (circular refs, etc.)
+      jsonString = JSON.stringify(
         {
-          key: index,
-          label: (
-            <Space>
-              {getLevelIcon(log.level)}
-              <Tag color={getLevelColor(log.level)}>{log.level.toUpperCase()}</Tag>
-              <Text type="secondary" style={{ fontSize: 12 }}>
-                {formatTime(log.time)}
-              </Text>
-              {log.plugin && <Tag color="purple">{log.plugin}</Tag>}
-              {log.executionId && (
-                <Tooltip title="Click to copy execution ID">
-                  <Tag
-                    color="cyan"
-                    style={{ fontSize: 11, cursor: 'pointer' }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      copyToClipboard(log.executionId!, 'Execution ID');
-                    }}
-                    icon={<CopyOutlined />}
-                  >
-                    {log.executionId.slice(0, 8)}
-                  </Tag>
-                </Tooltip>
-              )}
-              {log.trace && (
-                <Tooltip title="Click to copy trace ID">
-                  <Tag
-                    color="geekblue"
-                    style={{ fontSize: 11, cursor: 'pointer' }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      copyToClipboard(log.trace!, 'Trace ID');
-                    }}
-                    icon={<CopyOutlined />}
-                  >
-                    {log.trace.slice(0, 8)}
-                  </Tag>
-                </Tooltip>
-              )}
-              <Text>{log.msg || '(no message)'}</Text>
-            </Space>
-          ),
-          children: (
-            <Descriptions bordered size="small" column={2}>
-              <Descriptions.Item label="Timestamp">{formatDateTime(log.time)}</Descriptions.Item>
-              <Descriptions.Item label="Level">
-                <Tag color={getLevelColor(log.level)}>{log.level}</Tag>
-              </Descriptions.Item>
-              {log.plugin && <Descriptions.Item label="Plugin">{log.plugin}</Descriptions.Item>}
-              {log.executionId && (
-                <Descriptions.Item label="Execution ID">
-                  <Paragraph
-                    copyable={{ text: log.executionId }}
-                    style={{ marginBottom: 0, fontSize: 12 }}
-                  >
-                    {log.executionId}
-                  </Paragraph>
-                </Descriptions.Item>
-              )}
-              {log.trace && (
-                <Descriptions.Item label="Trace ID">
-                  <Paragraph copyable={{ text: log.trace }} style={{ marginBottom: 0, fontSize: 12 }}>
-                    {log.trace}
-                  </Paragraph>
-                </Descriptions.Item>
-              )}
-              {log.span && <Descriptions.Item label="Span ID">{log.span}</Descriptions.Item>}
-              {log.tenantId && <Descriptions.Item label="Tenant">{log.tenantId}</Descriptions.Item>}
-              {log.command && <Descriptions.Item label="Command">{log.command}</Descriptions.Item>}
-              {log.err && (
-                <>
-                  <Descriptions.Item label="Error Name" span={2}>
-                    <Text type="danger">{log.err.name}</Text>
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Error Message" span={2}>
-                    <Text type="danger">{log.err.message}</Text>
-                  </Descriptions.Item>
-                  {log.err.stack && (
-                    <Descriptions.Item label="Stack Trace" span={2}>
-                      <Paragraph
-                        copyable={{ text: log.err.stack }}
-                        style={{
-                          fontSize: 11,
-                          fontFamily: 'monospace',
-                          whiteSpace: 'pre-wrap',
-                          maxHeight: 200,
-                          overflow: 'auto',
-                        }}
-                      >
-                        {log.err.stack}
-                      </Paragraph>
-                    </Descriptions.Item>
-                  )}
-                </>
-              )}
-              {log.meta && Object.keys(log.meta).length > 0 && (
-                <Descriptions.Item label="Metadata" span={2}>
-                  <Paragraph
-                    copyable={{ text: JSON.stringify(log.meta, null, 2) }}
-                    style={{
-                      fontSize: 11,
-                      fontFamily: 'monospace',
-                      whiteSpace: 'pre-wrap',
-                      maxHeight: 200,
-                      overflow: 'auto',
-                    }}
-                  >
-                    {JSON.stringify(log.meta, null, 2)}
-                  </Paragraph>
-                </Descriptions.Item>
-              )}
-            </Descriptions>
-          ),
+          ...logData,
+          err: logData.err ? {
+            name: String(logData.err.name || 'Error'),
+            message: String(logData.err.message || ''),
+            stack: String(logData.err.stack || '').split('\n').slice(0, 10).join('\n'),
+          } : undefined,
         },
-      ]}
-    />
-  );
+        null,
+        2
+      );
+    }
+
+    return (
+      <Collapse
+        ghost
+        key={`${log.time}-${index}`}
+        items={[
+          {
+            key: index,
+            label: (
+              <Space>
+                {getLevelIcon(log.level)}
+                <Tag color={getLevelColor(log.level)}>{log.level.toUpperCase()}</Tag>
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  {formatTime(log.time)}
+                </Text>
+                {log.plugin && <Tag color="purple">{log.plugin}</Tag>}
+                <Text>{log.msg || '(no message)'}</Text>
+                {log.err && (
+                  <Tag color="red" icon={<CloseCircleOutlined />}>
+                    {String(log.err.name || log.err.type || 'Error')}
+                  </Tag>
+                )}
+                {log.traceId && (
+                  <Tooltip title="Click to copy trace ID">
+                    <Tag
+                      color="default"
+                      style={{ fontSize: 11, cursor: 'pointer', color: '#8c8c8c' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        copyToClipboard(String(log.traceId), 'Trace ID');
+                      }}
+                      icon={<CopyOutlined />}
+                    >
+                      {String(log.traceId).slice(0, 8)}
+                    </Tag>
+                  </Tooltip>
+                )}
+              </Space>
+            ),
+            children: (
+              <div style={{ backgroundColor: '#fafafa', padding: 16, borderRadius: 4, marginLeft: -24, marginRight: -24 }}>
+                <Paragraph
+                  copyable={{ text: jsonString }}
+                  style={{
+                    marginBottom: 0,
+                    fontSize: 12,
+                    fontFamily: 'monospace',
+                    whiteSpace: 'pre-wrap',
+                    maxHeight: 400,
+                    overflow: 'auto',
+                  }}
+                >
+                  {jsonString}
+                </Paragraph>
+              </div>
+            ),
+          },
+        ]}
+      />
+    );
+  };
 
   /**
    * Render grouped logs
@@ -463,13 +438,11 @@ export function LogsPage() {
       };
 
       // Call API through data source
+      // Note: HttpClient auto-unwraps { ok: true, data: {...} } envelope
       const result = await sources.observability.summarizeLogs(request);
 
-      if (!result.ok) {
-        throw new Error('Summarization failed');
-      }
-
-      setSummaryResult(result.data.aiSummary || 'No summary generated');
+      // Store the full result data for structured rendering
+      setSummaryResult(result);
     } catch (err: any) {
       message.error('Failed to generate summary: ' + err.message);
     } finally {
@@ -707,19 +680,25 @@ export function LogsPage() {
       {/* Logs List */}
       <Card
         title={
-          <Row justify="space-between" align="middle">
-            <Col>
-              {groupBy === 'none' ? 'Recent Logs' : `Logs grouped by ${groupBy}`}
-            </Col>
-            <Col>
-              <Badge count={filteredLogs.length} showZero style={{ backgroundColor: '#52c41a' }} />
-            </Col>
-          </Row>
+          <Space>
+            <span>{groupBy === 'none' ? 'Recent Logs' : `Logs grouped by ${groupBy}`}</span>
+            <Badge count={filteredLogs.length} showZero style={{ backgroundColor: '#52c41a' }} />
+          </Space>
         }
         extra={
-          <a onClick={clearLogs} style={{ cursor: 'pointer' }}>
-            Clear
-          </a>
+          <Space>
+            <Button
+              size="small"
+              icon={isPaused ? <SyncOutlined /> : <ClockCircleOutlined />}
+              onClick={() => setIsPaused(!isPaused)}
+              type={isPaused ? 'primary' : 'default'}
+            >
+              {isPaused ? 'Resume' : 'Pause'}
+            </Button>
+            <Button size="small" onClick={clearLogs}>
+              Clear
+            </Button>
+          </Space>
         }
       >
         {filteredLogs.length === 0 ? (
@@ -730,12 +709,24 @@ export function LogsPage() {
             showIcon
           />
         ) : groupBy === 'none' ? (
-          <List
-            dataSource={filteredLogs}
-            renderItem={(log, index) => (
-              <List.Item style={{ padding: '8px 0' }}>{renderLogItem(log, index)}</List.Item>
-            )}
-          />
+          <div style={{ maxHeight: 600, overflow: 'auto' }}>
+            <List
+              dataSource={filteredLogs}
+              renderItem={(log, index) => (
+                <List.Item style={{ padding: '8px 0' }}>{renderLogItem(log, index)}</List.Item>
+              )}
+              pagination={
+                filteredLogs.length > 50
+                  ? {
+                      pageSize: 50,
+                      showSizeChanger: true,
+                      showTotal: (total) => `Total ${total} logs`,
+                      pageSizeOptions: ['25', '50', '100', '200'],
+                    }
+                  : false
+              }
+            />
+          </div>
         ) : (
           renderGroupedLogs()
         )}
@@ -892,18 +883,120 @@ export function LogsPage() {
           )}
 
           {summaryResult && !summarizing && (
-            <Card
-              title={
-                <Space>
-                  <RobotOutlined />
-                  <span>AI Summary</span>
-                </Space>
-              }
-              size="small"
-              style={{ marginTop: 16 }}
-            >
-              <Paragraph style={{ whiteSpace: 'pre-wrap' }}>{summaryResult}</Paragraph>
-            </Card>
+            <Space direction="vertical" size="middle" style={{ width: '100%', marginTop: 16 }}>
+              {/* Statistics Card */}
+              <Card
+                title={
+                  <Space>
+                    <InfoCircleOutlined />
+                    <span>Statistics</span>
+                  </Space>
+                }
+                size="small"
+              >
+                <Descriptions column={2} size="small">
+                  <Descriptions.Item label="Total Logs">{summaryResult.summary.total}</Descriptions.Item>
+                  <Descriptions.Item label="Time Range">
+                    {summaryResult.summary.timeRange.from && summaryResult.summary.timeRange.to
+                      ? `${summaryResult.summary.timeRange.from} to ${summaryResult.summary.timeRange.to}`
+                      : 'All time'}
+                  </Descriptions.Item>
+                </Descriptions>
+
+                {/* Level breakdown */}
+                {summaryResult.summary.stats?.byLevel && Object.keys(summaryResult.summary.stats.byLevel).length > 0 && (
+                  <>
+                    <Divider style={{ margin: '12px 0' }} />
+                    <Text strong>By Level:</Text>
+                    <div style={{ marginTop: 8 }}>
+                      <Space wrap>
+                        {Object.entries(summaryResult.summary.stats.byLevel).map(([level, count]) => (
+                          <Tag key={level} color={
+                            level === 'error' ? 'red' :
+                            level === 'warn' ? 'orange' :
+                            level === 'info' ? 'blue' :
+                            'default'
+                          }>
+                            {level}: {count}
+                          </Tag>
+                        ))}
+                      </Space>
+                    </div>
+                  </>
+                )}
+
+                {/* Plugin breakdown */}
+                {summaryResult.summary.stats?.byPlugin && Object.keys(summaryResult.summary.stats.byPlugin).length > 0 && (
+                  <>
+                    <Divider style={{ margin: '12px 0' }} />
+                    <Text strong>By Plugin (Top 5):</Text>
+                    <div style={{ marginTop: 8 }}>
+                      <Space wrap>
+                        {Object.entries(summaryResult.summary.stats.byPlugin)
+                          .sort((a: any, b: any) => b[1] - a[1])
+                          .slice(0, 5)
+                          .map(([plugin, count]) => (
+                            <Tag key={plugin}>{plugin}: {count}</Tag>
+                          ))}
+                      </Space>
+                    </div>
+                  </>
+                )}
+              </Card>
+
+              {/* Top Errors Card */}
+              {summaryResult.summary.stats?.topErrors && summaryResult.summary.stats.topErrors.length > 0 && (
+                <Card
+                  title={
+                    <Space>
+                      <BugOutlined />
+                      <span>Top Errors</span>
+                    </Space>
+                  }
+                  size="small"
+                >
+                  <List
+                    size="small"
+                    dataSource={summaryResult.summary.stats.topErrors.slice(0, 5)}
+                    renderItem={(err: any, idx: number) => (
+                      <List.Item>
+                        <Text>
+                          <Text type="secondary">{idx + 1}.</Text>{' '}
+                          <Text code>{err.message}</Text>{' '}
+                          <Text type="secondary">({err.count} times)</Text>
+                        </Text>
+                      </List.Item>
+                    )}
+                  />
+                </Card>
+              )}
+
+              {/* AI Analysis Card */}
+              {summaryResult.aiSummary && (
+                <Card
+                  title={
+                    <Space>
+                      <RobotOutlined />
+                      <span>AI Analysis</span>
+                    </Space>
+                  }
+                  size="small"
+                >
+                  <Paragraph style={{ whiteSpace: 'pre-wrap', marginBottom: 0 }}>
+                    {summaryResult.aiSummary}
+                  </Paragraph>
+                </Card>
+              )}
+
+              {/* Info message if AI not available */}
+              {!summaryResult.aiSummary && summaryResult.message && (
+                <Alert
+                  message={summaryResult.message}
+                  type="info"
+                  showIcon
+                />
+              )}
+            </Space>
           )}
         </Space>
       </Modal>
