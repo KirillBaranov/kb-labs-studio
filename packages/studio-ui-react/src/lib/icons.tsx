@@ -40,6 +40,10 @@ import {
   CopyOutlined,
   SearchOutlined,
   FilterOutlined,
+  ArrowUpOutlined,
+  ArrowDownOutlined,
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
 
   // Status & Alerts
   CheckCircleOutlined,
@@ -73,6 +77,8 @@ import {
   // Git & Version Control
   GithubOutlined,
   GitlabOutlined,
+  PullRequestOutlined,
+  MergeCellsOutlined,
 
   // Data & Analytics
   DatabaseOutlined,
@@ -180,6 +186,10 @@ export const AVAILABLE_ICONS: Record<string, React.ComponentType<any>> = {
   CopyOutlined,
   SearchOutlined,
   FilterOutlined,
+  ArrowUpOutlined,
+  ArrowDownOutlined,
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
 
   // Status & Alerts
   CheckCircleOutlined,
@@ -213,6 +223,8 @@ export const AVAILABLE_ICONS: Record<string, React.ComponentType<any>> = {
   // Git & Version Control
   GithubOutlined,
   GitlabOutlined,
+  PullRequestOutlined,
+  MergeCellsOutlined,
 
   // Data & Analytics
   DatabaseOutlined,
@@ -374,6 +386,10 @@ export {
   CopyOutlined,
   SearchOutlined,
   FilterOutlined,
+  ArrowUpOutlined,
+  ArrowDownOutlined,
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
 
   // Status & Alerts
   CheckCircleOutlined,
@@ -406,6 +422,8 @@ export {
   // Git & Version Control
   GithubOutlined,
   GitlabOutlined,
+  PullRequestOutlined,
+  MergeCellsOutlined,
 
   // Data & Analytics
   DatabaseOutlined,
