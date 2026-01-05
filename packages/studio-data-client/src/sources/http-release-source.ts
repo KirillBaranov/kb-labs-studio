@@ -147,19 +147,21 @@ export class HttpReleaseSource implements ReleaseDataSource {
     return await this.client.fetch<HistoryResponse>(`${this.basePath}/history`);
   }
 
-  async getHistoryReport(id: string): Promise<HistoryReportResponse> {
+  async getHistoryReport(scope: string, id: string): Promise<HistoryReportResponse> {
     return await this.client.fetch<HistoryReportResponse>(
-      `${this.basePath}/history/${id}/report`
+      `${this.basePath}/history/${scope}/${id}/report`
     );
   }
 
-  async getHistoryPlan(id: string): Promise<HistoryPlanResponse> {
-    return await this.client.fetch<HistoryPlanResponse>(`${this.basePath}/history/${id}/plan`);
+  async getHistoryPlan(scope: string, id: string): Promise<HistoryPlanResponse> {
+    return await this.client.fetch<HistoryPlanResponse>(
+      `${this.basePath}/history/${scope}/${id}/plan`
+    );
   }
 
-  async getHistoryChangelog(id: string): Promise<HistoryChangelogResponse> {
+  async getHistoryChangelog(scope: string, id: string): Promise<HistoryChangelogResponse> {
     return await this.client.fetch<HistoryChangelogResponse>(
-      `${this.basePath}/history/${id}/changelog`
+      `${this.basePath}/history/${scope}/${id}/changelog`
     );
   }
 

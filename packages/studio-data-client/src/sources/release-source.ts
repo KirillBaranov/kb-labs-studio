@@ -65,9 +65,9 @@ export interface ReleaseDataSource {
 
   // === History ===
   getHistory(): Promise<HistoryResponse>;
-  getHistoryReport(id: string): Promise<HistoryReportResponse>;
-  getHistoryPlan(id: string): Promise<HistoryPlanResponse>;
-  getHistoryChangelog(id: string): Promise<HistoryChangelogResponse>;
+  getHistoryReport(scope: string, id: string): Promise<HistoryReportResponse>;
+  getHistoryPlan(scope: string, id: string): Promise<HistoryPlanResponse>;
+  getHistoryChangelog(scope: string, id: string): Promise<HistoryChangelogResponse>;
 
   // === Git Timeline ===
   getGitTimeline(scope: string): Promise<GitTimelineResponse>;
