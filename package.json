@@ -1,7 +1,6 @@
 {
   "name": "@kb-labs/studio",
   "version": "0.1.0",
-  "private": true,
   "description": "KB Labs Studio — unified web dashboard for observing and managing the KB Labs ecosystem.",
   "type": "module",
   "author": {
