@@ -3,11 +3,29 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@kb-labs/commit-contracts": [
+        "../kb-labs-commit-plugin/packages/commit-contracts/src/index.ts"
+      ],
+      "@kb-labs/commit-contracts/*": [
+        "../kb-labs-commit-plugin/packages/commit-contracts/src/*"
+      ],
       "@kb-labs/core-platform": [
         "../kb-labs-core/packages/core-platform/src/index.ts"
       ],
       "@kb-labs/core-platform/*": [
         "../kb-labs-core/packages/core-platform/src/*"
+      ],
+      "@kb-labs/plugin-contracts": [
+        "../kb-labs-plugin/packages/plugin-contracts/src/index.ts"
+      ],
+      "@kb-labs/plugin-contracts/*": [
+        "../kb-labs-plugin/packages/plugin-contracts/src/*"
+      ],
+      "@kb-labs/release-manager-contracts": [
+        "../kb-labs-release-manager/packages/release-manager-contracts/src/index.ts"
+      ],
+      "@kb-labs/release-manager-contracts/*": [
+        "../kb-labs-release-manager/packages/release-manager-contracts/src/*"
       ],
       "@kb-labs/rest-api-contracts": [
         "../kb-labs-rest-api/packages/rest-api-contracts/src/index.ts"
