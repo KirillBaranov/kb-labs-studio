@@ -26,13 +26,7 @@ function buildQuery(params?: WorkflowRunsFilters): string {
   return qs ? `?${qs}` : ''
 }
 
-function ensureJsonHeaders(headers?: HeadersInit) {
-  const result = new Headers(headers)
-  if (!result.has('Content-Type')) {
-    result.set('Content-Type', 'application/json')
-  }
-  return result
-}
+// No longer needed with axios (handles JSON automatically)
 
 export class HttpWorkflowSource implements WorkflowDataSource {
   constructor(private readonly client: HttpClient) {}
@@ -59,7 +53,6 @@ export class HttpWorkflowSource implements WorkflowDataSource {
       `/workflows/runs/${runId}/cancel`,
       {
         method: 'POST',
-        headers: ensureJsonHeaders(),
       },
     )
     return response.run
@@ -68,13 +61,12 @@ export class HttpWorkflowSource implements WorkflowDataSource {
   async runWorkflow(params: WorkflowRunParams): Promise<WorkflowRun> {
     const response = await this.client.fetch<{ run: WorkflowRun }>(`/workflows/run`, {
       method: 'POST',
-      headers: ensureJsonHeaders(),
-      body: JSON.stringify({
+      data: {
         inlineSpec: params.spec,
         idempotency: params.idempotencyKey,
         concurrency: params.concurrencyGroup ? { group: params.concurrencyGroup } : undefined,
         metadata: params.metadata,
-      }),
+      },
     })
     return response.run
   }

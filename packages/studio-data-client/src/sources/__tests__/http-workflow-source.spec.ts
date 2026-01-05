@@ -44,13 +44,12 @@ describe('HttpWorkflowSource', () => {
     expect(result).toEqual(SAMPLE_RUN)
     expect(client.fetch).toHaveBeenCalledWith('/workflows/run', {
       method: 'POST',
-      headers: expect.any(Headers),
-      body: JSON.stringify({
+      data: {
         inlineSpec: { name: 'demo', version: '1.0.0', jobs: {} },
         idempotency: 'build#123',
         concurrency: { group: 'branch:main' },
         metadata: { trigger: 'ci' },
-      }),
+      },
     })
   })
 })

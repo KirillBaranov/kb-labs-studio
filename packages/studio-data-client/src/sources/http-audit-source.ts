@@ -30,10 +30,7 @@ export class HttpAuditSource implements AuditDataSource {
 
     await this.client.fetch('/audit/runs', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(request),
+      data: request,
     });
 
     return { ok: true };

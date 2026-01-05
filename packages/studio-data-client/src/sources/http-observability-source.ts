@@ -69,7 +69,7 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
     onEvent: (event: SystemEvent) => void,
     onError: (error: Error) => void
   ): () => void {
-    const baseUrl = this.client['baseUrl'] || 'http://localhost:5050';
+    const baseUrl = this.client.getBaseUrl() || 'http://localhost:5050';
     const eventSource = new EventSource(`${baseUrl}/events/registry`);
 
     eventSource.addEventListener('registry', (e) => {
@@ -136,7 +136,7 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
     onError: (error: Error) => void,
     filters?: LogQuery
   ): () => void {
-    const baseUrl = this.client['baseUrl'] || 'http://localhost:5050';
+    const baseUrl = this.client.getBaseUrl() || 'http://localhost:5050';
 
     // Build query string from filters
     const params = new URLSearchParams();
@@ -176,10 +176,7 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
     try {
       const response = await this.client.fetch<LogSummarizeResponse>('/logs/summarize', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
+        data: request,
       });
 
       return response;
