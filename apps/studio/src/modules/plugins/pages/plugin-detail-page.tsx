@@ -882,6 +882,227 @@ function PermissionsView({ permissions }: { permissions: any }) {
         </Card>
       )}
 
+      {/* Platform Services */}
+      {permissions.platform && (
+        <Card
+          title={
+            <Space>
+              <DatabaseOutlined />
+              <span>Platform Services</span>
+            </Space>
+          }
+        >
+          <Paragraph type="secondary" style={{ marginBottom: 16 }}>
+            Access to KB Labs platform services like LLM, vector store, cache, and analytics.
+          </Paragraph>
+          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                gap: 12,
+              }}
+            >
+              {/* LLM Service */}
+              {permissions.platform.llm !== undefined && (
+                <Card size="small">
+                  <Space direction="vertical" size="small">
+                    <Space>
+                      {permissions.platform.llm ? (
+                        <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                      ) : (
+                        <WarningOutlined style={{ color: '#d9d9d9' }} />
+                      )}
+                      <Text strong>LLM Service</Text>
+                    </Space>
+                    {typeof permissions.platform.llm === 'object' && permissions.platform.llm.models && (
+                      <div>
+                        <Text type="secondary" style={{ fontSize: 12 }}>Models:</Text>
+                        <div style={{ marginTop: 4 }}>
+                          <Space wrap size="small">
+                            {permissions.platform.llm.models.map((model: string, idx: number) => (
+                              <Tag key={idx} color="blue" style={{ fontSize: 11 }}>
+                                {model}
+                              </Tag>
+                            ))}
+                          </Space>
+                        </div>
+                      </div>
+                    )}
+                  </Space>
+                </Card>
+              )}
+
+              {/* Vector Store */}
+              {permissions.platform.vectorStore !== undefined && (
+                <Card size="small">
+                  <Space direction="vertical" size="small">
+                    <Space>
+                      {permissions.platform.vectorStore ? (
+                        <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                      ) : (
+                        <WarningOutlined style={{ color: '#d9d9d9' }} />
+                      )}
+                      <Text strong>Vector Store</Text>
+                    </Space>
+                    {typeof permissions.platform.vectorStore === 'object' && permissions.platform.vectorStore.collections && (
+                      <div>
+                        <Text type="secondary" style={{ fontSize: 12 }}>Collections:</Text>
+                        <div style={{ marginTop: 4 }}>
+                          <Space wrap size="small">
+                            {permissions.platform.vectorStore.collections.map((col: string, idx: number) => (
+                              <Tag key={idx} color="purple" style={{ fontSize: 11 }}>
+                                {col}
+                              </Tag>
+                            ))}
+                          </Space>
+                        </div>
+                      </div>
+                    )}
+                  </Space>
+                </Card>
+              )}
+
+              {/* Cache */}
+              {permissions.platform.cache !== undefined && (
+                <Card size="small">
+                  <Space direction="vertical" size="small">
+                    <Space>
+                      {permissions.platform.cache ? (
+                        <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                      ) : (
+                        <WarningOutlined style={{ color: '#d9d9d9' }} />
+                      )}
+                      <Text strong>Cache</Text>
+                    </Space>
+                    {typeof permissions.platform.cache === 'object' && permissions.platform.cache.namespaces && (
+                      <div>
+                        <Text type="secondary" style={{ fontSize: 12 }}>Namespaces:</Text>
+                        <div style={{ marginTop: 4 }}>
+                          <Space wrap size="small">
+                            {permissions.platform.cache.namespaces.map((ns: string, idx: number) => (
+                              <Tag key={idx} color="cyan" style={{ fontSize: 11 }}>
+                                {ns}
+                              </Tag>
+                            ))}
+                          </Space>
+                        </div>
+                      </div>
+                    )}
+                  </Space>
+                </Card>
+              )}
+
+              {/* Storage */}
+              {permissions.platform.storage !== undefined && (
+                <Card size="small">
+                  <Space direction="vertical" size="small">
+                    <Space>
+                      {permissions.platform.storage ? (
+                        <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                      ) : (
+                        <WarningOutlined style={{ color: '#d9d9d9' }} />
+                      )}
+                      <Text strong>Storage</Text>
+                    </Space>
+                    {typeof permissions.platform.storage === 'object' && permissions.platform.storage.paths && (
+                      <div>
+                        <Text type="secondary" style={{ fontSize: 12 }}>Paths:</Text>
+                        <div style={{ marginTop: 4 }}>
+                          <Space wrap size="small">
+                            {permissions.platform.storage.paths.map((path: string, idx: number) => (
+                              <Tag key={idx} color="orange" style={{ fontSize: 11 }}>
+                                {path}
+                              </Tag>
+                            ))}
+                          </Space>
+                        </div>
+                      </div>
+                    )}
+                  </Space>
+                </Card>
+              )}
+
+              {/* Analytics */}
+              {permissions.platform.analytics !== undefined && (
+                <Card size="small">
+                  <Space>
+                    {permissions.platform.analytics ? (
+                      <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                    ) : (
+                      <WarningOutlined style={{ color: '#d9d9d9' }} />
+                    )}
+                    <Text strong>Analytics</Text>
+                  </Space>
+                </Card>
+              )}
+
+              {/* Embeddings */}
+              {permissions.platform.embeddings !== undefined && (
+                <Card size="small">
+                  <Space>
+                    {permissions.platform.embeddings ? (
+                      <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                    ) : (
+                      <WarningOutlined style={{ color: '#d9d9d9' }} />
+                    )}
+                    <Text strong>Embeddings</Text>
+                  </Space>
+                </Card>
+              )}
+
+              {/* Events */}
+              {permissions.platform.events !== undefined && (
+                <Card size="small">
+                  <Space direction="vertical" size="small">
+                    <Space>
+                      {permissions.platform.events ? (
+                        <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                      ) : (
+                        <WarningOutlined style={{ color: '#d9d9d9' }} />
+                      )}
+                      <Text strong>Event Bus</Text>
+                    </Space>
+                    {typeof permissions.platform.events === 'object' && (
+                      <div>
+                        {permissions.platform.events.publish && permissions.platform.events.publish.length > 0 && (
+                          <div style={{ marginBottom: 8 }}>
+                            <Text type="secondary" style={{ fontSize: 12 }}>Publish:</Text>
+                            <div style={{ marginTop: 4 }}>
+                              <Space wrap size="small">
+                                {permissions.platform.events.publish.map((evt: string, idx: number) => (
+                                  <Tag key={idx} color="green" style={{ fontSize: 11 }}>
+                                    {evt}
+                                  </Tag>
+                                ))}
+                              </Space>
+                            </div>
+                          </div>
+                        )}
+                        {permissions.platform.events.subscribe && permissions.platform.events.subscribe.length > 0 && (
+                          <div>
+                            <Text type="secondary" style={{ fontSize: 12 }}>Subscribe:</Text>
+                            <div style={{ marginTop: 4 }}>
+                              <Space wrap size="small">
+                                {permissions.platform.events.subscribe.map((evt: string, idx: number) => (
+                                  <Tag key={idx} color="blue" style={{ fontSize: 11 }}>
+                                    {evt}
+                                  </Tag>
+                                ))}
+                              </Space>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </Space>
+                </Card>
+              )}
+            </div>
+          </Space>
+        </Card>
+      )}
+
       {/* Quotas */}
       {permissions.quotas && (
         <Card title="Resource Quotas">
