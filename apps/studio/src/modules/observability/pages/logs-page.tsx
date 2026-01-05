@@ -320,11 +320,11 @@ export function LogsPage() {
             key: index,
             label: (
               <Space>
-                {getLevelIcon(log.level)}
-                <Tag color={getLevelColor(log.level)}>{log.level.toUpperCase()}</Tag>
                 <Text type="secondary" style={{ fontSize: 12 }}>
                   {formatTime(log.time)}
                 </Text>
+                {getLevelIcon(log.level)}
+                <Tag color={getLevelColor(log.level)}>{log.level.toUpperCase()}</Tag>
                 {log.plugin && <Tag color="purple">{log.plugin}</Tag>}
                 <Text>{log.msg || '(no message)'}</Text>
                 {log.err && (
@@ -973,19 +973,21 @@ export function LogsPage() {
 
               {/* AI Analysis Card */}
               {summaryResult.aiSummary && (
-                <Card
-                  title={
-                    <Space>
-                      <RobotOutlined />
-                      <span>AI Analysis</span>
+                <Alert
+                  type="info"
+                  showIcon
+                  icon={<RobotOutlined />}
+                  message="AI Analysis"
+                  description={
+                    <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                      {summaryResult.aiSummary.split('\n\n').map((paragraph, idx) => (
+                        <Paragraph key={idx} style={{ marginBottom: 0 }}>
+                          {paragraph}
+                        </Paragraph>
+                      ))}
                     </Space>
                   }
-                  size="small"
-                >
-                  <Paragraph style={{ whiteSpace: 'pre-wrap', marginBottom: 0 }}>
-                    {summaryResult.aiSummary}
-                  </Paragraph>
-                </Card>
+                />
               )}
 
               {/* Info message if AI not available */}
