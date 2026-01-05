@@ -26,7 +26,17 @@ function useChartTheme() {
  */
 export function KBLineChart(props: any) {
   const chartTheme = useChartTheme();
-  return <Line {...props} theme={chartTheme} />;
+
+  // Merge theme with custom colors if provided
+  const mergedTheme = props.color
+    ? {
+        ...chartTheme,
+        colors10: Array.isArray(props.color) ? props.color : chartTheme.colors10,
+        colors20: Array.isArray(props.color) ? props.color : chartTheme.colors20,
+      }
+    : chartTheme;
+
+  return <Line {...props} theme={mergedTheme} />;
 }
 
 /**
