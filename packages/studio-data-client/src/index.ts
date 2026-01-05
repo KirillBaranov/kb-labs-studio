@@ -23,6 +23,9 @@ export * from './sources/observability-source';
 export * from './sources/analytics-source';
 export * from './sources/adapters-source';
 export * from './sources/platform-source';
+export * from './sources/plugins-source';
+// TODO: TEMPORARY - Remove after commit plugin UI is polished
+export * from './sources/commit-source';
 export * from './sources/http-audit-source';
 export * from './sources/http-release-source';
 export * from './sources/http-system-source';
@@ -33,6 +36,9 @@ export * from './sources/http-observability-source';
 export * from './sources/http-analytics-source';
 export * from './sources/http-adapters-source';
 export * from './sources/http-platform-source';
+export * from './sources/http-plugins-source';
+// TODO: TEMPORARY - Remove after commit plugin UI is polished
+export * from './sources/http-commit-source';
 export * from './mocks/mock-audit-source';
 export * from './mocks/mock-release-source';
 export * from './mocks/mock-system-source';
@@ -43,6 +49,9 @@ export * from './mocks/mock-observability-source';
 export * from './mocks/mock-analytics-source';
 export * from './mocks/mock-adapters-source';
 export * from './mocks/mock-platform-source';
+export * from './mocks/mock-plugins-source';
+// TODO: TEMPORARY - Remove after commit plugin UI is polished
+export * from './mocks/mock-commit-source';
 export * from './factory';
 export * from './query-keys';
 export * from './hooks/use-audit';
@@ -53,6 +62,7 @@ export * from './hooks/use-observability';
 export * from './hooks/use-analytics';
 export * from './hooks/use-adapters';
 export * from './hooks/use-platform';
+export * from './hooks/use-commit';
 export * from './hooks/types';
 export * from './hooks/use-job-events';
 export * from './hooks/use-notifications';

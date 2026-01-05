@@ -4,7 +4,7 @@
  */
 
 import type { ObservabilityDataSource } from '../sources/observability-source';
-import type { StateBrokerStats, DevKitHealth, PrometheusMetrics, SystemEvent, LogSummarizeRequest, LogSummarizeResponse } from '../contracts/observability';
+import type { StateBrokerStats, DevKitHealth, PrometheusMetrics, SystemEvent, LogRecord, LogQuery, LogQueryResponse, LogSummarizeRequest, LogSummarizeResponse } from '../contracts/observability';
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -186,6 +186,40 @@ export class MockObservabilitySource implements ObservabilityDataSource {
     };
   }
 
+  async queryLogs(filters: LogQuery): Promise<LogQueryResponse> {
+    await delay(200);
+
+    const now = Date.now();
+    const oldest = new Date(now - 3_600_000).toISOString(); // 1 hour ago
+    const newest = new Date(now).toISOString();
+
+    // Generate mock log records
+    const mockLogs: LogRecord[] = Array.from({ length: filters.limit || 20 }, (_, i) => ({
+      time: new Date(now - i * 60_000).toISOString(),
+      level: ['info', 'warn', 'error'][i % 3] as 'info' | 'warn' | 'error',
+      msg: `Mock log entry ${i + 1}`,
+      plugin: filters.plugin || ['rest-api', 'workflow', 'mind'][i % 3],
+      executionId: filters.executionId || `exec-${i}`,
+      tenantId: filters.tenantId || 'default',
+      meta: { mockData: true, index: i },
+    }));
+
+    return {
+      ok: true,
+      data: {
+        logs: mockLogs,
+        total: 42,
+        filters,
+        bufferStats: {
+          size: mockLogs.length,
+          maxSize: 1000,
+          oldest,
+          newest,
+        },
+      },
+    };
+  }
+
   subscribeToSystemEvents(
     onEvent: (event: SystemEvent) => void,
     _onError: (error: Error) => void
@@ -229,6 +263,33 @@ export class MockObservabilitySource implements ObservabilityDataSource {
         });
       }
     }, 3000); // Event every 3 seconds
+
+    // Return cleanup function
+    return () => {
+      clearInterval(interval);
+    };
+  }
+
+  subscribeToLogs(
+    onLog: (log: LogRecord) => void,
+    _onError: (error: Error) => void,
+    filters?: LogQuery
+  ): () => void {
+    // Simulate periodic log events in mock mode
+    let counter = 0;
+    const interval = setInterval(() => {
+      const now = Date.now();
+      onLog({
+        time: new Date(now).toISOString(),
+        level: ['info', 'warn', 'error'][counter % 3] as 'info' | 'warn' | 'error',
+        msg: `Mock live log ${counter + 1}`,
+        plugin: filters?.plugin || ['rest-api', 'workflow', 'mind'][counter % 3],
+        executionId: filters?.executionId || `exec-${counter}`,
+        tenantId: filters?.tenantId || 'default',
+        meta: { mockData: true, counter },
+      });
+      counter++;
+    }, 2000); // Log every 2 seconds
 
     // Return cleanup function
     return () => {
