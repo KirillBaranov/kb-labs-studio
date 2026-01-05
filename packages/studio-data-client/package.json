@@ -24,11 +24,15 @@
     "prebuild": "pnpm clean"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.0.0",
-    "@kb-labs/rest-api-contracts": "link:../../../kb-labs-rest-api/packages/rest-api-contracts",
+    "@kb-labs/commit-contracts": "link:../../../kb-labs-commit-plugin/packages/commit-contracts",
     "@kb-labs/core-platform": "link:../../../kb-labs-core/packages/core-platform",
-    "zod": "^3.23.8",
-    "ulid": "^2.3.0"
+    "@kb-labs/plugin-contracts": "link:../../../kb-labs-plugin/packages/plugin-contracts",
+    "@kb-labs/release-manager-contracts": "link:../../../kb-labs-release-manager/packages/release-manager-contracts",
+    "@kb-labs/rest-api-contracts": "link:../../../kb-labs-rest-api/packages/rest-api-contracts",
+    "@tanstack/react-query": "^5.0.0",
+    "axios": "^1.13.2",
+    "ulid": "^2.3.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@kb-labs/devkit": "github:KirillBaranov/kb-labs-devkit#main",

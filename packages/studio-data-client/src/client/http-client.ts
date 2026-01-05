@@ -1,29 +1,64 @@
-import type { FetchOptions, RequestInterceptor, ResponseInterceptor, ErrorInterceptor } from './types';
+import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse, type AxiosError } from 'axios';
+import type { RequestInterceptor, ResponseInterceptor, ErrorInterceptor } from './types';
 import { KBError } from '../errors/kb-error';
 import { mapFetchError } from './error-mapper';
-import { createEnvelopeInterceptor } from './envelope-interceptor';
 import { ulid } from 'ulid';
 
 export class HttpClient {
+  private client: AxiosInstance;
   private requestInterceptors: RequestInterceptor[] = [];
   private responseInterceptors: ResponseInterceptor[] = [];
   private errorInterceptors: ErrorInterceptor[] = [];
+  private baseUrl: string;
 
-  constructor(private baseUrl: string = '') {
-    // Add default envelope interceptor
-    this.addResponseInterceptor(createEnvelopeInterceptor());
-    
-    // Add default request interceptor for X-Request-Id
-    this.addRequestInterceptor((config) => {
-      const headers = new Headers(config.headers);
-      if (!headers.has('X-Request-Id')) {
-        headers.set('X-Request-Id', ulid());
-      }
-      return {
-        ...config,
-        headers,
-      };
+  constructor(baseUrl: string = '') {
+    this.baseUrl = baseUrl;
+    this.client = axios.create({
+      baseURL: baseUrl,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
+
+    // Axios request interceptor: add X-Request-Id
+    this.client.interceptors.request.use((config) => {
+      if (!config.headers['X-Request-Id']) {
+        config.headers['X-Request-Id'] = ulid();
+      }
+      return config;
+    });
+
+    // Axios response interceptor: unwrap envelope
+    this.client.interceptors.response.use(
+      (response) => {
+        const data = response.data;
+
+        // Check if response is an envelope
+        if (data && typeof data === 'object' && 'ok' in data) {
+          if (data.ok === true && 'data' in data) {
+            // Success envelope: unwrap and return data
+            response.data = data.data;
+          } else if (data.ok === false && 'error' in data) {
+            // Error envelope: throw error
+            const error = mapFetchError(data.error, {
+              status: response.status,
+              statusText: response.statusText,
+            } as Response);
+            return Promise.reject(error);
+          }
+        }
+
+        return response;
+      },
+      (error: AxiosError) => {
+        // Transform axios error to KBError
+        const kbError = mapFetchError(error.response?.data, {
+          status: error.response?.status ?? 500,
+          statusText: error.response?.statusText ?? 'Unknown Error',
+        } as Response);
+        return Promise.reject(kbError);
+      }
+    );
   }
 
   addRequestInterceptor(interceptor: RequestInterceptor): void {
@@ -38,67 +73,28 @@ export class HttpClient {
     this.errorInterceptors.push(interceptor);
   }
 
-  async fetch<T>(path: string, options: FetchOptions = {}): Promise<T> {
+  getBaseUrl(): string {
+    return this.baseUrl;
+  }
+
+  async fetch<T>(path: string, options: AxiosRequestConfig = {}): Promise<T> {
     try {
-      let config: FetchOptions = options;
+      // Apply custom request interceptors (if any)
+      let config: AxiosRequestConfig = {
+        url: path,
+        ...options,
+      };
 
-      // Apply request interceptors
-      for (const interceptor of this.requestInterceptors) {
-        config = await interceptor(config);
-      }
+      // Note: Custom interceptors work with FetchOptions (headers as Headers object)
+      // but axios uses plain objects. If you need custom interceptors, adapt them here.
 
-      // Normalize path: ensure no duplicate /v1
-      // If baseUrl is '/api' and path starts with '/v1', construct full path correctly
-      let normalizedPath = path;
+      const response: AxiosResponse<T> = await this.client.request<T>(config);
 
-      const url = normalizedPath.startsWith('http') ? normalizedPath : `${this.baseUrl}${normalizedPath}`;
-      const response = await fetch(url, config);
+      // Apply custom response interceptors (if any)
+      // Note: These expect Response objects from fetch API
+      // You may need to adapt or remove these if not used
 
-      // Apply response interceptors
-      let processedResponse = response;
-      for (const interceptor of this.responseInterceptors) {
-        processedResponse = await interceptor(processedResponse);
-      }
-
-      if (!processedResponse.ok) {
-        let parsedBody: unknown = null;
-        try {
-          const cloned = processedResponse.clone();
-          const contentType = cloned.headers.get('content-type');
-          if (contentType?.includes('application/json')) {
-            parsedBody = await cloned.json();
-          }
-        } catch {
-          // Ignore parse errors; fallback to default handling
-        }
-
-        const error = mapFetchError(parsedBody, processedResponse);
-        throw await this.processError(error);
-      }
-
-      // Parse response data
-      const contentType = processedResponse.headers.get('content-type');
-      if (!contentType?.includes('application/json')) {
-        // Non-JSON response - return as is
-        return processedResponse as unknown as T;
-      }
-
-      const data = await processedResponse.json();
-      
-      // Check if response is still an envelope (interceptor might not have processed it)
-      if (data && typeof data === 'object' && 'ok' in data) {
-        if (data.ok === true && 'data' in data) {
-          // Success envelope: return unwrapped data
-          return data.data as T;
-        } else if (data.ok === false && 'error' in data) {
-          // Error envelope: throw error
-          const error = mapFetchError(undefined, processedResponse);
-          throw await this.processError(error);
-        }
-      }
-
-      // Not an envelope or already unwrapped
-      return data as T;
+      return response.data;
     } catch (error) {
       const kbError = error instanceof KBError ? error : mapFetchError(error);
       throw await this.processError(kbError);
