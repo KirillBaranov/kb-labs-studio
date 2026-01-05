@@ -37,6 +37,11 @@ import { AnalyticsVectorStorePage } from './modules/analytics/pages/analytics-ve
 import { AnalyticsCachePage } from './modules/analytics/pages/analytics-cache-page';
 import { AnalyticsStoragePage } from './modules/analytics/pages/analytics-storage-page';
 import { AssistantPage } from './pages/assistant-page';
+// TODO: TEMPORARY - Remove after commit plugin UI is polished
+import { CommitPage } from './modules/commit/pages/commit-page';
+import { ReleasePage } from './modules/release/pages/release-page';
+import { PluginsPage } from './modules/plugins/pages/plugins-page';
+import { PluginDetailPage } from './modules/plugins/pages/plugin-detail-page';
 import { WidgetModalManager } from './components/widget-modal';
 import { PageTransition } from './components/page-transition';
 import { createStudioLogger } from './utils/logger';
@@ -134,10 +139,29 @@ function LayoutContent() {
         path: '/workflows',
       },
       {
+        key: 'plugins',
+        label: 'Plugins',
+        icon: renderPluginIcon('AppstoreOutlined'),
+        path: '/plugins',
+      },
+      {
         key: 'assistant',
         label: 'AI Assistant',
         icon: renderPluginIcon('RobotOutlined'),
         path: '/assistant',
+      },
+      // TODO: TEMPORARY - Remove after commit plugin UI is polished
+      {
+        key: 'commit',
+        label: 'Commit',
+        icon: renderPluginIcon('GitlabOutlined'),
+        path: '/commit',
+      },
+      {
+        key: 'release',
+        label: 'Release',
+        icon: renderPluginIcon('RocketOutlined'),
+        path: '/release',
       },
       {
         key: 'analytics',
@@ -391,6 +415,16 @@ export const router = createBrowserRouter([
         errorElement: <ErrorBoundary />,
       },
       {
+        path: '/plugins',
+        element: <PluginsPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/plugins/:pluginId',
+        element: <PluginDetailPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
         path: '/assistant',
         element: <AssistantPage />,
         errorElement: <ErrorBoundary />,
@@ -453,6 +487,27 @@ export const router = createBrowserRouter([
       {
         path: '/observability/logs',
         element: <LogsPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      // TODO: TEMPORARY - Remove after commit plugin UI is polished
+      {
+        path: '/commit',
+        element: <CommitPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/commit/:tab',
+        element: <CommitPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/release',
+        element: <ReleasePage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/release/:tab',
+        element: <ReleasePage />,
         errorElement: <ErrorBoundary />,
       },
     ],
