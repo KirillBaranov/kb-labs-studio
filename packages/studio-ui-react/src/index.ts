@@ -37,6 +37,7 @@ export * from './components/kb-quick-search';
 export * from './components/kb-full-page-loader';
 export * from './components/kb-status-bar';
 export * from './components/kb-notification-bell';
+export * from './components/kb-diff-viewer';
 
 // Chart components
 export * from './components/kb-chart';
