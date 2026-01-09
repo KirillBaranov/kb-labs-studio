@@ -214,11 +214,12 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
       params.append('range', query.range);
       if (query.interval) params.append('interval', query.interval);
 
-      const response = await this.client.fetch<{ ok: true; data: HistoricalDataPoint[] }>(
+      // HttpClient auto-unwraps { ok, data } envelope in response interceptor
+      const data = await this.client.fetch<HistoricalDataPoint[]>(
         `/observability/metrics/history?${params.toString()}`
       );
 
-      return response.data;
+      return data;
     } catch (error) {
       throw new KBError(
         'METRICS_HISTORY_FETCH_FAILED',
@@ -235,11 +236,12 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
       params.append('metric', query.metric);
       if (query.days) params.append('days', String(query.days));
 
-      const response = await this.client.fetch<{ ok: true; data: HeatmapCell[] }>(
+      // HttpClient auto-unwraps { ok, data } envelope in response interceptor
+      const data = await this.client.fetch<HeatmapCell[]>(
         `/observability/metrics/heatmap?${params.toString()}`
       );
 
-      return response.data;
+      return data;
     } catch (error) {
       throw new KBError(
         'METRICS_HEATMAP_FETCH_FAILED',
@@ -271,9 +273,10 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
       const queryString = params.toString();
       const url = queryString ? `/observability/incidents/history?${queryString}` : '/observability/incidents/history';
 
-      const response = await this.client.fetch<{ ok: true; data: Incident[] }>(url);
+      // HttpClient auto-unwraps { ok, data } envelope in response interceptor
+      const data = await this.client.fetch<Incident[]>(url);
 
-      return response.data;
+      return data;
     } catch (error) {
       throw new KBError(
         'INCIDENTS_QUERY_FAILED',
@@ -286,7 +289,8 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
 
   async createIncident(payload: IncidentCreatePayload): Promise<Incident> {
     try {
-      const response = await this.client.fetch<{ ok: true; data: Incident }>(
+      // HttpClient auto-unwraps { ok, data } envelope in response interceptor
+      const data = await this.client.fetch<Incident>(
         '/observability/incidents',
         {
           method: 'POST',
@@ -294,7 +298,7 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
         }
       );
 
-      return response.data;
+      return data;
     } catch (error) {
       throw new KBError(
         'INCIDENT_CREATE_FAILED',
@@ -307,7 +311,8 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
 
   async resolveIncident(id: string, resolutionNotes?: string): Promise<Incident> {
     try {
-      const response = await this.client.fetch<{ ok: true; data: Incident }>(
+      // HttpClient auto-unwraps { ok, data } envelope in response interceptor
+      const data = await this.client.fetch<Incident>(
         `/observability/incidents/${id}/resolve`,
         {
           method: 'POST',
@@ -315,7 +320,7 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
         }
       );
 
-      return response.data;
+      return data;
     } catch (error) {
       throw new KBError(
         'INCIDENT_RESOLVE_FAILED',
