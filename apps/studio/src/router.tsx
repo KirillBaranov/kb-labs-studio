@@ -23,6 +23,8 @@ import { SettingsPage } from './modules/settings/pages/settings-page';
 import { WorkflowsListPage } from './modules/workflows/pages/workflows-list-page';
 import { WorkflowRunPage } from './modules/workflows/pages/workflow-run-page';
 import { DashboardPage } from './modules/dashboard/pages/dashboard-page';
+import { AIInsightsPage } from './modules/dashboard/pages/ai-insights-page';
+import { DashboardLayout } from './modules/dashboard/layouts/dashboard-layout';
 import { GalleryPage } from './pages/gallery-page';
 import { StateBrokerPage } from './modules/observability/pages/state-broker-page';
 import { DevKitPage } from './modules/observability/pages/devkit-page';
@@ -130,7 +132,20 @@ function LayoutContent() {
         key: 'dashboard',
         label: 'Dashboard',
         icon: renderPluginIcon('DashboardOutlined'),
-        path: '/',
+        children: [
+          {
+            key: 'dashboard-overview',
+            label: 'Overview',
+            path: '/',
+            icon: renderPluginIcon('DashboardOutlined'),
+          },
+          {
+            key: 'dashboard-insights',
+            label: 'AI Insights',
+            path: '/insights',
+            icon: renderPluginIcon('RobotOutlined'),
+          },
+        ],
       },
       {
         key: 'workflows',
@@ -394,8 +409,18 @@ export const router = createBrowserRouter([
     children: [
       {
         path: '/',
-        element: <DashboardPage />,
+        element: <DashboardLayout />,
         errorElement: <ErrorBoundary />,
+        children: [
+          {
+            index: true,
+            element: <DashboardPage />,
+          },
+          {
+            path: 'insights',
+            element: <AIInsightsPage />,
+          },
+        ],
       },
       {
         path: '/gallery',
