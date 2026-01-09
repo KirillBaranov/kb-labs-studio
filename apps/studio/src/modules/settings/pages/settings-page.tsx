@@ -25,6 +25,7 @@ import { NotificationsSettings } from '../components/notifications-settings';
 import { ExperimentalSettings } from '../components/experimental-settings';
 import { ConfigurationSettings } from '../components/configuration-settings';
 import { RoleSwitcher } from '@/components/role-switcher';
+import { ApiRoutesViewer } from '../components/api-routes-viewer';
 
 const { Text, Paragraph, Title } = Typography;
 
@@ -252,46 +253,54 @@ export function SettingsPage() {
         </span>
       ),
       children: (
-        <KBSection>
-          <KBCard title="Development Tools">
-            <Space direction="vertical" style={{ width: '100%' }} size="large">
-              <div>
-                <Title level={5}>Refresh Registry</Title>
-                <Paragraph type="secondary">
-                  Fetch fresh registry data from the REST API without clearing the cache.
-                  Use this to get the latest changes without forcing re-discovery.
-                </Paragraph>
-                <Button
-                  icon={<ReloadOutlined />}
-                  onClick={handleRefreshRegistry}
-                  type="default"
-                >
-                  Refresh Registry
-                </Button>
-              </div>
+        <>
+          <KBSection>
+            <KBCard title="Development Tools">
+              <Space direction="vertical" style={{ width: '100%' }} size="large">
+                <div>
+                  <Title level={5}>Refresh Registry</Title>
+                  <Paragraph type="secondary">
+                    Fetch fresh registry data from the REST API without clearing the cache.
+                    Use this to get the latest changes without forcing re-discovery.
+                  </Paragraph>
+                  <Button
+                    icon={<ReloadOutlined />}
+                    onClick={handleRefreshRegistry}
+                    type="default"
+                  >
+                    Refresh Registry
+                  </Button>
+                </div>
 
-              <Divider />
+                <Divider />
 
-              <div>
-                <Title level={5}>Invalidate Cache (Force Discovery)</Title>
-                <Paragraph type="secondary">
-                  Force cache invalidation and trigger full plugin re-discovery on the REST API.
-                  This clears the snapshot cache and rescans all plugin directories.
-                  Useful when testing plugin changes or troubleshooting registry issues.
-                </Paragraph>
-                <Button
-                  icon={<DeleteOutlined />}
-                  onClick={handleInvalidateCache}
-                  loading={invalidating}
-                  type="primary"
-                  danger
-                >
-                  Invalidate Cache & Re-discover
-                </Button>
-              </div>
-            </Space>
-          </KBCard>
-        </KBSection>
+                <div>
+                  <Title level={5}>Invalidate Cache (Force Discovery)</Title>
+                  <Paragraph type="secondary">
+                    Force cache invalidation and trigger full plugin re-discovery on the REST API.
+                    This clears the snapshot cache and rescans all plugin directories.
+                    Useful when testing plugin changes or troubleshooting registry issues.
+                  </Paragraph>
+                  <Button
+                    icon={<DeleteOutlined />}
+                    onClick={handleInvalidateCache}
+                    loading={invalidating}
+                    type="primary"
+                    danger
+                  >
+                    Invalidate Cache & Re-discover
+                  </Button>
+                </div>
+              </Space>
+            </KBCard>
+          </KBSection>
+
+          <KBSection>
+            <KBCard>
+              <ApiRoutesViewer />
+            </KBCard>
+          </KBSection>
+        </>
       ),
     },
   ];
