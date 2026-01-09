@@ -4,23 +4,20 @@
  */
 
 import * as React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Tabs, Select, Collapse, Descriptions, Tag } from 'antd';
+import { Select, Collapse, Descriptions, Tag } from 'antd';
 import { KBPageContainer, KBPageHeader } from '@kb-labs/studio-ui-react';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useReleaseScopes } from '@kb-labs/studio-data-client';
-import { PlanTab } from '../components/plan-tab';
-import { ChangelogTab } from '../components/changelog-tab';
+import { ReleaseStepper } from '../components/release-stepper';
 import { HistoryTab } from '../components/history-tab';
-import { ReportTab } from '../components/report-tab';
 
-export function ReleasePage() {
-  const params = useParams<{ tab?: string }>();
-  const navigate = useNavigate();
+interface ReleasePageProps {
+  view?: 'overview' | 'history';
+}
+
+export function ReleasePage({ view = 'overview' }: ReleasePageProps) {
   const sources = useDataSources();
   const [selectedScope, setSelectedScope] = React.useState<string>('');
-
-  const activeTab = params.tab || 'plan';
 
   // Fetch available scopes
   const { data: scopesData, isLoading: scopesLoading } = useReleaseScopes(sources.release);
@@ -32,33 +29,6 @@ export function ReleasePage() {
       setSelectedScope(rootScope?.id || scopesData.scopes[0].id);
     }
   }, [scopesData, selectedScope]);
-
-  const handleTabChange = (key: string) => {
-    navigate(`/release/${key}`);
-  };
-
-  const tabItems = [
-    {
-      key: 'plan',
-      label: 'Plan',
-      children: <PlanTab selectedScope={selectedScope} />,
-    },
-    {
-      key: 'changelog',
-      label: 'Changelog',
-      children: <ChangelogTab selectedScope={selectedScope} />,
-    },
-    {
-      key: 'history',
-      label: 'History',
-      children: <HistoryTab selectedScope={selectedScope} />,
-    },
-    {
-      key: 'report',
-      label: 'Latest Report',
-      children: <ReportTab />,
-    },
-  ];
 
   // Get current scope info
   const currentScope = scopesData?.scopes?.find((s) => s.id === selectedScope);
@@ -77,11 +47,30 @@ export function ReleasePage() {
     }
   };
 
+  // Render content based on view
+  const renderContent = () => {
+    if (view === 'history') {
+      return <HistoryTab selectedScope={selectedScope} />;
+    }
+
+    // Overview with stepper-based release flow
+    return (
+      <div style={{ marginTop: 16 }}>
+        <ReleaseStepper selectedScope={selectedScope} />
+      </div>
+    );
+  };
+
+  const pageTitle = view === 'history' ? 'Release History' : 'Release Manager';
+  const pageDescription = view === 'history'
+    ? 'View past releases and their reports'
+    : 'Plan, execute, and audit releases across your workspace';
+
   return (
     <KBPageContainer>
       <KBPageHeader
-        title="Release Manager"
-        description="Plan, execute, and audit releases across your workspace"
+        title={pageTitle}
+        description={pageDescription}
         extra={
           <Select
             style={{ width: 400 }}
@@ -147,13 +136,7 @@ export function ReleasePage() {
         />
       )}
 
-      <Tabs
-        activeKey={activeTab}
-        onChange={handleTabChange}
-        items={tabItems}
-        size="large"
-        style={{ marginTop: 16 }}
-      />
+      {renderContent()}
     </KBPageContainer>
   );
 }

@@ -1,30 +1,26 @@
 /**
- * @module @kb-labs/studio-app/modules/release/components/plan-tab
- * Plan Tab - View and generate release plans for selected scope
+ * @module @kb-labs/studio-app/modules/release/components/steps/plan-step
+ * Step 1: Generate and review release plan
  */
 
-import { useState } from 'react';
+import * as React from 'react';
 import {
   Button,
   Card,
   Empty,
-  Alert,
   Spin,
   Table,
   Typography,
   Space,
   Tag,
   message,
-  Popconfirm,
-  Timeline,
   Checkbox,
   Collapse,
+  Timeline,
 } from 'antd';
 import {
   ThunderboltOutlined,
-  DeleteOutlined,
   CheckCircleOutlined,
-  RocketOutlined,
   BranchesOutlined,
   ArrowUpOutlined,
   DownOutlined,
@@ -35,26 +31,24 @@ import {
   useReleaseStatus,
   useReleasePlan,
   useGenerateReleasePlan,
-  useResetReleasePlan,
-  useRunRelease,
   useGitTimeline,
 } from '@kb-labs/studio-data-client';
-import type { PackageVersion } from '@kb-labs/release-manager-contracts';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
-interface PlanTabProps {
+interface PlanStepProps {
   selectedScope: string;
+  onPlanReady: (ready: boolean) => void;
 }
 
 const INITIAL_COMMITS_COUNT = 5;
 
-export function PlanTab({ selectedScope }: PlanTabProps) {
+export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
   const sources = useDataSources();
-  const [useLLM, setUseLLM] = useState(true);
-  const [showAllCommits, setShowAllCommits] = useState(false);
+  const [useLLM, setUseLLM] = React.useState(true);
+  const [showAllCommits, setShowAllCommits] = React.useState(false);
 
-  // Fetch status and plan
+  // Fetch data
   const { data: statusData, isLoading: statusLoading, refetch: refetchStatus } = useReleaseStatus(
     sources.release,
     selectedScope,
@@ -67,16 +61,19 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
     !!selectedScope
   );
 
-  const { data: gitTimelineData, isLoading: gitTimelineLoading } = useGitTimeline(
+  const { data: gitTimelineData } = useGitTimeline(
     sources.release,
     selectedScope,
     !!selectedScope
   );
 
-  // Mutations
   const generateMutation = useGenerateReleasePlan(sources.release);
-  const resetMutation = useResetReleasePlan(sources.release);
-  const runReleaseMutation = useRunRelease(sources.release);
+
+  // Update parent when plan is ready
+  React.useEffect(() => {
+    const hasPlan = !!(planData?.plan && planData.plan.packages.length > 0);
+    onPlanReady(hasPlan);
+  }, [planData, onPlanReady]);
 
   const handleGenerate = async () => {
     try {
@@ -86,7 +83,6 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
         useLLM,
       });
 
-      // Explicitly refetch to ensure UI updates
       await Promise.all([refetchStatus(), refetchPlan()]);
 
       const confidencePercent = result.confidence ? Math.round(result.confidence * 100) : 0;
@@ -99,40 +95,11 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
     }
   };
 
-  const handleReset = async () => {
-    try {
-      await resetMutation.mutateAsync({ scope: selectedScope });
-
-      // Explicitly refetch to ensure UI updates
-      await Promise.all([refetchStatus(), refetchPlan()]);
-
-      message.success('Plan reset successfully');
-    } catch (error) {
-      message.error(`Failed to reset plan: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  };
-
-  const handleRunRelease = async () => {
-    try {
-      const result = await runReleaseMutation.mutateAsync({
-        scope: selectedScope,
-        dryRun: false,
-      });
-      message.success(`Release completed! ${result.packagesReleased} package(s) released in ${result.duration}ms`);
-    } catch (error) {
-      message.error(`Failed to run release: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  };
-
-  if (!selectedScope) {
-    return <Empty description="Please select a scope to continue" style={{ marginTop: 48 }} />;
-  }
-
   if (statusLoading) {
     return <Spin size="large" style={{ display: 'block', margin: '48px auto' }} />;
   }
 
-  // No plan exists
+  // No plan exists - show generate UI
   if (!statusData?.hasPlan && !planData?.plan) {
     return (
       <Card>
@@ -153,11 +120,11 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
             >
               Generate Release Plan
             </Button>
-            <div style={{ color: '#8c8c8c', fontSize: 12 }}>
+            <Text type="secondary" style={{ fontSize: 12 }}>
               {useLLM
                 ? 'AI will analyze git history and provide intelligent reasoning for version bumps'
                 : 'Generate plan using conventional commits analysis'}
-            </div>
+            </Text>
           </Space>
         </Empty>
       </Card>
@@ -169,6 +136,36 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
   }
 
   const { plan } = planData;
+
+  // Plan exists but no packages - show regenerate prompt
+  if (plan.packages.length === 0) {
+    return (
+      <Card>
+        <Empty
+          description="Plan exists but contains no packages"
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+        >
+          <Space direction="vertical" size="middle" style={{ display: 'flex', alignItems: 'center' }}>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              This may happen if there are no changes to release or the scope has no packages.
+            </Text>
+            <Checkbox checked={useLLM} onChange={(e) => setUseLLM(e.target.checked)}>
+              Use AI-powered analysis
+            </Checkbox>
+            <Button
+              type="primary"
+              icon={<ThunderboltOutlined />}
+              onClick={handleGenerate}
+              loading={generateMutation.isPending}
+            >
+              Regenerate Plan
+            </Button>
+          </Space>
+        </Empty>
+      </Card>
+    );
+  }
+
   const columns = [
     {
       title: 'Package',
@@ -212,24 +209,9 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
       },
     },
     {
-      title: 'Status',
-      dataIndex: 'isPublished',
-      key: 'isPublished',
-      width: 100,
-      render: (published: boolean) =>
-        published ? (
-          <Tag icon={<CheckCircleOutlined />} color="success">
-            Published
-          </Tag>
-        ) : (
-          <Tag color="default">Pending</Tag>
-        ),
-    },
-    {
       title: 'Reason',
       dataIndex: 'reason',
       key: 'reason',
-      width: 260,
       ellipsis: { showTitle: false },
       render: (reason: string) => (
         <Text
@@ -243,18 +225,13 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
     },
   ];
 
-  const allPublished = plan.packages.every((pkg) => pkg.isPublished);
-
   return (
     <Card
-      key={plan.createdAt}
       title={
         <Space>
-          <Title level={4} style={{ margin: 0 }}>
-            Release Plan
-          </Title>
-          <Tag color="blue">{plan.strategy}</Tag>
-          {plan.rollbackEnabled && <Tag color="green">Rollback Enabled</Tag>}
+          <CheckCircleOutlined style={{ color: '#52c41a' }} />
+          <span>Release Plan Ready</span>
+          <Tag color="blue">{plan.packages.length} package(s)</Tag>
         </Space>
       }
       extra={
@@ -270,75 +247,48 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
             icon={<ThunderboltOutlined />}
             onClick={handleGenerate}
             loading={generateMutation.isPending}
+            size="small"
           >
             Regenerate
-          </Button>
-          <Popconfirm
-            title="Reset Release Plan"
-            description="This will delete the current plan. Continue?"
-            onConfirm={handleReset}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button icon={<DeleteOutlined />} loading={resetMutation.isPending} danger>
-              Reset
-            </Button>
-          </Popconfirm>
-          <Button
-            type="primary"
-            icon={<RocketOutlined />}
-            onClick={handleRunRelease}
-            loading={runReleaseMutation.isPending}
-            disabled={allPublished}
-          >
-            Run Release
           </Button>
         </Space>
       }
     >
-      {/* Git Timeline & Version Preview */}
+      {/* Git Timeline */}
       {gitTimelineData && gitTimelineData.hasUnreleasedChanges && (
         <Collapse
+          size="small"
           style={{ marginBottom: 16 }}
-          defaultActiveKey={['timeline']}
           items={[
             {
               key: 'timeline',
               label: (
                 <Space>
                   <BranchesOutlined />
-                  <span>Git Timeline & Version Preview</span>
+                  <span>Git Timeline</span>
                   <Tag>{gitTimelineData.unreleased} commits</Tag>
                 </Space>
               ),
               children: (
                 <>
-                  {/* Version Preview */}
                   {gitTimelineData.suggestedVersion && (
-                    <Alert
-                      message={
-                        <Space>
-                          <ArrowUpOutlined />
-                          <Text strong>
-                            Version {gitTimelineData.currentVersion || '0.0.0'} → {gitTimelineData.suggestedVersion}
-                          </Text>
-                          <Tag color={
-                            gitTimelineData.suggestedBump === 'major' ? 'red' :
-                            gitTimelineData.suggestedBump === 'minor' ? 'orange' :
-                            'blue'
-                          }>
-                            {gitTimelineData.suggestedBump}
-                          </Tag>
-                        </Space>
-                      }
-                      description={`Based on ${gitTimelineData.unreleased} unreleased commit(s) since ${gitTimelineData.lastTag || 'initial commit'}`}
-                      type="info"
-                      showIcon
-                      style={{ marginBottom: 16 }}
-                    />
+                    <div style={{ marginBottom: 16, padding: '8px 12px', background: '#f6ffed', borderRadius: 4 }}>
+                      <Space>
+                        <ArrowUpOutlined />
+                        <Text strong>
+                          {gitTimelineData.currentVersion || '0.0.0'} → {gitTimelineData.suggestedVersion}
+                        </Text>
+                        <Tag color={
+                          gitTimelineData.suggestedBump === 'major' ? 'red' :
+                          gitTimelineData.suggestedBump === 'minor' ? 'orange' :
+                          'blue'
+                        }>
+                          {gitTimelineData.suggestedBump}
+                        </Tag>
+                      </Space>
+                    </div>
                   )}
 
-                  {/* Commit Timeline */}
                   <Timeline
                     mode="left"
                     items={gitTimelineData.commits
@@ -351,30 +301,19 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
                           'gray',
                         children: (
                           <div>
-                            <Space>
+                            <Space size="small">
                               <Tag color={
                                 commit.type === 'feat' ? 'green' :
                                 commit.type === 'fix' ? 'red' :
                                 commit.type === 'BREAKING' ? 'volcano' :
                                 'default'
-                              }>
+                              } style={{ fontSize: 10 }}>
                                 {commit.type}
                               </Tag>
-                              <Tag color={
-                                commit.bump === 'major' ? 'red' :
-                                commit.bump === 'minor' ? 'orange' :
-                                commit.bump === 'patch' ? 'blue' :
-                                'default'
-                              }>
-                                {commit.bump}
-                              </Tag>
-                              <Text code style={{ fontSize: 11 }}>{commit.shortSha}</Text>
+                              <Text code style={{ fontSize: 10 }}>{commit.shortSha}</Text>
                             </Space>
-                            <div style={{ marginTop: 4 }}>
-                              <Text>{commit.message}</Text>
-                            </div>
-                            <div style={{ marginTop: 4, fontSize: 12, color: '#8c8c8c' }}>
-                              {commit.author} • {new Date(commit.date).toLocaleString()}
+                            <div style={{ marginTop: 2 }}>
+                              <Text style={{ fontSize: 12 }}>{commit.message}</Text>
                             </div>
                           </div>
                         ),
@@ -391,7 +330,7 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
                     >
                       {showAllCommits
                         ? 'Show less'
-                        : `Show ${gitTimelineData.commits.length - INITIAL_COMMITS_COUNT} more commits`}
+                        : `Show ${gitTimelineData.commits.length - INITIAL_COMMITS_COUNT} more`}
                     </Button>
                   )}
                 </>
@@ -407,19 +346,9 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
         rowKey="name"
         pagination={false}
         size="small"
-        scroll={{ x: 800 }}
+        scroll={{ x: 700 }}
         tableLayout="fixed"
       />
-
-      {allPublished && (
-        <Alert
-          message="All packages have been published"
-          description="This release plan has been fully executed."
-          type="success"
-          showIcon
-          style={{ marginTop: 16 }}
-        />
-      )}
     </Card>
   );
 }
