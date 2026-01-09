@@ -1,7 +1,3 @@
-import {
-  KBPageContainer,
-  KBPageHeader,
-} from '@kb-labs/studio-ui-react';
 import { HeroMetricsWidget } from '../components/HeroMetricsWidget';
 import { ActivityTimelineWidget } from '../components/ActivityTimelineWidget';
 import { PerformanceBudgetWidget } from '../components/PerformanceBudgetWidget';
@@ -12,18 +8,17 @@ import { PerformanceHeatmapWidget } from '../components/PerformanceHeatmapWidget
 import { CostAttributionWidget } from '../components/CostAttributionWidget';
 import { ComparativeBenchmarkWidget } from '../components/ComparativeBenchmarkWidget';
 import { ChaosEngineeringWidget } from '../components/ChaosEngineeringWidget';
-import { AIInsightsWidget } from '../components/AIInsightsWidget';
 import { TimeTravelWidget } from '../components/TimeTravelWidget';
 import { IndustryBenchmarkWidget } from '../components/IndustryBenchmarkWidget';
 
+/**
+ * Dashboard Overview Page
+ *
+ * Displays all monitoring widgets. AI Insights has its own page at /insights.
+ */
 export function DashboardPage() {
   return (
-    <KBPageContainer>
-      <KBPageHeader
-        title="Intelligence Dashboard"
-        description="Real-time platform observability and performance analytics"
-      />
-
+    <>
       <div className="dashboard-content">
         {/* Hero Metrics - Overview cards */}
         <section className="dashboard-section">
@@ -88,12 +83,6 @@ export function DashboardPage() {
         <section className="dashboard-section">
           <SectionHeader title="Industry Comparison" />
           <IndustryBenchmarkWidget />
-        </section>
-
-        {/* AI Insights */}
-        <section className="dashboard-section">
-          <SectionHeader title="AI Insights" />
-          <AIInsightsWidget />
         </section>
 
         {/* Time Travel */}
@@ -169,7 +158,7 @@ export function DashboardPage() {
           }
         }
       `}</style>
-    </KBPageContainer>
+    </>
   );
 }
 
