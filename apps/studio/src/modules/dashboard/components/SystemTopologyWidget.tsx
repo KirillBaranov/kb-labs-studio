@@ -181,13 +181,12 @@ export function SystemTopologyWidget() {
     <Card
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: '#999' }} />
           <ApartmentOutlined />
           <span>System Topology</span>
         </div>
       }
-      style={{ height: '100%' }}
-      bodyStyle={{ padding: 0, height: 'calc(100% - 57px)' }}
+      style={{ minHeight: 400 }}
+      styles={{ body: { padding: 0, height: 343 } }}
     >
       <div style={{ width: '100%', height: '100%' }}>
         <ReactFlow
