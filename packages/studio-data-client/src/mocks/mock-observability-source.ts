@@ -452,7 +452,18 @@ The system has been mostly stable with info-level logs. Two connection timeout e
         severity: 'warning',
         title: 'Elevated API Latency',
         details: 'Average latency increased to 250ms (baseline: 50ms)',
-        rootCause: 'Database connection pool exhaustion',
+        rootCause: [
+          {
+            factor: 'Database connection pool exhaustion',
+            confidence: 0.85,
+            evidence: 'Connection pool utilization at 100%, wait queue growing',
+          },
+          {
+            factor: 'Increased query complexity',
+            confidence: 0.6,
+            evidence: 'Average query time increased 3x in the last hour',
+          },
+        ],
         affectedServices: ['rest-api', 'workflow-runtime'],
         timestamp: Date.now() - 2 * 60 * 60 * 1000, // 2 hours ago
         resolvedAt: Date.now() - 1 * 60 * 60 * 1000, // 1 hour ago
@@ -542,5 +553,42 @@ The system has been mostly stable with info-level logs. Two connection timeout e
     };
 
     return incident;
+  }
+
+  async chatWithInsights(
+    question: string,
+    context?: {
+      includeMetrics?: boolean;
+      includeIncidents?: boolean;
+      includeHistory?: boolean;
+      timeRange?: '1h' | '6h' | '24h' | '7d';
+      plugins?: string[];
+    }
+  ): Promise<{
+    answer: string;
+    context: string[];
+    usage: {
+      promptTokens: number;
+      completionTokens: number;
+      totalTokens: number;
+    };
+  }> {
+    await delay(500);
+
+    // Mock AI response
+    return {
+      answer: `Based on the current system metrics, here's my analysis of "${question}": The system is performing well with average latency of 45ms and 99.2% success rate. No critical issues detected.`,
+      context: [
+        'Current metrics: 1,234 requests in the last hour',
+        'Average latency: 45ms',
+        'Error rate: 0.8%',
+        context?.includeIncidents ? '2 active incidents' : undefined,
+      ].filter(Boolean) as string[],
+      usage: {
+        promptTokens: 150,
+        completionTokens: 80,
+        totalTokens: 230,
+      },
+    };
   }
 }

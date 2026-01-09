@@ -414,6 +414,18 @@ export type IncidentType =
   | 'custom';
 
 /**
+ * Root cause analysis item
+ */
+export interface RootCauseItem {
+  /** Factor contributing to the incident */
+  factor: string;
+  /** Confidence level (0.0 - 1.0) */
+  confidence: number;
+  /** Evidence supporting this root cause */
+  evidence: string;
+}
+
+/**
  * Incident record
  */
 export interface Incident {
@@ -427,8 +439,8 @@ export interface Incident {
   title: string;
   /** Detailed description */
   details: string;
-  /** Root cause analysis (optional) */
-  rootCause?: string;
+  /** Root cause analysis (optional) - array of contributing factors */
+  rootCause?: RootCauseItem[];
   /** Affected services/plugins */
   affectedServices?: string[];
   /** Timestamp when incident occurred (Unix ms) */
@@ -467,7 +479,7 @@ export interface IncidentCreatePayload {
   severity: IncidentSeverity;
   title: string;
   details: string;
-  rootCause?: string;
+  rootCause?: RootCauseItem[];
   affectedServices?: string[];
   timestamp?: number;
   metadata?: Record<string, unknown>;

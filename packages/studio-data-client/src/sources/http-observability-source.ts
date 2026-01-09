@@ -330,4 +330,47 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
       );
     }
   }
+
+  async chatWithInsights(
+    question: string,
+    context?: {
+      includeMetrics?: boolean;
+      includeIncidents?: boolean;
+      includeHistory?: boolean;
+      timeRange?: '1h' | '6h' | '24h' | '7d';
+      plugins?: string[];
+    }
+  ): Promise<{
+    answer: string;
+    context: string[];
+    usage: {
+      promptTokens: number;
+      completionTokens: number;
+      totalTokens: number;
+    };
+  }> {
+    try {
+      const response = await this.client.fetch<{
+        answer: string;
+        context: string[];
+        usage: {
+          promptTokens: number;
+          completionTokens: number;
+          totalTokens: number;
+        };
+      }>('/observability/insights/chat', {
+        method: 'POST',
+        data: { question, context },
+      });
+
+      return response;
+    } catch (error) {
+      throw new KBError(
+        'INSIGHTS_CHAT_FAILED',
+        'Failed to chat with AI insights',
+        500,
+        error
+      );
+    }
+  }
 }

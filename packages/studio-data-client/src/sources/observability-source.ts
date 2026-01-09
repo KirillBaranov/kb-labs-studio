@@ -83,4 +83,26 @@ export interface ObservabilityDataSource {
    * Resolve an incident
    */
   resolveIncident(id: string, resolutionNotes?: string): Promise<Incident>;
+
+  /**
+   * Chat with AI insights
+   */
+  chatWithInsights(
+    question: string,
+    context?: {
+      includeMetrics?: boolean;
+      includeIncidents?: boolean;
+      includeHistory?: boolean;
+      timeRange?: '1h' | '6h' | '24h' | '7d';
+      plugins?: string[];
+    }
+  ): Promise<{
+    answer: string;
+    context: string[];
+    usage: {
+      promptTokens: number;
+      completionTokens: number;
+      totalTokens: number;
+    };
+  }>;
 }
