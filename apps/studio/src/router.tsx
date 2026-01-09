@@ -161,7 +161,20 @@ function LayoutContent() {
         key: 'release',
         label: 'Release',
         icon: renderPluginIcon('RocketOutlined'),
-        path: '/release',
+        children: [
+          {
+            key: 'release-overview',
+            label: 'Overview',
+            path: '/release',
+            icon: renderPluginIcon('DashboardOutlined'),
+          },
+          {
+            key: 'release-history',
+            label: 'History',
+            path: '/release/history',
+            icon: renderPluginIcon('HistoryOutlined'),
+          },
+        ],
       },
       {
         key: 'analytics',
@@ -506,8 +519,8 @@ export const router = createBrowserRouter([
         errorElement: <ErrorBoundary />,
       },
       {
-        path: '/release/:tab',
-        element: <ReleasePage />,
+        path: '/release/history',
+        element: <ReleasePage view="history" />,
         errorElement: <ErrorBoundary />,
       },
     ],

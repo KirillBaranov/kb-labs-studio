@@ -1,4 +1,4 @@
-import type { SystemDataSource } from '../sources/system-source';
+import type { SystemDataSource, RoutesResponse } from '../sources/system-source';
 import type { HealthStatus } from '../contracts/system';
 
 function delay(ms: number): Promise<void> {
@@ -17,6 +17,26 @@ export class MockSystemSource implements SystemDataSource {
         { name: 'system', ok: true, latency: 50 },
       ],
     };
+  }
+
+  async getRoutes(): Promise<RoutesResponse> {
+    await delay(100);
+    return {
+      schema: 'kb.routes/1',
+      ts: new Date().toISOString(),
+      count: 5,
+      routes: [
+        { method: 'GET', url: '/api/v1/health' },
+        { method: 'GET', url: '/api/v1/ready' },
+        { method: 'GET', url: '/api/v1/plugins' },
+        { method: 'GET', url: '/api/v1/plugins/:id' },
+        { method: 'POST', url: '/api/v1/workflows/run' },
+      ],
+    };
+  }
+
+  getBaseUrl(): string {
+    return 'http://localhost:5050/api/v1';
   }
 }
 

@@ -5,7 +5,7 @@
 
 import { HttpClient } from '../client/http-client';
 import { KBError } from '../errors/kb-error';
-import type { SystemDataSource } from './system-source';
+import type { SystemDataSource, RoutesResponse } from './system-source';
 import type {
   SystemHealthSnapshot,
   ReadyResponse,
@@ -85,6 +85,20 @@ export class HttpSystemSource implements SystemDataSource {
   async getConfig(): Promise<SystemConfigPayload> {
     const response = await this.client.fetch<ConfigResponse>('/info/config');
     return response.data;
+  }
+
+  /**
+   * Get all registered API routes
+   */
+  async getRoutes(): Promise<RoutesResponse> {
+    return this.client.fetch<RoutesResponse>('/routes');
+  }
+
+  /**
+   * Get the base URL of the API
+   */
+  getBaseUrl(): string {
+    return this.client.getBaseUrl();
   }
 }
 
