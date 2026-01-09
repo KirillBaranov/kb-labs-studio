@@ -28,12 +28,13 @@ const statusColors: Record<MetricStatus, string> = {
   default: '#595959',
 };
 
+// Minimal background - just very subtle tint
 const statusBgColors: Record<MetricStatus, string> = {
-  healthy: '#f6ffed',
-  warning: '#fffbe6',
-  critical: '#fff1f0',
-  live: '#e6f7ff',
-  default: '#fafafa',
+  healthy: '#ffffff',
+  warning: '#ffffff',
+  critical: '#ffffff',
+  live: '#ffffff',
+  default: '#ffffff',
 };
 
 export function HeroMetricCard({
@@ -55,8 +56,8 @@ export function HeroMetricCard({
       className={`hero-metric-card ${onClick ? 'clickable' : ''} ${pulsing ? 'pulsing' : ''}`}
       style={{
         backgroundColor: bgColor,
-        borderColor: mainColor,
-        borderWidth: 2,
+        border: '1px solid #f0f0f0',
+        borderRadius: 8,
         cursor: onClick ? 'pointer' : 'default',
       }}
       onClick={onClick}
@@ -74,28 +75,28 @@ export function HeroMetricCard({
         {value}
       </div>
 
-      {subtitle && (
-        <div className="hero-metric-subtitle">
-          {subtitle}
-        </div>
-      )}
+      {/* Always render subtitle for consistent height */}
+      <div className="hero-metric-subtitle">
+        {subtitle || '\u00A0'}
+      </div>
 
+      {/* Always show footer for consistent card height */}
       <div className="hero-metric-footer">
-        {sparklineData && sparklineData.length > 0 && (
-          <div className="hero-metric-sparkline">
+        <div className="hero-metric-sparkline">
+          {sparklineData && sparklineData.length > 1 && (
             <Sparkline data={sparklineData} color={mainColor} />
-          </div>
-        )}
+          )}
+        </div>
 
-        {trend && (
-          <div className="hero-metric-trend">
+        <div className="hero-metric-trend">
+          {trend && (
             <TrendIndicator
               direction={trend.direction}
               value={trend.value}
               isPositive={trend.isPositive ?? trend.direction === 'up'}
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </Card>
   );
