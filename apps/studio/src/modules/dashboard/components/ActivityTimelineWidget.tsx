@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Card, Segmented } from 'antd';
-import { LineChartOutlined } from '@ant-design/icons';
 import { KBAreaChart } from '@kb-labs/studio-ui-react';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { useMetricsHistory } from '@kb-labs/studio-data-client';
@@ -63,48 +62,46 @@ export function ActivityTimelineWidget() {
   const currentErrors = errorsQuery.data?.[errorsQuery.data.length - 1]?.value ?? 0;
 
   const config = {
-    data: chartData,
     xField: 'time',
     yField: 'value',
-    seriesField: 'type',
+    colorField: 'type',
     height: 250,
     smooth: true,
-    animation: {
-      appear: {
-        animation: 'wave-in',
-        duration: 500,
+    scale: {
+      color: {
+        range: ['#1890ff', '#ff4d4f'], // Requests: blue, Errors: red
       },
     },
-    areaStyle: {
+    style: {
       fillOpacity: 0.3,
     },
-    slider: {
-      start: 0,
-      end: 1,
-    },
-    legend: {
-      position: 'top-right' as const,
-      itemName: {
-        formatter: (text: string) => {
-          if (text === 'Requests') {
-            return `${text} (${currentRequests.toLocaleString()})`;
-          }
-          if (text === 'Errors') {
-            return `${text} (${currentErrors.toLocaleString()})`;
-          }
-          return text;
+    axis: {
+      x: {
+        label: {
+          autoRotate: true,
+        },
+      },
+      y: {
+        label: {
+          formatter: (v: string) => {
+            const num = Number(v);
+            if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+            return num.toLocaleString();
+          },
         },
       },
     },
+    legend: false,
     tooltip: {
-      formatter: (datum: any) => {
-        return {
-          name: datum.type,
-          value: datum.value?.toLocaleString() ?? 0,
-        };
-      },
+      title: (d: any) => d.time,
+      items: [
+        (d: any) => ({
+          name: d.type,
+          value: d.value?.toLocaleString() ?? 0,
+          color: d.type === 'Requests' ? '#1890ff' : '#ff4d4f',
+        }),
+      ],
     },
-    color: ['#1890ff', '#ff4d4f'],
   };
 
   // Transform to multi-series format
@@ -120,13 +117,10 @@ export function ActivityTimelineWidget() {
     <Card
       title={
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <LineChartOutlined />
-            <span>Activity Timeline</span>
-          </div>
+          <span>Requests & Errors</span>
           <Segmented
-            options={Object.entries(TIME_RANGE_CONFIG).map(([key, config]) => ({
-              label: config.label,
+            options={Object.entries(TIME_RANGE_CONFIG).map(([key, cfg]) => ({
+              label: cfg.label,
               value: key,
             }))}
             value={timeRange}
@@ -135,8 +129,7 @@ export function ActivityTimelineWidget() {
           />
         </div>
       }
-      style={{ height: '100%' }}
-      bodyStyle={{ padding: '16px' }}
+      styles={{ body: { padding: '16px' } }}
     >
       {isLoading ? (
         <div style={{
@@ -159,7 +152,36 @@ export function ActivityTimelineWidget() {
           Failed to load metrics
         </div>
       ) : chartData.length > 0 ? (
-        <KBAreaChart {...config} data={multiSeriesData} />
+        <div>
+          {/* Custom Legend */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12, gap: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{
+                display: 'inline-block',
+                width: 10,
+                height: 10,
+                borderRadius: '50%',
+                backgroundColor: '#1890ff',
+              }} />
+              <span style={{ fontSize: 13, fontWeight: 500 }}>
+                Requests ({currentRequests.toLocaleString()})
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{
+                display: 'inline-block',
+                width: 10,
+                height: 10,
+                borderRadius: '50%',
+                backgroundColor: '#ff4d4f',
+              }} />
+              <span style={{ fontSize: 13, fontWeight: 500 }}>
+                Errors ({currentErrors.toLocaleString()})
+              </span>
+            </div>
+          </div>
+          <KBAreaChart {...config} data={multiSeriesData} />
+        </div>
       ) : (
         <div style={{
           height: 250,
