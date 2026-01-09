@@ -29,6 +29,10 @@ import type {
   HistoryPlanResponse,
   HistoryChangelogResponse,
   GitTimelineResponse,
+  PreviewResponse,
+  BuildRequest,
+  BuildResponse,
+  ReleaseChecklist,
 } from '@kb-labs/release-manager-contracts';
 
 /**
@@ -74,9 +78,9 @@ export class HttpReleaseSource implements ReleaseDataSource {
   }
 
   // === Preview ===
-  async getPreview(scope: string): Promise<PlanResponse> {
+  async getPreview(scope: string): Promise<PreviewResponse> {
     const params = new URLSearchParams({ scope });
-    return await this.client.fetch<PlanResponse>(`${this.basePath}/preview?${params}`);
+    return await this.client.fetch<PreviewResponse>(`${this.basePath}/preview?${params}`);
   }
 
   // === Verify ===
@@ -169,6 +173,20 @@ export class HttpReleaseSource implements ReleaseDataSource {
   async getGitTimeline(scope: string): Promise<GitTimelineResponse> {
     const params = new URLSearchParams({ scope });
     return await this.client.fetch<GitTimelineResponse>(`${this.basePath}/git-timeline?${params}`);
+  }
+
+  // === Build ===
+  async triggerBuild(request: BuildRequest): Promise<BuildResponse> {
+    return await this.client.fetch<BuildResponse>(`${this.basePath}/build`, {
+      method: 'POST',
+      data: request,
+    });
+  }
+
+  // === Checklist ===
+  async getChecklist(scope: string): Promise<ReleaseChecklist> {
+    const params = new URLSearchParams({ scope });
+    return await this.client.fetch<ReleaseChecklist>(`${this.basePath}/checklist?${params}`);
   }
 }
 

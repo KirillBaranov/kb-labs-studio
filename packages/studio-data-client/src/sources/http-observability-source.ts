@@ -6,7 +6,24 @@
 import { HttpClient } from '../client/http-client';
 import { KBError } from '../errors/kb-error';
 import type { ObservabilityDataSource } from './observability-source';
-import type { StateBrokerStats, DevKitHealth, PrometheusMetrics, SystemEvent, LogQuery, LogQueryResponse, LogRecord, LogSummarizeRequest, LogSummarizeResponse } from '../contracts/observability';
+import type {
+  StateBrokerStats,
+  DevKitHealth,
+  PrometheusMetrics,
+  SystemEvent,
+  LogQuery,
+  LogQueryResponse,
+  LogRecord,
+  LogSummarizeRequest,
+  LogSummarizeResponse,
+  HistoricalDataPoint,
+  HeatmapCell,
+  MetricsHistoryQuery,
+  MetricsHeatmapQuery,
+  Incident,
+  IncidentQuery,
+  IncidentCreatePayload,
+} from '../contracts/observability';
 
 /**
  * HTTP implementation of ObservabilityDataSource
@@ -184,6 +201,125 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
       throw new KBError(
         'LOG_SUMMARIZATION_FAILED',
         'Failed to summarize logs',
+        500,
+        error
+      );
+    }
+  }
+
+  async getMetricsHistory(query: MetricsHistoryQuery): Promise<HistoricalDataPoint[]> {
+    try {
+      const params = new URLSearchParams();
+      params.append('metric', query.metric);
+      params.append('range', query.range);
+      if (query.interval) params.append('interval', query.interval);
+
+      const response = await this.client.fetch<{ ok: true; data: HistoricalDataPoint[] }>(
+        `/observability/metrics/history?${params.toString()}`
+      );
+
+      return response.data;
+    } catch (error) {
+      throw new KBError(
+        'METRICS_HISTORY_FETCH_FAILED',
+        'Failed to fetch metrics history',
+        500,
+        error
+      );
+    }
+  }
+
+  async getMetricsHeatmap(query: MetricsHeatmapQuery): Promise<HeatmapCell[]> {
+    try {
+      const params = new URLSearchParams();
+      params.append('metric', query.metric);
+      if (query.days) params.append('days', String(query.days));
+
+      const response = await this.client.fetch<{ ok: true; data: HeatmapCell[] }>(
+        `/observability/metrics/heatmap?${params.toString()}`
+      );
+
+      return response.data;
+    } catch (error) {
+      throw new KBError(
+        'METRICS_HEATMAP_FETCH_FAILED',
+        'Failed to fetch metrics heatmap',
+        500,
+        error
+      );
+    }
+  }
+
+  async queryIncidents(query?: IncidentQuery): Promise<Incident[]> {
+    try {
+      const params = new URLSearchParams();
+      if (query?.limit) params.append('limit', String(query.limit));
+      if (query?.severity) {
+        const severityList = Array.isArray(query.severity) ? query.severity : [query.severity];
+        params.append('severity', severityList.join(','));
+      }
+      if (query?.type) {
+        const typeList = Array.isArray(query.type) ? query.type : [query.type];
+        params.append('type', typeList.join(','));
+      }
+      if (query?.from) params.append('from', String(query.from));
+      if (query?.to) params.append('to', String(query.to));
+      if (query?.includeResolved !== undefined) {
+        params.append('includeResolved', String(query.includeResolved));
+      }
+
+      const queryString = params.toString();
+      const url = queryString ? `/observability/incidents/history?${queryString}` : '/observability/incidents/history';
+
+      const response = await this.client.fetch<{ ok: true; data: Incident[] }>(url);
+
+      return response.data;
+    } catch (error) {
+      throw new KBError(
+        'INCIDENTS_QUERY_FAILED',
+        'Failed to query incidents',
+        500,
+        error
+      );
+    }
+  }
+
+  async createIncident(payload: IncidentCreatePayload): Promise<Incident> {
+    try {
+      const response = await this.client.fetch<{ ok: true; data: Incident }>(
+        '/observability/incidents',
+        {
+          method: 'POST',
+          data: payload,
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      throw new KBError(
+        'INCIDENT_CREATE_FAILED',
+        'Failed to create incident',
+        500,
+        error
+      );
+    }
+  }
+
+  async resolveIncident(id: string, resolutionNotes?: string): Promise<Incident> {
+    try {
+      const response = await this.client.fetch<{ ok: true; data: Incident }>(
+        `/observability/incidents/${id}/resolve`,
+        {
+          method: 'POST',
+          data: { resolutionNotes },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      throw new KBError(
+        'INCIDENT_RESOLVE_FAILED',
+        'Failed to resolve incident',
         500,
         error
       );

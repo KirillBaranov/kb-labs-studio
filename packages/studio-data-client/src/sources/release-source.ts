@@ -27,6 +27,10 @@ import type {
   HistoryPlanResponse,
   HistoryChangelogResponse,
   GitTimelineResponse,
+  PreviewResponse,
+  BuildRequest,
+  BuildResponse,
+  ReleaseChecklist,
 } from '@kb-labs/release-manager-contracts';
 
 /**
@@ -45,7 +49,7 @@ export interface ReleaseDataSource {
   resetPlan(scope: string): Promise<{ success: boolean }>;
 
   // === Preview ===
-  getPreview(scope: string): Promise<PlanResponse>;
+  getPreview(scope: string): Promise<PreviewResponse>;
 
   // === Verify ===
   getVerify(scope: string): Promise<VerifyResponse>;
@@ -71,5 +75,11 @@ export interface ReleaseDataSource {
 
   // === Git Timeline ===
   getGitTimeline(scope: string): Promise<GitTimelineResponse>;
+
+  // === Build ===
+  triggerBuild(request: BuildRequest): Promise<BuildResponse>;
+
+  // === Checklist ===
+  getChecklist(scope: string): Promise<ReleaseChecklist>;
 }
 

@@ -30,6 +30,10 @@ import type {
   GitTimelineResponse,
   ReleasePlan,
   ReleaseReport,
+  PreviewResponse,
+  BuildRequest,
+  BuildResponse,
+  ReleaseChecklist,
 } from '@kb-labs/release-manager-contracts';
 
 /**
@@ -224,9 +228,46 @@ export class MockReleaseSource implements ReleaseDataSource {
   }
 
   // === Preview ===
-  async getPreview(scope: string): Promise<PlanResponse> {
-    // Preview is same as getPlan in mock
-    return this.getPlan(scope);
+  async getPreview(scope: string): Promise<PreviewResponse> {
+    await this.delay(200);
+
+    const plan = this.mockPlans.get(scope);
+    if (!plan) {
+      return {
+        scope,
+        packages: [],
+        totalSize: 0,
+        totalFiles: 0,
+        allBuilt: false,
+      };
+    }
+
+    // Generate mock file lists
+    const packages = plan.packages.map((pkg) => ({
+      name: pkg.name,
+      version: pkg.nextVersion,
+      path: pkg.path,
+      buildStatus: 'ready' as const,
+      files: [
+        { path: 'package.json', size: 1024 },
+        { path: 'dist/index.js', size: 8192 },
+        { path: 'dist/index.d.ts', size: 2048 },
+        { path: 'dist/index.js.map', size: 4096 },
+        { path: 'README.md', size: 3500 },
+        { path: 'LICENSE', size: 1068 },
+      ],
+      expectedFiles: ['dist', 'README.md', 'LICENSE'],
+      totalSize: 19928,
+      fileCount: 6,
+    }));
+
+    return {
+      scope,
+      packages,
+      totalSize: packages.reduce((sum, p) => sum + p.totalSize, 0),
+      totalFiles: packages.reduce((sum, p) => sum + p.fileCount, 0),
+      allBuilt: true,
+    };
   }
 
   // === Verify ===
@@ -567,6 +608,64 @@ export class MockReleaseSource implements ReleaseDataSource {
       unreleased: mockCommits.length,
       lastTag: 'v1.0.0',
       hasUnreleasedChanges: true,
+    };
+  }
+
+  // === Build ===
+  async triggerBuild(request: BuildRequest): Promise<BuildResponse> {
+    // Simulate build time
+    await this.delay(2000);
+
+    const plan = this.mockPlans.get(request.scope);
+    const packages = plan?.packages.map((pkg) => ({
+      name: pkg.name,
+      success: true,
+      durationMs: 1500 + Math.random() * 1000,
+    })) ?? [];
+
+    return {
+      scope: request.scope,
+      success: true,
+      packages,
+      builtCount: packages.filter(pkg => pkg.success).length,
+      totalCount: packages.length,
+      totalDurationMs: 2000,
+    };
+  }
+
+  // === Checklist ===
+  async getChecklist(scope: string): Promise<ReleaseChecklist> {
+    await this.delay(100);
+
+    const plan = this.mockPlans.get(scope);
+    const changelog = this.mockChangelogs.get(scope);
+
+    return {
+      scope,
+      plan: {
+        status: plan ? 'ready' : 'pending',
+        message: plan ? `${plan.packages.length} package(s), ${plan.packages[0]?.bump} bump` : 'No release plan found',
+        packagesCount: plan?.packages.length,
+        bump: plan?.packages[0]?.bump,
+      },
+      changelog: {
+        status: changelog ? 'ready' : 'pending',
+        message: changelog ? '12 changes documented' : 'Changelog not generated',
+        commitsCount: changelog ? 12 : undefined,
+      },
+      build: {
+        status: plan ? 'ready' : 'pending',
+        message: plan ? `All ${plan.packages.length} package(s) built` : 'Build required',
+        builtCount: plan?.packages.length,
+        totalCount: plan?.packages.length,
+      },
+      preview: {
+        status: plan ? 'ready' : 'pending',
+        message: plan ? '6 files ready to publish' : 'Waiting for build',
+        filesCount: plan ? 6 : undefined,
+        totalSize: plan ? 19928 : undefined,
+      },
+      canPublish: !!(plan && changelog),
     };
   }
 

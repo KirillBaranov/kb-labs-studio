@@ -1,4 +1,22 @@
-import type { StateBrokerStats, DevKitHealth, PrometheusMetrics, SystemEvent, LogRecord, LogQuery, LogQueryResponse, LogEvent, LogSummarizeRequest, LogSummarizeResponse } from '../contracts/observability';
+import type {
+  StateBrokerStats,
+  DevKitHealth,
+  PrometheusMetrics,
+  SystemEvent,
+  LogRecord,
+  LogQuery,
+  LogQueryResponse,
+  LogEvent,
+  LogSummarizeRequest,
+  LogSummarizeResponse,
+  HistoricalDataPoint,
+  HeatmapCell,
+  MetricsHistoryQuery,
+  MetricsHeatmapQuery,
+  Incident,
+  IncidentQuery,
+  IncidentCreatePayload,
+} from '../contracts/observability';
 
 /**
  * Observability data source interface
@@ -40,4 +58,29 @@ export interface ObservabilityDataSource {
    * Get AI-powered log summarization
    */
   summarizeLogs(request: LogSummarizeRequest): Promise<LogSummarizeResponse>;
+
+  /**
+   * Get historical metrics time-series data
+   */
+  getMetricsHistory(query: MetricsHistoryQuery): Promise<HistoricalDataPoint[]>;
+
+  /**
+   * Get metrics heatmap data (7 days × 24 hours)
+   */
+  getMetricsHeatmap(query: MetricsHeatmapQuery): Promise<HeatmapCell[]>;
+
+  /**
+   * Query incident history
+   */
+  queryIncidents(query?: IncidentQuery): Promise<Incident[]>;
+
+  /**
+   * Create a new incident
+   */
+  createIncident(payload: IncidentCreatePayload): Promise<Incident>;
+
+  /**
+   * Resolve an incident
+   */
+  resolveIncident(id: string, resolutionNotes?: string): Promise<Incident>;
 }

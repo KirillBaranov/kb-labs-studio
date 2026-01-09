@@ -4,7 +4,24 @@
  */
 
 import type { ObservabilityDataSource } from '../sources/observability-source';
-import type { StateBrokerStats, DevKitHealth, PrometheusMetrics, SystemEvent, LogRecord, LogQuery, LogQueryResponse, LogSummarizeRequest, LogSummarizeResponse } from '../contracts/observability';
+import type {
+  StateBrokerStats,
+  DevKitHealth,
+  PrometheusMetrics,
+  SystemEvent,
+  LogRecord,
+  LogQuery,
+  LogQueryResponse,
+  LogSummarizeRequest,
+  LogSummarizeResponse,
+  HistoricalDataPoint,
+  HeatmapCell,
+  MetricsHistoryQuery,
+  MetricsHeatmapQuery,
+  Incident,
+  IncidentQuery,
+  IncidentCreatePayload,
+} from '../contracts/observability';
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -354,5 +371,176 @@ The system has been mostly stable with info-level logs. Two connection timeout e
         message: null,
       },
     };
+  }
+
+  async getMetricsHistory(query: MetricsHistoryQuery): Promise<HistoricalDataPoint[]> {
+    await delay(100);
+
+    // Generate mock time-series data
+    const now = Date.now();
+    const rangeMs = {
+      '1m': 60 * 1000,
+      '5m': 5 * 60 * 1000,
+      '10m': 10 * 60 * 1000,
+      '30m': 30 * 60 * 1000,
+      '1h': 60 * 60 * 1000,
+    }[query.range];
+
+    const intervalMs = query.interval === '1m' ? 60 * 1000 : query.interval === '5m' ? 5 * 60 * 1000 : 5000;
+    const points: HistoricalDataPoint[] = [];
+
+    for (let t = now - rangeMs; t <= now; t += intervalMs) {
+      let value = 0;
+
+      switch (query.metric) {
+        case 'requests':
+          value = 100 + Math.floor(Math.random() * 50);
+          break;
+        case 'errors':
+          value = Math.floor(Math.random() * 5);
+          break;
+        case 'latency':
+          value = 30 + Math.floor(Math.random() * 20);
+          break;
+        case 'uptime':
+          value = (now - t) / 1000;
+          break;
+      }
+
+      points.push({ timestamp: t, value });
+    }
+
+    return points;
+  }
+
+  async getMetricsHeatmap(query: MetricsHeatmapQuery): Promise<HeatmapCell[]> {
+    await delay(150);
+
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const cells: HeatmapCell[] = [];
+
+    for (const day of days) {
+      for (let hour = 0; hour < 24; hour++) {
+        let value = 0;
+
+        switch (query.metric) {
+          case 'latency':
+            value = 30 + Math.floor(Math.random() * 40) + (hour >= 9 && hour <= 17 ? 10 : 0);
+            break;
+          case 'errors':
+            value = Math.floor(Math.random() * 10);
+            break;
+          case 'requests':
+            value = 50 + Math.floor(Math.random() * 100) + (hour >= 9 && hour <= 17 ? 50 : 0);
+            break;
+        }
+
+        cells.push({ day, hour, value });
+      }
+    }
+
+    return cells;
+  }
+
+  async queryIncidents(query?: IncidentQuery): Promise<Incident[]> {
+    await delay(200);
+
+    const mockIncidents: Incident[] = [
+      {
+        id: 'inc-1',
+        type: 'latency_spike',
+        severity: 'warning',
+        title: 'Elevated API Latency',
+        details: 'Average latency increased to 250ms (baseline: 50ms)',
+        rootCause: 'Database connection pool exhaustion',
+        affectedServices: ['rest-api', 'workflow-runtime'],
+        timestamp: Date.now() - 2 * 60 * 60 * 1000, // 2 hours ago
+        resolvedAt: Date.now() - 1 * 60 * 60 * 1000, // 1 hour ago
+        resolutionNotes: 'Increased connection pool size from 10 to 20',
+        metadata: { peakLatency: 350, duration: '45m' },
+      },
+      {
+        id: 'inc-2',
+        type: 'error_rate',
+        severity: 'critical',
+        title: 'High Error Rate in Mind Plugin',
+        details: 'Error rate spiked to 15% (baseline: <1%)',
+        affectedServices: ['mind-engine'],
+        timestamp: Date.now() - 30 * 60 * 1000, // 30 minutes ago
+        metadata: { errorCount: 47, requestCount: 310 },
+      },
+      {
+        id: 'inc-3',
+        type: 'plugin_failure',
+        severity: 'warning',
+        title: 'Plugin Mount Timeout',
+        details: 'workflow plugin took 15s to mount (expected: <3s)',
+        affectedServices: ['workflow-runtime'],
+        timestamp: Date.now() - 10 * 60 * 1000, // 10 minutes ago
+        resolvedAt: Date.now() - 5 * 60 * 1000, // 5 minutes ago
+        resolutionNotes: 'Plugin restarted successfully',
+      },
+    ];
+
+    // Apply filters
+    let filtered = [...mockIncidents];
+
+    if (query?.severity) {
+      const severityList = Array.isArray(query.severity) ? query.severity : [query.severity];
+      filtered = filtered.filter(inc => severityList.includes(inc.severity));
+    }
+
+    if (query?.type) {
+      const typeList = Array.isArray(query.type) ? query.type : [query.type];
+      filtered = filtered.filter(inc => typeList.includes(inc.type));
+    }
+
+    if (query?.from) {
+      filtered = filtered.filter(inc => inc.timestamp >= query.from!);
+    }
+
+    if (query?.to) {
+      filtered = filtered.filter(inc => inc.timestamp <= query.to!);
+    }
+
+    if (!query?.includeResolved) {
+      filtered = filtered.filter(inc => !inc.resolvedAt);
+    }
+
+    if (query?.limit) {
+      filtered = filtered.slice(0, query.limit);
+    }
+
+    return filtered;
+  }
+
+  async createIncident(payload: IncidentCreatePayload): Promise<Incident> {
+    await delay(150);
+
+    const incident: Incident = {
+      id: `inc-${Date.now()}`,
+      ...payload,
+      timestamp: payload.timestamp || Date.now(),
+    };
+
+    return incident;
+  }
+
+  async resolveIncident(id: string, resolutionNotes?: string): Promise<Incident> {
+    await delay(150);
+
+    // Mock resolving an incident
+    const incident: Incident = {
+      id,
+      type: 'error_rate',
+      severity: 'critical',
+      title: 'Mock Incident',
+      details: 'Mock incident details',
+      timestamp: Date.now() - 60 * 60 * 1000,
+      resolvedAt: Date.now(),
+      resolutionNotes,
+    };
+
+    return incident;
   }
 }

@@ -6,7 +6,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import type { ObservabilityDataSource } from '../sources/observability-source';
-import type { SystemEvent, LogRecord, LogQuery } from '../contracts/observability';
+import type {
+  SystemEvent,
+  LogRecord,
+  LogQuery,
+  MetricsHistoryQuery,
+  MetricsHeatmapQuery,
+  IncidentQuery,
+} from '../contracts/observability';
 
 /**
  * Hook to fetch State Broker statistics
@@ -125,4 +132,49 @@ export function useLogStream(source: ObservabilityDataSource, filters?: LogQuery
   const clearLogs = () => setLogs([]);
 
   return { logs, isConnected, error, clearLogs };
+}
+
+/**
+ * Hook to fetch historical metrics time-series data
+ *
+ * Auto-refreshes every 5 seconds for near real-time charts
+ */
+export function useMetricsHistory(source: ObservabilityDataSource, query: MetricsHistoryQuery) {
+  return useQuery({
+    queryKey: ['observability', 'metrics-history', query.metric, query.range, query.interval],
+    queryFn: () => source.getMetricsHistory(query),
+    refetchInterval: 5000, // Auto-refresh every 5s
+    staleTime: 3000, // Consider data stale after 3s
+    retry: 2,
+  });
+}
+
+/**
+ * Hook to fetch metrics heatmap data
+ *
+ * Caches for 1 minute as heatmap data changes slowly
+ */
+export function useMetricsHeatmap(source: ObservabilityDataSource, query: MetricsHeatmapQuery) {
+  return useQuery({
+    queryKey: ['observability', 'metrics-heatmap', query.metric, query.days],
+    queryFn: () => source.getMetricsHeatmap(query),
+    staleTime: 60000, // Cache for 1 minute
+    gcTime: 300000, // Keep in cache for 5 minutes
+    retry: 2,
+  });
+}
+
+/**
+ * Hook to query incident history
+ *
+ * Auto-refreshes every 30 seconds to show new incidents
+ */
+export function useIncidents(source: ObservabilityDataSource, query?: IncidentQuery) {
+  return useQuery({
+    queryKey: ['observability', 'incidents', query],
+    queryFn: () => source.queryIncidents(query),
+    refetchInterval: 30000, // Auto-refresh every 30s
+    staleTime: 20000, // Consider data stale after 20s
+    retry: 2,
+  });
 }

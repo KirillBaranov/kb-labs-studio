@@ -7,6 +7,7 @@ import type {
   RunReleaseRequest,
   PublishRequest,
   RollbackRequest,
+  BuildRequest,
 } from '@kb-labs/release-manager-contracts';
 
 /**
@@ -27,6 +28,7 @@ export const releaseQueryKeys = {
   historyPlan: (scope: string, id: string) => [...releaseQueryKeys.all, 'history', scope, id, 'plan'] as const,
   historyChangelog: (scope: string, id: string) => [...releaseQueryKeys.all, 'history', scope, id, 'changelog'] as const,
   gitTimeline: (scope: string) => [...releaseQueryKeys.all, 'git-timeline', scope] as const,
+  checklist: (scope: string) => [...releaseQueryKeys.all, 'checklist', scope] as const,
 };
 
 /**
@@ -178,6 +180,7 @@ export function useGenerateReleasePlan(source: ReleaseDataSource) {
       queryClient.invalidateQueries({ queryKey: releaseQueryKeys.plan(variables.scope) });
       queryClient.invalidateQueries({ queryKey: releaseQueryKeys.status(variables.scope) });
       queryClient.invalidateQueries({ queryKey: releaseQueryKeys.preview(variables.scope) });
+      queryClient.invalidateQueries({ queryKey: releaseQueryKeys.gitTimeline(variables.scope) });
     },
   });
 }
@@ -294,5 +297,34 @@ export function useGitTimeline(source: ReleaseDataSource, scope: string, enabled
     queryFn: () => source.getGitTimeline(scope),
     enabled: enabled && !!scope,
     staleTime: 30000, // 30 seconds
+  });
+}
+
+/**
+ * Hook to get release checklist status
+ */
+export function useReleaseChecklist(source: ReleaseDataSource, scope: string, enabled = true) {
+  return useQuery({
+    queryKey: releaseQueryKeys.checklist(scope),
+    queryFn: () => source.getChecklist(scope),
+    enabled: enabled && !!scope,
+    staleTime: 5000, // Refetch frequently to show updates
+    refetchInterval: 10000, // Auto-refetch every 10s
+  });
+}
+
+/**
+ * Hook to trigger package build
+ */
+export function useTriggerBuild(source: ReleaseDataSource) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (request: BuildRequest) => source.triggerBuild(request),
+    onSuccess: (_, variables) => {
+      // Invalidate checklist and preview after build
+      queryClient.invalidateQueries({ queryKey: releaseQueryKeys.checklist(variables.scope) });
+      queryClient.invalidateQueries({ queryKey: releaseQueryKeys.preview(variables.scope) });
+    },
   });
 }

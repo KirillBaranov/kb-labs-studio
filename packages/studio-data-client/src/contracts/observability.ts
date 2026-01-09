@@ -352,3 +352,123 @@ export interface LogSummarizeResponse {
     message?: string | null;
   };
 }
+
+/**
+ * Historical data point for time-series metrics
+ */
+export interface HistoricalDataPoint {
+  /** Unix timestamp in milliseconds */
+  timestamp: number;
+  /** Metric value */
+  value: number;
+}
+
+/**
+ * Heatmap cell data (7 days × 24 hours)
+ */
+export interface HeatmapCell {
+  /** Day of week: 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun' */
+  day: string;
+  /** Hour of day: 0-23 */
+  hour: number;
+  /** Aggregated metric value */
+  value: number;
+}
+
+/**
+ * Metrics history query options
+ */
+export interface MetricsHistoryQuery {
+  /** Metric type */
+  metric: 'requests' | 'errors' | 'latency' | 'uptime';
+  /** Time range */
+  range: '1m' | '5m' | '10m' | '30m' | '1h';
+  /** Aggregation interval (optional) */
+  interval?: '5s' | '1m' | '5m';
+}
+
+/**
+ * Metrics heatmap query options
+ */
+export interface MetricsHeatmapQuery {
+  /** Metric type */
+  metric: 'latency' | 'errors' | 'requests';
+  /** Number of days (optional, default: 7) */
+  days?: 7 | 14 | 30;
+}
+
+/**
+ * Incident severity levels
+ */
+export type IncidentSeverity = 'critical' | 'warning' | 'info';
+
+/**
+ * Incident type categories
+ */
+export type IncidentType =
+  | 'error_rate'
+  | 'latency_spike'
+  | 'plugin_failure'
+  | 'adapter_failure'
+  | 'system_health'
+  | 'custom';
+
+/**
+ * Incident record
+ */
+export interface Incident {
+  /** Unique incident identifier */
+  id: string;
+  /** Incident type */
+  type: IncidentType;
+  /** Severity level */
+  severity: IncidentSeverity;
+  /** Incident title/summary */
+  title: string;
+  /** Detailed description */
+  details: string;
+  /** Root cause analysis (optional) */
+  rootCause?: string;
+  /** Affected services/plugins */
+  affectedServices?: string[];
+  /** Timestamp when incident occurred (Unix ms) */
+  timestamp: number;
+  /** Timestamp when incident was resolved (Unix ms) */
+  resolvedAt?: number;
+  /** Resolution notes */
+  resolutionNotes?: string;
+  /** Related metrics/logs */
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Incident query options
+ */
+export interface IncidentQuery {
+  /** Maximum number of incidents to return (default: 50) */
+  limit?: number;
+  /** Filter by severity */
+  severity?: IncidentSeverity | IncidentSeverity[];
+  /** Filter by type */
+  type?: IncidentType | IncidentType[];
+  /** Filter by time range (from timestamp) */
+  from?: number;
+  /** Filter by time range (to timestamp) */
+  to?: number;
+  /** Include resolved incidents (default: false) */
+  includeResolved?: boolean;
+}
+
+/**
+ * Incident create payload
+ */
+export interface IncidentCreatePayload {
+  type: IncidentType;
+  severity: IncidentSeverity;
+  title: string;
+  details: string;
+  rootCause?: string;
+  affectedServices?: string[];
+  timestamp?: number;
+  metadata?: Record<string, unknown>;
+}
