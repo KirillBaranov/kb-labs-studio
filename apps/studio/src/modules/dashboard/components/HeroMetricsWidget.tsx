@@ -135,7 +135,7 @@ export function HeroMetricsWidget() {
         <HeroMetricCard
           title="Uptime"
           value={`${currentUptime.toFixed(2)}%`}
-          subtitle={stateBroker.data ? `Cache: ${(stateBroker.data.hitRate * 100).toFixed(1)}%` : undefined}
+          subtitle={stateBroker.data ? `Cache: ${(stateBroker.data.hitRate * 100).toFixed(1)}%` : 'Success rate'}
           sparklineData={uptimeSparkline}
           status={getUptimeStatus()}
           icon={<RiseOutlined />}
@@ -146,7 +146,7 @@ export function HeroMetricsWidget() {
         <HeroMetricCard
           title="Total Requests"
           value={totalRequests.toLocaleString()}
-          subtitle={metrics.data ? `Success: ${metrics.data.requests.success.toLocaleString()}` : undefined}
+          subtitle={metrics.data ? `Success: ${metrics.data.requests.success.toLocaleString()}` : 'Loading...'}
           sparklineData={requestsSparkline}
           trend={requestsTrend ?? undefined}
           status="default"
