@@ -109,7 +109,7 @@ export function ConfigurationSettings() {
       name: 'Database',
       icon: <DatabaseOutlined />,
       color: 'blue',
-      adapters: ['database'],
+      adapters: ['database', 'db', 'documentDb'],
     },
     {
       name: 'Infrastructure',
@@ -121,7 +121,7 @@ export function ConfigurationSettings() {
       name: 'Observability',
       icon: <ThunderboltOutlined />,
       color: 'orange',
-      adapters: ['logger', 'analytics'],
+      adapters: ['logger', 'analytics', 'logRingBuffer', 'logPersistence'],
     },
   ];
 
