@@ -26,6 +26,7 @@ export interface KBHeaderProps {
   onMarkAllNotificationsAsRead?: () => void;
   onClearAllNotifications?: () => void;
   onClearNotification?: (id: string) => void;
+  onNotificationClick?: (notification: LogNotification) => void;
 }
 
 export function KBHeader({
@@ -45,6 +46,7 @@ export function KBHeader({
   onMarkAllNotificationsAsRead,
   onClearAllNotifications,
   onClearNotification,
+  onNotificationClick,
 }: KBHeaderProps) {
   const profileItems: MenuProps['items'] = profileMenuItems || [
     ...(onLogout
@@ -119,6 +121,7 @@ export function KBHeader({
               onMarkAllAsRead={onMarkAllNotificationsAsRead}
               onClearAll={onClearAllNotifications}
               onClearNotification={onClearNotification}
+              onNotificationClick={onNotificationClick}
             />
           )}
 

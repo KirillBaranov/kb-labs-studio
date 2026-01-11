@@ -30,6 +30,7 @@ export interface KBNotificationBellProps {
   onMarkAllAsRead: () => void;
   onClearAll: () => void;
   onClearNotification: (id: string) => void;
+  onNotificationClick?: (notification: LogNotification) => void;
 }
 
 /**
@@ -47,6 +48,7 @@ export function KBNotificationBell({
   onMarkAllAsRead,
   onClearAll,
   onClearNotification,
+  onNotificationClick,
 }: KBNotificationBellProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -164,6 +166,11 @@ export function KBNotificationBell({
                 onClick={() => {
                   if (!notification.read) {
                     onMarkAsRead(notification.id);
+                  }
+                  // Navigate to log detail page if handler provided
+                  if (onNotificationClick) {
+                    setOpen(false); // Close dropdown
+                    onNotificationClick(notification);
                   }
                 }}
                 onMouseEnter={(e) => {
