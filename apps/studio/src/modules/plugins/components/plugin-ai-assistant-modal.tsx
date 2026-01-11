@@ -22,16 +22,12 @@ import {
 } from 'antd';
 import {
   QuestionCircleOutlined,
-  ApiOutlined,
-  CodeOutlined,
-  SafetyOutlined,
-  BulbOutlined,
-  SendOutlined,
   ClockCircleOutlined,
   RobotOutlined,
   ThunderboltOutlined,
 } from '@ant-design/icons';
 import type { PluginAskResponse } from '@kb-labs/studio-data-client';
+import { MarkdownViewer } from '../../../components/markdown/markdown-viewer';
 
 const { TextArea } = Input;
 const { Text, Paragraph } = Typography;
@@ -247,15 +243,9 @@ export function PluginAIAssistantModal({
                       marginBottom: 8,
                     }}
                   >
-                    <Paragraph
-                      style={{
-                        whiteSpace: 'pre-wrap',
-                        marginBottom: 0,
-                        fontSize: 14,
-                      }}
-                    >
+                    <MarkdownViewer className="plugin-assistant-markdown">
                       {item.answer}
-                    </Paragraph>
+                    </MarkdownViewer>
                   </div>
 
                   {/* Metadata */}
@@ -293,6 +283,102 @@ export function PluginAIAssistantModal({
           </div>
         )}
       </Space>
+
+      {/* Custom styles for markdown in modal context */}
+      <style>{`
+        .plugin-assistant-markdown {
+          padding: 0;
+          background: transparent;
+          border-radius: 0;
+        }
+        .plugin-assistant-markdown p {
+          margin: 0 0 8px 0;
+        }
+        .plugin-assistant-markdown p:last-child {
+          margin-bottom: 0;
+        }
+        .plugin-assistant-markdown h1,
+        .plugin-assistant-markdown h2,
+        .plugin-assistant-markdown h3,
+        .plugin-assistant-markdown h4 {
+          margin-top: 12px;
+          margin-bottom: 8px;
+          font-size: 1em;
+          font-weight: 600;
+          border: none;
+          padding: 0;
+        }
+        .plugin-assistant-markdown h1 {
+          font-size: 1.15em;
+        }
+        .plugin-assistant-markdown h2 {
+          font-size: 1.1em;
+        }
+        .plugin-assistant-markdown h3 {
+          font-size: 1.05em;
+        }
+        .plugin-assistant-markdown ul,
+        .plugin-assistant-markdown ol {
+          margin: 8px 0;
+          padding-left: 20px;
+        }
+        .plugin-assistant-markdown li {
+          margin: 4px 0;
+        }
+        .plugin-assistant-markdown code {
+          background: rgba(0, 0, 0, 0.06);
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-size: 0.9em;
+          font-family: 'SF Mono', Menlo, Monaco, Consolas, monospace;
+        }
+        .plugin-assistant-markdown pre {
+          background: #f5f5f5;
+          padding: 12px 16px;
+          border-radius: 6px;
+          margin: 12px 0;
+          overflow-x: auto;
+        }
+        .plugin-assistant-markdown pre code {
+          background: none;
+          padding: 0;
+          font-size: 0.85em;
+        }
+        .plugin-assistant-markdown table {
+          margin: 12px 0;
+          font-size: 0.9em;
+          width: 100%;
+          border-collapse: collapse;
+        }
+        .plugin-assistant-markdown th,
+        .plugin-assistant-markdown td {
+          padding: 8px 12px;
+          border: 1px solid #e8e8e8;
+          text-align: left;
+        }
+        .plugin-assistant-markdown th {
+          background: #fafafa;
+          font-weight: 600;
+        }
+        .plugin-assistant-markdown blockquote {
+          margin: 12px 0;
+          padding: 8px 16px;
+          border-left: 4px solid #1890ff;
+          background: #f6f8fa;
+          border-radius: 0 4px 4px 0;
+        }
+        .plugin-assistant-markdown strong {
+          font-weight: 600;
+        }
+        .plugin-assistant-markdown a {
+          color: #1890ff;
+        }
+        .plugin-assistant-markdown hr {
+          margin: 16px 0;
+          border: none;
+          border-top: 1px solid #e8e8e8;
+        }
+      `}</style>
     </Modal>
   );
 }
