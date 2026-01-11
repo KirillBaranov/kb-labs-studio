@@ -32,6 +32,8 @@ import { PrometheusMetricsPage } from './modules/observability/pages/prometheus-
 import { SystemEventsPage } from './modules/observability/pages/system-events-page';
 import { LogsPage } from './modules/observability/pages/logs-page';
 import { LogDetailPage } from './modules/observability/pages/log-detail-page';
+import { IncidentsPage } from './modules/observability/pages/incidents-page';
+import { IncidentDetailPage } from './modules/observability/pages/incident-detail-page';
 import { AnalyticsOverviewPage } from './modules/analytics/pages/analytics-overview-page';
 import { AnalyticsEventsPage } from './modules/analytics/pages/analytics-events-page';
 import { AnalyticsLLMPage } from './modules/analytics/pages/analytics-llm-page';
@@ -283,6 +285,12 @@ function LayoutContent() {
             path: '/observability/logs',
             icon: renderPluginIcon('FileTextOutlined'),
           },
+          {
+            key: 'incidents',
+            label: 'Incidents',
+            path: '/observability/incidents',
+            icon: renderPluginIcon('FireOutlined'),
+          },
         ],
       },
     ];
@@ -421,11 +429,12 @@ export const router = createBrowserRouter([
             index: true,
             element: <DashboardPage />,
           },
-          {
-            path: 'insights',
-            element: <AIInsightsPage />,
-          },
         ],
+      },
+      {
+        path: '/insights',
+        element: <AIInsightsPage />,
+        errorElement: <ErrorBoundary />,
       },
       {
         path: '/gallery',
@@ -535,6 +544,16 @@ export const router = createBrowserRouter([
       {
         path: '/observability/logs/:id',
         element: <LogDetailPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/observability/incidents',
+        element: <IncidentsPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/observability/incidents/:id',
+        element: <IncidentDetailPage />,
         errorElement: <ErrorBoundary />,
       },
       // TODO: TEMPORARY - Remove after commit plugin UI is polished
