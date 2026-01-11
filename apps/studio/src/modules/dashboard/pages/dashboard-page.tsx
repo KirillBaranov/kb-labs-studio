@@ -1,3 +1,12 @@
+import { useState } from 'react';
+import { Tabs } from 'antd';
+import {
+  DashboardOutlined,
+  ThunderboltOutlined,
+  AlertOutlined,
+  AppstoreOutlined,
+  ExperimentOutlined,
+} from '@ant-design/icons';
 import { HeroMetricsWidget } from '../components/HeroMetricsWidget';
 import { ActivityTimelineWidget } from '../components/ActivityTimelineWidget';
 import { PerformanceBudgetWidget } from '../components/PerformanceBudgetWidget';
@@ -10,93 +19,171 @@ import { ComparativeBenchmarkWidget } from '../components/ComparativeBenchmarkWi
 import { ChaosEngineeringWidget } from '../components/ChaosEngineeringWidget';
 import { TimeTravelWidget } from '../components/TimeTravelWidget';
 import { IndustryBenchmarkWidget } from '../components/IndustryBenchmarkWidget';
+import { SystemResourcesWidget } from '../components/SystemResourcesWidget';
 
 /**
  * Dashboard Overview Page
  *
- * Displays all monitoring widgets. AI Insights has its own page at /insights.
+ * Displays all monitoring widgets organized in tabs.
  */
 export function DashboardPage() {
+  const [activeTab, setActiveTab] = useState('overview');
+
+  const items = [
+    {
+      key: 'overview',
+      label: (
+        <span>
+          <DashboardOutlined style={{ marginRight: 8 }} />
+          Overview
+        </span>
+      ),
+      children: (
+        <div className="dashboard-content">
+          {/* Hero Metrics */}
+          <section className="dashboard-section">
+            <HeroMetricsWidget />
+          </section>
+
+          {/* System Resources */}
+          <section className="dashboard-section">
+            <SectionHeader title="System Resources" />
+            <SystemResourcesWidget />
+          </section>
+
+          {/* Activity Timeline */}
+          <section className="dashboard-section">
+            <SectionHeader title="Activity" />
+            <ActivityTimelineWidget />
+          </section>
+
+          {/* System Topology */}
+          <section className="dashboard-section">
+            <SectionHeader title="System Architecture" />
+            <SystemTopologyWidget />
+          </section>
+        </div>
+      ),
+    },
+    {
+      key: 'performance',
+      label: (
+        <span>
+          <ThunderboltOutlined style={{ marginRight: 8 }} />
+          Performance
+        </span>
+      ),
+      children: (
+        <div className="dashboard-content">
+          {/* Performance Budget */}
+          <section className="dashboard-section">
+            <SectionHeader title="Performance" />
+            <PerformanceBudgetWidget />
+          </section>
+
+          {/* Performance Heatmap */}
+          <section className="dashboard-section">
+            <SectionHeader title="Latency Heatmap" />
+            <PerformanceHeatmapWidget />
+          </section>
+
+          {/* Benchmarks */}
+          <section className="dashboard-section">
+            <SectionHeader title="Benchmarks" />
+            <ComparativeBenchmarkWidget />
+          </section>
+
+          {/* Industry Comparison */}
+          <section className="dashboard-section">
+            <SectionHeader title="Industry Comparison" />
+            <IndustryBenchmarkWidget />
+          </section>
+        </div>
+      ),
+    },
+    {
+      key: 'incidents',
+      label: (
+        <span>
+          <AlertOutlined style={{ marginRight: 8 }} />
+          Incidents
+        </span>
+      ),
+      children: (
+        <div className="dashboard-content">
+          {/* Smart Incidents */}
+          <section className="dashboard-section">
+            <SmartIncidentsWidget />
+          </section>
+
+          {/* Predictions */}
+          <section className="dashboard-section">
+            <SectionHeader title="Predictive Analytics" />
+            <PredictiveAnalyticsWidget />
+          </section>
+        </div>
+      ),
+    },
+    {
+      key: 'resources',
+      label: (
+        <span>
+          <AppstoreOutlined style={{ marginRight: 8 }} />
+          Resources
+        </span>
+      ),
+      children: (
+        <div className="dashboard-content">
+          {/* Cost Attribution */}
+          <section className="dashboard-section">
+            <SectionHeader title="Cost Attribution" />
+            <CostAttributionWidget />
+          </section>
+
+          {/* Time Travel */}
+          <section className="dashboard-section">
+            <SectionHeader title="Time Travel" />
+            <TimeTravelWidget />
+          </section>
+        </div>
+      ),
+    },
+    {
+      key: 'experiments',
+      label: (
+        <span>
+          <ExperimentOutlined style={{ marginRight: 8 }} />
+          Experiments
+        </span>
+      ),
+      children: (
+        <div className="dashboard-content">
+          {/* Chaos Engineering */}
+          <section className="dashboard-section">
+            <SectionHeader title="Chaos Engineering" />
+            <ChaosEngineeringWidget />
+          </section>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <>
-      <div className="dashboard-content">
-        {/* Hero Metrics - Overview cards */}
-        <section className="dashboard-section">
-          <HeroMetricsWidget />
-        </section>
-
-        {/* Activity Timeline */}
-        <section className="dashboard-section">
-          <SectionHeader title="Activity" />
-          <ActivityTimelineWidget />
-        </section>
-
-        {/* System Topology */}
-        <section className="dashboard-section">
-          <SectionHeader title="System Architecture" />
-          <SystemTopologyWidget />
-        </section>
-
-        {/* Performance */}
-        <section className="dashboard-section">
-          <SectionHeader title="Performance" />
-          <PerformanceBudgetWidget />
-        </section>
-
-        {/* Performance Heatmap */}
-        <section className="dashboard-section">
-          <SectionHeader title="Latency Heatmap" />
-          <PerformanceHeatmapWidget />
-        </section>
-
-        {/* Cost Attribution */}
-        <section className="dashboard-section">
-          <SectionHeader title="Cost Attribution" />
-          <CostAttributionWidget />
-        </section>
-
-        {/* Comparative Benchmark */}
-        <section className="dashboard-section">
-          <SectionHeader title="Benchmarks" />
-          <ComparativeBenchmarkWidget />
-        </section>
-
-        {/* Predictive Analytics */}
-        <section className="dashboard-section">
-          <SectionHeader title="Predictions" />
-          <PredictiveAnalyticsWidget />
-        </section>
-
-        {/* Incidents */}
-        <section className="dashboard-section">
-          <SectionHeader title="Incidents" />
-          <SmartIncidentsWidget />
-        </section>
-
-        {/* Chaos Engineering */}
-        <section className="dashboard-section">
-          <SectionHeader title="Chaos Engineering" />
-          <ChaosEngineeringWidget />
-        </section>
-
-        {/* Industry Benchmark */}
-        <section className="dashboard-section">
-          <SectionHeader title="Industry Comparison" />
-          <IndustryBenchmarkWidget />
-        </section>
-
-        {/* Time Travel */}
-        <section className="dashboard-section">
-          <SectionHeader title="Time Travel" />
-          <TimeTravelWidget />
-        </section>
-      </div>
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        items={items}
+        size="large"
+        style={{ marginTop: -16 }}
+      />
 
       <style>{`
         .dashboard-content {
           display: flex;
           flex-direction: column;
           gap: 32px;
+          padding-top: 16px;
         }
 
         .dashboard-section {

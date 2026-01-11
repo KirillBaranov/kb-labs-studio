@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Card, List, Tag, Badge, Collapse, Alert, Timeline, Typography, Empty, Progress, Segmented } from 'antd';
+import { Card, List, Tag, Badge, Collapse, Alert, Timeline, Typography, Empty, Progress, Segmented, Button } from 'antd';
 import {
   AlertOutlined,
   CheckCircleOutlined,
@@ -8,7 +8,11 @@ import {
   ThunderboltOutlined,
   LineChartOutlined,
   BugOutlined,
+  EyeOutlined,
+  DownOutlined,
+  UpOutlined,
 } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { useIncidents, type Incident, type IncidentSeverity } from '@kb-labs/studio-data-client';
 
@@ -28,6 +32,7 @@ interface RCAResult {
 }
 
 export function SmartIncidentsWidget() {
+  const navigate = useNavigate();
   const sources = useDataSources();
   const [severityFilter, setSeverityFilter] = useState<'all' | IncidentSeverity>('all');
   const [expandedIncidents, setExpandedIncidents] = useState<string[]>([]);
@@ -199,111 +204,137 @@ export function SmartIncidentsWidget() {
           renderItem={(incident) => {
             const config = getSeverityConfig(incident.severity);
             const rca = analyzeRootCause(incident);
+            const isExpanded = expandedIncidents.includes(incident.id);
 
             return (
               <List.Item style={{ padding: '12px 0', borderBottom: '1px solid #f0f0f0' }}>
                 <div style={{ width: '100%' }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 8 }}>
+                  {/* Compact header - always visible */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <span style={{ fontSize: 20, color: config.color }}>
                       {getTypeIcon(incident.type)}
                     </span>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                        <Text strong style={{ fontSize: 14 }}>{incident.title}</Text>
-                        <Tag color={config.color} icon={config.icon}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+                        <Text
+                          strong
+                          style={{ fontSize: 14, cursor: 'pointer' }}
+                          onClick={() => navigate(`/observability/incidents/${incident.id}`)}
+                        >
+                          {incident.title}
+                        </Text>
+                        <Tag color={config.color} icon={config.icon} style={{ margin: 0 }}>
                           {incident.severity.toUpperCase()}
                         </Tag>
-                      </div>
-                      <Paragraph style={{ marginBottom: 8, color: '#666' }}>
-                        {incident.details}
-                      </Paragraph>
-                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
-                        {incident.affectedServices && incident.affectedServices.length > 0 && (
-                          <Text type="secondary" style={{ fontSize: 12 }}>
-                            Affected: {incident.affectedServices.join(', ')}
-                          </Text>
-                        )}
-                        <Text type="secondary" style={{ fontSize: 12 }}>
-                          • {new Date(incident.timestamp).toLocaleTimeString()}
-                        </Text>
                         {incident.resolvedAt && (
-                          <Text type="success" style={{ fontSize: 12 }}>
-                            • Resolved: {new Date(incident.resolvedAt).toLocaleTimeString()}
-                          </Text>
+                          <Tag color="green" icon={<CheckCircleOutlined />} style={{ margin: 0 }}>
+                            RESOLVED
+                          </Tag>
                         )}
                       </div>
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        {new Date(incident.timestamp).toLocaleString()}
+                        {incident.affectedServices && incident.affectedServices.length > 0 && (
+                          <> • Affected: {incident.affectedServices.slice(0, 2).join(', ')}{incident.affectedServices.length > 2 && '...'}</>
+                        )}
+                      </Text>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => navigate(`/observability/incidents/${incident.id}`)}
+                      >
+                        View
+                      </Button>
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={isExpanded ? <UpOutlined /> : <DownOutlined />}
+                        onClick={() => {
+                          if (isExpanded) {
+                            setExpandedIncidents(expandedIncidents.filter(id => id !== incident.id));
+                          } else {
+                            setExpandedIncidents([...expandedIncidents, incident.id]);
+                          }
+                        }}
+                      >
+                        {isExpanded ? 'Hide' : 'Details'}
+                      </Button>
                     </div>
                   </div>
 
-                  {/* Root Cause Analysis */}
-                  <Collapse
-                    ghost
-                    activeKey={expandedIncidents}
-                    onChange={(keys) => setExpandedIncidents(keys as string[])}
-                  >
-                    <Panel
-                      header={
-                        <Text strong style={{ fontSize: 13 }}>
-                          🔍 Root Cause Analysis
-                        </Text>
-                      }
-                      key={incident.id}
-                    >
-                      {/* Causal Chain */}
+                  {/* Expanded details - show when expanded */}
+                  {isExpanded && (
+                    <div style={{ marginTop: 12, paddingLeft: 32 }}>
+                      {/* Summary */}
+                      <Paragraph style={{ marginBottom: 12, color: '#666', fontSize: 13 }}>
+                        {incident.details}
+                      </Paragraph>
+
+                      {/* Quick Stats */}
+                      <div style={{ display: 'flex', gap: 16, marginBottom: 12 }}>
+                        {incident.relatedData?.logs && (
+                          <Text type="secondary" style={{ fontSize: 12 }}>
+                            📋 {incident.relatedData.logs.errorCount} errors
+                          </Text>
+                        )}
+                        {incident.relatedData?.metrics?.before && incident.relatedData?.metrics?.during && (
+                          <Text type="secondary" style={{ fontSize: 12 }}>
+                            📈 {incident.relatedData.metrics.during.errorRate?.toFixed(1)}% error rate
+                            {incident.relatedData.metrics.before.errorRate &&
+                              ` (was ${incident.relatedData.metrics.before.errorRate.toFixed(1)}%)`
+                            }
+                          </Text>
+                        )}
+                        {incident.relatedData?.metrics?.topSlowest && incident.relatedData.metrics.topSlowest.length > 0 && (
+                          <Text type="secondary" style={{ fontSize: 12 }}>
+                            🐌 {incident.relatedData.metrics.topSlowest.length} slow endpoints
+                          </Text>
+                        )}
+                      </div>
+
+                      {/* Root Cause Summary */}
                       {rca.causalChain.length > 0 && (
-                        <div style={{ marginBottom: 16 }}>
-                          <Text strong>Causal Chain:</Text>
-                          <Timeline
-                            style={{ marginTop: 8 }}
-                            items={rca.causalChain.map((factor, index) => ({
-                              children: factor,
-                              color: index === 0 ? 'red' : 'blue',
-                            }))}
-                          />
-                        </div>
-                      )}
-
-                      {/* Evidence */}
-                      {rca.evidence.length > 0 && (
-                        <div style={{ marginBottom: 16 }}>
-                          <Text strong>Evidence:</Text>
-                          {rca.evidence.map((ev, index) => (
-                            <div key={index} style={{ marginTop: 8 }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <Progress
-                                  type="line"
-                                  percent={ev.correlation * 100}
-                                  size="small"
-                                  style={{ width: 100 }}
-                                  format={(percent) => `${percent?.toFixed(0)}%`}
-                                />
-                                <Text>{ev.factor}</Text>
+                        <div style={{ marginBottom: 12 }}>
+                          <Text strong style={{ fontSize: 13 }}>🔍 Root Cause:</Text>
+                          <div style={{ marginTop: 4 }}>
+                            {rca.evidence.slice(0, 2).map((ev, index) => (
+                              <div key={index} style={{ marginTop: 4, paddingLeft: 16 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                  <Progress
+                                    type="line"
+                                    percent={ev.correlation * 100}
+                                    size="small"
+                                    style={{ width: 80 }}
+                                    format={(percent) => `${percent?.toFixed(0)}%`}
+                                  />
+                                  <Text style={{ fontSize: 12 }}>{ev.factor}</Text>
+                                </div>
                               </div>
-                              <Text type="secondary" style={{ fontSize: 12, marginLeft: 108 }}>
-                                {ev.evidence}
+                            ))}
+                            {rca.evidence.length > 2 && (
+                              <Text type="secondary" style={{ fontSize: 12, marginLeft: 16 }}>
+                                +{rca.evidence.length - 2} more...
                               </Text>
-                            </div>
-                          ))}
+                            )}
+                          </div>
                         </div>
                       )}
 
-                      {/* Recommendations */}
+                      {/* Top Recommendation */}
                       {rca.recommendations.length > 0 && (
                         <Alert
-                          message="Recommended Actions"
-                          description={
-                            <ul style={{ paddingLeft: 20, marginBottom: 0 }}>
-                              {rca.recommendations.map((rec, index) => (
-                                <li key={index}>{rec}</li>
-                              ))}
-                            </ul>
-                          }
+                          message="Top Recommendation"
+                          description={rca.recommendations[0]}
                           type="info"
                           showIcon
+                          style={{ fontSize: 12 }}
                         />
                       )}
-                    </Panel>
-                  </Collapse>
+                    </div>
+                  )}
                 </div>
               </List.Item>
             );
