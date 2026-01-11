@@ -74,6 +74,66 @@ export interface DevKitHealth {
 }
 
 /**
+ * System metrics from a single REST API instance
+ */
+export interface SystemMetricsInstance {
+  /** Instance identifier (hostname) */
+  instanceId: string;
+
+  /** Timestamp when metrics were collected */
+  timestamp: number;
+
+  /** CPU usage */
+  cpu: {
+    user: number;
+    system: number;
+    percentage: number;
+  };
+
+  /** Memory usage */
+  memory: {
+    rss: number;
+    heapTotal: number;
+    heapUsed: number;
+    external: number;
+    arrayBuffers: number;
+    rssPercentage: number;
+    heapPercentage: number;
+  };
+
+  /** Process uptime (seconds) */
+  uptime: number;
+
+  /** System load average (1, 5, 15 minutes) */
+  loadAvg: [number, number, number];
+
+  /** Total system memory (bytes) */
+  totalMemory: number;
+
+  /** Free system memory (bytes) */
+  freeMemory: number;
+}
+
+/**
+ * System metrics response with summary
+ */
+export interface SystemMetricsData {
+  /** Metrics from all instances */
+  instances: SystemMetricsInstance[];
+
+  /** Summary statistics */
+  summary: {
+    totalInstances: number;
+    activeInstances: number;
+    staleInstances: number;
+    deadInstances: number;
+    avgCpu: number;
+    avgMemory: number;
+    avgHeap: number;
+  };
+}
+
+/**
  * Prometheus metrics from REST API
  */
 export interface PrometheusMetrics {
@@ -427,6 +487,70 @@ export interface RootCauseItem {
 }
 
 /**
+ * Related logs data collected during incident
+ */
+export interface RelatedLogsData {
+  errorCount: number;
+  warnCount: number;
+  timeRange: [number, number];
+  sampleErrors: string[];
+  topEndpoints?: Array<{
+    endpoint: string;
+    count: number;
+    sample: string;
+  }>;
+}
+
+/**
+ * Slow request details
+ */
+export interface SlowRequest {
+  endpoint: string;
+  method: string;
+  durationMs: number;
+  statusCode?: number;
+}
+
+/**
+ * Related metrics data (before/during comparison)
+ */
+export interface RelatedMetricsData {
+  before?: Record<string, number>;
+  during?: Record<string, number>;
+  topSlowest?: SlowRequest[];
+  affectedEndpoints?: string[];
+}
+
+/**
+ * Timeline event during incident
+ */
+export interface TimelineEvent {
+  timestamp: number;
+  event: string;
+  source: 'detector' | 'logs' | 'metrics' | 'manual';
+}
+
+/**
+ * Related data gathered during incident detection
+ */
+export interface RelatedData {
+  logs?: RelatedLogsData;
+  metrics?: RelatedMetricsData;
+  timeline?: TimelineEvent[];
+}
+
+/**
+ * AI-generated incident analysis
+ */
+export interface IncidentAnalysis {
+  summary: string;
+  rootCauses: RootCauseItem[];
+  patterns: string[];
+  recommendations: string[];
+  analyzedAt: number;
+}
+
+/**
  * Incident record
  */
 export interface Incident {
@@ -452,6 +576,12 @@ export interface Incident {
   resolutionNotes?: string;
   /** Related metrics/logs */
   metadata?: Record<string, unknown>;
+  /** Related data gathered during detection (NEW) */
+  relatedData?: RelatedData;
+  /** AI analysis results (NEW) */
+  aiAnalysis?: IncidentAnalysis;
+  /** When AI analysis was performed (NEW) */
+  aiAnalyzedAt?: number;
 }
 
 /**
@@ -484,4 +614,50 @@ export interface IncidentCreatePayload {
   affectedServices?: string[];
   timestamp?: number;
   metadata?: Record<string, unknown>;
+  relatedData?: RelatedData;
+}
+
+/**
+ * Incidents list response with summary stats
+ */
+export interface IncidentsListResponse {
+  ok: boolean;
+  data: {
+    incidents: Incident[];
+    summary: {
+      total: number;
+      unresolved: number;
+      bySeverity: {
+        critical: number;
+        warning: number;
+        info: number;
+      };
+      showing: number;
+    };
+  };
+}
+
+/**
+ * Incident detail response
+ */
+export interface IncidentDetailResponse {
+  ok: boolean;
+  data: Incident;
+}
+
+/**
+ * Incident analysis response
+ */
+export interface IncidentAnalysisResponse {
+  ok: boolean;
+  data: IncidentAnalysis & {
+    cached: boolean;
+  };
+}
+
+/**
+ * Incident resolve request
+ */
+export interface IncidentResolveRequest {
+  resolutionNotes?: string;
 }

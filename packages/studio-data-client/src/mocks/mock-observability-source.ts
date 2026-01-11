@@ -21,6 +21,10 @@ import type {
   Incident,
   IncidentQuery,
   IncidentCreatePayload,
+  IncidentsListResponse,
+  IncidentDetailResponse,
+  IncidentAnalysisResponse,
+  SystemMetricsData,
 } from '../contracts/observability';
 
 function delay(ms: number): Promise<void> {
@@ -81,6 +85,48 @@ export class MockObservabilitySource implements ObservabilityDataSource {
       },
       packages: 91,
       avgTypeCoverage: 91.1,
+    };
+  }
+
+  async getSystemMetrics(): Promise<SystemMetricsData> {
+    await delay(150);
+
+    const now = Date.now();
+
+    return {
+      instances: [
+        {
+          instanceId: 'kb-api-instance-1',
+          timestamp: now - 5000, // 5 seconds ago
+          cpu: {
+            user: 1234567,
+            system: 567890,
+            percentage: 45.2,
+          },
+          memory: {
+            rss: 134217728, // 128MB
+            heapTotal: 67108864, // 64MB
+            heapUsed: 50331648, // 48MB
+            external: 2097152, // 2MB
+            arrayBuffers: 1048576, // 1MB
+            rssPercentage: 12.5,
+            heapPercentage: 75.0,
+          },
+          uptime: 3600, // 1 hour
+          loadAvg: [1.2, 1.5, 1.8],
+          totalMemory: 1073741824, // 1GB
+          freeMemory: 536870912, // 512MB
+        },
+      ],
+      summary: {
+        totalInstances: 1,
+        activeInstances: 1,
+        staleInstances: 0,
+        deadInstances: 0,
+        avgCpu: 45.2,
+        avgMemory: 12.5,
+        avgHeap: 75.0,
+      },
     };
   }
 
@@ -621,6 +667,137 @@ The system has been mostly stable with info-level logs. Two connection timeout e
     };
 
     return incident;
+  }
+
+  async listIncidents(query?: IncidentQuery): Promise<IncidentsListResponse> {
+    await delay(150);
+
+    const incidents = await this.queryIncidents(query);
+    const unresolved = incidents.filter(i => !i.resolvedAt).length;
+
+    return {
+      ok: true,
+      data: {
+        incidents,
+        summary: {
+          total: incidents.length,
+          unresolved,
+          bySeverity: {
+            critical: incidents.filter(i => i.severity === 'critical').length,
+            warning: incidents.filter(i => i.severity === 'warning').length,
+            info: incidents.filter(i => i.severity === 'info').length,
+          },
+          showing: incidents.length,
+        },
+      },
+    };
+  }
+
+  async getIncident(id: string): Promise<IncidentDetailResponse> {
+    await delay(150);
+
+    const incident: Incident = {
+      id,
+      type: 'error_rate',
+      severity: 'critical',
+      title: 'High Error Rate Detected',
+      details: 'Error rate exceeded threshold of 10%',
+      timestamp: Date.now() - 60 * 60 * 1000,
+      affectedServices: ['rest-api', 'workflow-engine'],
+      metadata: {
+        errorRate: 15.2,
+        threshold: 10,
+      },
+      relatedData: {
+        logs: {
+          errorCount: 42,
+          warnCount: 18,
+          timeRange: [Date.now() - 5 * 60 * 1000, Date.now()],
+          sampleErrors: [
+            'TypeError: Cannot read property \'name\' of undefined',
+            'Error: Failed to connect to database',
+            'Error: Timeout exceeded for operation',
+          ],
+        },
+        metrics: {
+          before: {
+            errorRate: 2.1,
+            avgLatency: 45,
+            totalRequests: 1000,
+          },
+          during: {
+            errorRate: 15.2,
+            avgLatency: 120,
+            totalRequests: 500,
+            totalErrors: 76,
+          },
+        },
+        timeline: [
+          {
+            timestamp: Date.now(),
+            event: 'Incident detected: error_rate',
+            source: 'detector',
+          },
+          {
+            timestamp: Date.now() - 2 * 60 * 1000,
+            event: 'Error: Failed to connect to database',
+            source: 'logs',
+          },
+          {
+            timestamp: Date.now() - 3 * 60 * 1000,
+            event: 'Error: Timeout exceeded for operation',
+            source: 'logs',
+          },
+        ],
+      },
+    };
+
+    return {
+      ok: true,
+      data: incident,
+    };
+  }
+
+  async analyzeIncident(id: string): Promise<IncidentAnalysisResponse> {
+    await delay(800); // Simulate LLM processing time
+
+    return {
+      ok: true,
+      data: {
+        summary: 'High error rate detected due to database connection issues and timeout problems. System experienced 15.2% error rate, significantly above the 2.1% baseline.',
+        rootCauses: [
+          {
+            factor: 'Database connection pool exhaustion',
+            confidence: 0.85,
+            evidence: 'Multiple "Failed to connect to database" errors in logs. Error rate correlation with database connection attempts.',
+          },
+          {
+            factor: 'Increased request timeout frequency',
+            confidence: 0.72,
+            evidence: 'Timeout errors increased from 0% to 8% during incident window. Latency jumped from 45ms to 120ms.',
+          },
+          {
+            factor: 'Potential memory leak in error handler',
+            confidence: 0.45,
+            evidence: 'TypeError suggests undefined object access, possibly due to improper error handling initialization.',
+          },
+        ],
+        patterns: [
+          'Error rate spike correlates with increased latency (45ms → 120ms)',
+          'Database connection errors preceded timeout errors by ~1 minute',
+          'Error rate increased 7x above baseline during incident',
+        ],
+        recommendations: [
+          'Increase database connection pool size and implement connection retry logic with exponential backoff',
+          'Add circuit breaker pattern to prevent cascading failures when database is unavailable',
+          'Review error handling code for undefined object access, especially in database connection error paths',
+          'Implement request timeout monitoring and alerting at 75% of threshold',
+          'Consider adding database health check endpoint to proactively detect connection issues',
+        ],
+        analyzedAt: Date.now(),
+        cached: false,
+      },
+    };
   }
 
   async chatWithInsights(

@@ -16,6 +16,11 @@ import type {
   Incident,
   IncidentQuery,
   IncidentCreatePayload,
+  IncidentsListResponse,
+  IncidentDetailResponse,
+  IncidentAnalysisResponse,
+  IncidentResolveRequest,
+  SystemMetricsData,
 } from '../contracts/observability';
 
 /**
@@ -31,6 +36,11 @@ export interface ObservabilityDataSource {
    * Get DevKit health snapshot
    */
   getDevKitHealth(): Promise<DevKitHealth>;
+
+  /**
+   * Get system resource metrics (CPU, memory, uptime) from all REST API instances
+   */
+  getSystemMetrics(): Promise<SystemMetricsData>;
 
   /**
    * Get Prometheus metrics from REST API
@@ -80,7 +90,7 @@ export interface ObservabilityDataSource {
   getMetricsHeatmap(query: MetricsHeatmapQuery): Promise<HeatmapCell[]>;
 
   /**
-   * Query incident history
+   * Query incident history (DEPRECATED - use listIncidents)
    */
   queryIncidents(query?: IncidentQuery): Promise<Incident[]>;
 
@@ -93,6 +103,21 @@ export interface ObservabilityDataSource {
    * Resolve an incident
    */
   resolveIncident(id: string, resolutionNotes?: string): Promise<Incident>;
+
+  /**
+   * List incidents with filters and summary stats (NEW)
+   */
+  listIncidents(query?: IncidentQuery): Promise<IncidentsListResponse>;
+
+  /**
+   * Get incident details by ID (NEW)
+   */
+  getIncident(id: string): Promise<IncidentDetailResponse>;
+
+  /**
+   * Analyze incident with AI (NEW)
+   */
+  analyzeIncident(id: string): Promise<IncidentAnalysisResponse>;
 
   /**
    * Chat with AI insights

@@ -23,6 +23,10 @@ import type {
   Incident,
   IncidentQuery,
   IncidentCreatePayload,
+  IncidentsListResponse,
+  IncidentDetailResponse,
+  IncidentAnalysisResponse,
+  SystemMetricsData,
 } from '../contracts/observability';
 
 /**
@@ -59,6 +63,23 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
       throw new KBError(
         'DEVKIT_FETCH_FAILED',
         'Failed to fetch DevKit health',
+        500,
+        error
+      );
+    }
+  }
+
+  async getSystemMetrics(): Promise<SystemMetricsData> {
+    try {
+      const response = await this.client.fetch<SystemMetricsData>(
+        '/observability/system-metrics'
+      );
+
+      return response;
+    } catch (error) {
+      throw new KBError(
+        'SYSTEM_METRICS_FETCH_FAILED',
+        'Failed to fetch system metrics',
         500,
         error
       );
@@ -365,6 +386,81 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
       throw new KBError(
         'INCIDENT_RESOLVE_FAILED',
         'Failed to resolve incident',
+        500,
+        error
+      );
+    }
+  }
+
+  async listIncidents(query?: IncidentQuery): Promise<IncidentsListResponse> {
+    try {
+      const params = new URLSearchParams();
+
+      if (query) {
+        if (query.limit !== undefined) params.append('limit', query.limit.toString());
+        if (query.severity) {
+          const severities = Array.isArray(query.severity) ? query.severity : [query.severity];
+          severities.forEach(s => params.append('severity', s));
+        }
+        if (query.type) {
+          const types = Array.isArray(query.type) ? query.type : [query.type];
+          types.forEach(t => params.append('type', t));
+        }
+        if (query.from !== undefined) params.append('from', query.from.toString());
+        if (query.to !== undefined) params.append('to', query.to.toString());
+        if (query.includeResolved !== undefined) params.append('includeResolved', query.includeResolved.toString());
+      }
+
+      const url = `/observability/incidents${params.toString() ? `?${params.toString()}` : ''}`;
+      const response = await this.client.fetch<{ incidents: Incident[]; summary: any }>(url);
+
+      return {
+        ok: true,
+        data: response as any, // HttpClient auto-unwraps envelope
+      };
+    } catch (error) {
+      throw new KBError(
+        'INCIDENTS_LIST_FAILED',
+        'Failed to list incidents',
+        500,
+        error
+      );
+    }
+  }
+
+  async getIncident(id: string): Promise<IncidentDetailResponse> {
+    try {
+      const data = await this.client.fetch<Incident>(`/observability/incidents/${id}`);
+
+      return {
+        ok: true,
+        data,
+      };
+    } catch (error) {
+      throw new KBError(
+        'INCIDENT_FETCH_FAILED',
+        'Failed to fetch incident',
+        500,
+        error
+      );
+    }
+  }
+
+  async analyzeIncident(id: string): Promise<IncidentAnalysisResponse> {
+    try {
+      const data = await this.client.fetch<any>(
+        `/observability/incidents/${id}/analyze`,
+        { method: 'POST' }
+      );
+
+      return {
+        ok: true,
+        data,
+      };
+    } catch (error) {
+      throw new KBError(
+        'INCIDENT_ANALYSIS_FAILED',
+        'Failed to analyze incident',
         500,
         error
       );

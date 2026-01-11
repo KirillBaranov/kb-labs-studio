@@ -46,6 +46,21 @@ export function useDevKitHealth(source: ObservabilityDataSource) {
 }
 
 /**
+ * Hook to fetch system resource metrics (CPU, memory, uptime) from all REST API instances
+ *
+ * Auto-refreshes every 10 seconds to show near real-time system metrics
+ */
+export function useSystemMetrics(source: ObservabilityDataSource) {
+  return useQuery({
+    queryKey: ['observability', 'system-metrics'],
+    queryFn: () => source.getSystemMetrics(),
+    refetchInterval: 10000, // Auto-refresh every 10s
+    staleTime: 8000, // Consider data stale after 8s
+    retry: 2, // Retry failed requests twice
+  });
+}
+
+/**
  * Hook to fetch Prometheus metrics from REST API
  *
  * Auto-refreshes every 10 seconds to show near real-time metrics
