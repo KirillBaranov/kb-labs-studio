@@ -60,6 +60,16 @@ export interface ObservabilityDataSource {
   summarizeLogs(request: LogSummarizeRequest): Promise<LogSummarizeResponse>;
 
   /**
+   * Get single log by ID with optional related logs
+   */
+  getLog(id: string, includeRelated?: boolean): Promise<{ log: LogRecord; related?: LogRecord[] }>;
+
+  /**
+   * Get logs related to a specific log (same trace/execution/request)
+   */
+  getRelatedLogs(id: string): Promise<{ total: number; logs: LogRecord[]; correlationKeys: any }>;
+
+  /**
    * Get historical metrics time-series data
    */
   getMetricsHistory(query: MetricsHistoryQuery): Promise<HistoricalDataPoint[]>;

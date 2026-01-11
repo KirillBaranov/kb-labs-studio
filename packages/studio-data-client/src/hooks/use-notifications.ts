@@ -62,7 +62,7 @@ export function useNotifications(
         }
 
         const notification: LogNotification = {
-          id: `${log.time}-${Math.random().toString(36).slice(2, 9)}`,
+          id: log.id || `${log.time}-${Math.random().toString(36).slice(2, 9)}`, // Use log.id from database, fallback to generated
           timestamp: log.time,
           level: log.level,
           message: messageText,

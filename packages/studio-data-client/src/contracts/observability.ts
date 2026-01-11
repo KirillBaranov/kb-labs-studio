@@ -218,6 +218,7 @@ export interface HealthEvent {
  * Log record (matches backend LogRecord interface)
  */
 export interface LogRecord {
+  id?: string; // ULID log identifier (present in database, may be missing in live stream)
   time: string; // ISO 8601 timestamp
   level: 'trace' | 'debug' | 'info' | 'warn' | 'error';
   msg?: string;

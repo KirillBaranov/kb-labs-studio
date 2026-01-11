@@ -207,6 +207,46 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
     }
   }
 
+  async getLog(id: string, includeRelated?: boolean): Promise<{ log: LogRecord; related?: LogRecord[] }> {
+    try {
+      const params = new URLSearchParams();
+      if (includeRelated) {
+        params.append('includeRelated', 'true');
+      }
+
+      const queryString = params.toString();
+      const url = queryString ? `/logs/${id}?${queryString}` : `/logs/${id}`;
+
+      const response = await this.client.fetch<{ log: LogRecord; related?: LogRecord[] }>(url);
+
+      return response;
+    } catch (error) {
+      throw new KBError(
+        'LOG_FETCH_FAILED',
+        'Failed to fetch log',
+        500,
+        error
+      );
+    }
+  }
+
+  async getRelatedLogs(id: string): Promise<{ total: number; logs: LogRecord[]; correlationKeys: any }> {
+    try {
+      const response = await this.client.fetch<{ total: number; logs: LogRecord[]; correlationKeys: any }>(
+        `/logs/${id}/related`
+      );
+
+      return response;
+    } catch (error) {
+      throw new KBError(
+        'RELATED_LOGS_FETCH_FAILED',
+        'Failed to fetch related logs',
+        500,
+        error
+      );
+    }
+  }
+
   async getMetricsHistory(query: MetricsHistoryQuery): Promise<HistoricalDataPoint[]> {
     try {
       const params = new URLSearchParams();

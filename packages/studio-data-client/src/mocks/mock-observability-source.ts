@@ -314,6 +314,74 @@ export class MockObservabilitySource implements ObservabilityDataSource {
     };
   }
 
+  async getLog(id: string, includeRelated?: boolean): Promise<{ log: LogRecord; related?: LogRecord[] }> {
+    await delay(200);
+
+    const now = Date.now();
+    const mockLog: LogRecord = {
+      id,
+      time: new Date(now - 120_000).toISOString(), // 2 minutes ago
+      level: 'error',
+      msg: `Mock log entry with id ${id}`,
+      plugin: 'rest-api',
+      executionId: `exec-${id}`,
+      tenantId: 'default',
+      requestId: `req-${id}`,
+      traceId: `trace-${id}`,
+      err: {
+        name: 'MockError',
+        message: 'This is a mock error for demonstration',
+        stack: `MockError: This is a mock error for demonstration\n    at mockFunction (mock.ts:42)\n    at handler (handler.ts:89)\n    at process (process.ts:123)`,
+      },
+      meta: { mockData: true },
+    };
+
+    let related: LogRecord[] | undefined;
+    if (includeRelated) {
+      // Generate mock related logs
+      related = Array.from({ length: 3 }, (_, i) => ({
+        id: `${id}-related-${i}`,
+        time: new Date(now - (120_000 + i * 1000)).toISOString(),
+        level: ['info', 'debug', 'error'][i % 3] as 'info' | 'debug' | 'error',
+        msg: `Mock related log ${i + 1}`,
+        plugin: 'rest-api',
+        executionId: mockLog.executionId,
+        requestId: mockLog.requestId,
+        traceId: mockLog.traceId,
+        meta: { mockData: true, relatedIndex: i },
+      }));
+    }
+
+    return { log: mockLog, related };
+  }
+
+  async getRelatedLogs(id: string): Promise<{ total: number; logs: LogRecord[]; correlationKeys: any }> {
+    await delay(150);
+
+    const now = Date.now();
+    const mockLogs: LogRecord[] = Array.from({ length: 5 }, (_, i) => ({
+      id: `${id}-related-${i}`,
+      time: new Date(now - (120_000 + i * 1000)).toISOString(),
+      level: ['info', 'debug', 'warn', 'error'][i % 4] as 'info' | 'debug' | 'warn' | 'error',
+      msg: `Mock related log ${i + 1}`,
+      plugin: 'rest-api',
+      executionId: `exec-${id}`,
+      requestId: `req-${id}`,
+      traceId: `trace-${id}`,
+      meta: { mockData: true, relatedIndex: i },
+    }));
+
+    return {
+      total: mockLogs.length,
+      logs: mockLogs,
+      correlationKeys: {
+        requestId: `req-${id}`,
+        traceId: `trace-${id}`,
+        executionId: `exec-${id}`,
+      },
+    };
+  }
+
   async summarizeLogs(request: LogSummarizeRequest): Promise<LogSummarizeResponse> {
     await delay(1500); // Simulate LLM processing time
 
