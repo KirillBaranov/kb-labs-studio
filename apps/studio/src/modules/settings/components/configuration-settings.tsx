@@ -73,6 +73,30 @@ export function ConfigurationSettings() {
   const adaptersArray = Object.entries(data.adapters || {});
   const hasRedacted = data.redacted && data.redacted.length > 0;
 
+  // Helper to count adapters including nested ones
+  const countAdapters = (items: Array<[string, unknown]>): number => {
+    return items.reduce((count, [, packageName]) => {
+      // If it's an object (nested adapters), count its children
+      if (typeof packageName === 'object' && packageName !== null && !Array.isArray(packageName)) {
+        return count + Object.keys(packageName).length;
+      }
+      // Otherwise it's a single adapter
+      return count + 1;
+    }, 0);
+  };
+
+  // Count total adapters (including nested)
+  const totalAdaptersCount = countAdapters(adaptersArray);
+
+  // Count active adapters (non-null packages, including nested)
+  const activeAdaptersCount = adaptersArray.reduce((count, [, packageName]) => {
+    if (typeof packageName === 'object' && packageName !== null && !Array.isArray(packageName)) {
+      // Count non-null nested adapters
+      return count + Object.values(packageName).filter(pkg => pkg !== null).length;
+    }
+    return count + (packageName !== null ? 1 : 0);
+  }, 0);
+
   // Adapter categories
   const categories = [
     {
@@ -82,8 +106,14 @@ export function ConfigurationSettings() {
       adapters: ['llm', 'embeddings', 'vectorStore'],
     },
     {
-      name: 'Infrastructure',
+      name: 'Database',
       icon: <DatabaseOutlined />,
+      color: 'blue',
+      adapters: ['database'],
+    },
+    {
+      name: 'Infrastructure',
+      icon: <CloudOutlined />,
       color: 'green',
       adapters: ['storage', 'cache'],
     },
@@ -96,10 +126,14 @@ export function ConfigurationSettings() {
   ];
 
   // Group adapters by category
-  const groupedAdapters = categories.map((category) => ({
-    ...category,
-    items: adaptersArray.filter(([name]) => category.adapters.includes(name)),
-  }));
+  const groupedAdapters = categories.map((category) => {
+    const items = adaptersArray.filter(([name]) => category.adapters.includes(name));
+    return {
+      ...category,
+      items,
+      count: countAdapters(items),
+    };
+  });
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
@@ -113,9 +147,9 @@ export function ConfigurationSettings() {
           </Descriptions.Item>
           <Descriptions.Item label="Total Adapters">
             <Space size={4}>
-              <Text>{adaptersArray.length}</Text>
+              <Text>{totalAdaptersCount}</Text>
               <Text type="secondary">
-                ({adaptersArray.filter(([, pkg]) => pkg !== null).length} active)
+                ({activeAdaptersCount} active)
               </Text>
             </Space>
           </Descriptions.Item>
@@ -140,59 +174,76 @@ export function ConfigurationSettings() {
                     {category.icon}
                   </span>
                   <Text strong>{category.name}</Text>
-                  <Tag color={category.color}>{category.items.length}</Tag>
+                  <Tag color={category.color}>{category.count}</Tag>
                 </Space>
               }
             >
               <Space direction="vertical" size="small" style={{ width: '100%' }}>
                 {category.items.map(([name, packageName]) => {
-                  const isEnabled = packageName !== null;
-                  return (
-                    <div
-                      key={name}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '8px 12px',
-                        background: 'var(--kb-bg-secondary)',
-                        borderRadius: 4,
-                        borderLeft: isEnabled ? `3px solid var(--ant-${category.color}-6)` : '3px solid var(--ant-border-color)',
-                      }}
-                    >
-                      <Space style={{ flex: 1, minWidth: 0 }}>
-                        <Text strong style={{ minWidth: 100 }}>{name}</Text>
-                        <Text
-                          code
-                          style={{
-                            fontSize: '0.85rem',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {packageName || 'null'}
-                        </Text>
-                      </Space>
-                      <Space>
-                        {isEnabled ? (
-                          <>
-                            <CheckCircleOutlined style={{ color: 'var(--ant-success-color)' }} />
-                            <Button
-                              size="small"
-                              type="text"
-                              icon={copiedKey === name ? <CheckOutlined /> : <CopyOutlined />}
-                              onClick={() => handleCopy(packageName as string, name)}
-                            >
-                              {copiedKey === name ? 'Copied' : 'Copy'}
-                            </Button>
-                          </>
-                        ) : (
-                          <CloseCircleOutlined style={{ color: 'var(--ant-text-secondary)' }} />
+                  // Helper to render a single adapter item
+                  const renderAdapterItem = (itemName: string, itemPackage: string, itemKey: string) => {
+                    const isEnabled = itemPackage !== null;
+                    return (
+                      <div
+                        key={itemKey}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '8px 12px',
+                          background: 'var(--kb-bg-secondary)',
+                          borderRadius: 4,
+                          borderLeft: isEnabled ? `3px solid var(--ant-${category.color}-6)` : '3px solid var(--ant-border-color)',
+                        }}
+                      >
+                        <Space style={{ flex: 1, minWidth: 0 }}>
+                          <Text strong style={{ minWidth: 100 }}>{itemName}</Text>
+                          <Text
+                            code
+                            style={{
+                              fontSize: '0.85rem',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {itemPackage || 'null'}
+                          </Text>
+                        </Space>
+                        <Space>
+                          {isEnabled ? (
+                            <>
+                              <CheckCircleOutlined style={{ color: 'var(--ant-success-color)' }} />
+                              <Button
+                                size="small"
+                                type="text"
+                                icon={copiedKey === itemKey ? <CheckOutlined /> : <CopyOutlined />}
+                                onClick={() => handleCopy(itemPackage, itemKey)}
+                              >
+                                {copiedKey === itemKey ? 'Copied' : 'Copy'}
+                              </Button>
+                            </>
+                          ) : (
+                            <CloseCircleOutlined style={{ color: 'var(--ant-text-secondary)' }} />
+                          )}
+                        </Space>
+                      </div>
+                    );
+                  };
+
+                  // Handle nested adapters (object with sub-adapters)
+                  if (typeof packageName === 'object' && packageName !== null && !Array.isArray(packageName)) {
+                    return (
+                      <Space key={name} direction="vertical" size="small" style={{ width: '100%' }}>
+                        {Object.entries(packageName as Record<string, string>).map(([subName, subPackage]) =>
+                          renderAdapterItem(subName, subPackage, `${name}.${subName}`)
                         )}
                       </Space>
-                    </div>
-                  );
+                    );
+                  }
+
+                  // Regular adapter (string package name)
+                  return renderAdapterItem(name, packageName as string, name);
                 })}
               </Space>
             </Card>
