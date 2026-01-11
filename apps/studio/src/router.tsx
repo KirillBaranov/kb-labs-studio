@@ -31,6 +31,7 @@ import { DevKitPage } from './modules/observability/pages/devkit-page';
 import { PrometheusMetricsPage } from './modules/observability/pages/prometheus-metrics-page';
 import { SystemEventsPage } from './modules/observability/pages/system-events-page';
 import { LogsPage } from './modules/observability/pages/logs-page';
+import { LogDetailPage } from './modules/observability/pages/log-detail-page';
 import { AnalyticsOverviewPage } from './modules/analytics/pages/analytics-overview-page';
 import { AnalyticsEventsPage } from './modules/analytics/pages/analytics-events-page';
 import { AnalyticsLLMPage } from './modules/analytics/pages/analytics-llm-page';
@@ -333,6 +334,10 @@ function LayoutContent() {
           onMarkAllNotificationsAsRead: markAllAsRead,
           onClearAllNotifications: clearAll,
           onClearNotification: clearNotification,
+          onNotificationClick: (notification) => {
+            // Navigate to log detail page
+            navigate(`/observability/logs/${notification.id}`);
+          },
         }}
         sidebarProps={{
           items: allNavigationItems,
@@ -525,6 +530,11 @@ export const router = createBrowserRouter([
       {
         path: '/observability/logs',
         element: <LogsPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/observability/logs/:id',
+        element: <LogDetailPage />,
         errorElement: <ErrorBoundary />,
       },
       // TODO: TEMPORARY - Remove after commit plugin UI is polished
