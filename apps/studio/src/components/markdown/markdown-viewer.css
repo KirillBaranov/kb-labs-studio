@@ -52,7 +52,7 @@
 .markdown-viewer ul,
 .markdown-viewer ol {
   margin: 0 0 16px 0;
-  padding-left: 32px;
+  padding-left: 8px;
 }
 
 .markdown-viewer li {
@@ -120,6 +120,10 @@
   border: none;
   border-top: 1px solid var(--border-primary);
   margin: 24px 0;
+}
+
+.markdown-viewer:last-child {
+  margin-bottom: 0 !important;
 }
 
 /*

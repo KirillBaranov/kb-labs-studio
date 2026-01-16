@@ -43,6 +43,7 @@ export * from './components/kb-diff-viewer';
 export * from './components/kb-chart';
 
 // Utils
+export * from './components/kb-ai-assistant';
 export * from './lib/utils';
 export * from './lib/icons';
 

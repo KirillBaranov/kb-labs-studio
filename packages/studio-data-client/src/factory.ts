@@ -9,8 +9,10 @@ import type { AnalyticsDataSource } from './sources/analytics-source';
 import type { AdaptersDataSource } from './sources/adapters-source';
 import type { PlatformDataSource } from './sources/platform-source';
 import type { PluginsDataSource } from './sources/plugins-source';
+import type { AgentDataSource } from './sources/agent-source';
 // TODO: TEMPORARY - Remove after commit plugin UI is polished
 import type { CommitDataSource } from './sources/commit-source';
+import type { QualityDataSource } from './sources/quality-source';
 import { MockAuditSource } from './mocks/mock-audit-source';
 import { MockReleaseSource } from './mocks/mock-release-source';
 import { MockSystemSource } from './mocks/mock-system-source';
@@ -22,8 +24,10 @@ import { MockAnalyticsSource } from './mocks/mock-analytics-source';
 import { MockAdaptersSource } from './mocks/mock-adapters-source';
 import { MockPlatformSource } from './mocks/mock-platform-source';
 import { MockPluginsSource } from './mocks/mock-plugins-source';
+import { MockAgentSource } from './mocks/mock-agent-source';
 // TODO: TEMPORARY - Remove after commit plugin UI is polished
 import { MockCommitSource } from './mocks/mock-commit-source';
+import { MockQualitySource } from './mocks/mock-quality-source';
 import { HttpAuditSource } from './sources/http-audit-source';
 import { HttpReleaseSource } from './sources/http-release-source';
 import { HttpSystemSource } from './sources/http-system-source';
@@ -35,8 +39,10 @@ import { HttpAnalyticsSource } from './sources/http-analytics-source';
 import { HttpAdaptersSource } from './sources/http-adapters-source';
 import { HttpPlatformSource } from './sources/http-platform-source';
 import { HttpPluginsSource } from './sources/http-plugins-source';
+import { HttpAgentSource } from './sources/http-agent-source';
 // TODO: TEMPORARY - Remove after commit plugin UI is polished
 import { HttpCommitSource } from './sources/http-commit-source';
+import { HttpQualitySource } from './sources/http-quality-source';
 import { HttpClient } from './client/http-client';
 
 export interface DataSourcesConfig {
@@ -56,8 +62,10 @@ export interface DataSources {
   adapters: AdaptersDataSource;
   platform: PlatformDataSource;
   plugins: PluginsDataSource;
+  agent: AgentDataSource;
   // TODO: TEMPORARY - Remove after commit plugin UI is polished
   commit: CommitDataSource;
+  quality: QualityDataSource;
 }
 
 export function createDataSources(config: DataSourcesConfig): DataSources {
@@ -74,8 +82,10 @@ export function createDataSources(config: DataSourcesConfig): DataSources {
       adapters: new MockAdaptersSource(),
       platform: new MockPlatformSource(),
       plugins: new MockPluginsSource(),
+      agent: new MockAgentSource(),
       // TODO: TEMPORARY - Remove after commit plugin UI is polished
       commit: new MockCommitSource(),
+      quality: new MockQualitySource(),
     };
   }
 
@@ -94,8 +104,10 @@ export function createDataSources(config: DataSourcesConfig): DataSources {
     adapters: new HttpAdaptersSource(client),
     platform: new HttpPlatformSource(client),
     plugins: new HttpPluginsSource(client),
+    agent: new HttpAgentSource(client),
     // TODO: TEMPORARY - Remove after commit plugin UI is polished
     commit: new HttpCommitSource(client),
+    quality: new HttpQualitySource(client),
   };
 }
 
