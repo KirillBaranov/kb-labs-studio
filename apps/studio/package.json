@@ -17,6 +17,7 @@
   "dependencies": {
     "@ant-design/icons": "^5.4.0",
     "@ant-design/plots": "^2.6.6",
+    "@kb-labs/quality-contracts": "link:../../../kb-labs-quality-plugin/packages/quality-contracts",
     "@kb-labs/rest-api-contracts": "link:../../../kb-labs-rest-api/packages/rest-api-contracts",
     "@kb-labs/studio-data-client": "link:../../packages/studio-data-client",
     "@kb-labs/studio-ui-core": "link:../../packages/studio-ui-core",

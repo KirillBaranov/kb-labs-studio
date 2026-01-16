@@ -89,6 +89,9 @@ importers:
       '@ant-design/plots':
         specifier: ^2.6.6
         version: 2.6.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@kb-labs/quality-contracts':
+        specifier: link:../../../kb-labs-quality-plugin/packages/quality-contracts
+        version: link:../../../kb-labs-quality-plugin/packages/quality-contracts
       '@kb-labs/rest-api-contracts':
         specifier: link:../../../kb-labs-rest-api/packages/rest-api-contracts
         version: link:../../../kb-labs-rest-api/packages/rest-api-contracts
@@ -145,7 +148,7 @@ importers:
         version: 11.11.4(@types/react@18.3.26)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       zustand:
         specifier: ^5.0.2
-        version: 5.0.8(@types/react@18.3.26)(react@18.3.1)
+        version: 5.0.8(@types/react@18.3.26)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1))
     devDependencies:
       '@kb-labs/devkit':
         specifier: file:../../../kb-labs-devkit
@@ -216,6 +219,9 @@ importers:
 
   packages/studio-data-client:
     dependencies:
+      '@kb-labs/agent-contracts':
+        specifier: link:../../../kb-labs-agents/packages/agent-contracts
+        version: link:../../../kb-labs-agents/packages/agent-contracts
       '@kb-labs/commit-contracts':
         specifier: link:../../../kb-labs-commit-plugin/packages/commit-contracts
         version: link:../../../kb-labs-commit-plugin/packages/commit-contracts
@@ -225,6 +231,9 @@ importers:
       '@kb-labs/plugin-contracts':
         specifier: link:../../../kb-labs-plugin/packages/plugin-contracts
         version: link:../../../kb-labs-plugin/packages/plugin-contracts
+      '@kb-labs/quality-contracts':
+        specifier: link:../../../kb-labs-quality-plugin/packages/quality-contracts
+        version: link:../../../kb-labs-quality-plugin/packages/quality-contracts
       '@kb-labs/release-manager-contracts':
         specifier: link:../../../kb-labs-release-manager/packages/release-manager-contracts
         version: link:../../../kb-labs-release-manager/packages/release-manager-contracts
@@ -8944,7 +8953,8 @@ snapshots:
       '@types/react': 18.3.26
       react: 18.3.1
 
-  zustand@5.0.8(@types/react@18.3.26)(react@18.3.1):
+  zustand@5.0.8(@types/react@18.3.26)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1)):
     optionalDependencies:
       '@types/react': 18.3.26
       react: 18.3.1
+      use-sync-external-store: 1.6.0(react@18.3.1)

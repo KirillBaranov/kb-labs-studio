@@ -3,6 +3,12 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@kb-labs/agent-contracts": [
+        "../kb-labs-agents/packages/agent-contracts/src/index.ts"
+      ],
+      "@kb-labs/agent-contracts/*": [
+        "../kb-labs-agents/packages/agent-contracts/src/*"
+      ],
       "@kb-labs/commit-contracts": [
         "../kb-labs-commit-plugin/packages/commit-contracts/src/index.ts"
       ],
@@ -20,6 +26,12 @@
       ],
       "@kb-labs/plugin-contracts/*": [
         "../kb-labs-plugin/packages/plugin-contracts/src/*"
+      ],
+      "@kb-labs/quality-contracts": [
+        "../kb-labs-quality-plugin/packages/quality-contracts/src/index.ts"
+      ],
+      "@kb-labs/quality-contracts/*": [
+        "../kb-labs-quality-plugin/packages/quality-contracts/src/*"
       ],
       "@kb-labs/release-manager-contracts": [
         "../kb-labs-release-manager/packages/release-manager-contracts/src/index.ts"

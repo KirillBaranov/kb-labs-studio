@@ -24,9 +24,11 @@
     "prebuild": "pnpm clean"
   },
   "dependencies": {
+    "@kb-labs/agent-contracts": "link:../../../kb-labs-agents/packages/agent-contracts",
     "@kb-labs/commit-contracts": "link:../../../kb-labs-commit-plugin/packages/commit-contracts",
     "@kb-labs/core-platform": "link:../../../kb-labs-core/packages/core-platform",
     "@kb-labs/plugin-contracts": "link:../../../kb-labs-plugin/packages/plugin-contracts",
+    "@kb-labs/quality-contracts": "link:../../../kb-labs-quality-plugin/packages/quality-contracts",
     "@kb-labs/release-manager-contracts": "link:../../../kb-labs-release-manager/packages/release-manager-contracts",
     "@kb-labs/rest-api-contracts": "link:../../../kb-labs-rest-api/packages/rest-api-contracts",
     "@tanstack/react-query": "^5.0.0",

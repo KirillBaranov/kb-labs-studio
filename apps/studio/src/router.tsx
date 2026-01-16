@@ -41,10 +41,11 @@ import { AnalyticsEmbeddingsPage } from './modules/analytics/pages/analytics-emb
 import { AnalyticsVectorStorePage } from './modules/analytics/pages/analytics-vectorstore-page';
 import { AnalyticsCachePage } from './modules/analytics/pages/analytics-cache-page';
 import { AnalyticsStoragePage } from './modules/analytics/pages/analytics-storage-page';
-import { AssistantPage } from './pages/assistant-page';
+import { AssistantPage } from './modules/assistant/pages/assistant-page';
 // TODO: TEMPORARY - Remove after commit plugin UI is polished
 import { CommitPage } from './modules/commit/pages/commit-page';
 import { ReleasePage } from './modules/release/pages/release-page';
+import { QualityPage } from './modules/quality/pages/quality-page';
 import { PluginsPage } from './modules/plugins/pages/plugins-page';
 import { PluginDetailPage } from './modules/plugins/pages/plugin-detail-page';
 import { WidgetModalManager } from './components/widget-modal';
@@ -174,6 +175,12 @@ function LayoutContent() {
         label: 'Commit',
         icon: renderPluginIcon('GitlabOutlined'),
         path: '/commit',
+      },
+      {
+        key: 'quality',
+        label: 'Quality',
+        icon: renderPluginIcon('CheckCircleOutlined'),
+        path: '/quality',
       },
       {
         key: 'release',
@@ -565,6 +572,16 @@ export const router = createBrowserRouter([
       {
         path: '/commit/:tab',
         element: <CommitPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/quality',
+        element: <QualityPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/quality/:tab',
+        element: <QualityPage />,
         errorElement: <ErrorBoundary />,
       },
       {
