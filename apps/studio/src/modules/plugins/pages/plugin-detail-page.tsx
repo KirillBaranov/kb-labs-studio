@@ -30,6 +30,7 @@ import {
   SearchOutlined,
   QuestionCircleOutlined,
   ConsoleSqlOutlined,
+  CloseCircleOutlined,
 } from '@ant-design/icons';
 import { KBPageContainer, KBPageHeader } from '@kb-labs/studio-ui-react';
 import { useDataSources } from '@/providers/data-sources-provider';
@@ -122,6 +123,27 @@ export function PluginDetailPage() {
       label: 'Overview',
       children: (
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          {/* Validation Errors Alert */}
+          {plugin.validation && !plugin.validation.valid && (
+            <Alert
+              type="error"
+              icon={<CloseCircleOutlined />}
+              message={`Manifest Validation Failed (${plugin.validation.errors.length} error${plugin.validation.errors.length > 1 ? 's' : ''})`}
+              description={
+                <div style={{ marginTop: 8 }}>
+                  <ul style={{ margin: 0, paddingLeft: 20 }}>
+                    {plugin.validation.errors.map((error, idx) => (
+                      <li key={idx} style={{ marginBottom: 4 }}>
+                        <Text code style={{ fontSize: 12 }}>{error}</Text>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              }
+              showIcon
+            />
+          )}
+
           {/* Plugin Header Card */}
           <Card>
             <Space direction="vertical" size="middle" style={{ width: '100%' }}>

@@ -24,6 +24,13 @@ export interface PluginManifestEntry {
   discoveredAt?: string;
   /** When the plugin's dist/ was last built (ISO timestamp) */
   buildTimestamp?: string;
+  /** Manifest validation result */
+  validation?: {
+    /** Whether the manifest is valid */
+    valid: boolean;
+    /** Validation errors (if any) */
+    errors: string[];
+  };
 }
 
 export interface PluginsRegistryResponse {

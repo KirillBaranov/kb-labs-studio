@@ -6,6 +6,7 @@ import {
   ClockCircleOutlined,
   WarningOutlined,
   CheckCircleOutlined,
+  CloseCircleOutlined,
 } from '@ant-design/icons';
 import type { PluginManifestEntry } from '@kb-labs/studio-data-client';
 
@@ -27,6 +28,7 @@ export function PluginCard({ plugin, onClick }: PluginCardProps) {
 
   const hasPermissions = !!manifest.permissions;
   const requiresPlatform = manifest.platform?.requires && manifest.platform.requires.length > 0;
+  const hasValidationErrors = plugin.validation && !plugin.validation.valid;
 
   return (
     <Card
@@ -121,6 +123,13 @@ export function PluginCard({ plugin, onClick }: PluginCardProps) {
 
         {/* Indicators */}
         <Space wrap size={4} style={{ marginTop: 'auto' }}>
+          {hasValidationErrors && (
+            <Tooltip title={`${plugin.validation!.errors.length} validation error${plugin.validation!.errors.length > 1 ? 's' : ''}`}>
+              <Tag icon={<CloseCircleOutlined />} color="red" style={{ fontSize: 11 }}>
+                Invalid
+              </Tag>
+            </Tooltip>
+          )}
           {hasPermissions && (
             <Tooltip title="Requires permissions">
               <Tag icon={<WarningOutlined />} color="gold" style={{ fontSize: 11 }}>
