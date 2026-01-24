@@ -48,6 +48,7 @@ import { ReleasePage } from './modules/release/pages/release-page';
 import { QualityPage } from './modules/quality/pages/quality-page';
 import { PluginsPage } from './modules/plugins/pages/plugins-page';
 import { PluginDetailPage } from './modules/plugins/pages/plugin-detail-page';
+import { WorkflowPage } from './modules/workflow/pages/workflow-page';
 import { WidgetModalManager } from './components/widget-modal';
 import { PageTransition } from './components/page-transition';
 import { createStudioLogger } from './utils/logger';
@@ -152,10 +153,10 @@ function LayoutContent() {
         ],
       },
       {
-        key: 'workflows',
-        label: 'Workflows',
-        icon: renderPluginIcon('BranchesOutlined'),
-        path: '/workflows',
+        key: 'workflow',
+        label: 'Workflow',
+        icon: renderPluginIcon('ThunderboltOutlined'),
+        path: '/workflow',
       },
       {
         key: 'plugins',
@@ -471,6 +472,16 @@ export const router = createBrowserRouter([
       {
         path: '/workflows/:runId',
         element: <WorkflowRunPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/workflow',
+        element: <WorkflowPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/workflow/:tab',
+        element: <WorkflowPage />,
         errorElement: <ErrorBoundary />,
       },
       {
