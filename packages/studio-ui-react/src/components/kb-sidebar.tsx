@@ -99,17 +99,27 @@ export function KBSidebar({
   // Get selected keys based on current path
   const selectedKeys = React.useMemo(() => {
     if (!currentPath) return [];
-    
+
     const findKeys = (path: string, navItems: NavigationItem[]): string[] => {
       for (const item of navItems) {
+        // Exact match - always select this item
         if (item.path === path) {
           return [item.key || item.path || `item-${Math.random()}`];
         }
-        if (item.children) {
+
+        // Check children first
+        if (item.children && item.children.length > 0) {
           const childKeys = findKeys(path, item.children);
           if (childKeys.length > 0) {
-            return [item.key || item.path || `item-${Math.random()}`, ...childKeys];
+            // Found match in children - return only child key (don't select parent)
+            return childKeys;
           }
+        }
+
+        // Parent without children: check if current path starts with parent path
+        // This handles cases like /workflow parent matching /workflow/jobs child route
+        if (item.path && !item.children?.length && path.startsWith(item.path + '/')) {
+          return [item.key || item.path || `item-${Math.random()}`];
         }
       }
       return [];
