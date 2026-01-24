@@ -20,7 +20,10 @@
     "build": "tsup",
     "type-check": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
-    "lint": "eslint . --max-warnings=0"
+    "lint": "eslint . --max-warnings=0",
+    "dev": "tsup --config tsup.config.ts --watch",
+    "lint:fix": "eslint . --fix",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@ant-design/charts": "^2.6.6",
@@ -33,7 +36,7 @@
     "react-resizable": "^3.0.5"
   },
   "devDependencies": {
-    "@kb-labs/devkit": "github:KirillBaranov/kb-labs-devkit#main",
+    "@kb-labs/devkit": "link:../../../kb-labs-devkit",
     "@testing-library/react": "^16.1.0",
     "@types/react": "^18.3.8",
     "@types/react-dom": "^18.3.0",
@@ -42,10 +45,15 @@
     "rimraf": "^6.0.1",
     "tsup": "^8.5.0",
     "typescript": "^5.6.3",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "@types/node": "^24.3.3"
   },
   "peerDependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
   }
 }
