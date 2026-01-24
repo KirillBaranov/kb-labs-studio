@@ -1,17 +1,9 @@
 {
-  "extends": "@kb-labs/devkit/tsconfig/react-lib.json",
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@kb-labs/devkit/tsconfig/node.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "declaration": true,
-    "declarationMap": true,
-    "noEmit": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vite/client", "node"]
+    "rootDir": "src",
+    "outDir": "dist"
   },
-  "include": ["src", "src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["src/**/*.js", "src/**/*.js.map", "node_modules", "dist"],
-  "ts-node": {
-    "transpileOnly": true
-  }
+  "include": ["src"]
 }
-
