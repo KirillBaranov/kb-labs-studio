@@ -12,6 +12,7 @@ import type {
   CyclesResponse,
   GraphResponse,
   GraphMode,
+  StaleResponse,
 } from '@kb-labs/quality-contracts';
 
 export class MockQualitySource implements QualityDataSource {
@@ -53,13 +54,35 @@ export class MockQualitySource implements QualityDataSource {
       duplicates: [
         {
           name: 'typescript',
-          versions: ['5.9.3', '5.8.0'],
-          packages: ['@kb-labs/cli', '@kb-labs/workflow'],
+          versions: [
+            {
+              version: '5.9.3',
+              packages: ['@kb-labs/cli'],
+              count: 1,
+            },
+            {
+              version: '5.8.0',
+              packages: ['@kb-labs/workflow'],
+              count: 1,
+            },
+          ],
+          totalPackages: 2,
         },
         {
           name: 'react',
-          versions: ['18.3.1', '18.2.0'],
-          packages: ['@kb-labs/studio', '@kb-labs/ui'],
+          versions: [
+            {
+              version: '18.3.1',
+              packages: ['@kb-labs/studio'],
+              count: 1,
+            },
+            {
+              version: '18.2.0',
+              packages: ['@kb-labs/ui'],
+              count: 1,
+            },
+          ],
+          totalPackages: 2,
         },
       ],
       unused: [
@@ -135,6 +158,15 @@ export class MockQualitySource implements QualityDataSource {
         '@kb-labs/plugin-execution',
         '@kb-labs/core-runtime',
       ],
+    };
+  }
+
+  async getStale(detailed?: boolean): Promise<StaleResponse> {
+    return {
+      stalePackages: [],
+      totalStale: 0,
+      totalAffected: 0,
+      criticalChains: detailed ? [] : undefined,
     };
   }
 

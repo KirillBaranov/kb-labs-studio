@@ -15,7 +15,8 @@ export class MockPlatformSource implements PlatformDataSource {
       schema: 'kb.platform.config/1',
       ts: new Date().toISOString(),
       adapters: {
-        llm: '@kb-labs/adapters-openai',
+        // Multi-adapter example: array of providers for LLM
+        llm: ['@kb-labs/adapters-openai', '@kb-labs/adapters-vibeproxy'],
         embeddings: '@kb-labs/adapters-openai/embeddings',
         storage: '@kb-labs/adapters-fs',
         logger: '@kb-labs/adapters-pino',

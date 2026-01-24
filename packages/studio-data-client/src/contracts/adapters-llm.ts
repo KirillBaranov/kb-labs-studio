@@ -12,6 +12,9 @@ export interface LLMModelStats {
   completionTokens: number;
   totalTokens: number;
   cost: number;
+  costPer1KTokens: number;
+  tokensPerRequest: number;
+  errorRate: number;
   avgDurationMs: number;
 }
 

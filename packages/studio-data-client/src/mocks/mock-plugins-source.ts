@@ -133,15 +133,22 @@ const mockManifests: PluginsRegistryResponse = {
             },
           ],
         },
-        jobs: [
-          {
-            id: 'cleanup-old-runs',
-            handler: './dist/jobs/cleanup.js',
-            schedule: '0 2 * * *',
-            describe: 'Clean up old workflow runs',
-            enabled: true,
-          },
-        ],
+        jobs: {
+          handlers: [
+            {
+              id: 'cleanup-old-runs',
+              handler: './dist/jobs/cleanup.js',
+              describe: 'Clean up old workflow runs',
+            },
+          ],
+          cron: [
+            {
+              jobId: 'cleanup-old-runs',
+              schedule: '0 2 * * *',
+              enabled: true,
+            },
+          ],
+        },
       } as ManifestV3,
     },
   ],
