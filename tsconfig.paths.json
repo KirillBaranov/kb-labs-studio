@@ -45,6 +45,12 @@
       "@kb-labs/rest-api-contracts/*": [
         "../kb-labs-rest-api/packages/rest-api-contracts/src/*"
       ],
+      "@kb-labs/studio-contracts": [
+        "packages/studio-contracts/src/index.ts"
+      ],
+      "@kb-labs/studio-contracts/*": [
+        "packages/studio-contracts/src/*"
+      ],
       "@kb-labs/studio-data-client": [
         "packages/studio-data-client/src/index.ts"
       ],
