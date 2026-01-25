@@ -313,7 +313,7 @@ export const AVAILABLE_ICONS: Record<string, React.ComponentType<any>> = {
  * ```
  */
 export function getIconComponent(iconName?: string): React.ComponentType<any> | null {
-  if (!iconName) return null;
+  if (!iconName) {return null;}
 
   const icon = AVAILABLE_ICONS[iconName];
   if (!icon) {
@@ -342,7 +342,7 @@ export function getIconComponent(iconName?: string): React.ComponentType<any> | 
  */
 export function renderIcon(iconName?: string, props?: any): React.ReactElement | null {
   const IconComponent = getIconComponent(iconName);
-  if (!IconComponent) return null;
+  if (!IconComponent) {return null;}
   return <IconComponent {...props} />;
 }
 

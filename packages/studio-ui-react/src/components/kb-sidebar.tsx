@@ -98,7 +98,7 @@ export function KBSidebar({
 
   // Get selected keys based on current path
   const selectedKeys = React.useMemo(() => {
-    if (!currentPath) return [];
+    if (!currentPath) {return [];}
 
     const findKeys = (path: string, navItems: NavigationItem[]): string[] => {
       for (const item of navItems) {
@@ -129,7 +129,7 @@ export function KBSidebar({
   }, [currentPath, items]);
 
   const openKeys = React.useMemo(() => {
-    if (!currentPath) return [];
+    if (!currentPath) {return [];}
     
     const findOpenKeys = (path: string, navItems: NavigationItem[]): string[] => {
       for (const item of navItems) {

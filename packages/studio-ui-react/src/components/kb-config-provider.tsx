@@ -28,7 +28,7 @@ export function KBConfigProvider({
 }: KBConfigProviderProps) {
   // Get initial theme
   const getInitialTheme = (): ThemeMode => {
-    if (typeof window === 'undefined') return defaultTheme;
+    if (typeof window === 'undefined') {return defaultTheme;}
     const stored = localStorage.getItem(storageKey) as ThemeMode;
     return stored || defaultTheme;
   };
@@ -40,7 +40,7 @@ export function KBConfigProvider({
 
   // Get actual theme for tokens (auto -> system preference)
   const actualTheme = React.useMemo(() => {
-    if (typeof window === 'undefined') return theme === 'auto' ? 'light' : theme;
+    if (typeof window === 'undefined') {return theme === 'auto' ? 'light' : theme;}
     return theme === 'auto'
       ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
       : theme;
@@ -49,7 +49,7 @@ export function KBConfigProvider({
   // Apply theme class SYNCHRONOUSLY on mount and theme change
   // This ensures CSS variables are correct before tokens are computed
   React.useLayoutEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') {return;}
     
     const root = document.documentElement;
     root.classList.remove('light', 'dark');
@@ -59,7 +59,7 @@ export function KBConfigProvider({
 
   // Store theme in localStorage (non-blocking)
   React.useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') {return;}
     localStorage.setItem(storageKey, theme);
   }, [theme, storageKey]);
 

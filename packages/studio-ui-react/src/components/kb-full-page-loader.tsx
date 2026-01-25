@@ -24,7 +24,7 @@ export function KBFullPageLoader({
   tip,
   iconSize = 64,
 }: KBFullPageLoaderProps) {
-  if (!show) return null;
+  if (!show) {return null;}
 
   return (
     <div

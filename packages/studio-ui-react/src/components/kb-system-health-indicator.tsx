@@ -50,15 +50,15 @@ const STATUS_CONFIG = {
 } as const;
 
 function formatTimeAgo(isoString: string | null | undefined): string {
-  if (!isoString) return 'unknown';
+  if (!isoString) {return 'unknown';}
 
   const now = Date.now();
   const timestamp = new Date(isoString).getTime();
   const diffMs = now - timestamp;
 
-  if (diffMs < 60_000) return 'just now';
-  if (diffMs < 3600_000) return `${Math.floor(diffMs / 60_000)}min ago`;
-  if (diffMs < 86400_000) return `${Math.floor(diffMs / 3600_000)}h ago`;
+  if (diffMs < 60_000) {return 'just now';}
+  if (diffMs < 3600_000) {return `${Math.floor(diffMs / 60_000)}min ago`;}
+  if (diffMs < 86400_000) {return `${Math.floor(diffMs / 3600_000)}h ago`;}
   return `${Math.floor(diffMs / 86400_000)}d ago`;
 }
 
@@ -137,8 +137,8 @@ export function KBSystemHealthIndicator({
                   Registry: rev #{health.registryRev ?? 'unknown'}
                   {(() => {
                     const badges: string[] = [];
-                    if (health.registryStale) badges.push('stale');
-                    if (health.registryPartial) badges.push('partial');
+                    if (health.registryStale) {badges.push('stale');}
+                    if (health.registryPartial) {badges.push('partial');}
                     return badges.length > 0 ? ` (${badges.join(', ')})` : '';
                   })()}
                 </div>
