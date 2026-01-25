@@ -80,7 +80,7 @@ export class HttpClient {
   async fetch<T>(path: string, options: AxiosRequestConfig = {}): Promise<T> {
     try {
       // Apply custom request interceptors (if any)
-      let config: AxiosRequestConfig = {
+      const config: AxiosRequestConfig = {
         url: path,
         ...options,
       };

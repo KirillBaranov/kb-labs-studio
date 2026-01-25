@@ -3,7 +3,7 @@
  * HTTP implementation of CacheDataSource
  */
 
-import { HttpClient } from '../client/http-client';
+import type { HttpClient } from '../client/http-client';
 import type { CacheDataSource, CacheInvalidationResult } from './cache-source';
 
 /**

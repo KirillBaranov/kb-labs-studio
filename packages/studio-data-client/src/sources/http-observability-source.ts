@@ -3,7 +3,7 @@
  * HTTP implementation of ObservabilityDataSource
  */
 
-import { HttpClient } from '../client/http-client';
+import type { HttpClient } from '../client/http-client';
 import { KBError } from '../errors/kb-error';
 import type { ObservabilityDataSource } from './observability-source';
 import type {
@@ -143,15 +143,15 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
     try {
       const params = new URLSearchParams();
 
-      if (filters.from) params.append('from', filters.from);
-      if (filters.to) params.append('to', filters.to);
-      if (filters.level) params.append('level', filters.level);
-      if (filters.plugin) params.append('plugin', filters.plugin);
-      if (filters.executionId) params.append('executionId', filters.executionId);
-      if (filters.tenantId) params.append('tenantId', filters.tenantId);
-      if (filters.search) params.append('search', filters.search);
-      if (filters.limit !== undefined) params.append('limit', String(filters.limit));
-      if (filters.offset !== undefined) params.append('offset', String(filters.offset));
+      if (filters.from) {params.append('from', filters.from);}
+      if (filters.to) {params.append('to', filters.to);}
+      if (filters.level) {params.append('level', filters.level);}
+      if (filters.plugin) {params.append('plugin', filters.plugin);}
+      if (filters.executionId) {params.append('executionId', filters.executionId);}
+      if (filters.tenantId) {params.append('tenantId', filters.tenantId);}
+      if (filters.search) {params.append('search', filters.search);}
+      if (filters.limit !== undefined) {params.append('limit', String(filters.limit));}
+      if (filters.offset !== undefined) {params.append('offset', String(filters.offset));}
 
       const queryString = params.toString();
       const url = queryString ? `/logs?${queryString}` : '/logs';
@@ -178,10 +178,10 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
 
     // Build query string from filters
     const params = new URLSearchParams();
-    if (filters?.level) params.append('level', filters.level);
-    if (filters?.plugin) params.append('plugin', filters.plugin);
-    if (filters?.executionId) params.append('executionId', filters.executionId);
-    if (filters?.tenantId) params.append('tenantId', filters.tenantId);
+    if (filters?.level) {params.append('level', filters.level);}
+    if (filters?.plugin) {params.append('plugin', filters.plugin);}
+    if (filters?.executionId) {params.append('executionId', filters.executionId);}
+    if (filters?.tenantId) {params.append('tenantId', filters.tenantId);}
 
     const queryString = params.toString();
     const url = queryString
@@ -273,7 +273,7 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
       const params = new URLSearchParams();
       params.append('metric', query.metric);
       params.append('range', query.range);
-      if (query.interval) params.append('interval', query.interval);
+      if (query.interval) {params.append('interval', query.interval);}
 
       // HttpClient auto-unwraps { ok, data } envelope in response interceptor
       const data = await this.client.fetch<HistoricalDataPoint[]>(
@@ -295,7 +295,7 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
     try {
       const params = new URLSearchParams();
       params.append('metric', query.metric);
-      if (query.days) params.append('days', String(query.days));
+      if (query.days) {params.append('days', String(query.days));}
 
       // HttpClient auto-unwraps { ok, data } envelope in response interceptor
       const data = await this.client.fetch<HeatmapCell[]>(
@@ -316,7 +316,7 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
   async queryIncidents(query?: IncidentQuery): Promise<Incident[]> {
     try {
       const params = new URLSearchParams();
-      if (query?.limit) params.append('limit', String(query.limit));
+      if (query?.limit) {params.append('limit', String(query.limit));}
       if (query?.severity) {
         const severityList = Array.isArray(query.severity) ? query.severity : [query.severity];
         params.append('severity', severityList.join(','));
@@ -325,8 +325,8 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
         const typeList = Array.isArray(query.type) ? query.type : [query.type];
         params.append('type', typeList.join(','));
       }
-      if (query?.from) params.append('from', String(query.from));
-      if (query?.to) params.append('to', String(query.to));
+      if (query?.from) {params.append('from', String(query.from));}
+      if (query?.to) {params.append('to', String(query.to));}
       if (query?.includeResolved !== undefined) {
         params.append('includeResolved', String(query.includeResolved));
       }
@@ -397,7 +397,7 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
       const params = new URLSearchParams();
 
       if (query) {
-        if (query.limit !== undefined) params.append('limit', query.limit.toString());
+        if (query.limit !== undefined) {params.append('limit', query.limit.toString());}
         if (query.severity) {
           const severities = Array.isArray(query.severity) ? query.severity : [query.severity];
           severities.forEach(s => params.append('severity', s));
@@ -406,9 +406,9 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
           const types = Array.isArray(query.type) ? query.type : [query.type];
           types.forEach(t => params.append('type', t));
         }
-        if (query.from !== undefined) params.append('from', query.from.toString());
-        if (query.to !== undefined) params.append('to', query.to.toString());
-        if (query.includeResolved !== undefined) params.append('includeResolved', query.includeResolved.toString());
+        if (query.from !== undefined) {params.append('from', query.from.toString());}
+        if (query.to !== undefined) {params.append('to', query.to.toString());}
+        if (query.includeResolved !== undefined) {params.append('includeResolved', query.includeResolved.toString());}
       }
 
       const url = `/observability/incidents${params.toString() ? `?${params.toString()}` : ''}`;

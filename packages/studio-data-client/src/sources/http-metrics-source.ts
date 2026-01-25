@@ -3,7 +3,7 @@
  * HTTP implementation of MetricsDataSource
  */
 
-import { HttpClient } from '../client/http-client';
+import type { HttpClient } from '../client/http-client';
 import type { MetricsDataSource, MetricsSnapshot } from './metrics-source';
 
 /**

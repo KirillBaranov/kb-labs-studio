@@ -3,7 +3,7 @@
  * HTTP implementation of SystemDataSource
  */
 
-import { HttpClient } from '../client/http-client';
+import type { HttpClient } from '../client/http-client';
 import { KBError } from '../errors/kb-error';
 import type { SystemDataSource, RoutesResponse } from './system-source';
 import type {

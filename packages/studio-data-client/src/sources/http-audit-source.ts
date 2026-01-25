@@ -3,7 +3,7 @@
  * HTTP implementation of AuditDataSource
  */
 
-import { HttpClient } from '../client/http-client';
+import type { HttpClient } from '../client/http-client';
 import type { AuditDataSource } from './audit-source';
 import type { ActionResult } from '../contracts/common';
 import type { HealthStatus } from '../contracts/system';

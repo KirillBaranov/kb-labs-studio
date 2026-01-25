@@ -3,7 +3,7 @@
  * HTTP implementation of ReleaseDataSource
  */
 
-import { HttpClient } from '../client/http-client';
+import type { HttpClient } from '../client/http-client';
 import type { ReleaseDataSource } from './release-source';
 import type {
   ScopesResponse,
@@ -95,8 +95,8 @@ export class HttpReleaseSource implements ReleaseDataSource {
     options?: { from?: string; to?: string }
   ): Promise<ChangelogResponse> {
     const params = new URLSearchParams({ scope });
-    if (options?.from) params.set('from', options.from);
-    if (options?.to) params.set('to', options.to);
+    if (options?.from) {params.set('from', options.from);}
+    if (options?.to) {params.set('to', options.to);}
     return await this.client.fetch<ChangelogResponse>(`${this.basePath}/changelog?${params}`);
   }
 

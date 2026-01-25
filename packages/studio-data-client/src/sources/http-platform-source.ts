@@ -3,7 +3,7 @@
  * HTTP implementation of PlatformDataSource
  */
 
-import { HttpClient } from '../client/http-client';
+import type { HttpClient } from '../client/http-client';
 import type { PlatformDataSource } from './platform-source';
 import type { PlatformConfigPayload } from '@kb-labs/rest-api-contracts';
 

@@ -29,8 +29,8 @@ export class HttpAdaptersSource implements AdaptersDataSource {
     }
 
     const params = new URLSearchParams();
-    if (options.from) params.append('from', options.from);
-    if (options.to) params.append('to', options.to);
+    if (options.from) {params.append('from', options.from);}
+    if (options.to) {params.append('to', options.to);}
 
     return `?${params.toString()}`;
   }

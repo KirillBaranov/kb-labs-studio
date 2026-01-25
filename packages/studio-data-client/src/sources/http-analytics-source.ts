@@ -30,12 +30,12 @@ export class HttpAnalyticsSource implements AnalyticsDataSource {
         params.set('type', query.type);
       }
     }
-    if (query?.source) params.set('source', query.source);
-    if (query?.actor) params.set('actor', query.actor);
-    if (query?.from) params.set('from', query.from);
-    if (query?.to) params.set('to', query.to);
-    if (query?.limit) params.set('limit', String(query.limit));
-    if (query?.offset) params.set('offset', String(query.offset));
+    if (query?.source) {params.set('source', query.source);}
+    if (query?.actor) {params.set('actor', query.actor);}
+    if (query?.from) {params.set('from', query.from);}
+    if (query?.to) {params.set('to', query.to);}
+    if (query?.limit) {params.set('limit', String(query.limit));}
+    if (query?.offset) {params.set('offset', String(query.offset));}
 
     const path = `/analytics/events${params.toString() ? `?${params}` : ''}`;
     return await this.client.fetch<EventsResponse>(path);
