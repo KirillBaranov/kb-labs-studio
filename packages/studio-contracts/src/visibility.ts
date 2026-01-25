@@ -32,18 +32,18 @@ export function matchesVisibility(rule: VisibilityRule, user: UserContext): bool
   // Roles check (OR)
   if (rule.roles?.length) {
     const hasRole = rule.roles.some((r) => user.roles.includes(r));
-    if (!hasRole) return false;
+    if (!hasRole) {return false;}
   }
 
   // Permissions check (OR)
   if (rule.permissions?.length) {
     const hasPerm = rule.permissions.some((p) => user.permissions.includes(p));
-    if (!hasPerm) return false;
+    if (!hasPerm) {return false;}
   }
 
   // Tenant check
   if (rule.tenants?.length && user.tenantId) {
-    if (!rule.tenants.includes(user.tenantId)) return false;
+    if (!rule.tenants.includes(user.tenantId)) {return false;}
   }
 
   return true;
