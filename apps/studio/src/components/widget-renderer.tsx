@@ -20,6 +20,9 @@ import { useWidgetEvents } from '../hooks/useWidgetEvents';
 import { useWidgetEventSubscription } from '../hooks/useWidgetEventSubscription';
 import { useCircularDependencyDetection } from '../hooks/useCircularDependencyDetection';
 import { useWidgetDataMerger } from '../hooks/useWidgetDataMerger';
+import { useWidgetComponentLoader } from '../hooks/useWidgetComponentLoader';
+import { useWidgetChangeHandler } from '../hooks/useWidgetChangeHandler';
+import { useHeaderNotice } from '../hooks/useHeaderNotice';
 import { WithWidgetState } from '../hocs/WithWidgetState';
 
 /**
@@ -101,9 +104,6 @@ export function WidgetRenderer({
   layoutHint,
 }: WidgetRendererProps): React.ReactElement | null {
   const { registry } = useRegistry();
-  const [component, setComponent] = React.useState<React.ComponentType<WidgetProps> | null>(null);
-  const [componentError, setComponentError] = React.useState<Error | null>(null);
-  const [loadingComponent, setLoadingComponent] = React.useState(false);
 
   // Find widget in registry using O(1) Map lookup (from flattened registry)
   const widget = React.useMemo(() => {
@@ -123,6 +123,9 @@ export function WidgetRenderer({
     }
     return undefined;
   }, [registry, widgetId, pluginId]);
+
+  // 🎯 REFACTOR: Use hook for dynamic component loading
+  const { component, loading: loadingComponent, error: componentError } = useWidgetComponentLoader(widget);
 
   // Event bus for widget communication
   const { subscribe, emit } = useWidgetEvents();
@@ -189,57 +192,6 @@ export function WidgetRenderer({
     }
   }, [widgetData.error, widgetId, pluginId]);
 
-  // Load custom component if needed
-  React.useEffect(() => {
-    if (!widget) {
-      setLoadingComponent(false);
-      return;
-    }
-
-    // If standard widget, use kind mapping
-    if (!widget.component) {
-      setLoadingComponent(false);
-      return;
-    }
-
-    // Load custom component dynamically
-    setLoadingComponent(true);
-    setComponentError(null);
-
-    try {
-      // Use component path from registry (set by server or manifest)
-      const componentPath = widget.component;
-      if (!componentPath) {
-        throw new Error(`Widget ${widget.id} has no component path`);
-      }
-
-      // Dynamic import - path comes from server registry, not user input
-      import(/* @vite-ignore */ componentPath)
-        .then((module) => {
-          const imported = module as Record<string, unknown>;
-          const keys = Object.keys(imported);
-          const fallbackKey = keys.length > 0 ? keys[0] : undefined;
-          const Component =
-            (imported.default as React.ComponentType<WidgetProps> | undefined) ||
-            (fallbackKey ? (imported[fallbackKey] as React.ComponentType<WidgetProps> | undefined) : undefined);
-          if (!Component) {
-            throw new Error(`Component not found in ${componentPath}`);
-          }
-          setComponent(Component);
-          setComponentError(null);
-        })
-        .catch((e) => {
-          setComponentError(e instanceof Error ? e : new Error(String(e)));
-        })
-        .finally(() => {
-          setLoadingComponent(false);
-        });
-    } catch (e) {
-      setComponentError(e instanceof Error ? e : new Error(String(e)));
-      setLoadingComponent(false);
-    }
-  }, [widget]);
-
   // 🎯 REFACTOR: Determine component to use
   const resolvedComponent: React.ComponentType<WidgetProps> | null =
     (widget?.component && component) ? component :
@@ -266,81 +218,16 @@ export function WidgetRenderer({
   // Widget is valid - get the actual component for rendering
   const WidgetComponent = resolvedComponent;
 
-  const rawHeaderOptions = (widget.options as any)?.headers as
-    | {
-        enabled?: boolean;
-        title?: string;
-        description?: string;
-        collapsible?: boolean;
-        expanded?: boolean;
-        showProvided?: boolean;
-      }
-    | undefined;
-
-  const missingHeadersCount = widgetData.headers?.missingRequired?.length ?? 0;
-  const headerNoticeEnabled =
-    !!headerHints &&
-    ((rawHeaderOptions?.enabled ?? studioConfig.headerNotices.enabled) || missingHeadersCount > 0);
-
-  const headerNotice = headerNoticeEnabled && headerHints ? (
-    <HeaderPolicyCallout
-      hints={headerHints}
-      status={widgetData.headers}
-      title={rawHeaderOptions?.title || 'Header policy'}
-      description={
-        rawHeaderOptions?.description ||
-        'Studio forwards headers that match this manifest-defined policy.'
-      }
-      collapsible={rawHeaderOptions?.collapsible ?? studioConfig.headerNotices.collapsible}
-      defaultExpanded={
-        rawHeaderOptions?.expanded ??
-        (missingHeadersCount > 0 || studioConfig.headerNotices.defaultExpanded)
-      }
-      showProvided={rawHeaderOptions?.showProvided ?? studioConfig.headerNotices.showProvided}
-    />
-  ) : null;
+  // 🎯 REFACTOR: Use hook for header notice
+  const headerNotice = useHeaderNotice(widget, widgetData, headerHints);
 
   // Extract showTitle and showDescription from options
-  // Default: showTitle=true for charts, false for others
   const widgetOptions = widget.options as Record<string, unknown> | undefined;
   const showTitle = widgetOptions?.showTitle as boolean | undefined;
   const showDescription = widgetOptions?.showDescription as boolean | undefined;
 
-  // Create onChange handler for form widgets that auto-emits events
-  const handleChange = React.useCallback(
-    (value: unknown) => {
-
-      // Auto-emit events declared in manifest
-      if (!widget?.events?.emit || widget.events.emit.length === 0) {
-        return;
-      }
-
-      const eventConfig = widget.events.emit[0]; // Use first event config
-      const eventName = typeof eventConfig === 'string' ? eventConfig : eventConfig.name;
-      const payloadMap = typeof eventConfig === 'object' ? eventConfig.payloadMap : undefined;
-
-
-      // Build payload using payloadMap or default { value }
-      const payload: Record<string, unknown> = {};
-
-      if (payloadMap) {
-        // Use explicit mapping: payloadMap = { workspace: 'value' }
-        for (const [payloadKey, dataKey] of Object.entries(payloadMap)) {
-          if (dataKey === 'value') {
-            payload[payloadKey] = value;
-          } else if (widgetData.data && typeof widgetData.data === 'object') {
-            payload[payloadKey] = (widgetData.data as Record<string, unknown>)[dataKey];
-          }
-        }
-      } else {
-        // Default: emit { value }
-        payload.value = value;
-      }
-
-      emit(eventName, payload);
-    },
-    [widget?.events?.emit, widgetData.data, emit, widgetId]
-  );
+  // 🎯 REFACTOR: Use hook for change handler
+  const handleChange = useWidgetChangeHandler(widget, widgetData.data, emit, widgetId);
 
   // 🎯 REFACTOR: Use extracted hook for circular dependency detection
   const { isCircular, markVisited, clearVisited } = useCircularDependencyDetection();
