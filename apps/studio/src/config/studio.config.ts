@@ -1,18 +1,22 @@
 /**
  * Studio configuration
- * 
+ *
  * Configuration can be set via environment variables:
  * - VITE_API_BASE_URL: Backend API base URL
  *   - Use '/api' to use Vite proxy (default, requires VITE_API_PROXY_TARGET)
  *   - Use full URL like 'http://localhost:5173/api/v1' for direct connection
  * - VITE_DATA_SOURCE_MODE: 'mock' | 'http' (default: 'http')
  * - VITE_API_PROXY_TARGET: Target URL for Vite proxy (default: 'http://localhost:5050')
- * 
+ *
  * Environment files (in order of precedence):
  * - .env.local (highest priority, git-ignored)
  * - .env.development / .env.production
  * - .env (lowest priority)
+ *
+ * 🎯 TYPE SAFETY: Configuration is now validated at runtime with Zod
  */
+import { validateStudioConfig } from './studio.config.schema';
+
 function parseBooleanEnv(value: string | undefined, defaultValue: boolean): boolean {
   if (value === undefined) {
     return defaultValue;
@@ -66,7 +70,8 @@ function parseHeaders(value: string | undefined): Record<string, string> | undef
   return undefined;
 }
 
-export const studioConfig = {
+// Raw configuration object (before validation)
+const rawConfig = {
   dataSourceMode: (import.meta.env.VITE_DATA_SOURCE_MODE || 'http') as 'mock' | 'http',
   apiBaseUrl,
   features: {
@@ -94,5 +99,10 @@ export const studioConfig = {
     token: eventsAuthTokenEnv,
     headers: parseHeaders(eventsHeadersEnv),
   },
-} as const;
+};
 
+/**
+ * Validated studio configuration
+ * This will throw ZodError with clear error messages if config is malformed
+ */
+export const studioConfig = validateStudioConfig(rawConfig);
