@@ -26,9 +26,17 @@
  */
 
 import * as React from 'react';
-import type { StudioRegistryEntry } from '@kb-labs/studio-contracts';
-import { ErrorState } from '../components/error-state';
-import { Skeleton } from '../components/skeleton';
+import { ErrorState, Skeleton } from '../components/widgets/shared/index';
+
+/**
+ * Widget registry entry interface (simplified for HOC validation)
+ */
+interface WidgetEntry {
+  data?: {
+    source?: unknown;
+  };
+  kind?: string;
+}
 
 export interface WithWidgetStateProps {
   /**
@@ -44,7 +52,7 @@ export interface WithWidgetStateProps {
   /**
    * Widget registry entry (for validation)
    */
-  widget: StudioRegistryEntry | undefined;
+  widget: WidgetEntry | undefined;
 
   /**
    * Whether custom component is currently loading
