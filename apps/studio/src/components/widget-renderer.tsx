@@ -8,6 +8,7 @@ import { useRegistry } from '../providers/registry-provider';
 import { useWidgetData } from '../hooks/useWidgetData';
 import type { StudioRegistryEntry } from '@kb-labs/rest-api-contracts';
 import { isCompositeWidget } from '@kb-labs/rest-api-contracts';
+import { WidgetPropsSchema, validateWidgetProps, type WidgetProps } from '@kb-labs/studio-contracts';
 import * as Widgets from './widgets/index';
 import { Skeleton, ErrorState } from './widgets/shared/index';
 import { trackWidgetEvent } from '../utils/analytics';
@@ -25,8 +26,10 @@ import { useWidgetEvents } from '../hooks/useWidgetEvents';
  * Layout (5): section, grid, stack, tabs, modal
  * Navigation (3): breadcrumb, stepper, menu
  * Feedback (2): alert, confirm
+ *
+ * 🎯 TYPE SAFETY: Now uses WidgetProps discriminated union instead of `any`
  */
-const WIDGET_COMPONENTS: Record<string, React.ComponentType<any>> = {
+const WIDGET_COMPONENTS: Record<string, React.ComponentType<WidgetProps>> = {
   // Display widgets (14)
   'metric': Widgets.Metric,
   'metric-group': Widgets.MetricGroup,
@@ -94,7 +97,7 @@ export function WidgetRenderer({
   layoutHint,
 }: WidgetRendererProps): React.ReactElement | null {
   const { registry } = useRegistry();
-  const [component, setComponent] = React.useState<React.ComponentType<any> | null>(null);
+  const [component, setComponent] = React.useState<React.ComponentType<WidgetProps> | null>(null);
   const [componentError, setComponentError] = React.useState<Error | null>(null);
   const [loadingComponent, setLoadingComponent] = React.useState(false);
 
@@ -285,8 +288,8 @@ export function WidgetRenderer({
           const keys = Object.keys(imported);
           const fallbackKey = keys.length > 0 ? keys[0] : undefined;
           const Component =
-            (imported.default as React.ComponentType<any> | undefined) ||
-            (fallbackKey ? (imported[fallbackKey] as React.ComponentType<any> | undefined) : undefined);
+            (imported.default as React.ComponentType<WidgetProps> | undefined) ||
+            (fallbackKey ? (imported[fallbackKey] as React.ComponentType<WidgetProps> | undefined) : undefined);
           if (!Component) {
             throw new Error(`Component not found in ${componentPath}`);
           }
@@ -326,7 +329,7 @@ export function WidgetRenderer({
   }
 
   // Determine component to use
-  let WidgetComponent: React.ComponentType<any> | null = null;
+  let WidgetComponent: React.ComponentType<WidgetProps> | null = null;
 
   if (widget.component && component) {
     // Custom component loaded

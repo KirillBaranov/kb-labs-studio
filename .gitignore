@@ -73,3 +73,5 @@ analytics/
 **/src/**/*.js
 **/src/**/*.js.map.env.local
 .npmrc
+playwright-report/
+test-results/
