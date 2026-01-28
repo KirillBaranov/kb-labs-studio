@@ -1,15 +1,15 @@
 /**
- * UIIcon component - Icon wrapper
+ * UIIcon component - Icon wrapper with proper theming
  *
- * Provides consistent icon sizing and coloring using design tokens.
- * Supports both icon components and icon names (from AVAILABLE_ICONS).
- * NO hardcoded colors, uses Ant Design theme.
+ * Provides consistent icon sizing and coloring using CSS variables.
+ * Supports Ant Design icons, lucide-react, and custom SVG icons.
+ * NO hardcoded colors, uses CSS variables for theme support.
+ *
+ * IMPORTANT: All icons (SVG, icon fonts) inherit colors through CSS.
  */
 
 import * as React from 'react';
-import { theme } from 'antd';
-
-const { useToken } = theme;
+import styles from './UIIcon.module.css';
 
 export type UIIconSize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
 export type UIIconColor = 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'inherit';
@@ -34,14 +34,18 @@ export interface UIIconProps {
 }
 
 /**
- * UIIcon - Icon wrapper
+ * UIIcon - Icon wrapper with CSS-based theming
  *
  * @example
  * ```tsx
  * import { CheckCircleOutlined } from '@ant-design/icons';
+ * import { Check } from 'lucide-react';
  *
- * // Using icon component
+ * // Ant Design icon
  * <UIIcon icon={<CheckCircleOutlined />} color="success" />
+ *
+ * // lucide-react icon
+ * <UIIcon icon={<Check />} color="success" size="lg" />
  *
  * // Using icon name (from AVAILABLE_ICONS)
  * <UIIcon name="HomeOutlined" size="lg" />
@@ -66,39 +70,17 @@ export function UIIcon({
   className,
   style: customStyle,
 }: UIIconProps) {
-  const { token } = useToken();
-
-  const sizeMap: Record<UIIconSize, string> = {
-    xs: '12px',
-    sm: '14px',
-    base: '16px',
-    lg: '20px',
-    xl: '24px',
-    '2xl': '32px',
-  };
-
-  const colorMap: Record<UIIconColor, string> = {
-    primary: token.colorPrimary,
-    secondary: token.colorTextSecondary,
-    success: token.colorSuccess,
-    warning: token.colorWarning,
-    error: token.colorError,
-    info: token.colorInfo,
-    inherit: 'inherit',
-  };
-
-  const style: React.CSSProperties = {
-    fontSize: sizeMap[size],
-    color: colorMap[color],
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: onClick ? 'pointer' : undefined,
-    ...(spin && {
-      animation: 'spin 1s linear infinite',
-    }),
-    ...customStyle,
-  };
+  // Build CSS classes
+  const classes = [
+    styles.uiIcon,
+    styles[`size-${size}`],
+    styles[`color-${color}`],
+    spin && styles.spin,
+    onClick && styles.clickable,
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   // Resolve icon: name prop > string icon > React element icon
   let iconElement: React.ReactNode = null;
@@ -125,23 +107,23 @@ export function UIIcon({
 
   return (
     <span
-      className={className}
-      style={style}
+      className={classes}
+      style={customStyle}
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
     >
       {iconElement}
-      {spin && (
-        <style>
-          {`
-            @keyframes spin {
-              from { transform: rotate(0deg); }
-              to { transform: rotate(360deg); }
-            }
-          `}
-        </style>
-      )}
     </span>
   );
 }

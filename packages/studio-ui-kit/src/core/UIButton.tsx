@@ -1,72 +1,52 @@
 /**
  * UIButton component - Action button with semantic variants
  *
- * Wraps Ant Design Button with consistent styling.
- * NO hardcoded colors, uses Ant Design theme.
+ * Wraps Ant Design Button with consistent styling and proper SVG icon theming.
+ * NO hardcoded colors, uses Ant Design theme tokens + CSS variables.
+ *
+ * IMPORTANT: This component ensures all SVG icons (lucide-react, etc.)
+ * inherit colors correctly in both light and dark themes through CSS.
  */
 
 import * as React from 'react';
-import { Button as AntButton } from 'antd';
+import { Button as AntButton, ButtonProps as AntButtonProps } from 'antd';
+import styles from './UIButton.module.css';
 
 export type UIButtonVariant = 'primary' | 'default' | 'dashed' | 'text' | 'link';
-export type UIButtonSize = 'small' | 'middle' | 'large';
 
-export interface UIButtonProps {
-  /** Button variant */
+export interface UIButtonProps extends Omit<AntButtonProps, 'type' | 'variant'> {
+  /** Button variant (maps to Ant Design 'type' prop) */
   variant?: UIButtonVariant;
-  /** Button size */
-  size?: UIButtonSize;
-  /** Danger mode (red button) */
-  danger?: boolean;
-  /** Icon element */
-  icon?: React.ReactNode;
-  /** Loading state */
-  loading?: boolean;
-  /** Disabled state */
-  disabled?: boolean;
-  /** Full width button */
-  block?: boolean;
-  /** Click handler */
-  onClick?: () => void;
-  /** Button content */
-  children?: React.ReactNode;
+  /** Additional CSS class */
+  className?: string;
 }
 
 /**
- * UIButton - Action button
+ * UIButton - Action button with proper icon theming
  *
  * @example
  * ```tsx
+ * import { X, Check } from 'lucide-react';
+ *
  * <UIButton variant="primary">Submit</UIButton>
- * <UIButton variant="default" icon={<SearchIcon />}>Search</UIButton>
- * <UIButton variant="text" danger>Delete</UIButton>
+ * <UIButton variant="default" icon={<Check />}>Confirm</UIButton>
+ * <UIButton variant="text" danger icon={<X />}>Delete</UIButton>
+ * <UIButton variant="text" icon={<X />} /> // Icon-only close button
  * ```
  */
 export function UIButton({
   variant = 'default',
-  size = 'middle',
-  danger,
-  icon,
-  loading,
-  disabled,
-  block,
-  onClick,
-  children,
+  className,
   ...rest
 }: UIButtonProps) {
+  // Combine our CSS module class with any user-provided className
+  const combinedClassName = [styles.uiButton, className].filter(Boolean).join(' ');
+
   return (
     <AntButton
       type={variant}
-      size={size}
-      danger={danger}
-      icon={icon}
-      loading={loading}
-      disabled={disabled}
-      block={block}
-      onClick={onClick}
+      className={combinedClassName}
       {...rest}
-    >
-      {children}
-    </AntButton>
+    />
   );
 }
