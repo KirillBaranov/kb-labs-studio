@@ -27,7 +27,7 @@ export function useAgentsList(source: AgentDataSource) {
  */
 export function useAgentRun(
   source: AgentDataSource,
-  options?: UseMutationOptions<RunAgentResponse | RunAgentErrorResponse, Error, RunAgentRequest>
+  options?: UseMutationOptions<RunAgentResponse, Error, RunAgentRequest>
 ) {
   return useMutation({
     mutationFn: (request: RunAgentRequest) => source.runAgent(request),

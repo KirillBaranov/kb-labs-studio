@@ -128,8 +128,8 @@ export function useJobEvents(
               onComplete?.();
             }
           } catch (_err) {
-            setError(err instanceof Error ? err : new Error('Failed to parse event'));
-            onError?.(err instanceof Error ? err : new Error('Failed to parse event'));
+            setError(_err instanceof Error ? _err : new Error('Failed to parse event'));
+            onError?.(_err instanceof Error ? _err : new Error('Failed to parse event'));
           }
         };
 
@@ -179,7 +179,7 @@ export function useJobEvents(
                 }
               }
             } catch (_err) {
-              const errorInstance = err instanceof Error ? err : new Error('Polling failed');
+              const errorInstance = _err instanceof Error ? _err : new Error('Polling failed');
               setError(errorInstance);
               onError?.(errorInstance);
             }
@@ -260,7 +260,7 @@ export function useJobEvents(
           setIsConnected(true);
           setError(null);
         } catch (_err) {
-          const errorInstance = err instanceof Error ? err : new Error('Polling failed');
+          const errorInstance = _err instanceof Error ? _err : new Error('Polling failed');
           setError(errorInstance);
           onError?.(errorInstance);
           setIsConnected(false);

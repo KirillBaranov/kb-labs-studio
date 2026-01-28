@@ -24,7 +24,7 @@ export class MockAuditSource implements AuditDataSource {
     return auditPackageFixture;
   }
 
-  async runAudit(scope?: string[]): Promise<ActionResult> {
+  async runAudit(_scope?: string[]): Promise<ActionResult> {
     await delay(600);
     return {
       ok: true,
