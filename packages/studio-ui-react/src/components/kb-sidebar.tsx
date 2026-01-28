@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Layout, Menu, Button } from 'antd';
+import { Layout, Menu } from 'antd';
 import type { MenuProps } from 'antd';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { UIButton } from '@kb-labs/studio-ui-kit';
 
 const { Sider: AntSider } = Layout;
 
@@ -166,8 +167,8 @@ export function KBSidebar({
       theme="light" // Prevent Ant Design from applying dark theme styles
     >
       <div style={{ padding: '16px', borderBottom: '1px solid var(--border-primary)' }}>
-        <Button
-          type="text"
+        <UIButton
+          variant="text"
           icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           onClick={() => setCollapsed(!collapsed)}
           style={{

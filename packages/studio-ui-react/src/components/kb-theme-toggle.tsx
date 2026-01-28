@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Dropdown, Button } from 'antd';
+import { Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
 import { Sun, Moon, Monitor } from 'lucide-react';
+import { UIButton } from '@kb-labs/studio-ui-kit';
 import { useKBTheme, type ThemeMode } from './kb-config-provider';
 
 const themeOptions: { key: ThemeMode; label: string; icon: React.ReactNode }[] = [
@@ -28,13 +29,13 @@ export function KBThemeToggle() {
 
   return (
     <Dropdown menu={{ items, selectedKeys: [theme] }} placement="bottomRight">
-      <Button
-        type="text"
+      <UIButton
+        variant="text"
         icon={React.cloneElement(currentTheme.icon as React.ReactElement, { size: 18 })}
         style={{ display: 'flex', alignItems: 'center', gap: 4 }}
       >
         {currentTheme.label}
-      </Button>
+      </UIButton>
     </Dropdown>
   );
 }

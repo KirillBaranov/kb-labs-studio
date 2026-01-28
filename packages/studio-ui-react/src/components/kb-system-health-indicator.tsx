@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { Dropdown, Badge, Button, Divider } from 'antd';
+import { Dropdown, Badge, Divider } from 'antd';
 import { Activity, CheckCircle, AlertTriangle, XCircle, Database, Package, Clock } from 'lucide-react';
+import { UIButton } from '@kb-labs/studio-ui-kit';
 
 export interface SystemHealthData {
   status: 'healthy' | 'degraded' | 'down' | 'unknown';
@@ -174,14 +175,14 @@ export function KBSystemHealthIndicator({
 
   if (loading) {
     return (
-      <Button
-        type="text"
+      <UIButton
+        variant="text"
         size="small"
         icon={<Clock size={16} />}
         style={{ display: 'flex', alignItems: 'center', gap: 6 }}
       >
         Loading...
-      </Button>
+      </UIButton>
     );
   }
 
@@ -194,14 +195,14 @@ export function KBSystemHealthIndicator({
     health?.registryPartial;
 
   const buttonElement = (
-    <Button
-      type="text"
+    <UIButton
+      variant="text"
       onClick={onClick}
       icon={<StatusIcon size={18} color={config.color} strokeWidth={2} />}
       style={{ display: 'flex', alignItems: 'center', gap: 4 }}
     >
       System
-    </Button>
+    </UIButton>
   );
 
   return (

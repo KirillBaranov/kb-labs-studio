@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { Badge, Dropdown, Button, List, Typography, Tag, Empty, Divider, Space, Tooltip } from 'antd';
+import { Badge, Dropdown, List, Typography, Tag, Empty, Divider, Space, Tooltip } from 'antd';
 import { Bell, AlertTriangle, XCircle, X, CheckCheck } from 'lucide-react';
+import { UIButton } from '@kb-labs/studio-ui-kit';
 
 const { Text, Paragraph } = Typography;
 
@@ -67,9 +68,9 @@ export function KBNotificationBell({
 
   const getLevelIcon = (level: 'warn' | 'error') => {
     if (level === 'error') {
-      return <XCircle size={16} style={{ color: '#ff4d4f' }} />;
+      return <XCircle size={16} style={{ color: 'var(--error)' }} />;
     }
-    return <AlertTriangle size={16} style={{ color: '#faad14' }} />;
+    return <AlertTriangle size={16} style={{ color: 'var(--warning)' }} />;
   };
 
   const getLevelColor = (level: 'warn' | 'error') => {
@@ -104,7 +105,7 @@ export function KBNotificationBell({
           {unreadCount > 0 && (
             <Badge
               count={unreadCount}
-              style={{ backgroundColor: '#ff4d4f' }}
+              style={{ backgroundColor: 'var(--error)' }}
             />
           )}
         </Space>
@@ -112,8 +113,8 @@ export function KBNotificationBell({
           {notifications.length > 0 && (
             <>
               <Tooltip title="Mark all as read">
-                <Button
-                  type="text"
+                <UIButton
+                  variant="text"
                   size="small"
                   icon={<CheckCheck size={14} />}
                   onClick={(e) => {
@@ -123,8 +124,8 @@ export function KBNotificationBell({
                 />
               </Tooltip>
               <Tooltip title="Clear all">
-                <Button
-                  type="text"
+                <UIButton
+                  variant="text"
                   size="small"
                   danger
                   icon={<X size={14} />}
@@ -234,15 +235,14 @@ export function KBNotificationBell({
 
                   {/* Clear Button */}
                   <div style={{ flexShrink: 0 }}>
-                    <Button
-                      type="text"
+                    <UIButton
+                      variant="text"
                       size="small"
                       icon={<X size={12} />}
                       onClick={(e) => {
                         e.stopPropagation();
                         onClearNotification(notification.id);
                       }}
-                      style={{ color: 'var(--text-secondary)' }}
                     />
                   </div>
                 </div>
@@ -261,8 +261,8 @@ export function KBNotificationBell({
             textAlign: 'center',
           }}
         >
-          <Button
-            type="link"
+          <UIButton
+            variant="link"
             size="small"
             onClick={() => {
               setOpen(false);
@@ -271,7 +271,7 @@ export function KBNotificationBell({
             }}
           >
             View all logs →
-          </Button>
+          </UIButton>
         </div>
       )}
     </div>
@@ -286,13 +286,13 @@ export function KBNotificationBell({
       placement="bottomRight"
     >
       <Badge count={unreadCount} offset={[-2, 2]} size="small">
-        <Button
-          type="text"
+        <UIButton
+          variant="text"
           icon={<Bell size={18} />}
           style={{
             display: 'flex',
             alignItems: 'center',
-            color: unreadCount > 0 ? '#ff4d4f' : undefined,
+            color: unreadCount > 0 ? 'var(--error)' : undefined,
           }}
         />
       </Badge>

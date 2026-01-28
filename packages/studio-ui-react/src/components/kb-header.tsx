@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { Layout, Dropdown, Avatar, Button, Tooltip } from 'antd';
+import { Layout, Dropdown, Avatar, Tooltip, type MenuProps } from 'antd';
 import { User, Search } from 'lucide-react';
+import { UIButton } from '@kb-labs/studio-ui-kit';
 import { KBThemeToggle } from './kb-theme-toggle';
 import { KBSystemHealthIndicator, type SystemHealthData } from './kb-system-health-indicator';
 import { KBNotificationBell, type LogNotification } from './kb-notification-bell';
@@ -100,8 +101,8 @@ export function KBHeader({
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         {onSearchClick && (
-          <Button
-            type="text"
+          <UIButton
+            variant="text"
             icon={<Search size={18} />}
             onClick={onSearchClick}
             style={{ display: 'flex', alignItems: 'center', gap: 4 }}
@@ -127,8 +128,8 @@ export function KBHeader({
         <KBThemeToggle />
 
         <Dropdown menu={{ items: profileItems }} placement="bottomRight">
-          <Button
-            type="text"
+          <UIButton
+            variant="text"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -143,7 +144,7 @@ export function KBHeader({
               style={{ flexShrink: 0 }}
             />
             {userName && <span>{userName}</span>}
-          </Button>
+          </UIButton>
         </Dropdown>
       </div>
     </AntHeader>
