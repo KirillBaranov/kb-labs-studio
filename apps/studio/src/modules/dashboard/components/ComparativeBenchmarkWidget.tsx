@@ -8,7 +8,7 @@ import {
   ClockCircleOutlined,
   FireOutlined,
 } from '@ant-design/icons';
-import { KBBarChart } from '@kb-labs/studio-ui-react';
+import { UIBarChart } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { usePrometheusMetrics, useAdaptersLLMUsage } from '@kb-labs/studio-data-client';
 
@@ -311,7 +311,7 @@ export function ComparativeBenchmarkWidget() {
           <FireOutlined style={{ color: 'var(--error)' }} /> Top 5 Performers
         </Title>
         {chartData.length > 0 ? (
-          <KBBarChart {...chartConfig} />
+          <UIBarChart {...chartConfig} />
         ) : (
           <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-tertiary)' }}>
             No data available

@@ -8,7 +8,7 @@ import {
   WarningOutlined,
   ThunderboltOutlined,
 } from '@ant-design/icons';
-import { KBLineChart } from '@kb-labs/studio-ui-react';
+import { UILineChart } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { usePrometheusMetrics } from '@kb-labs/studio-data-client';
 
@@ -268,7 +268,7 @@ export function PredictiveAnalyticsWidget() {
         {/* Forecast Chart */}
         <Col span={24}>
           <Title level={5}>Forecast: {selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</Title>
-          <KBLineChart {...chartConfig} />
+          <UILineChart {...chartConfig} />
         </Col>
 
         {/* Anomaly List */}

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Card, Row, Col, Table, Tag, Typography } from 'antd';
 import { HolderOutlined, DollarOutlined, RiseOutlined, FallOutlined } from '@ant-design/icons';
-import { KBPieChart } from '@kb-labs/studio-ui-react';
+import { UIPieChart } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import {
   useAdaptersLLMUsage,
@@ -233,7 +233,7 @@ export function CostAttributionWidget() {
         {/* Pie Chart */}
         <Col xs={24} md={12}>
           {pieChartData.length > 0 ? (
-            <KBPieChart {...pieConfig} />
+            <UIPieChart {...pieConfig} />
           ) : (
             <div style={{
               height: 250,

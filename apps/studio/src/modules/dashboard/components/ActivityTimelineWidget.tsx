@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { Card, Segmented, theme } from 'antd';
-import { UIAreaChart } from '@kb-labs/studio-ui-kit';
+import { Card, Segmented } from 'antd';
+import { UIAreaChart, useChartColors } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { useMetricsHistory } from '@kb-labs/studio-data-client';
-
-const { useToken } = theme;
 
 type TimeRange = '1m' | '5m' | '10m' | '30m';
 
@@ -17,12 +15,13 @@ const TIME_RANGE_CONFIG = {
 
 export function ActivityTimelineWidget() {
   const sources = useDataSources();
-  const { token } = useToken();
+  const palette = useChartColors();
   const [timeRange, setTimeRange] = useState<TimeRange>('10m');
 
-  // Chart colors - use token colors with fallback
-  const requestsColor = token.colorInfo || '#1890ff';
-  const errorsColor = token.colorError || '#ff4d4f';
+  // Get colors from palette for legend
+  const colorMap = palette.mapColors([{ type: 'Requests' }, { type: 'Errors' }], 'type');
+  const requestsColor = colorMap['Requests'];
+  const errorsColor = colorMap['Errors'];
 
   // Fetch requests and errors history
   const requestsQuery = useMetricsHistory(sources.observability, {
@@ -72,7 +71,6 @@ export function ActivityTimelineWidget() {
     xField: 'time',
     yField: 'value',
     colorField: 'type',
-    color: [requestsColor, errorsColor],
     height: 250,
     smooth: true,
     style: {
@@ -101,7 +99,7 @@ export function ActivityTimelineWidget() {
         (d: any) => ({
           name: d.type,
           value: d.value?.toLocaleString() ?? 0,
-          color: d.type === 'Requests' ? requestsColor : errorsColor,
+          color: colorMap[d.type],
         }),
       ],
     },
