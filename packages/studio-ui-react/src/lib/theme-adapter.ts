@@ -50,6 +50,7 @@ export function getAntDesignTokens(theme: 'light' | 'dark' | 'auto' = 'light'): 
     colorWarningText: 'var(--warning, #F59E0B)',
     colorWarningTextHover: 'var(--warning, #F59E0B)',
     colorWarningTextActive: 'var(--warning, #F59E0B)',
+    colorWarningOutline: 'rgba(245, 158, 11, 0.2)', // NEW: Warning outline
 
     // ============ Error Colors ============
     colorError: 'var(--error, #DC2626)',
@@ -62,6 +63,7 @@ export function getAntDesignTokens(theme: 'light' | 'dark' | 'auto' = 'light'): 
     colorErrorText: 'var(--error, #DC2626)',
     colorErrorTextHover: 'var(--error, #DC2626)',
     colorErrorTextActive: 'var(--error, #DC2626)',
+    colorErrorOutline: 'rgba(220, 38, 38, 0.2)', // NEW: Error outline
 
     // ============ Info Colors ============
     colorInfo: 'var(--info, #0EA5E9)',
@@ -82,9 +84,13 @@ export function getAntDesignTokens(theme: 'light' | 'dark' | 'auto' = 'light'): 
     colorBgLayout: 'var(--bg-primary, #F9FAFB)',
     colorBgSpotlight: 'var(--bg-tertiary, #F3F4F6)',
     colorBgMask: 'rgba(0, 0, 0, 0.45)', // Overlay/modal backdrop - use standard dark overlay
+    colorBgTextHover: 'var(--bg-hover, #F3F4F6)', // NEW: Text hover background
+    colorBgTextActive: 'var(--bg-hover, #F3F4F6)', // NEW: Text active background
+    colorBgContainerDisabled: 'var(--bg-tertiary, #F3F4F6)', // NEW: Disabled container bg
 
     // ============ Text Colors ============
     colorText: 'var(--text-primary, #111827)',
+    colorTextBase: 'var(--text-primary, #111827)', // NEW: Base text color
     colorTextSecondary: 'var(--text-secondary, #6B7280)',
     colorTextTertiary: 'var(--text-tertiary, #6B7280)',
     colorTextQuaternary: 'var(--text-tertiary, #6B7280)', // Use tertiary as fallback
@@ -93,10 +99,12 @@ export function getAntDesignTokens(theme: 'light' | 'dark' | 'auto' = 'light'): 
     colorTextLabel: 'var(--text-secondary, #6B7280)', // Labels use secondary
     colorTextDescription: 'var(--text-secondary, #6B7280)', // Descriptions use secondary
     colorTextPlaceholder: 'var(--text-tertiary, #6B7280)', // Placeholders use tertiary
+    colorTextLightSolid: 'var(--text-inverse, #FFFFFF)', // NEW: Text on colored backgrounds
 
     // ============ Border Colors ============
     colorBorder: 'var(--border-primary, #E5E7EB)',
     colorBorderSecondary: 'var(--border-secondary, #D4D4D4)',
+    colorBorderBg: 'var(--bg-secondary, #FFFFFF)', // NEW: Background border color
     colorSplit: 'var(--border-primary, #E5E7EB)', // Splitter/divider uses primary border
 
     // ============ Fill Colors (for input backgrounds, etc.) ============
@@ -104,6 +112,9 @@ export function getAntDesignTokens(theme: 'light' | 'dark' | 'auto' = 'light'): 
     colorFillSecondary: 'var(--bg-tertiary, #F3F4F6)', // Used for table row hover
     colorFillTertiary: 'var(--bg-primary, #F9FAFB)', // Used for table header backgrounds
     colorFillQuaternary: 'var(--bg-primary, #F9FAFB)',
+    colorFillContent: 'var(--bg-hover, #F3F4F6)', // NEW: Content area fill
+    colorFillContentHover: 'var(--bg-hover, #F3F4F6)', // NEW: Content hover fill
+    colorFillAlter: 'var(--bg-tertiary, #F3F4F6)', // NEW: Alternative fill
 
     // ============ Neutral Colors ============
     colorWhite: '#FFFFFF', // Always white
@@ -170,6 +181,21 @@ export function getAntDesignTokens(theme: 'light' | 'dark' | 'auto' = 'light'): 
     colorLinkHover: 'var(--link-hover, #1E40AF)',
     colorLinkActive: 'var(--link-hover, #1E40AF)',
 
+    // ============ Icons & Highlights ============
+    colorIcon: 'var(--text-secondary, #6B7280)', // NEW: Icon color
+    colorIconHover: 'var(--text-primary, #111827)', // NEW: Icon hover
+    colorHighlight: 'var(--link, #2563EB)', // NEW: Highlight color
+
+    // ============ Control States (Inputs, Buttons, etc.) ============
+    controlOutline: 'rgba(91, 87, 214, 0.2)', // NEW: Input outline on focus
+    controlOutlineWidth: 2, // NEW: Outline width
+    controlInteractiveSize: 16, // NEW: Interactive hit area size
+    controlItemBgHover: 'var(--bg-hover, #F3F4F6)', // NEW: Item hover bg
+    controlItemBgActive: 'var(--accent-subtle, #DBEAFE)', // NEW: Item active bg
+    controlItemBgActiveHover: 'var(--accent-subtle, #DBEAFE)', // NEW: Item active hover
+    controlItemBgActiveDisabled: 'var(--bg-tertiary, #F3F4F6)', // NEW: Disabled active bg
+    controlTmpOutline: 'rgba(91, 87, 214, 0.1)', // NEW: Temporary outline
+
     // ============ Screen Sizes (for responsive) ============
     screenXS: 480,
     screenSM: 576,
@@ -187,24 +213,36 @@ export function getAntDesignTokens(theme: 'light' | 'dark' | 'auto' = 'light'): 
 export function getAntDesignComponents(): ThemeConfig['components'] {
   return {
     Table: {
+      // Colors
       headerBg: 'var(--bg-tertiary)',
       headerColor: 'var(--text-primary)',
-      rowHoverBg: 'var(--bg-hover)',
       borderColor: 'var(--border-primary)',
       colorText: 'var(--text-primary)',
       colorTextHeading: 'var(--text-primary)',
-      // Disable header cell hover - it should not change color
+
+      // Row states (IMPORTANT for UX)
+      rowHoverBg: 'var(--bg-hover)',
+      rowSelectedBg: 'var(--accent-subtle)', // NEW: Selected row background
+      rowSelectedHoverBg: 'var(--accent-subtle)', // NEW: Selected row hover
+      rowExpandedBg: 'var(--bg-secondary)', // NEW: Expanded row background
+      bodySortBg: 'var(--bg-tertiary)', // NEW: Sorted column background
+
+      // Header states
       headerSortActiveBg: 'var(--bg-tertiary)',
       headerSortHoverBg: 'var(--bg-tertiary)',
-      // Fix filter dropdown
       headerFilterHoverBg: 'var(--bg-tertiary)',
-      // Fix sort icons color (the arrows in header)
+      fixedHeaderSortActiveBg: 'var(--bg-tertiary)',
+
+      // Icons (IMPORTANT for visibility)
       colorIcon: 'var(--text-secondary)',
       colorIconHover: 'var(--text-primary)',
-      // Fix icons in table body cells
       expandIconBg: 'var(--bg-secondary)',
-      fixedHeaderSortActiveBg: 'var(--bg-tertiary)',
-      // Selection checkbox colors
+
+      // Footer
+      footerBg: 'var(--bg-tertiary)', // NEW: Table footer background
+      footerColor: 'var(--text-primary)', // NEW: Footer text color
+
+      // Sizing
       selectionColumnWidth: 60,
       stickyScrollBarBg: 'var(--bg-tertiary)',
       stickyScrollBarBorderRadius: 4,
@@ -226,20 +264,46 @@ export function getAntDesignComponents(): ThemeConfig['components'] {
       colorText: 'var(--text-primary)',
     },
     Alert: {
+      // ============ Status colors ============
       colorSuccess: 'var(--success)',
       colorError: 'var(--error)',
       colorWarning: 'var(--warning)',
       colorInfo: 'var(--info)',
+
+      // ============ Text & background ============
       colorText: 'var(--text-primary)',
       colorTextHeading: 'var(--text-primary)',
       colorBgContainer: 'var(--bg-secondary)',
       colorBorder: 'var(--border-primary)',
+
+      // ============ Icons (IMPORTANT for close button visibility) ============
+      colorIcon: 'var(--text-secondary)', // NEW: Icon color (close button)
+      colorIconHover: 'var(--text-primary)', // NEW: Icon hover (close button hover)
+
+      // ============ Status-specific backgrounds ============
+      colorSuccessBg: 'var(--bg-tertiary)', // NEW: Success alert background
+      colorErrorBg: 'var(--bg-tertiary)', // NEW: Error alert background
+      colorWarningBg: 'var(--bg-tertiary)', // NEW: Warning alert background
+      colorInfoBg: 'var(--bg-tertiary)', // NEW: Info alert background
+
+      // ============ Status-specific borders ============
+      colorSuccessBorder: 'var(--success)', // NEW: Success alert border
+      colorErrorBorder: 'var(--error)', // NEW: Error alert border
+      colorWarningBorder: 'var(--warning)', // NEW: Warning alert border
+      colorInfoBorder: 'var(--info)', // NEW: Info alert border
     },
     Card: {
+      // Colors
       colorText: 'var(--text-primary)',
       colorTextHeading: 'var(--text-primary)',
-      colorBorderSecondary: 'var(--border-primary)',
       colorBgContainer: 'var(--bg-secondary)',
+      colorBorder: 'var(--border-primary)',
+      colorBorderSecondary: 'var(--border-primary)',
+
+      // Header & Actions (IMPORTANT for visual hierarchy)
+      headerBg: 'var(--bg-secondary)', // NEW: Card header background
+      actionsBg: 'var(--bg-tertiary)', // NEW: Card actions background
+      extraColor: 'var(--text-secondary)', // NEW: Extra area text color
     },
     Descriptions: {
       colorText: 'var(--text-primary)',
@@ -247,93 +311,257 @@ export function getAntDesignComponents(): ThemeConfig['components'] {
       colorBorder: 'var(--border-primary)',
     },
     Button: {
+      // ============ Base colors ============
       colorText: 'var(--text-primary)',
       colorBgContainer: 'var(--bg-secondary)',
       colorBorder: 'var(--border-primary)',
+
+      // ============ Primary button ============
       colorPrimary: 'var(--link)',
       colorPrimaryHover: 'var(--link-hover)',
       colorPrimaryActive: 'var(--link-hover)',
       primaryColor: 'var(--text-inverse)',
+      primaryShadow: '0 2px 0 rgba(91, 87, 214, 0.1)',
+
+      // ============ Default button (filled style) ============
+      defaultBg: 'var(--bg-secondary)',
+      defaultColor: 'var(--text-primary)',
+      defaultBorderColor: 'var(--border-primary)',
+      defaultShadow: '0 2px 0 rgba(0, 0, 0, 0.015)',
+
+      // Default button - hover states (IMPORTANT for dark theme)
       defaultHoverBg: 'var(--bg-hover)',
       defaultHoverColor: 'var(--text-primary)',
       defaultHoverBorderColor: 'var(--border-secondary)',
-      // Text button hover colors
-      colorTextHover: 'var(--link)',
-      colorTextActive: 'var(--link)',
-      textHoverBg: 'var(--accent-subtle)',
+
+      // Default button - active states
+      defaultActiveBg: 'var(--bg-hover)',
+      defaultActiveColor: 'var(--text-primary)',
+      defaultActiveBorderColor: 'var(--border-secondary)',
+
+      // ============ Ghost button (transparent with border) ============
+      ghostBg: 'transparent',
+      defaultGhostColor: 'var(--text-primary)', // Text color
+      defaultGhostBorderColor: 'var(--border-primary)', // Border color
+
+      // Ghost button - hover states (IMPORTANT for visibility in dark theme)
+      defaultGhostHoverBg: 'var(--bg-hover)', // Add subtle background on hover
+      defaultGhostHoverColor: 'var(--link)', // Change text to link color
+      defaultGhostHoverBorderColor: 'var(--link)', // Change border to link color
+
+      // Ghost button - active states
+      defaultGhostActiveBg: 'var(--bg-hover)',
+      defaultGhostActiveColor: 'var(--link-hover)',
+      defaultGhostActiveBorderColor: 'var(--link-hover)',
+
+      // ============ Dashed button (dashed border) ============
+      borderColorDisabled: 'var(--border-primary)', // Dashed border uses this
+      colorBgContainerDisabled: 'var(--bg-tertiary)', // Disabled background
+
+      // ============ Text button (no background, no border) ============
+      // CRITICAL: These control icon-only buttons like notification close button!
+      textTextColor: 'var(--text-secondary)', // Base text color for text buttons (icons!)
+      textTextHoverColor: 'var(--text-primary)', // Text button hover (icon hover!)
+      textTextActiveColor: 'var(--text-primary)', // Text button active (icon active!)
+      colorTextHover: 'var(--link)', // Legacy hover color
+      colorTextActive: 'var(--link)', // Legacy active color
+      textHoverBg: 'var(--accent-subtle)', // Text button hover background
+
+      // ============ Link button (looks like a link) ============
+      linkHoverBg: 'transparent',
+      colorLink: 'var(--link)',
+      colorLinkHover: 'var(--link-hover)',
+      colorLinkActive: 'var(--link-hover)',
+
+      // ============ Solid button (filled buttons) ============
+      solidTextColor: 'var(--text-primary)', // Text color for solid buttons
+
+      // ============ Danger button ============
+      dangerColor: 'var(--error)', // Danger button text & border color
+      dangerShadow: '0 2px 0 rgba(220, 38, 38, 0.1)',
+
+      // Danger ghost button
+      colorErrorBg: 'transparent', // Ghost danger background
+      colorErrorBgHover: 'var(--bg-hover)', // Ghost danger hover
+      colorErrorBorder: 'var(--error)', // Ghost danger border
+      colorErrorBorderHover: 'var(--error)', // Ghost danger border hover
+      colorErrorHover: 'var(--error)', // Ghost danger text hover
+      colorErrorActive: 'var(--error)', // Ghost danger text active
     },
     Input: {
+      // Base colors
       colorText: 'var(--text-primary)',
       colorBgContainer: 'var(--bg-secondary)',
       colorBorder: 'var(--border-primary)',
+      colorTextPlaceholder: 'var(--text-tertiary)',
+
+      // Interactive states (IMPORTANT for focus feedback)
       hoverBorderColor: 'var(--border-secondary)',
       activeBorderColor: 'var(--link)',
-      colorTextPlaceholder: 'var(--text-tertiary)',
+      activeShadow: '0 0 0 2px rgba(91, 87, 214, 0.1)', // NEW: Focus shadow
+      errorActiveShadow: '0 0 0 2px rgba(220, 38, 38, 0.1)', // NEW: Error focus shadow
+      warningActiveShadow: '0 0 0 2px rgba(245, 158, 11, 0.1)', // NEW: Warning focus shadow
+
+      // Clear icon (IMPORTANT for visibility)
+      colorIcon: 'var(--text-secondary)', // NEW: Clear icon color
+      colorIconHover: 'var(--text-primary)', // NEW: Clear icon hover
     },
     Select: {
+      // ============ Base colors ============
       colorText: 'var(--text-primary)',
-      colorBgContainer: 'var(--bg-secondary)',
-      colorBorder: 'var(--border-primary)',
-      colorBgElevated: 'var(--bg-secondary)',
-      colorPrimary: 'var(--link)',
-      colorPrimaryHover: 'var(--link-hover)',
-      optionSelectedBg: 'var(--accent-subtle)',
-      optionSelectedColor: 'var(--link)',
-      optionActiveBg: 'var(--accent-subtle)',
+      colorBgContainer: 'var(--bg-secondary)', // Input background
+      colorBorder: 'var(--border-primary)', // Input border
+      colorBgElevated: 'var(--bg-secondary)', // Dropdown panel background
+      colorTextPlaceholder: 'var(--text-tertiary)', // Placeholder text
+
+      // ============ Primary & status colors ============
+      colorPrimary: 'var(--link)', // Selected item marker color
+      colorPrimaryHover: 'var(--link-hover)', // Selected item hover
+
+      // ============ Options/items (IMPORTANT for selection feedback) ============
+      optionSelectedBg: 'var(--accent-subtle)', // Selected option background
+      optionSelectedColor: 'var(--link)', // Selected option text color
+      optionActiveBg: 'var(--bg-hover)', // Option hover background
+      optionSelectedFontWeight: 600, // Bold for selected items
+
+      // ============ Multiple select (tags mode) ============
+      multipleItemBg: 'var(--bg-tertiary)', // Tag background
+      multipleItemBorderColor: 'var(--border-primary)', // Tag border
+      multipleItemColorDisabled: 'var(--disabled)', // Disabled tag color
+
+      // ============ Icons (IMPORTANT for visibility) ============
+      colorIcon: 'var(--text-secondary)', // Dropdown arrow, clear icon
+      colorIconHover: 'var(--text-primary)', // Icon hover
+
+      // ============ Selector (input area) ============
+      selectorBg: 'var(--bg-secondary)', // Selector background
     },
     Dropdown: {
+      // ============ Base colors ============
       colorText: 'var(--text-primary)',
-      colorBgElevated: 'var(--bg-secondary)',
+      colorBgElevated: 'var(--bg-secondary)', // Dropdown panel background
       colorBorder: 'var(--border-primary)',
-      controlItemBgHover: 'var(--accent-subtle)',
-      controlItemBgActive: 'var(--accent-subtle)',
-      controlItemBgActiveHover: 'var(--accent-subtle)',
       colorTextDisabled: 'var(--disabled)',
-      colorPrimary: 'var(--link)',
-      colorPrimaryHover: 'var(--link-hover)',
-      // Dropdown uses these for menu items
-      colorTextHover: 'var(--link)',
+
+      // ============ Item states (IMPORTANT for visual feedback) ============
+      controlItemBgHover: 'var(--bg-hover)', // Item hover background
+      controlItemBgActive: 'var(--accent-subtle)', // Selected item background
+      controlItemBgActiveHover: 'var(--accent-subtle)', // Selected item hover
+
+      // ============ Colors for items ============
+      colorPrimary: 'var(--link)', // Primary color for selected items
+      colorPrimaryHover: 'var(--link-hover)', // Primary hover
+
+      // ============ Dropdown.Button specific ============
+      colorBgContainer: 'var(--bg-secondary)', // Button background
+      colorSplit: 'var(--border-primary)', // Split line between button parts
+
+      // ============ Padding & sizing ============
+      paddingBlock: 8, // Vertical padding for items
+      controlPaddingHorizontal: 12, // Horizontal padding for items
     },
     Menu: {
+      // ============ Base colors ============
       colorText: 'var(--text-primary)',
-      colorBgContainer: 'var(--bg-secondary)',
-      itemHoverBg: 'var(--accent-subtle)',
-      itemHoverColor: 'var(--link)',
-      itemSelectedBg: 'var(--accent-subtle)',
-      itemSelectedColor: 'var(--link)',
-      itemActiveBg: 'var(--accent-subtle)',
-      itemActiveColor: 'var(--link)',
-      colorActiveBarBorderSize: 0,
-      subMenuItemBg: 'var(--bg-secondary)',
-      darkItemSelectedBg: 'var(--accent-subtle)',
-      darkItemSelectedColor: 'var(--link)',
-      colorPrimary: 'var(--link)',
-      // Danger items (like Logout)
-      colorDanger: 'var(--error)',
-      colorDangerHover: 'var(--error)',
-      itemDangerColor: 'var(--error)',
+      colorTextSecondary: 'var(--text-secondary)', // NEW: Secondary text in menu items
+      colorBgContainer: 'var(--bg-secondary)', // Menu background
+      colorBorder: 'var(--border-primary)', // NEW: Border color
+      colorSplit: 'var(--border-primary)', // NEW: Divider color
+
+      // ============ Item colors (IMPORTANT for visibility) ============
+      itemColor: 'var(--text-primary)', // NEW: Default item text color
+      itemBg: 'var(--bg-secondary)', // NEW: Item background
+
+      // ============ Hover states (IMPORTANT for feedback) ============
+      itemHoverBg: 'var(--bg-hover)', // Item hover background
+      itemHoverColor: 'var(--link)', // Item hover text color
+
+      // ============ Selected states ============
+      itemSelectedBg: 'var(--accent-subtle)', // Selected item background
+      itemSelectedColor: 'var(--link)', // Selected item text color
+
+      // ============ Active states ============
+      itemActiveBg: 'var(--accent-subtle)', // Active item background
+      itemActiveColor: 'var(--link)', // Active item text color
+      colorActiveBarBorderSize: 0, // No active bar (using background instead)
+
+      // ============ Dark theme specific ============
+      darkItemBg: 'var(--bg-secondary)', // NEW: Dark mode item background
+      darkItemColor: 'var(--text-primary)', // NEW: Dark mode item text
+      darkItemHoverBg: 'var(--bg-hover)', // NEW: Dark mode hover
+      darkItemSelectedBg: 'var(--accent-subtle)', // Dark mode selected
+      darkItemSelectedColor: 'var(--link)', // Dark mode selected text
+      darkSubMenuItemBg: 'var(--bg-secondary)', // NEW: Dark mode submenu background
+
+      // ============ SubMenu (dropdown menus) ============
+      subMenuItemBg: 'var(--bg-secondary)', // Submenu background
+      popupBg: 'var(--bg-secondary)', // NEW: Popup menu background
+
+      // ============ Primary color ============
+      colorPrimary: 'var(--link)', // Primary color for active elements
+
+      // ============ Danger items (like Logout) ============
+      colorDanger: 'var(--error)', // Danger text color
+      colorDangerHover: 'var(--error)', // Danger hover color
+      itemDangerColor: 'var(--error)', // Danger item text
+
+      // ============ Icons (IMPORTANT for visibility) ============
+      colorIcon: 'var(--text-secondary)', // NEW: Icon color
+      colorIconHover: 'var(--text-primary)', // NEW: Icon hover
+
+      // ============ Group title ============
+      groupTitleColor: 'var(--text-secondary)', // NEW: Group title color
+      groupTitleFontSize: 12, // NEW: Group title font size
     },
     Tabs: {
+      // Base colors
       colorText: 'var(--text-secondary)',
       colorTextHeading: 'var(--text-primary)',
       colorBorder: 'var(--border-primary)',
       colorBorderSecondary: 'var(--border-primary)',
+
+      // Interactive states (IMPORTANT for tab navigation feedback)
       colorPrimary: 'var(--link)',
-      itemHoverColor: 'var(--link)',
-      itemSelectedColor: 'var(--link)',
-      itemActiveColor: 'var(--link)',
-      inkBarColor: 'var(--link)',
+      itemHoverColor: 'var(--link)', // Tab hover color
+      itemSelectedColor: 'var(--link)', // Selected tab color
+      itemActiveColor: 'var(--link)', // Active tab color
+      inkBarColor: 'var(--link)', // Active tab underline
+
+      // Hover background (IMPORTANT for visual feedback)
+      itemHoverBg: 'var(--bg-hover)', // NEW: Tab hover background
+      itemSelectedBg: 'transparent', // NEW: Selected tab background (keep clean)
+      itemActiveBg: 'var(--bg-hover)', // NEW: Active tab background
     },
     Modal: {
+      // Content colors
       colorText: 'var(--text-primary)',
       colorTextHeading: 'var(--text-primary)',
       colorBgElevated: 'var(--bg-secondary)',
       colorBorder: 'var(--border-primary)',
+
+      // Header & Footer
+      headerBg: 'var(--bg-secondary)', // NEW: Modal header background
+      footerBg: 'var(--bg-tertiary)', // NEW: Modal footer background
+      contentBg: 'var(--bg-secondary)', // NEW: Modal content background
+
+      // Close icon (IMPORTANT for visibility)
+      colorIcon: 'var(--text-secondary)', // NEW: Close icon color
+      colorIconHover: 'var(--text-primary)', // NEW: Close icon hover
     },
     Drawer: {
+      // Content colors
       colorText: 'var(--text-primary)',
       colorBgElevated: 'var(--bg-secondary)',
       colorBorder: 'var(--border-primary)',
+
+      // Header & Footer
+      headerBg: 'var(--bg-secondary)', // NEW: Drawer header background
+      footerBg: 'var(--bg-tertiary)', // NEW: Drawer footer background
+      contentBg: 'var(--bg-secondary)', // NEW: Drawer content background
+
+      // Close icon (IMPORTANT for visibility)
+      colorIcon: 'var(--text-secondary)', // NEW: Close icon color
+      colorIconHover: 'var(--text-primary)', // NEW: Close icon hover
     },
     Popover: {
       colorText: 'var(--text-primary)',
@@ -346,9 +574,17 @@ export function getAntDesignComponents(): ThemeConfig['components'] {
       colorTextLightSolid: 'var(--text-primary)',
     },
     List: {
+      // Base colors
       colorText: 'var(--text-primary)',
       colorTextHeading: 'var(--text-primary)',
       colorBorder: 'var(--border-primary)',
+      colorSplit: 'var(--border-primary)',
+
+      // Interactive states (IMPORTANT for list item feedback)
+      itemHoverBg: 'var(--bg-hover)', // NEW: List item hover background
+      itemActiveBg: 'var(--accent-subtle)', // NEW: List item active/selected background
+      metaMarginBottom: 8, // NEW: Meta info spacing
+      avatarMarginRight: 16, // NEW: Avatar spacing
     },
     Switch: {
       colorPrimary: 'var(--link)',
@@ -370,14 +606,24 @@ export function getAntDesignComponents(): ThemeConfig['components'] {
       colorText: 'var(--text-primary)',
     },
     DatePicker: {
+      // Base colors
       colorText: 'var(--text-primary)',
       colorBgContainer: 'var(--bg-secondary)',
       colorBorder: 'var(--border-primary)',
       colorBgElevated: 'var(--bg-secondary)',
       colorTextPlaceholder: 'var(--text-tertiary)',
       colorTextDisabled: 'var(--disabled)',
-      colorLink: 'var(--link)',
-      colorLinkHover: 'var(--link-hover)',
+
+      // Interactive states (IMPORTANT for date selection feedback)
+      colorLink: 'var(--link)', // Selected date color
+      colorLinkHover: 'var(--link-hover)', // Date hover color
+      cellHoverBg: 'var(--bg-hover)', // NEW: Date cell hover background
+      cellActiveWithRangeBg: 'var(--accent-subtle)', // NEW: Range selection background
+      cellBgDisabled: 'var(--bg-tertiary)', // NEW: Disabled date background
+
+      // Icons (IMPORTANT for visibility)
+      colorIcon: 'var(--text-secondary)', // NEW: Calendar icon color
+      colorIconHover: 'var(--text-primary)', // NEW: Calendar icon hover
     },
     TimePicker: {
       colorText: 'var(--text-primary)',
@@ -393,11 +639,22 @@ export function getAntDesignComponents(): ThemeConfig['components'] {
       colorWarning: 'var(--warning)',
     },
     Pagination: {
+      // Base colors
       colorText: 'var(--text-primary)',
       colorTextDisabled: 'var(--disabled)',
       colorBgContainer: 'var(--bg-secondary)',
-      colorPrimary: 'var(--link)',
-      colorPrimaryHover: 'var(--link-hover)',
+
+      // Interactive states (IMPORTANT for navigation feedback)
+      colorPrimary: 'var(--link)', // Active page background
+      colorPrimaryHover: 'var(--link-hover)', // Active page hover
+      itemBg: 'var(--bg-secondary)', // NEW: Page item background
+      itemActiveBg: 'var(--link)', // NEW: Active page background
+      itemActiveBgDisabled: 'var(--bg-tertiary)', // NEW: Disabled active page
+      itemInputBg: 'var(--bg-secondary)', // NEW: Quick jumper input background
+      itemLinkBg: 'var(--bg-secondary)', // NEW: Page link background
+
+      // Hover states (IMPORTANT for visual feedback)
+      colorBgTextHover: 'var(--bg-hover)', // NEW: Page item hover background
     },
     Steps: {
       colorText: 'var(--text-primary)',
@@ -535,18 +792,30 @@ export function getAntDesignComponents(): ThemeConfig['components'] {
       colorTextDescription: 'var(--text-tertiary)',
     },
     Message: {
+      // ============ Base colors ============
       colorText: 'var(--text-primary)',
-      colorBgElevated: 'var(--bg-secondary)',
+      colorBgElevated: 'var(--bg-secondary)', // Message background
+      contentBg: 'var(--bg-secondary)', // NEW: Content background
+      contentPadding: '10px 16px', // NEW: Message padding
+
+      // ============ Status colors ============
       colorSuccess: 'var(--success)',
       colorError: 'var(--error)',
       colorWarning: 'var(--warning)',
       colorInfo: 'var(--info)',
     },
     Notification: {
+      // ============ Base colors ============
       colorText: 'var(--text-primary)',
       colorTextHeading: 'var(--text-primary)',
-      colorBgElevated: 'var(--bg-secondary)',
+      colorBgElevated: 'var(--bg-secondary)', // Notification background
       colorBorder: 'var(--border-primary)',
+
+      // ============ Close icon (IMPORTANT for visibility in dark theme!) ============
+      colorIcon: 'var(--text-secondary)', // NEW: Close button icon color
+      colorIconHover: 'var(--text-primary)', // NEW: Close button hover color
+
+      // ============ Status colors ============
       colorSuccess: 'var(--success)',
       colorError: 'var(--error)',
       colorWarning: 'var(--warning)',

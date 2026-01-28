@@ -82,7 +82,7 @@ Essential UI components
 | **UIBadge** | Badge component - Status indicator with semantic colors | ❌ |
 | **UIButton** | UIButton component - Action button with semantic variants | ✅ |
 | **UICard** | UICard component - Card container with header/footer | ❌ |
-| **UIIcon** | UIIcon component - Icon wrapper | ❌ |
+| **UIIcon** | UIIcon component - Icon wrapper with proper theming | ❌ |
 | **UITag** | UITag component - Label/category tag with semantic colors | ❌ |
 | **UITitle** | UITitle component - Page/section titles with hierarchy | ❌ |
 
