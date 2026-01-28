@@ -40,7 +40,7 @@ export function ComparativeBenchmarkWidget() {
 
   // Calculate benchmark scores for plugins
   const pluginBenchmarks = useMemo(() => {
-    if (!metrics.data?.perPlugin) return [];
+    if (!metrics.data?.perPlugin) {return [];}
 
     const entries: BenchmarkEntry[] = metrics.data.perPlugin.map((plugin) => {
       const requests = plugin.requests ?? 0;
@@ -73,9 +73,9 @@ export function ComparativeBenchmarkWidget() {
     entries.sort((a, b) => b.score - a.score);
     entries.forEach((entry, index) => {
       entry.rank = index + 1;
-      if (index === 0) entry.badge = 'gold';
-      else if (index === 1) entry.badge = 'silver';
-      else if (index === 2) entry.badge = 'bronze';
+      if (index === 0) {entry.badge = 'gold';}
+      else if (index === 1) {entry.badge = 'silver';}
+      else if (index === 2) {entry.badge = 'bronze';}
     });
 
     return entries;
@@ -83,7 +83,7 @@ export function ComparativeBenchmarkWidget() {
 
   // Calculate benchmark scores for adapters (LLM)
   const adapterBenchmarks = useMemo(() => {
-    if (!llmUsage.data?.byModel) return [];
+    if (!llmUsage.data?.byModel) {return [];}
 
     const entries: BenchmarkEntry[] = Object.entries(llmUsage.data.byModel).map(([model, stats]) => {
       const requests = stats.requests ?? 0;
@@ -114,9 +114,9 @@ export function ComparativeBenchmarkWidget() {
     entries.sort((a, b) => b.score - a.score);
     entries.forEach((entry, index) => {
       entry.rank = index + 1;
-      if (index === 0) entry.badge = 'gold';
-      else if (index === 1) entry.badge = 'silver';
-      else if (index === 2) entry.badge = 'bronze';
+      if (index === 0) {entry.badge = 'gold';}
+      else if (index === 1) {entry.badge = 'silver';}
+      else if (index === 2) {entry.badge = 'bronze';}
     });
 
     return entries;
@@ -158,9 +158,9 @@ export function ComparativeBenchmarkWidget() {
     legend: false,
     color: (datum: any) => {
       const entry = sortedData.find(e => e.name === datum.name);
-      if (entry?.badge === 'gold') return '#FFD700';
-      if (entry?.badge === 'silver') return '#C0C0C0';
-      if (entry?.badge === 'bronze') return '#CD7F32';
+      if (entry?.badge === 'gold') {return '#FFD700';}
+      if (entry?.badge === 'silver') {return '#C0C0C0';}
+      if (entry?.badge === 'bronze') {return '#CD7F32';}
       return '#1890ff';
     },
     label: {
@@ -176,15 +176,15 @@ export function ComparativeBenchmarkWidget() {
   };
 
   const getBadgeIcon = (badge?: 'gold' | 'silver' | 'bronze') => {
-    if (badge === 'gold') return <TrophyOutlined style={{ color: '#FFD700', fontSize: 18 }} />;
-    if (badge === 'silver') return <TrophyOutlined style={{ color: '#C0C0C0', fontSize: 18 }} />;
-    if (badge === 'bronze') return <TrophyOutlined style={{ color: '#CD7F32', fontSize: 18 }} />;
+    if (badge === 'gold') {return <TrophyOutlined style={{ color: '#FFD700', fontSize: 18 }} />;}
+    if (badge === 'silver') {return <TrophyOutlined style={{ color: '#C0C0C0', fontSize: 18 }} />;}
+    if (badge === 'bronze') {return <TrophyOutlined style={{ color: '#CD7F32', fontSize: 18 }} />;}
     return null;
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return '#52c41a';
-    if (score >= 60) return '#faad14';
+    if (score >= 80) {return '#52c41a';}
+    if (score >= 60) {return '#faad14';}
     return '#ff4d4f';
   };
 

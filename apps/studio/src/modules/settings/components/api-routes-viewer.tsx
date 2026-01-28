@@ -225,7 +225,7 @@ export function ApiRoutesViewer() {
 
   // Get unique methods for filter
   const availableMethods = useMemo(() => {
-    if (!data?.routes) return [];
+    if (!data?.routes) {return [];}
     const methods = new Set<string>();
     data.routes.forEach((route) => {
       route.method.split(',').forEach((m) => methods.add(m.trim()));
@@ -235,7 +235,7 @@ export function ApiRoutesViewer() {
 
   // Filter routes
   const filteredRoutes = useMemo(() => {
-    if (!data?.routes) return [];
+    if (!data?.routes) {return [];}
     return data.routes.filter((route) => {
       // Search filter
       const matchesSearch =
@@ -252,7 +252,7 @@ export function ApiRoutesViewer() {
 
   // Build tree structure
   const treeData = useMemo(() => {
-    if (filteredRoutes.length === 0) return [];
+    if (filteredRoutes.length === 0) {return [];}
     const tree = buildRouteTree(filteredRoutes);
     return treeNodeToAntdNode(tree, baseUrl, copiedUrl, handleCopyUrl);
   }, [filteredRoutes, baseUrl, copiedUrl]);
@@ -261,7 +261,7 @@ export function ApiRoutesViewer() {
   const sortedRoutes = useMemo(() => {
     return [...filteredRoutes].sort((a, b) => {
       const urlCompare = a.url.localeCompare(b.url);
-      if (urlCompare !== 0) return urlCompare;
+      if (urlCompare !== 0) {return urlCompare;}
       return a.method.localeCompare(b.method);
     });
   }, [filteredRoutes]);

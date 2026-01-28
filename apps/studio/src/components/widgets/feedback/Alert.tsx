@@ -47,7 +47,7 @@ export function Alert({ data, options, onClose, onAction }: AlertProps) {
   }
 
   const renderAction = () => {
-    if (!showAction && !actionText) return null;
+    if (!showAction && !actionText) {return null;}
 
     const text = actionText || 'Action';
 

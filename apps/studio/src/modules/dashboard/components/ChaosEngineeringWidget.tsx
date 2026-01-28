@@ -91,7 +91,7 @@ const EXPERIMENT_LIBRARY: ChaosExperiment[] = [
 // Calculate resilience score based on experiment results
 const calculateResilienceScore = (experiments: ChaosExperiment[]): number => {
   const completed = experiments.filter(e => e.lastRun);
-  if (completed.length === 0) return 0;
+  if (completed.length === 0) {return 0;}
 
   const successRate = completed.filter(e => e.lastRun?.status === 'success').length / completed.length;
   const coverage = completed.length / experiments.length;
@@ -202,7 +202,7 @@ export function ChaosEngineeringWidget() {
       key: 'lastRun',
       width: 120,
       render: (lastRun?: ChaosExperiment['lastRun']) => {
-        if (!lastRun) return <Text type="secondary">Never</Text>;
+        if (!lastRun) {return <Text type="secondary">Never</Text>;}
         const daysAgo = Math.floor((Date.now() - lastRun.timestamp) / 86400000);
         return (
           <div>

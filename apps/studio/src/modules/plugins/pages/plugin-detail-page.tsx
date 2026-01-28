@@ -43,11 +43,11 @@ const { Panel } = Collapse;
 
 // Helper to safely render schema objects
 function renderSchema(schema: any): string {
-  if (!schema) return '—';
-  if (typeof schema === 'string') return schema;
+  if (!schema) {return '—';}
+  if (typeof schema === 'string') {return schema;}
   if (typeof schema === 'object') {
-    if ('$ref' in schema) return schema.$ref;
-    if ('zod' in schema) return schema.zod;
+    if ('$ref' in schema) {return schema.$ref;}
+    if ('zod' in schema) {return schema.zod;}
     return JSON.stringify(schema);
   }
   return String(schema);
@@ -604,10 +604,10 @@ function RestRoutesTable({ routes, basePath, apiBasePath }: { routes: any[]; bas
   ];
 
   const formatSchemaRef = (schema: any): string => {
-    if (!schema) return '—';
-    if (typeof schema === 'string') return schema;
-    if ('$ref' in schema) return schema.$ref;
-    if ('zod' in schema) return schema.zod;
+    if (!schema) {return '—';}
+    if (typeof schema === 'string') {return schema;}
+    if ('$ref' in schema) {return schema.$ref;}
+    if ('zod' in schema) {return schema.zod;}
     return JSON.stringify(schema);
   };
 
@@ -635,7 +635,7 @@ function RestRoutesTable({ routes, basePath, apiBasePath }: { routes: any[]; bas
             const hasOutput = record.output;
             const hasErrors = record.errors && record.errors.length > 0;
 
-            if (!hasInput && !hasOutput && !hasErrors) return null;
+            if (!hasInput && !hasOutput && !hasErrors) {return null;}
 
             return (
               <div style={{ margin: 0, paddingLeft: 48 }}>

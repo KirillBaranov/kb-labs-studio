@@ -21,9 +21,9 @@ function SingleMetric({ metric, options }: { metric: MetricData; options?: Contr
   const { value, label, unit, trend, trendValue, status } = metric;
 
   const valueStyle: React.CSSProperties = {};
-  if (status === 'success') valueStyle.color = 'var(--success)';
-  else if (status === 'warning') valueStyle.color = 'var(--warning)';
-  else if (status === 'error') valueStyle.color = 'var(--error)';
+  if (status === 'success') {valueStyle.color = 'var(--success)';}
+  else if (status === 'warning') {valueStyle.color = 'var(--warning)';}
+  else if (status === 'error') {valueStyle.color = 'var(--error)';}
 
   const trendColor = trend === 'up' ? 'var(--success)' : trend === 'down' ? 'var(--error)' : 'var(--text-secondary)';
   const trendIcon = trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→';

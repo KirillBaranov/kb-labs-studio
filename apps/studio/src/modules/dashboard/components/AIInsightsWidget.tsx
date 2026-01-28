@@ -175,7 +175,7 @@ export function AIInsightsWidget() {
   });
 
   const sendMessage = async (text: string) => {
-    if (!text.trim()) return;
+    if (!text.trim()) {return;}
 
     const userMessage: Message = {
       id: `user-${Date.now()}`,

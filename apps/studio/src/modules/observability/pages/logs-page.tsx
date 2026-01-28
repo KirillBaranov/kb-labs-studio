@@ -40,7 +40,8 @@ import { KBPageContainer, KBPageHeader } from '@kb-labs/studio-ui-react';
 import { useLogStream } from '@kb-labs/studio-data-client';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import type { LogRecord, LogSummarizeResponse } from '@kb-labs/studio-data-client';
-import dayjs, { Dayjs } from 'dayjs';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 
 const { Text, Paragraph } = Typography;
 const { RangePicker } = DatePicker;
@@ -170,12 +171,12 @@ function calculateLogStats(logs: LogRecord[]) {
     }
 
     // Track errors and warnings
-    if (log.level === 'error') stats.errorCount++;
-    if (log.level === 'warn') stats.warningCount++;
+    if (log.level === 'error') {stats.errorCount++;}
+    if (log.level === 'warn') {stats.warningCount++;}
 
     // Track unique traces and executions
-    if (log.trace) stats.uniqueTraces.add(log.trace);
-    if (log.executionId) stats.uniqueExecutions.add(log.executionId);
+    if (log.trace) {stats.uniqueTraces.add(log.trace);}
+    if (log.executionId) {stats.uniqueExecutions.add(log.executionId);}
   }
 
   return stats;
@@ -270,7 +271,7 @@ export function LogsPage() {
 
   // Group logs if needed
   const groupedLogs = useMemo(() => {
-    if (groupBy === 'none') return null;
+    if (groupBy === 'none') {return null;}
 
     switch (groupBy) {
       case 'trace':
@@ -376,7 +377,7 @@ export function LogsPage() {
    * Render grouped logs
    */
   const renderGroupedLogs = () => {
-    if (!groupedLogs) return null;
+    if (!groupedLogs) {return null;}
 
     const groups = Array.from(groupedLogs.entries());
 

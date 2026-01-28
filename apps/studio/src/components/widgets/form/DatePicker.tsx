@@ -46,7 +46,7 @@ export function DatePicker({ data, options, onChange }: DatePickerProps) {
 
   // Parse value to dayjs
   const parseValue = (value: string | [string, string] | null): Dayjs | [Dayjs, Dayjs] | null => {
-    if (!value) return null;
+    if (!value) {return null;}
     if (Array.isArray(value)) {
       return [dayjs(value[0]), dayjs(value[1])];
     }
@@ -55,7 +55,7 @@ export function DatePicker({ data, options, onChange }: DatePickerProps) {
 
   // Format dayjs to string
   const formatValue = (value: Dayjs | [Dayjs, Dayjs] | null): string | [string, string] | null => {
-    if (!value) return null;
+    if (!value) {return null;}
     if (Array.isArray(value)) {
       return [value[0].toISOString(), value[1].toISOString()];
     }
@@ -68,11 +68,11 @@ export function DatePicker({ data, options, onChange }: DatePickerProps) {
 
   // Disable dates outside min/max range
   const disabledDate = (current: Dayjs) => {
-    if (!current) return false;
+    if (!current) {return false;}
 
     // Check min/max
-    if (minDate && current.isBefore(dayjs(minDate), 'day')) return true;
-    if (maxDate && current.isAfter(dayjs(maxDate), 'day')) return true;
+    if (minDate && current.isBefore(dayjs(minDate), 'day')) {return true;}
+    if (maxDate && current.isAfter(dayjs(maxDate), 'day')) {return true;}
 
     // Check disabled dates from data
     if (data?.disabledDates) {

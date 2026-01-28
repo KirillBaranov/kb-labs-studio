@@ -67,7 +67,7 @@ export function FilesTab() {
       key: 'changes',
       width: 120,
       render: (record: any) => {
-        if (!record.additions && !record.deletions) return '-';
+        if (!record.additions && !record.deletions) {return '-';}
         return (
           <span>
             <span style={{ color: 'green' }}>+{record.additions || 0}</span>

@@ -30,11 +30,11 @@ export function RunningNowPanel() {
   const hasRunningJobs = activeExecutions.length > 0;
 
   const formatDuration = (ms?: number) => {
-    if (!ms) return '—';
+    if (!ms) {return '—';}
     const seconds = Math.floor(ms / 1000);
-    if (seconds < 60) return `${seconds}s`;
+    if (seconds < 60) {return `${seconds}s`;}
     const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ${seconds % 60}s`;
+    if (minutes < 60) {return `${minutes}m ${seconds % 60}s`;}
     const hours = Math.floor(minutes / 60);
     return `${hours}h ${minutes % 60}m`;
   };

@@ -9,7 +9,8 @@ import {
   ReloadOutlined,
   ClockCircleOutlined,
 } from '@ant-design/icons';
-import dayjs, { Dayjs } from 'dayjs';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 
 const { Text, Title } = Typography;
 
@@ -101,7 +102,7 @@ export function TimeTravelWidget() {
     if (state.isPlaying && state.selectedTime && historicalData.length > 0) {
       const interval = setInterval(() => {
         setState(prev => {
-          if (!prev.selectedTime) return prev;
+          if (!prev.selectedTime) {return prev;}
 
           const currentIndex = historicalData.findIndex(
             s => s.timestamp >= prev.selectedTime!.valueOf()
@@ -128,7 +129,7 @@ export function TimeTravelWidget() {
   };
 
   const stepBackward = () => {
-    if (!state.selectedTime || historicalData.length === 0) return;
+    if (!state.selectedTime || historicalData.length === 0) {return;}
 
     const currentIndex = historicalData.findIndex(
       s => s.timestamp >= state.selectedTime!.valueOf()
@@ -142,7 +143,7 @@ export function TimeTravelWidget() {
   };
 
   const stepForward = () => {
-    if (!state.selectedTime || historicalData.length === 0) return;
+    if (!state.selectedTime || historicalData.length === 0) {return;}
 
     const currentIndex = historicalData.findIndex(
       s => s.timestamp >= state.selectedTime!.valueOf()
@@ -167,7 +168,7 @@ export function TimeTravelWidget() {
   };
 
   const handleSliderChange = (value: number) => {
-    if (historicalData.length === 0) return;
+    if (historicalData.length === 0) {return;}
     const index = Math.floor((value / 100) * (historicalData.length - 1));
     setState(prev => ({
       ...prev,
@@ -177,7 +178,7 @@ export function TimeTravelWidget() {
   };
 
   const getSliderValue = () => {
-    if (!state.selectedTime || historicalData.length === 0) return 0;
+    if (!state.selectedTime || historicalData.length === 0) {return 0;}
     const currentIndex = historicalData.findIndex(
       s => s.timestamp >= state.selectedTime!.valueOf()
     );
@@ -285,7 +286,7 @@ export function TimeTravelWidget() {
               onChange={handleSliderChange}
               tooltip={{
                 formatter: (value) => {
-                  if (!value || historicalData.length === 0) return '';
+                  if (!value || historicalData.length === 0) {return '';}
                   const index = Math.floor((value / 100) * (historicalData.length - 1));
                   return dayjs(historicalData[index].timestamp).format('HH:mm');
                 },

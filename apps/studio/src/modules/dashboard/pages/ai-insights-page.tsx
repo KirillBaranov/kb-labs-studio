@@ -98,7 +98,7 @@ export function AIInsightsPage() {
 
   // Build context summary for display
   const contextSummary = React.useMemo(() => {
-    if (!metrics) return null;
+    if (!metrics) {return null;}
 
     const errorRate = metrics.requests?.total
       ? (((metrics.requests.clientErrors ?? 0) + (metrics.requests.serverErrors ?? 0)) / metrics.requests.total * 100)
@@ -126,7 +126,7 @@ export function AIInsightsPage() {
 
   // Send message
   const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading) {return;}
 
     const userMessage: Message = {
       id: `user-${Date.now()}`,

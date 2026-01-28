@@ -73,7 +73,7 @@ export function Tree({ data, loading, error, options, onNodeClick }: TreeProps) 
       let foundNode: TreeNode | null = null;
       for (const rootNode of data.nodes) {
         foundNode = findNode(rootNode, String(selectedKeys[0]));
-        if (foundNode) break;
+        if (foundNode) {break;}
       }
 
       if (foundNode) {

@@ -6,7 +6,7 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { WidgetAction } from '@kb-labs/studio-contracts';
-// eslint-disable-next-line import/extensions
+ 
 import { useWidgetEvents } from './useWidgetEvents';
 import { studioConfig } from '../config/studio.config';
 

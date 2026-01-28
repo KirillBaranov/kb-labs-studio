@@ -112,7 +112,7 @@ export function IncidentDetailPage() {
   } = useQuery<IncidentDetailResponse>({
     queryKey: ['incidents', 'detail', id],
     queryFn: async () => {
-      if (!id) throw new Error('Incident ID is required');
+      if (!id) {throw new Error('Incident ID is required');}
       return sources.observability.getIncident(id);
     },
     enabled: !!id,
@@ -129,7 +129,7 @@ export function IncidentDetailPage() {
   } = useQuery<IncidentAnalysisResponse>({
     queryKey: ['incidents', 'analysis', id],
     queryFn: async () => {
-      if (!id) throw new Error('Incident ID is required');
+      if (!id) {throw new Error('Incident ID is required');}
       return sources.observability.analyzeIncident(id);
     },
     enabled: false, // Manual trigger
@@ -140,7 +140,7 @@ export function IncidentDetailPage() {
   // Resolve incident mutation
   const resolveMutation = useMutation({
     mutationFn: async () => {
-      if (!id) throw new Error('Incident ID is required');
+      if (!id) {throw new Error('Incident ID is required');}
       return sources.observability.resolveIncident(id, resolutionNotes);
     },
     onSuccess: () => {

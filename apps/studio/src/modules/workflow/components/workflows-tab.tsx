@@ -95,7 +95,7 @@ export function WorkflowsTab() {
       dataIndex: 'status',
       key: 'status',
       render: (status?: 'active' | 'inactive') => {
-        if (!status) return <Text className="typo-caption text-tertiary">—</Text>;
+        if (!status) {return <Text className="typo-caption text-tertiary">—</Text>;}
         return (
           <Tag color={status === 'active' ? 'success' : 'default'}>
             {status.toUpperCase()}

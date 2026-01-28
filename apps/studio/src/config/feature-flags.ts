@@ -436,7 +436,7 @@ export function isFeatureEnabled(
   userPreferences?: Record<FeatureId, boolean>
 ): boolean {
   const flag = FEATURE_FLAGS[featureId];
-  if (!flag) return false;
+  if (!flag) {return false;}
 
   // If user has explicit preference, use that
   if (userPreferences && featureId in userPreferences) {
@@ -460,7 +460,7 @@ export function areDependenciesMet(
   userPreferences?: Record<FeatureId, boolean>
 ): boolean {
   const flag = FEATURE_FLAGS[featureId];
-  if (!flag.dependencies || flag.dependencies.length === 0) return true;
+  if (!flag.dependencies || flag.dependencies.length === 0) {return true;}
 
   return flag.dependencies.every((dep) => isFeatureEnabled(dep, userPreferences));
 }

@@ -56,9 +56,9 @@ export function ReleaseStepper({ selectedScope }: ReleaseStepperProps) {
   ];
 
   const canGoNext = () => {
-    if (currentStep === 0) return planReady;
-    if (currentStep === 1) return changelogReady;
-    if (currentStep === 2) return previewReady;
+    if (currentStep === 0) {return planReady;}
+    if (currentStep === 1) {return changelogReady;}
+    if (currentStep === 2) {return previewReady;}
     return false;
   };
 

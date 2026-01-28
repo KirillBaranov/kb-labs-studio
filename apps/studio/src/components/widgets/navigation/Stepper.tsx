@@ -49,8 +49,8 @@ export function Stepper({ data, options, onStepChange }: StepperProps) {
   };
 
   const handleStepClick = (index: number) => {
-    if (!clickable) return;
-    if (previousOnly && index > currentStep) return;
+    if (!clickable) {return;}
+    if (previousOnly && index > currentStep) {return;}
     onStepChange?.(index);
   };
 

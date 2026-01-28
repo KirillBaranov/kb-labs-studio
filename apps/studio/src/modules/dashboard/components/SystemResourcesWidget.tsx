@@ -13,7 +13,7 @@ import { useSystemMetrics, type SystemMetricsData } from '@kb-labs/studio-data-c
  * Format bytes to human-readable string
  */
 function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B';
+  if (bytes === 0) {return '0 B';}
   const k = 1024;
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
@@ -41,8 +41,8 @@ function formatUptime(seconds: number): string {
  * Get color for metric value based on thresholds
  */
 function getMetricColor(value: number, warningThreshold: number, criticalThreshold: number): string {
-  if (value >= criticalThreshold) return '#ff4d4f';
-  if (value >= warningThreshold) return '#faad14';
+  if (value >= criticalThreshold) {return '#ff4d4f';}
+  if (value >= warningThreshold) {return '#faad14';}
   return '#52c41a';
 }
 

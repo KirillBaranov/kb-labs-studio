@@ -53,8 +53,8 @@ function getGradeIcon(grade: string) {
  * Get status for health score progress bar
  */
 function getScoreStatus(score: number): 'success' | 'normal' | 'exception' {
-  if (score >= 80) return 'success';
-  if (score >= 60) return 'normal';
+  if (score >= 80) {return 'success';}
+  if (score >= 60) {return 'normal';}
   return 'exception';
 }
 

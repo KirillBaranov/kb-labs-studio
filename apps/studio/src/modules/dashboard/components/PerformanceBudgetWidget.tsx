@@ -29,7 +29,7 @@ export function PerformanceBudgetWidget() {
 
   // Calculate overall uptime
   const overallUptime = useMemo(() => {
-    if (!metrics.data?.requests) return 100;
+    if (!metrics.data?.requests) {return 100;}
 
     const total = metrics.data.requests.total ?? 0;
     const success = metrics.data.requests.success ?? 0;
@@ -64,7 +64,7 @@ export function PerformanceBudgetWidget() {
 
   // Per-plugin SLO tracking
   const serviceSLOs = useMemo(() => {
-    if (!metrics.data?.perPlugin) return [];
+    if (!metrics.data?.perPlugin) {return [];}
 
     return metrics.data.perPlugin.map((plugin): ServiceSLO => {
       const total = plugin.requests;
@@ -77,8 +77,8 @@ export function PerformanceBudgetWidget() {
       const budgetUsed = (currentDowntime / allowedDowntime) * 100;
 
       let status: 'healthy' | 'warning' | 'critical' = 'healthy';
-      if (budgetUsed > 90) status = 'critical';
-      else if (budgetUsed > 70) status = 'warning';
+      if (budgetUsed > 90) {status = 'critical';}
+      else if (budgetUsed > 70) {status = 'warning';}
 
       const serviceBurnRate = currentDowntime / allowedDowntime;
 
@@ -95,8 +95,8 @@ export function PerformanceBudgetWidget() {
 
   // Error budget gauge status
   const getGaugeStatus = (usedPercent: number) => {
-    if (usedPercent < 70) return 'success';
-    if (usedPercent < 90) return 'warning';
+    if (usedPercent < 70) {return 'success';}
+    if (usedPercent < 90) {return 'warning';}
     return 'exception';
   };
 

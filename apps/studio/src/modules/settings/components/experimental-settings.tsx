@@ -54,7 +54,7 @@ const RISK_ICONS: Record<FeatureRisk, React.ReactNode> = {
 };
 
 function isNewFeature(addedAt?: string): boolean {
-  if (!addedAt) return false;
+  if (!addedAt) {return false;}
   const added = new Date(addedAt);
   const now = new Date();
   const daysDiff = (now.getTime() - added.getTime()) / (1000 * 60 * 60 * 24);

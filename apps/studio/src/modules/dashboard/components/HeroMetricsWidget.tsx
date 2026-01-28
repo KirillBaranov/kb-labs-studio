@@ -49,7 +49,7 @@ export function HeroMetricsWidget() {
 
   // Calculate uptime percentage
   const calculateUptime = (metricsData: any) => {
-    if (!metricsData?.requests) return 100;
+    if (!metricsData?.requests) {return 100;}
     const total = metricsData.requests.total ?? 0;
     const success = metricsData.requests.success ?? 0;
     return total > 0 ? (success / total) * 100 : 100;
@@ -57,15 +57,15 @@ export function HeroMetricsWidget() {
 
   // Calculate trend from history
   const calculateTrend = (data: number[]) => {
-    if (data.length < 2) return null;
+    if (data.length < 2) {return null;}
     const recent = data.slice(-5); // Last 5 points
     const older = data.slice(-10, -5); // Previous 5 points
-    if (older.length === 0 || recent.length === 0) return null;
+    if (older.length === 0 || recent.length === 0) {return null;}
 
     const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
     const olderAvg = older.reduce((a, b) => a + b, 0) / older.length;
 
-    if (olderAvg === 0) return null;
+    if (olderAvg === 0) {return null;}
 
     const change = ((recentAvg - olderAvg) / olderAvg) * 100;
     return {
@@ -77,14 +77,14 @@ export function HeroMetricsWidget() {
 
   // Format uptime seconds to human-readable
   const formatUptime = (seconds: number | undefined) => {
-    if (!seconds) return '0s';
+    if (!seconds) {return '0s';}
 
     const days = Math.floor(seconds / 86400);
     const hours = Math.floor((seconds % 86400) / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
 
-    if (days > 0) return `${days}d ${hours}h`;
-    if (hours > 0) return `${hours}h ${minutes}m`;
+    if (days > 0) {return `${days}d ${hours}h`;}
+    if (hours > 0) {return `${hours}h ${minutes}m`;}
     return `${minutes}m`;
   };
 
@@ -104,14 +104,14 @@ export function HeroMetricsWidget() {
 
   // Determine health status
   const getHealthStatus = () => {
-    if (healthScore >= 80) return 'healthy';
-    if (healthScore >= 60) return 'warning';
+    if (healthScore >= 80) {return 'healthy';}
+    if (healthScore >= 60) {return 'warning';}
     return 'critical';
   };
 
   const getUptimeStatus = () => {
-    if (currentUptime >= 99.9) return 'healthy';
-    if (currentUptime >= 99) return 'warning';
+    if (currentUptime >= 99.9) {return 'healthy';}
+    if (currentUptime >= 99) {return 'warning';}
     return 'critical';
   };
 

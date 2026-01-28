@@ -72,7 +72,7 @@ export function PluginAIAssistantModal({
   const [error, setError] = useState<string | null>(null);
 
   const handleAsk = async (question: string) => {
-    if (!question.trim()) return;
+    if (!question.trim()) {return;}
 
     setLoading(true);
     setError(null);

@@ -15,7 +15,7 @@ import { trackWidgetEvent } from '../utils/analytics';
 import { studioConfig } from '../config/studio.config';
 import { HeaderPolicyCallout } from './header-policy-callout';
 import { WidgetErrorBoundary } from './widget-error-boundary';
-// eslint-disable-next-line import/extensions
+ 
 import { useWidgetEvents } from '../hooks/useWidgetEvents';
 import { useWidgetEventSubscription } from '../hooks/useWidgetEventSubscription';
 import { useCircularDependencyDetection } from '../hooks/useCircularDependencyDetection';

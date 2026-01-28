@@ -44,8 +44,8 @@ export function Timeline({ data, loading, error, options, onEventClick }: Timeli
   const compact = options?.compact === true;
 
   const getStatusColor = (kind?: string): string => {
-    if (kind === 'error') return 'red';
-    if (kind === 'success') return 'green';
+    if (kind === 'error') {return 'red';}
+    if (kind === 'success') {return 'green';}
     return 'blue';
   };
 

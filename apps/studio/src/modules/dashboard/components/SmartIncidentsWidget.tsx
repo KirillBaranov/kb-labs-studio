@@ -45,7 +45,7 @@ export function SmartIncidentsWidget() {
 
   // Filter and sort incidents
   const incidents = useMemo(() => {
-    if (!incidentsQuery.data) return [];
+    if (!incidentsQuery.data) {return [];}
     return incidentsQuery.data.sort((a, b) => b.timestamp - a.timestamp);
   }, [incidentsQuery.data]);
 

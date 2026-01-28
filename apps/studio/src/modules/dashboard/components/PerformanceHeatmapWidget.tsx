@@ -31,7 +31,7 @@ export function PerformanceHeatmapWidget() {
 
   // Transform backend data to include colors and labels
   const heatmapData = useMemo(() => {
-    if (!heatmapQuery.data) return [];
+    if (!heatmapQuery.data) {return [];}
 
     return heatmapQuery.data.map((cell) => ({
       hour: cell.hour,
@@ -44,7 +44,7 @@ export function PerformanceHeatmapWidget() {
 
   // Calculate statistics
   const stats = useMemo(() => {
-    if (heatmapData.length === 0) return { min: 0, max: 0, avg: 0, peak: { hour: 0, day: '' } };
+    if (heatmapData.length === 0) {return { min: 0, max: 0, avg: 0, peak: { hour: 0, day: '' } };}
 
     const values = heatmapData.map((c) => c.value);
     const min = Math.min(...values);
@@ -171,7 +171,7 @@ export function PerformanceHeatmapWidget() {
               <div style={{ display: 'flex', gap: 2, flex: 1 }}>
                 {HOURS.map((hour) => {
                   const cell = heatmapData.find((c) => c.day === day && c.hour === hour);
-                  if (!cell) return null;
+                  if (!cell) {return null;}
 
                   return (
                     <Tooltip
@@ -276,10 +276,10 @@ export function PerformanceHeatmapWidget() {
 
 // Helper: Calculate average latency across all plugins
 function calculateAverageLatency(data: any): number {
-  if (!data?.perPlugin || data.perPlugin.length === 0) return 100;
+  if (!data?.perPlugin || data.perPlugin.length === 0) {return 100;}
 
   const latencies = data.perPlugin.map((p: any) => p.latency?.average ?? 0).filter((l: number) => l > 0);
-  if (latencies.length === 0) return 100;
+  if (latencies.length === 0) {return 100;}
 
   return latencies.reduce((a: number, b: number) => a + b, 0) / latencies.length;
 }

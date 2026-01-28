@@ -31,7 +31,7 @@ export function AnimatedMetricCard({
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
-    if (value === displayValue) return;
+    if (value === displayValue) {return;}
 
     setIsAnimating(true);
     const startValue = displayValue;

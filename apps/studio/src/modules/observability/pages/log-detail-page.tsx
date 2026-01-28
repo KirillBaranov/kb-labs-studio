@@ -58,9 +58,9 @@ function formatRelativeTime(timestamp: string | number): string {
   const ms = typeof timestamp === 'number' ? timestamp : new Date(timestamp).getTime();
   const seconds = Math.floor((Date.now() - ms) / 1000);
 
-  if (seconds < 60) return `${seconds}s ago`;
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  if (seconds < 60) {return `${seconds}s ago`;}
+  if (seconds < 3600) {return `${Math.floor(seconds / 60)}m ago`;}
+  if (seconds < 86400) {return `${Math.floor(seconds / 3600)}h ago`;}
   return `${Math.floor(seconds / 86400)}d ago`;
 }
 
@@ -129,7 +129,7 @@ export function LogDetailPage() {
   const [correlationKeys, setCorrelationKeys] = useState<any>(null);
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {return;}
 
     const loadLog = async () => {
       setLoading(true);
@@ -153,7 +153,7 @@ export function LogDetailPage() {
 
   // Load correlation keys separately if we have the log
   useEffect(() => {
-    if (!id || !log) return;
+    if (!id || !log) {return;}
 
     const loadRelated = async () => {
       try {

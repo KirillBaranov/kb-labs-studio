@@ -111,7 +111,7 @@ interface SparklineProps {
 }
 
 function Sparkline({ data, color, width = 100, height = 30 }: SparklineProps) {
-  if (data.length < 2) return null;
+  if (data.length < 2) {return null;}
 
   const min = Math.min(...data);
   const max = Math.max(...data);

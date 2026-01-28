@@ -22,7 +22,7 @@ export function CronsTab() {
   });
 
   const formatDate = (date?: Date | string) => {
-    if (!date) return '—';
+    if (!date) {return '—';}
     return new Date(date).toLocaleString();
   };
 

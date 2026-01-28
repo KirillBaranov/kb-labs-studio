@@ -115,10 +115,10 @@ export function Menu({ data, options, onItemClick, trigger }: MenuProps) {
 
   const findItem = (menuItems: MenuItemDef[], id: string): MenuItemDef | undefined => {
     for (const item of menuItems) {
-      if (item.id === id) return item;
+      if (item.id === id) {return item;}
       if (item.children) {
         const found = findItem(item.children, id);
-        if (found) return found;
+        if (found) {return found;}
       }
     }
     return undefined;

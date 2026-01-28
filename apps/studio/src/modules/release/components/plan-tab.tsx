@@ -202,7 +202,7 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
       key: 'bump',
       width: 80,
       render: (bump: string) => {
-        if (!bump) return '-';
+        if (!bump) {return '-';}
         const colorMap: Record<string, string> = {
           major: 'red',
           minor: 'orange',

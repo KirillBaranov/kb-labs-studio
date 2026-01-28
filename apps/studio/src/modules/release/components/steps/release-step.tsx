@@ -150,7 +150,7 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
   };
 
   const handleRunRelease = async () => {
-    if (!validateOtp()) return;
+    if (!validateOtp()) {return;}
 
     setReleaseStarted(true);
     setReleaseError(null);

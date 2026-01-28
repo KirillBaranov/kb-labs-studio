@@ -75,20 +75,20 @@ export function IndustryBenchmarkWidget() {
     // Calculate percentile ranking for each metric
     const calculatePercentile = (value: number, median: number, top10: number, lowerIsBetter: boolean): number => {
       if (lowerIsBetter) {
-        if (value <= top10) return 95;
-        if (value <= median) return 50 + ((median - value) / (median - top10)) * 40;
+        if (value <= top10) {return 95;}
+        if (value <= median) {return 50 + ((median - value) / (median - top10)) * 40;}
         return Math.max(5, 50 - ((value - median) / median) * 40);
       } else {
-        if (value >= top10) return 95;
-        if (value >= median) return 50 + ((value - median) / (top10 - median)) * 40;
+        if (value >= top10) {return 95;}
+        if (value >= median) {return 50 + ((value - median) / (top10 - median)) * 40;}
         return Math.max(5, 50 - ((median - value) / median) * 40);
       }
     };
 
     const getStatus = (percentile: number): MetricComparison['status'] => {
-      if (percentile >= 90) return 'excellent';
-      if (percentile >= 70) return 'good';
-      if (percentile >= 40) return 'average';
+      if (percentile >= 90) {return 'excellent';}
+      if (percentile >= 70) {return 'good';}
+      if (percentile >= 40) {return 'average';}
       return 'poor';
     };
 
@@ -185,9 +185,9 @@ export function IndustryBenchmarkWidget() {
   };
 
   const formatValue = (value: number, unit: string) => {
-    if (unit === '$') return `$${value.toFixed(2)}`;
-    if (unit === '%') return `${value.toFixed(2)}%`;
-    if (unit === 'ms') return `${value.toFixed(0)}ms`;
+    if (unit === '$') {return `$${value.toFixed(2)}`;}
+    if (unit === '%') {return `${value.toFixed(2)}%`;}
+    if (unit === 'ms') {return `${value.toFixed(0)}ms`;}
     return value.toFixed(2);
   };
 

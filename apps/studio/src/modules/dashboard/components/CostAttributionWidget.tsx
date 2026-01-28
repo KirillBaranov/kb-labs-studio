@@ -102,7 +102,7 @@ export function CostAttributionWidget() {
 
   // Detect anomalies (>2x standard deviation)
   const anomalies = useMemo(() => {
-    if (topSpenders.length < 3) return [];
+    if (topSpenders.length < 3) {return [];}
 
     const costs = topSpenders.map(s => s.cost);
     const mean = costs.reduce((a, b) => a + b, 0) / costs.length;

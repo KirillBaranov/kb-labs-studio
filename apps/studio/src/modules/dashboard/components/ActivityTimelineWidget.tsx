@@ -32,7 +32,7 @@ export function ActivityTimelineWidget() {
 
   // Transform data for chart
   const chartData = React.useMemo(() => {
-    if (!requestsQuery.data || !errorsQuery.data) return [];
+    if (!requestsQuery.data || !errorsQuery.data) {return [];}
 
     // Merge requests and errors by timestamp
     const dataMap = new Map<number, { time: string; Requests: number; Errors: number }>();
@@ -85,7 +85,7 @@ export function ActivityTimelineWidget() {
         label: {
           formatter: (v: string) => {
             const num = Number(v);
-            if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+            if (num >= 1000) {return `${(num / 1000).toFixed(1)}K`;}
             return num.toLocaleString();
           },
         },

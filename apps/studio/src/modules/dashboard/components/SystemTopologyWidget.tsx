@@ -1,9 +1,10 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { Card, Drawer, Descriptions, Badge, Tag, Statistic, Row, Col } from 'antd';
 import { HolderOutlined, ApartmentOutlined, CloseOutlined } from '@ant-design/icons';
-import ReactFlow, {
+import type {
   Node,
-  Edge,
+  Edge} from 'reactflow';
+import ReactFlow, {
   Controls,
   Background,
   BackgroundVariant,
@@ -108,8 +109,8 @@ export function SystemTopologyWidget() {
       const errorRate = pluginRequests > 0 ? (pluginErrors / pluginRequests) * 100 : 0;
 
       let status: 'healthy' | 'warning' | 'error' = 'healthy';
-      if (errorRate > 5) status = 'error';
-      else if (errorRate > 1) status = 'warning';
+      if (errorRate > 5) {status = 'error';}
+      else if (errorRate > 1) {status = 'warning';}
 
       nodes.push({
         id: plugin.pluginId,
@@ -203,8 +204,8 @@ export function SystemTopologyWidget() {
           <MiniMap
             nodeColor={(node) => {
               const data = node.data as NodeData;
-              if (data.status === 'error') return '#ff4d4f';
-              if (data.status === 'warning') return '#faad14';
+              if (data.status === 'error') {return '#ff4d4f';}
+              if (data.status === 'warning') {return '#faad14';}
               return '#52c41a';
             }}
             nodeStrokeWidth={3}

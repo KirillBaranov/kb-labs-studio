@@ -117,7 +117,7 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
   const handleNavigate = React.useCallback(
     (path: string) => {
       const command = allCommands.find((cmd) => cmd.path === path);
-      if (!command) return;
+      if (!command) {return;}
 
       // Save to recent
       saveRecentCommand(command.id);

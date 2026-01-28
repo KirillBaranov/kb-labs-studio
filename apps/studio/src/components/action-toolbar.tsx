@@ -136,9 +136,9 @@ export function ActionToolbar({
 
   // Render icon
   const renderIcon = (iconName?: string) => {
-    if (!iconName) return null;
+    if (!iconName) {return null;}
     const IconComponent = (Icons as Record<string, React.ComponentType<any>>)[iconName];
-    if (!IconComponent) return null;
+    if (!IconComponent) {return null;}
     return <IconComponent />;
   };
 

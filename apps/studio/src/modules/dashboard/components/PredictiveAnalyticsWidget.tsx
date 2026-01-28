@@ -41,7 +41,7 @@ export function PredictiveAnalyticsWidget() {
 
   // Simple moving average prediction (can be replaced with ML model)
   const predictions = useMemo(() => {
-    if (!metrics.data?.requests) return [];
+    if (!metrics.data?.requests) {return [];}
 
     const historicalData = generateHistoricalData(selectedMetric, metrics.data);
     return forecastWithMovingAverage(historicalData, timeHorizon);
@@ -49,7 +49,7 @@ export function PredictiveAnalyticsWidget() {
 
   // Anomaly detection using statistical methods
   const anomalies = useMemo(() => {
-    if (!metrics.data) return [];
+    if (!metrics.data) {return [];}
 
     const detected: Anomaly[] = [];
     const threshold = 2; // 2 standard deviations
@@ -156,14 +156,14 @@ export function PredictiveAnalyticsWidget() {
 
   // Calculate prediction confidence score
   const overallConfidence = useMemo(() => {
-    if (predictions.length === 0) return 0;
+    if (predictions.length === 0) {return 0;}
     const avg = predictions.reduce((sum, p) => sum + p.confidence, 0) / predictions.length;
     return avg;
   }, [predictions]);
 
   // Trend analysis
   const trendAnalysis = useMemo(() => {
-    if (predictions.length < 2) return null;
+    if (predictions.length < 2) {return null;}
 
     const first = predictions[0].value;
     const last = predictions[predictions.length - 1].value;
@@ -378,7 +378,7 @@ function forecastWithMovingAverage(
   historical: { timestamp: number; value: number }[],
   horizon: '15m' | '30m' | '1h' | '2h'
 ): Prediction[] {
-  if (historical.length < 3) return [];
+  if (historical.length < 3) {return [];}
 
   const predictions: Prediction[] = [];
   const windowSize = 3; // 3-point moving average
@@ -409,10 +409,10 @@ function forecastWithMovingAverage(
 
 // Helper: Calculate average latency across all plugins
 function calculateAverageLatency(data: any): number {
-  if (!data?.perPlugin || data.perPlugin.length === 0) return 0;
+  if (!data?.perPlugin || data.perPlugin.length === 0) {return 0;}
 
   const latencies = data.perPlugin.map((p: any) => p.latency?.average ?? 0).filter((l: number) => l > 0);
-  if (latencies.length === 0) return 0;
+  if (latencies.length === 0) {return 0;}
 
   return latencies.reduce((a: number, b: number) => a + b, 0) / latencies.length;
 }

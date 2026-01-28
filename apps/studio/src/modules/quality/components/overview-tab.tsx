@@ -59,15 +59,15 @@ export function OverviewTab() {
   };
 
   const getHealthStatus = (score?: number): 'success' | 'exception' | 'normal' => {
-    if (!score) return 'normal';
-    if (score >= 80) return 'success';
-    if (score < 60) return 'exception';
+    if (!score) {return 'normal';}
+    if (score >= 80) {return 'success';}
+    if (score < 60) {return 'exception';}
     return 'normal';
   };
 
   const getSeverityType = (severity: string): 'error' | 'warning' | 'info' => {
-    if (severity === 'high') return 'error';
-    if (severity === 'medium') return 'warning';
+    if (severity === 'high') {return 'error';}
+    if (severity === 'medium') {return 'warning';}
     return 'info';
   };
 

@@ -56,9 +56,9 @@ function formatRelativeTime(timestamp: number): string {
  * Get status code color
  */
 function getStatusCodeColor(code: number): string {
-  if (code >= 500) return '#ff4d4f'; // red
-  if (code >= 400) return '#faad14'; // orange
-  if (code >= 300) return '#1890ff'; // blue
+  if (code >= 500) {return '#ff4d4f';} // red
+  if (code >= 400) {return '#faad14';} // orange
+  if (code >= 300) {return '#1890ff';} // blue
   return '#52c41a'; // green
 }
 

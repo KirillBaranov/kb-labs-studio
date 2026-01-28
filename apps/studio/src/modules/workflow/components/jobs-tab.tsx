@@ -31,19 +31,19 @@ export function JobsTab() {
   });
 
   const formatDate = (date?: Date | string) => {
-    if (!date) return '—';
+    if (!date) {return '—';}
     return new Date(date).toLocaleString();
   };
 
   const formatDuration = (start?: Date | string, end?: Date | string) => {
-    if (!start) return '—';
+    if (!start) {return '—';}
     const startMs = new Date(start).getTime();
     const endMs = end ? new Date(end).getTime() : Date.now();
     const durationMs = endMs - startMs;
     const seconds = Math.floor(durationMs / 1000);
-    if (seconds < 60) return `${seconds}s`;
+    if (seconds < 60) {return `${seconds}s`;}
     const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ${seconds % 60}s`;
+    if (minutes < 60) {return `${minutes}m ${seconds % 60}s`;}
     const hours = Math.floor(minutes / 60);
     return `${hours}h ${minutes % 60}m`;
   };
