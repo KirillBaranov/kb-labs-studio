@@ -1,0 +1,144 @@
+/**
+ * @module @kb-labs/studio-app/modules/commit/components/plan-tab
+ * Plan tab - commit plan viewer
+ *
+ * TODO: TEMPORARY - Remove after commit plugin UI is polished
+ */
+
+import { useState, useEffect } from 'react';
+import { Select, List, Empty, Space, theme } from 'antd';
+import { FileTextOutlined } from '@ant-design/icons';
+import { KBSection, KBKBSkeleton } from '@kb-labs/studio-ui-react';
+import { useDataSources } from '@/providers/data-sources-provider';
+import { useQuery } from '@tanstack/react-query';
+import { UIBox, UICard, UITag, UIText } from '@kb-labs/studio-ui-kit';
+
+const { useToken } = theme;
+
+export function PlanTab() {
+  const sources = useDataSources();
+  const [selectedWorkspace, setSelectedWorkspace] = useState<string>('');
+  const { token } = useToken();
+
+  // Fetch workspaces
+  const { data: workspacesData, isLoading: workspacesLoading } = useQuery({
+    queryKey: ['commit', 'workspaces'],
+    queryFn: () => sources.commit.getWorkspaces(),
+  });
+
+  // Fetch plan for selected workspace
+  const { data: planData, isLoading: planLoading } = useQuery({
+    queryKey: ['commit', 'plan', selectedWorkspace],
+    queryFn: () => sources.commit.getPlan(selectedWorkspace),
+    enabled: !!selectedWorkspace,
+  });
+
+  // Auto-select first workspace
+  useEffect(() => {
+    if (workspacesData?.workspaces && workspacesData.workspaces.length > 0 && !selectedWorkspace) {
+      setSelectedWorkspace(workspacesData.workspaces[0].id);
+    }
+  }, [workspacesData, selectedWorkspace]);
+
+  if (workspacesLoading) {
+    return <KBSkeleton />;
+  }
+
+  return (
+    <div style={{ marginTop: 16 }}>
+      <KBSection>
+        <KBCard>
+          <label>Select Workspace</label>
+          <Select
+            style={{ width: '100%', marginTop: 8 }}
+            placeholder="Choose monorepo package or repository"
+            value={selectedWorkspace}
+            onChange={setSelectedWorkspace}
+            loading={workspacesLoading}
+            showSearch
+            options={workspacesData?.workspaces?.map((w: any) => ({
+              label: w.name,
+              value: w.id,
+              title: w.path,
+            })) || []}
+          />
+        </KBCard>
+      </KBSection>
+
+      {selectedWorkspace && (
+        <KBSection style={{ marginTop: 16 }}>
+          <KBCard title="Commit Plan">
+            {planLoading ? (
+              <KBSkeleton />
+            ) : !planData?.hasPlan ? (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No plan. Click Generate Plan to create commits."
+              />
+            ) : (
+              <List
+                dataSource={planData.plan?.commits || []}
+                renderItem={(commit: any, index: number) => (
+                  <List.Item>
+                    <List.Item.Meta
+                      avatar={
+                        <div
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: '50%',
+                            background: token.colorPrimary,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: token.colorTextLightSolid,
+                            fontWeight: token.fontWeightStrong,
+                          }}
+                        >
+                          {index + 1}
+                        </div>
+                      }
+                      title={
+                        <Space>
+                          <UITag color={getTypeColor(commit.type)}>{commit.type}</UITag>
+                          {commit.scope && <UITag>{commit.scope}</UITag>}
+                          <UIText weight="semibold">{commit.subject}</UIText>
+                        </Space>
+                      }
+                      description={
+                        <>
+                          {commit.body && <UIText style={{ display: 'block', marginBottom: token.marginXS }}>{commit.body}</UIText>}
+                          {commit.files && commit.files.length > 0 && (
+                            <div>
+                              <UIText color="secondary">
+                                <FileTextOutlined /> {commit.files.length} file(s):{' '}
+                                {commit.files.join(', ')}
+                              </UIText>
+                            </div>
+                          )}
+                        </>
+                      }
+                    />
+                  </List.Item>
+                )}
+              />
+            )}
+          </KBCard>
+        </KBSection>
+      )}
+    </div>
+  );
+}
+
+function getTypeColor(type: string): string {
+  const colors: Record<string, string> = {
+    feat: 'green',
+    fix: 'red',
+    docs: 'blue',
+    style: 'purple',
+    refactor: 'orange',
+    test: 'cyan',
+    chore: 'default',
+  };
+  return colors[type] || 'default';
+}

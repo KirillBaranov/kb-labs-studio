@@ -1,0 +1,124 @@
+/**
+ * @module @kb-labs/studio-app/components/widget-error-boundary
+ * Error Boundary for widget isolation - prevents one widget error from crashing the entire page
+ */
+
+import * as React from 'react';
+import { Button } from 'antd';
+import { trackWidgetEvent } from '../utils/analytics';
+
+export interface WidgetErrorBoundaryProps {
+  /** Widget ID for tracking */
+  widgetId?: string;
+  /** Plugin ID for tracking */
+  pluginId?: string;
+  /** Children to render */
+  children: React.ReactNode;
+  /** Custom fallback UI */
+  fallback?: React.ComponentType<{ error: Error; resetError: () => void }>;
+}
+
+interface WidgetErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+/**
+ * WidgetErrorBoundary - isolates widget errors and provides fallback UI
+ */
+export class WidgetErrorBoundary extends React.Component<
+  WidgetErrorBoundaryProps,
+  WidgetErrorBoundaryState
+> {
+  constructor(props: WidgetErrorBoundaryProps) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null,
+    };
+  }
+
+  static getDerivedStateFromError(error: Error): WidgetErrorBoundaryState {
+    return {
+      hasError: true,
+      error,
+    };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+    // Track error in analytics
+    if (this.props.widgetId && this.props.pluginId) {
+      trackWidgetEvent('error', {
+        widgetId: this.props.widgetId,
+        pluginId: this.props.pluginId,
+        code: error.message,
+      });
+    }
+
+    // Log error for debugging
+    console.error('Widget Error Boundary caught an error:', error, errorInfo);
+  }
+
+  resetError = (): void => {
+    this.setState({
+      hasError: false,
+      error: null,
+    });
+  };
+
+  render(): React.ReactNode {
+    if (this.state.hasError && this.state.error) {
+      if (this.props.fallback) {
+        const FallbackComponent = this.props.fallback;
+        return <FallbackComponent error={this.state.error} resetError={this.resetError} />;
+      }
+
+      return (
+        <UICard
+          style={{
+            borderColor: 'var(--error)',
+            backgroundColor: 'var(--bg-secondary)',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+          }}
+        >
+          <div style={{ textAlign: 'center', padding: '16px' }}>
+            <div
+              style={{
+                fontSize: '24px',
+                marginBottom: '8px',
+                color: 'var(--error)',
+              }}
+            >
+              ⚠️
+            </div>
+            <h3 style={{ color: 'var(--error)', marginBottom: '8px' }}>
+              Widget Error
+            </h3>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '16px', fontSize: '14px' }}>
+              {this.state.error.message || 'An unexpected error occurred'}
+            </p>
+            {this.props.widgetId && (
+              <p style={{ color: 'var(--text-tertiary)', marginBottom: '16px', fontSize: '12px' }}>
+                Widget: {this.props.widgetId}
+              </p>
+            )}
+            <Button
+              type="primary"
+              onClick={this.resetError}
+              style={{
+                backgroundColor: 'var(--error)',
+                borderColor: 'var(--error)',
+              }}
+            >
+              Retry Widget
+            </Button>
+          </div>
+        </UICard>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
