@@ -112,7 +112,7 @@ export function PredictiveAnalyticsWidget() {
     yField: 'value',
     seriesField: 'type',
     smooth: true,
-    color: ['#1890ff', '#52c41a'],
+    color: ['var(--info)', 'var(--success)'],
     lineStyle: (datum: any) => {
       if (datum.type === 'Predicted') {
         return { lineDash: [4, 4], opacity: 0.7 };
@@ -180,7 +180,7 @@ export function PredictiveAnalyticsWidget() {
     <Card
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: '#999' }} />
+          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
           <ExperimentOutlined />
           <span>Predictive Analytics</span>
         </div>
@@ -218,33 +218,33 @@ export function PredictiveAnalyticsWidget() {
 
         {/* Prediction Summary */}
         <Col xs={24} md={8}>
-          <div style={{ padding: '12px', background: '#f0f5ff', borderRadius: 8, textAlign: 'center' }}>
+          <div style={{ padding: '12px', background: 'var(--accent-subtle)', borderRadius: 8, textAlign: 'center' }}>
             <Text type="secondary">Prediction Confidence</Text>
-            <Title level={2} style={{ margin: '8px 0', color: overallConfidence > 70 ? '#52c41a' : '#faad14' }}>
+            <Title level={2} style={{ margin: '8px 0', color: overallConfidence > 70 ? 'var(--success)' : 'var(--warning)' }}>
               {overallConfidence.toFixed(0)}%
             </Title>
             <Progress
               percent={overallConfidence}
               showInfo={false}
-              strokeColor={overallConfidence > 70 ? '#52c41a' : '#faad14'}
+              strokeColor={overallConfidence > 70 ? 'var(--success)' : 'var(--warning)'}
             />
           </div>
         </Col>
 
         <Col xs={24} md={8}>
-          <div style={{ padding: '12px', background: '#f6ffed', borderRadius: 8, textAlign: 'center' }}>
+          <div style={{ padding: '12px', background: 'var(--bg-tertiary)', borderRadius: 8, textAlign: 'center' }}>
             <Text type="secondary">Forecasted Trend</Text>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 8, gap: 8 }}>
               {trendAnalysis && (
                 <>
                   {trendAnalysis.direction === 'up' ? (
-                    <RiseOutlined style={{ fontSize: 32, color: trendAnalysis.isPositive ? '#52c41a' : '#ff4d4f' }} />
+                    <RiseOutlined style={{ fontSize: 32, color: trendAnalysis.isPositive ? 'var(--success)' : 'var(--error)' }} />
                   ) : (
-                    <FallOutlined style={{ fontSize: 32, color: trendAnalysis.isPositive ? '#52c41a' : '#ff4d4f' }} />
+                    <FallOutlined style={{ fontSize: 32, color: trendAnalysis.isPositive ? 'var(--success)' : 'var(--error)' }} />
                   )}
                   <Title
                     level={2}
-                    style={{ margin: 0, color: trendAnalysis.isPositive ? '#52c41a' : '#ff4d4f' }}
+                    style={{ margin: 0, color: trendAnalysis.isPositive ? 'var(--success)' : 'var(--error)' }}
                   >
                     {trendAnalysis.percentage.toFixed(1)}%
                   </Title>
@@ -256,9 +256,9 @@ export function PredictiveAnalyticsWidget() {
         </Col>
 
         <Col xs={24} md={8}>
-          <div style={{ padding: '12px', background: '#fff1f0', borderRadius: 8, textAlign: 'center' }}>
+          <div style={{ padding: '12px', background: 'var(--bg-tertiary)', borderRadius: 8, textAlign: 'center' }}>
             <Text type="secondary">Anomalies Detected</Text>
-            <Title level={2} style={{ margin: '8px 0', color: anomalies.length > 0 ? '#ff4d4f' : '#52c41a' }}>
+            <Title level={2} style={{ margin: '8px 0', color: anomalies.length > 0 ? 'var(--error)' : 'var(--success)' }}>
               {anomalies.length}
             </Title>
             <Text type="secondary">{anomalies.length > 0 ? 'Needs attention' : 'All clear'}</Text>
@@ -285,8 +285,8 @@ export function PredictiveAnalyticsWidget() {
                         key={index}
                         style={{
                           padding: '8px 12px',
-                          background: '#fff',
-                          border: '1px solid #f0f0f0',
+                          background: 'var(--bg-secondary)',
+                          border: '1px solid var(--border-primary)',
                           borderRadius: 4,
                           marginBottom: 8,
                         }}
@@ -297,7 +297,7 @@ export function PredictiveAnalyticsWidget() {
                           </Tag>
                           <Text strong>{anomaly.metric}</Text>
                         </div>
-                        <div style={{ fontSize: 12, color: '#666' }}>
+                        <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
                           Expected: {anomaly.expectedValue.toFixed(1)} | Actual: {anomaly.actualValue.toFixed(1)} |
                           Deviation: +{anomaly.deviation.toFixed(0)}%
                         </div>

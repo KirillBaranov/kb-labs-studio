@@ -49,8 +49,8 @@ export function SystemTopologyWidget() {
       data: { label: '👤 User', type: 'user', status: 'healthy' },
       position: { x: 400, y: 0 },
       style: {
-        background: '#e6f7ff',
-        border: '2px solid #1890ff',
+        background: 'var(--accent-subtle)',
+        border: '2px solid var(--info)',
         borderRadius: 8,
         padding: 10,
         fontSize: 14,
@@ -74,8 +74,8 @@ export function SystemTopologyWidget() {
       } as NodeData,
       position: { x: 400, y: 100 },
       style: {
-        background: apiStatus === 'healthy' ? '#f6ffed' : apiStatus === 'warning' ? '#fffbe6' : '#fff1f0',
-        border: `2px solid ${apiStatus === 'healthy' ? '#52c41a' : apiStatus === 'warning' ? '#faad14' : '#ff4d4f'}`,
+        background: apiStatus === 'healthy' ? 'var(--bg-tertiary)' : apiStatus === 'warning' ? 'var(--bg-tertiary)' : 'var(--bg-tertiary)',
+        border: `2px solid ${apiStatus === 'healthy' ? 'var(--success)' : apiStatus === 'warning' ? 'var(--warning)' : 'var(--error)'}`,
         borderRadius: 8,
         padding: 12,
         fontSize: 13,
@@ -88,8 +88,8 @@ export function SystemTopologyWidget() {
       source: 'user',
       target: 'api',
       animated: true,
-      style: { stroke: '#1890ff', strokeWidth: 2 },
-      markerEnd: { type: MarkerType.ArrowClosed, color: '#1890ff' },
+      style: { stroke: 'var(--info)', strokeWidth: 2 },
+      markerEnd: { type: MarkerType.ArrowClosed, color: 'var(--info)' },
     });
 
     // Plugin nodes
@@ -124,8 +124,8 @@ export function SystemTopologyWidget() {
         } as NodeData,
         position: { x, y },
         style: {
-          background: status === 'healthy' ? '#f6ffed' : status === 'warning' ? '#fffbe6' : '#fff1f0',
-          border: `2px solid ${status === 'healthy' ? '#52c41a' : status === 'warning' ? '#faad14' : '#ff4d4f'}`,
+          background: status === 'healthy' ? 'var(--bg-tertiary)' : status === 'warning' ? 'var(--bg-tertiary)' : 'var(--bg-tertiary)',
+          border: `2px solid ${status === 'healthy' ? 'var(--success)' : status === 'warning' ? 'var(--warning)' : 'var(--error)'}`,
           borderRadius: 8,
           padding: 10,
           fontSize: 12,
@@ -140,15 +140,15 @@ export function SystemTopologyWidget() {
         target: plugin.pluginId,
         animated: pluginRequests > 100, // Animate high-traffic routes
         style: {
-          stroke: status === 'error' ? '#ff4d4f' : status === 'warning' ? '#faad14' : '#52c41a',
+          stroke: status === 'error' ? 'var(--error)' : status === 'warning' ? 'var(--warning)' : 'var(--success)',
           strokeWidth: Math.min(3, 1 + pluginRequests / 1000), // Width based on traffic
         },
         markerEnd: {
           type: MarkerType.ArrowClosed,
-          color: status === 'error' ? '#ff4d4f' : status === 'warning' ? '#faad14' : '#52c41a',
+          color: status === 'error' ? 'var(--error)' : status === 'warning' ? 'var(--warning)' : 'var(--success)',
         },
         label: pluginRequests > 100 ? `${pluginRequests}` : undefined,
-        labelBgStyle: { fill: '#fff', fillOpacity: 0.8 },
+        labelBgStyle: { fill: 'var(--bg-secondary)', fillOpacity: 0.8 },
         labelStyle: { fontSize: 10 },
       });
     });
@@ -204,9 +204,9 @@ export function SystemTopologyWidget() {
           <MiniMap
             nodeColor={(node) => {
               const data = node.data as NodeData;
-              if (data.status === 'error') {return '#ff4d4f';}
-              if (data.status === 'warning') {return '#faad14';}
-              return '#52c41a';
+              if (data.status === 'error') {return 'var(--error)';}
+              if (data.status === 'warning') {return 'var(--warning)';}
+              return 'var(--success)';
             }}
             nodeStrokeWidth={3}
             zoomable
@@ -252,7 +252,7 @@ export function SystemTopologyWidget() {
                   value={selectedNode.data.errors ?? 0}
                   valueStyle={{
                     fontSize: 24,
-                    color: (selectedNode.data.errors ?? 0) > 0 ? '#ff4d4f' : '#52c41a',
+                    color: (selectedNode.data.errors ?? 0) > 0 ? 'var(--error)' : 'var(--success)',
                   }}
                 />
               </Col>

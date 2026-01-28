@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Card, Tabs, Progress, Statistic, Row, Col, Tag, Empty } from 'antd';
+import { Tabs, Progress, Statistic, Row, Col, Tag, Empty } from 'antd';
 import {
   CloudServerOutlined,
   ThunderboltOutlined,
   DatabaseOutlined,
   ClockCircleOutlined,
 } from '@ant-design/icons';
+import { UICard } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { useSystemMetrics, type SystemMetricsData } from '@kb-labs/studio-data-client';
 
@@ -41,9 +42,9 @@ function formatUptime(seconds: number): string {
  * Get color for metric value based on thresholds
  */
 function getMetricColor(value: number, warningThreshold: number, criticalThreshold: number): string {
-  if (value >= criticalThreshold) {return '#ff4d4f';}
-  if (value >= warningThreshold) {return '#faad14';}
-  return '#52c41a';
+  if (value >= criticalThreshold) {return 'var(--error)';}
+  if (value >= warningThreshold) {return 'var(--warning)';}
+  return 'var(--success)';
 }
 
 /**
@@ -63,7 +64,7 @@ function InstanceMetrics({ instance }: { instance: SystemMetricsData['instances'
     <div style={{ padding: '16px 0' }}>
       {/* Instance header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-        <CloudServerOutlined style={{ fontSize: 18, color: isDead ? '#999' : '#1890ff' }} />
+        <CloudServerOutlined style={{ fontSize: 18, color: isDead ? 'var(--text-tertiary)' : 'var(--info)' }} />
         <span style={{ fontSize: 14, fontWeight: 500 }}>{instance.instanceId}</span>
         {isDead && <Tag color="red">Dead</Tag>}
         {isStale && !isDead && <Tag color="orange">Stale</Tag>}
@@ -77,7 +78,7 @@ function InstanceMetrics({ instance }: { instance: SystemMetricsData['instances'
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
               <ThunderboltOutlined style={{ color: cpuColor }} />
-              <span style={{ fontSize: 12, color: '#666' }}>CPU Usage</span>
+              <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>CPU Usage</span>
             </div>
             <Progress
               percent={parseFloat(instance.cpu.percentage.toFixed(1))}
@@ -93,7 +94,7 @@ function InstanceMetrics({ instance }: { instance: SystemMetricsData['instances'
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
               <DatabaseOutlined style={{ color: memoryColor }} />
-              <span style={{ fontSize: 12, color: '#666' }}>Memory (RSS)</span>
+              <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Memory (RSS)</span>
             </div>
             <Progress
               percent={parseFloat(instance.memory.rssPercentage.toFixed(1))}
@@ -101,7 +102,7 @@ function InstanceMetrics({ instance }: { instance: SystemMetricsData['instances'
               size="small"
               format={(percent) => `${percent}%`}
             />
-            <div style={{ fontSize: 11, color: '#999', marginTop: 4 }}>
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 4 }}>
               {formatBytes(instance.memory.rss)} / {formatBytes(instance.totalMemory)}
             </div>
           </div>
@@ -112,7 +113,7 @@ function InstanceMetrics({ instance }: { instance: SystemMetricsData['instances'
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
               <DatabaseOutlined style={{ color: heapColor }} />
-              <span style={{ fontSize: 12, color: '#666' }}>Heap Usage</span>
+              <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Heap Usage</span>
             </div>
             <Progress
               percent={parseFloat(instance.memory.heapPercentage.toFixed(1))}
@@ -120,7 +121,7 @@ function InstanceMetrics({ instance }: { instance: SystemMetricsData['instances'
               size="small"
               format={(percent) => `${percent}%`}
             />
-            <div style={{ fontSize: 11, color: '#999', marginTop: 4 }}>
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 4 }}>
               {formatBytes(instance.memory.heapUsed)} / {formatBytes(instance.memory.heapTotal)}
             </div>
           </div>
@@ -130,7 +131,7 @@ function InstanceMetrics({ instance }: { instance: SystemMetricsData['instances'
         <Col span={12}>
           <Statistic
             title={
-              <span style={{ fontSize: 12, color: '#666' }}>
+              <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
                 <ClockCircleOutlined style={{ marginRight: 4 }} />
                 Uptime
               </span>
@@ -142,18 +143,18 @@ function InstanceMetrics({ instance }: { instance: SystemMetricsData['instances'
 
         {/* Load Average */}
         <Col span={24}>
-          <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>Load Average</div>
+          <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 4 }}>Load Average</div>
           <div style={{ display: 'flex', gap: 16 }}>
             <div>
-              <span style={{ color: '#999' }}>1m:</span>{' '}
+              <span style={{ color: 'var(--text-tertiary)' }}>1m:</span>{' '}
               <span style={{ fontWeight: 500 }}>{instance.loadAvg[0].toFixed(2)}</span>
             </div>
             <div>
-              <span style={{ color: '#999' }}>5m:</span>{' '}
+              <span style={{ color: 'var(--text-tertiary)' }}>5m:</span>{' '}
               <span style={{ fontWeight: 500 }}>{instance.loadAvg[1].toFixed(2)}</span>
             </div>
             <div>
-              <span style={{ color: '#999' }}>15m:</span>{' '}
+              <span style={{ color: 'var(--text-tertiary)' }}>15m:</span>{' '}
               <span style={{ fontWeight: 500 }}>{instance.loadAvg[2].toFixed(2)}</span>
             </div>
           </div>
@@ -199,7 +200,7 @@ export function SystemResourcesWidget() {
   });
 
   return (
-    <Card
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <CloudServerOutlined />
@@ -219,7 +220,7 @@ export function SystemResourcesWidget() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#999',
+          color: 'var(--text-tertiary)',
         }}>
           Loading system metrics...
         </div>
@@ -229,7 +230,7 @@ export function SystemResourcesWidget() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#ff4d4f',
+          color: 'var(--error)',
         }}>
           Failed to load system metrics
         </div>
@@ -294,6 +295,6 @@ export function SystemResourcesWidget() {
           )}
         </>
       )}
-    </Card>
+    </UICard>
   );
 }

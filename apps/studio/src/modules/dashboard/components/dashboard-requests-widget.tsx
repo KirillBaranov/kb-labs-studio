@@ -63,7 +63,7 @@ export function DashboardRequestsWidget() {
     <KBCard
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: '#999' }} />
+          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
           <span>Top Routes</span>
           {loading && <Spin size="small" />}
         </div>
@@ -73,7 +73,7 @@ export function DashboardRequestsWidget() {
       {chartData.length > 0 ? (
         <KBLineChart {...config} />
       ) : (
-        <div style={{ padding: '40px', textAlign: 'center', color: '#999' }}>
+        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-tertiary)' }}>
           No request data available
         </div>
       )}

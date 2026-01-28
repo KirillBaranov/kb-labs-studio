@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Card, Segmented } from 'antd';
-import { KBAreaChart } from '@kb-labs/studio-ui-react';
+import { Card, Segmented, theme } from 'antd';
+import { UIAreaChart } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { useMetricsHistory } from '@kb-labs/studio-data-client';
+
+const { useToken } = theme;
 
 type TimeRange = '1m' | '5m' | '10m' | '30m';
 
@@ -15,7 +17,12 @@ const TIME_RANGE_CONFIG = {
 
 export function ActivityTimelineWidget() {
   const sources = useDataSources();
+  const { token } = useToken();
   const [timeRange, setTimeRange] = useState<TimeRange>('10m');
+
+  // Chart colors - use token colors with fallback
+  const requestsColor = token.colorInfo || '#1890ff';
+  const errorsColor = token.colorError || '#ff4d4f';
 
   // Fetch requests and errors history
   const requestsQuery = useMetricsHistory(sources.observability, {
@@ -65,13 +72,9 @@ export function ActivityTimelineWidget() {
     xField: 'time',
     yField: 'value',
     colorField: 'type',
+    color: [requestsColor, errorsColor],
     height: 250,
     smooth: true,
-    scale: {
-      color: {
-        range: ['#1890ff', '#ff4d4f'], // Requests: blue, Errors: red
-      },
-    },
     style: {
       fillOpacity: 0.3,
     },
@@ -98,7 +101,7 @@ export function ActivityTimelineWidget() {
         (d: any) => ({
           name: d.type,
           value: d.value?.toLocaleString() ?? 0,
-          color: d.type === 'Requests' ? '#1890ff' : '#ff4d4f',
+          color: d.type === 'Requests' ? requestsColor : errorsColor,
         }),
       ],
     },
@@ -137,7 +140,7 @@ export function ActivityTimelineWidget() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#999',
+          color: 'var(--text-tertiary)',
         }}>
           Loading metrics...
         </div>
@@ -147,7 +150,7 @@ export function ActivityTimelineWidget() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#ff4d4f',
+          color: 'var(--error)',
         }}>
           Failed to load metrics
         </div>
@@ -161,7 +164,7 @@ export function ActivityTimelineWidget() {
                 width: 10,
                 height: 10,
                 borderRadius: '50%',
-                backgroundColor: '#1890ff',
+                backgroundColor: requestsColor,
               }} />
               <span style={{ fontSize: 13, fontWeight: 500 }}>
                 Requests ({currentRequests.toLocaleString()})
@@ -173,14 +176,14 @@ export function ActivityTimelineWidget() {
                 width: 10,
                 height: 10,
                 borderRadius: '50%',
-                backgroundColor: '#ff4d4f',
+                backgroundColor: errorsColor,
               }} />
               <span style={{ fontSize: 13, fontWeight: 500 }}>
                 Errors ({currentErrors.toLocaleString()})
               </span>
             </div>
           </div>
-          <KBAreaChart {...config} data={multiSeriesData} />
+          <UIAreaChart {...config} data={multiSeriesData} />
         </div>
       ) : (
         <div style={{
@@ -188,7 +191,7 @@ export function ActivityTimelineWidget() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#999',
+          color: 'var(--text-tertiary)',
         }}>
           No data available
         </div>

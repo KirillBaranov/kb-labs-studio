@@ -1,4 +1,5 @@
-import { Card, Row, Col, Badge } from 'antd';
+import { Row, Col, Badge } from 'antd';
+import { UICard } from '@kb-labs/studio-ui-kit';
 import { HolderOutlined } from '@ant-design/icons';
 import { KBStatCard } from '@kb-labs/studio-ui-react';
 import { useRegistry } from '../../../providers/registry-provider';
@@ -16,7 +17,7 @@ export function DashboardKpisWidget() {
     <Card
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: '#999' }} />
+          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
           <span>System Status</span>
           <Badge status={statusType as 'success' | 'error'} />
         </div>
@@ -29,7 +30,7 @@ export function DashboardKpisWidget() {
           <KBStatCard
             label="Status"
             value={systemStatus}
-            valueColor={health?.ready ? '#52c41a' : '#ff4d4f'}
+            valueColor={health?.ready ? 'var(--success)' : 'var(--error)'}
           />
         </Col>
         <Col span={6}>
@@ -43,17 +44,17 @@ export function DashboardKpisWidget() {
           <KBStatCard
             label="Failed"
             value={pluginsFailed.toString()}
-            valueColor={pluginsFailed > 0 ? '#ff4d4f' : '#52c41a'}
+            valueColor={pluginsFailed > 0 ? 'var(--error)' : 'var(--success)'}
           />
         </Col>
         <Col span={6}>
           <KBStatCard
             label="Redis"
             value={health?.redisHealthy ? 'Healthy' : health?.redisEnabled ? 'Unhealthy' : 'Disabled'}
-            valueColor={health?.redisHealthy ? '#52c41a' : health?.redisEnabled ? '#ff4d4f' : '#999'}
+            valueColor={health?.redisHealthy ? 'var(--success)' : health?.redisEnabled ? 'var(--error)' : 'var(--text-tertiary)'}
           />
         </Col>
       </Row>
-    </Card>
+    </UICard>
   );
 }

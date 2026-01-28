@@ -245,7 +245,7 @@ export function AIInsightsWidget() {
       }}>
         {messages.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-            <BulbOutlined style={{ fontSize: 48, color: '#d9d9d9', marginBottom: 16 }} />
+            <BulbOutlined style={{ fontSize: 48, color: 'var(--border-primary)', marginBottom: 16 }} />
             <Title level={5} type="secondary">Ask me anything about your system</Title>
             <Paragraph type="secondary" style={{ fontSize: 13 }}>
               I can analyze costs, performance, health metrics, and suggest optimizations.
@@ -277,7 +277,7 @@ export function AIInsightsWidget() {
                 size={32}
                 icon={msg.role === 'user' ? <UserOutlined /> : <RobotOutlined />}
                 style={{
-                  backgroundColor: msg.role === 'user' ? '#1890ff' : '#722ed1',
+                  backgroundColor: msg.role === 'user' ? 'var(--info)' : 'var(--link)',
                   flexShrink: 0,
                 }}
               />
@@ -285,8 +285,8 @@ export function AIInsightsWidget() {
                 maxWidth: '80%',
                 padding: '10px 14px',
                 borderRadius: 12,
-                backgroundColor: msg.role === 'user' ? '#1890ff' : '#f5f5f5',
-                color: msg.role === 'user' ? '#fff' : '#000',
+                backgroundColor: msg.role === 'user' ? 'var(--info)' : 'var(--bg-tertiary)',
+                color: msg.role === 'user' ? 'var(--text-inverse)' : 'var(--text-primary)',
               }}>
                 <div style={{ whiteSpace: 'pre-wrap', fontSize: 13, lineHeight: 1.6 }}>
                   {msg.content.split('**').map((part, i) =>
@@ -316,11 +316,11 @@ export function AIInsightsWidget() {
 
         {isTyping && (
           <div style={{ display: 'flex', gap: 12 }}>
-            <Avatar size={32} icon={<RobotOutlined />} style={{ backgroundColor: '#722ed1' }} />
+            <Avatar size={32} icon={<RobotOutlined />} style={{ backgroundColor: 'var(--link)' }} />
             <div style={{
               padding: '10px 14px',
               borderRadius: 12,
-              backgroundColor: '#f5f5f5',
+              backgroundColor: 'var(--bg-tertiary)',
             }}>
               <Spin size="small" /> <Text type="secondary" style={{ marginLeft: 8 }}>Analyzing...</Text>
             </div>
@@ -332,7 +332,7 @@ export function AIInsightsWidget() {
       {/* Input Area */}
       <div style={{
         padding: 12,
-        borderTop: '1px solid #f0f0f0',
+        borderTop: '1px solid var(--border-primary)',
         display: 'flex',
         gap: 8,
       }}>

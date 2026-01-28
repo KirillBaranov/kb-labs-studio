@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Card, Row, Col } from 'antd';
+import { UICard } from '@kb-labs/studio-ui-kit';
+import { Row, Col } from 'antd';
 import { HolderOutlined } from '@ant-design/icons';
 import { KBStatCard } from '@kb-labs/studio-ui-react';
 import { type MetricsSnapshot } from '../../../api/metrics';
@@ -47,7 +48,7 @@ export function DashboardMetricsWidget() {
     <Card
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: '#999' }} />
+          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
           <span>Performance Metrics</span>
         </div>
       }
@@ -59,14 +60,14 @@ export function DashboardMetricsWidget() {
           <KBStatCard
             label="Requests"
             value={totalRequests.toLocaleString()}
-            valueColor="#1890ff"
+            valueColor="var(--info)"
           />
         </Col>
         <Col span={6}>
           <KBStatCard
             label="Error Rate"
             value={`${errorRate.toFixed(1)}%`}
-            valueColor={errorRate > 5 ? '#ff4d4f' : errorRate > 1 ? '#faad14' : '#52c41a'}
+            valueColor={errorRate > 5 ? 'var(--error)' : errorRate > 1 ? 'var(--warning)' : 'var(--success)'}
           />
         </Col>
         <Col span={6}>
@@ -74,7 +75,7 @@ export function DashboardMetricsWidget() {
             label="Latency (avg)"
             value={`${avgLatency.toFixed(1)}ms`}
             subValue={`p50 ${p50.toFixed(1)}ms`}
-            valueColor={avgLatency > 500 ? '#ff4d4f' : avgLatency > 200 ? '#faad14' : '#52c41a'}
+            valueColor={avgLatency > 500 ? 'var(--error)' : avgLatency > 200 ? 'var(--warning)' : 'var(--success)'}
           />
         </Col>
         <Col span={6}>
@@ -82,7 +83,7 @@ export function DashboardMetricsWidget() {
             label="Latency (p95/p99)"
             value={`${p95.toFixed(1)}ms`}
             subValue={`p99 ${p99.toFixed(1)}ms`}
-            valueColor={p95 > 1000 ? '#ff4d4f' : p95 > 500 ? '#faad14' : '#52c41a'}
+            valueColor={p95 > 1000 ? 'var(--error)' : p95 > 500 ? 'var(--warning)' : 'var(--success)'}
           />
         </Col>
       </Row>
@@ -91,10 +92,10 @@ export function DashboardMetricsWidget() {
           <KBStatCard
             label="Uptime"
             value={formatUptime(uptime)}
-            valueColor="#52c41a"
+            valueColor="var(--success)"
           />
         </Col>
       </Row>
-    </Card>
+    </UICard>
   );
 }

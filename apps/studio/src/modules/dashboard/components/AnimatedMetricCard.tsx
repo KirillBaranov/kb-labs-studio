@@ -23,7 +23,7 @@ export function AnimatedMetricCard({
   prefix,
   precision = 0,
   icon,
-  color = '#1890ff',
+  color = 'var(--info)',
   animationDuration = 1000,
   loading = false,
 }: AnimatedMetricCardProps) {
@@ -94,7 +94,7 @@ export function AnimatedMetricCard({
               style={{
                 marginTop: 8,
                 fontSize: 12,
-                color: isIncrease ? '#52c41a' : '#ff4d4f',
+                color: isIncrease ? 'var(--success)' : 'var(--error)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 4,
@@ -102,7 +102,7 @@ export function AnimatedMetricCard({
             >
               <span>{isIncrease ? '↑' : '↓'}</span>
               <span>{Math.abs(changePercent).toFixed(1)}%</span>
-              <span style={{ color: '#999' }}>from previous</span>
+              <span style={{ color: 'var(--text-tertiary)' }}>from previous</span>
             </div>
           )}
         </div>

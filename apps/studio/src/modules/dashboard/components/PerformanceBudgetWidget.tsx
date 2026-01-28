@@ -112,7 +112,7 @@ export function PerformanceBudgetWidget() {
       dataIndex: 'uptime',
       key: 'uptime',
       render: (uptime: number) => {
-        const color = uptime >= 99.9 ? '#52c41a' : uptime >= 99 ? '#faad14' : '#ff4d4f';
+        const color = uptime >= 99.9 ? 'var(--success)' : uptime >= 99 ? 'var(--warning)' : 'var(--error)';
         return <Text style={{ color }}>{uptime.toFixed(3)}%</Text>;
       },
       sorter: (a: ServiceSLO, b: ServiceSLO) => a.uptime - b.uptime,
@@ -158,7 +158,7 @@ export function PerformanceBudgetWidget() {
       dataIndex: 'burnRate',
       key: 'burnRate',
       render: (rate: number) => {
-        const color = rate <= 1 ? '#52c41a' : rate <= 2 ? '#faad14' : '#ff4d4f';
+        const color = rate <= 1 ? 'var(--success)' : rate <= 2 ? 'var(--warning)' : 'var(--error)';
         return <Text style={{ color }}>{rate.toFixed(2)}x</Text>;
       },
       sorter: (a: ServiceSLO, b: ServiceSLO) => a.burnRate - b.burnRate,
@@ -169,7 +169,7 @@ export function PerformanceBudgetWidget() {
     <Card
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: '#999' }} />
+          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
           <DashboardOutlined />
           <span>Performance Budget (SLO)</span>
         </div>
@@ -182,7 +182,7 @@ export function PerformanceBudgetWidget() {
         <Col xs={24} md={8}>
           <div style={{
             padding: '16px',
-            background: '#f0f5ff',
+            background: 'var(--accent-subtle)',
             borderRadius: 8,
             textAlign: 'center',
           }}>
@@ -197,7 +197,7 @@ export function PerformanceBudgetWidget() {
         <Col xs={24} md={8}>
           <div style={{
             padding: '16px',
-            background: overallUptime >= 99.9 ? '#f6ffed' : '#fff1f0',
+            background: overallUptime >= 99.9 ? 'var(--bg-tertiary)' : 'var(--bg-tertiary)',
             borderRadius: 8,
             textAlign: 'center',
           }}>
@@ -206,7 +206,7 @@ export function PerformanceBudgetWidget() {
               level={2}
               style={{
                 margin: '8px 0',
-                color: overallUptime >= 99.9 ? '#52c41a' : '#ff4d4f',
+                color: overallUptime >= 99.9 ? 'var(--success)' : 'var(--error)',
               }}
             >
               {overallUptime.toFixed(3)}%
@@ -220,7 +220,7 @@ export function PerformanceBudgetWidget() {
         <Col xs={24} md={8}>
           <div style={{
             padding: '16px',
-            background: '#fffbe6',
+            background: 'var(--bg-tertiary)',
             borderRadius: 8,
             textAlign: 'center',
           }}>
@@ -229,7 +229,7 @@ export function PerformanceBudgetWidget() {
               level={2}
               style={{
                 margin: '8px 0',
-                color: burnRate <= 1 ? '#52c41a' : burnRate <= 2 ? '#faad14' : '#ff4d4f',
+                color: burnRate <= 1 ? 'var(--success)' : burnRate <= 2 ? 'var(--warning)' : 'var(--error)',
               }}
             >
               {burnRate.toFixed(2)}x
@@ -245,7 +245,7 @@ export function PerformanceBudgetWidget() {
           <Card
             size="small"
             title="Error Budget Consumption"
-            style={{ background: '#fafafa' }}
+            style={{ background: 'var(--bg-tertiary)' }}
           >
             <Row gutter={16} align="middle">
               <Col xs={24} md={12}>
@@ -259,7 +259,7 @@ export function PerformanceBudgetWidget() {
                         <div style={{ fontSize: 24, fontWeight: 'bold' }}>
                           {(100 - (percent ?? 0)).toFixed(1)}%
                         </div>
-                        <div style={{ fontSize: 12, color: '#999' }}>
+                        <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
                           Remaining
                         </div>
                       </div>
@@ -286,7 +286,7 @@ export function PerformanceBudgetWidget() {
                       precision={1}
                       valueStyle={{
                         fontSize: 18,
-                        color: errorBudget.usedPercent > 90 ? '#ff4d4f' : '#52c41a',
+                        color: errorBudget.usedPercent > 90 ? 'var(--error)' : 'var(--success)',
                       }}
                     />
                   </Col>

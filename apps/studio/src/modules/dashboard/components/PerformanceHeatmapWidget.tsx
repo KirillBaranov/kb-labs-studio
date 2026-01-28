@@ -94,7 +94,7 @@ export function PerformanceHeatmapWidget() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#999',
+          color: 'var(--text-tertiary)',
         }}>
           Loading heatmap...
         </div>
@@ -104,7 +104,7 @@ export function PerformanceHeatmapWidget() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#ff4d4f',
+          color: 'var(--error)',
         }}>
           Failed to load heatmap
         </div>
@@ -117,7 +117,7 @@ export function PerformanceHeatmapWidget() {
             gridTemplateColumns: 'repeat(4, 1fr)',
             gap: 12,
             padding: 12,
-            background: '#fafafa',
+            background: 'var(--bg-tertiary)',
             borderRadius: 8,
           }}
         >
@@ -125,7 +125,7 @@ export function PerformanceHeatmapWidget() {
             <Text type="secondary" style={{ fontSize: 12 }}>
               Min
             </Text>
-            <div style={{ fontSize: 18, fontWeight: 600, color: '#52c41a' }}>
+            <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--success)' }}>
               {formatValue(stats.min, selectedMetric)}
             </div>
           </div>
@@ -133,7 +133,7 @@ export function PerformanceHeatmapWidget() {
             <Text type="secondary" style={{ fontSize: 12 }}>
               Average
             </Text>
-            <div style={{ fontSize: 18, fontWeight: 600, color: '#1890ff' }}>
+            <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--info)' }}>
               {formatValue(stats.avg, selectedMetric)}
             </div>
           </div>
@@ -141,7 +141,7 @@ export function PerformanceHeatmapWidget() {
             <Text type="secondary" style={{ fontSize: 12 }}>
               Max
             </Text>
-            <div style={{ fontSize: 18, fontWeight: 600, color: '#ff4d4f' }}>
+            <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--error)' }}>
               {formatValue(stats.max, selectedMetric)}
             </div>
           </div>
@@ -159,7 +159,7 @@ export function PerformanceHeatmapWidget() {
         <div>
           <div style={{ display: 'flex', gap: 4, marginBottom: 8, paddingLeft: 40 }}>
             {[0, 3, 6, 9, 12, 15, 18, 21].map((h) => (
-              <div key={h} style={{ flex: 1, fontSize: 11, color: '#999', textAlign: 'center' }}>
+              <div key={h} style={{ flex: 1, fontSize: 11, color: 'var(--text-tertiary)', textAlign: 'center' }}>
                 {h}:00
               </div>
             ))}
@@ -167,7 +167,7 @@ export function PerformanceHeatmapWidget() {
 
           {DAYS.map((day) => (
             <div key={day} style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-              <div style={{ width: 35, fontSize: 12, color: '#666', fontWeight: 500 }}>{day}</div>
+              <div style={{ width: 35, fontSize: 12, color: 'var(--text-secondary)', fontWeight: 500 }}>{day}</div>
               <div style={{ display: 'flex', gap: 2, flex: 1 }}>
                 {HOURS.map((hour) => {
                   const cell = heatmapData.find((c) => c.day === day && c.hour === hour);
@@ -236,15 +236,15 @@ export function PerformanceHeatmapWidget() {
         <div
           style={{
             padding: 12,
-            background: '#f0f5ff',
+            background: 'var(--accent-subtle)',
             borderRadius: 8,
-            borderLeft: '3px solid #1890ff',
+            borderLeft: '3px solid var(--info)',
           }}
         >
           <Text strong style={{ fontSize: 13 }}>
             💡 Insights:
           </Text>
-          <div style={{ marginTop: 8, fontSize: 12, color: '#666' }}>
+          <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text-secondary)' }}>
             {selectedMetric === 'latency' && (
               <>
                 • Peak latency occurs during business hours (9-17:00)

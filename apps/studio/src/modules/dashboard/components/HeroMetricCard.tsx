@@ -21,20 +21,20 @@ export interface HeroMetricCardProps {
 }
 
 const statusColors: Record<MetricStatus, string> = {
-  healthy: '#52c41a',
-  warning: '#faad14',
-  critical: '#ff4d4f',
-  live: '#1890ff',
-  default: '#595959',
+  healthy: 'var(--success)',
+  warning: 'var(--warning)',
+  critical: 'var(--error)',
+  live: 'var(--info)',
+  default: 'var(--text-secondary)',
 };
 
-// Minimal background - just very subtle tint
+// Use theme background colors instead of hardcoded white
 const statusBgColors: Record<MetricStatus, string> = {
-  healthy: '#ffffff',
-  warning: '#ffffff',
-  critical: '#ffffff',
-  live: '#ffffff',
-  default: '#ffffff',
+  healthy: 'var(--bg-secondary)',
+  warning: 'var(--bg-secondary)',
+  critical: 'var(--bg-secondary)',
+  live: 'var(--bg-secondary)',
+  default: 'var(--bg-secondary)',
 };
 
 export function HeroMetricCard({
@@ -56,7 +56,7 @@ export function HeroMetricCard({
       className={`hero-metric-card ${onClick ? 'clickable' : ''} ${pulsing ? 'pulsing' : ''}`}
       style={{
         backgroundColor: bgColor,
-        border: '1px solid #f0f0f0',
+        border: '1px solid var(--border-primary)',
         borderRadius: 8,
         cursor: onClick ? 'pointer' : 'default',
       }}
@@ -145,7 +145,7 @@ interface TrendIndicatorProps {
 }
 
 function TrendIndicator({ direction, value, isPositive }: TrendIndicatorProps) {
-  const color = isPositive ? '#52c41a' : '#ff4d4f';
+  const color = isPositive ? 'var(--success)' : 'var(--error)';
   const arrow = direction === 'up' ? '↑' : '↓';
 
   return (

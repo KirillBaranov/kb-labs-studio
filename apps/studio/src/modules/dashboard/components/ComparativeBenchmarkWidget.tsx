@@ -158,10 +158,10 @@ export function ComparativeBenchmarkWidget() {
     legend: false,
     color: (datum: any) => {
       const entry = sortedData.find(e => e.name === datum.name);
-      if (entry?.badge === 'gold') {return '#FFD700';}
-      if (entry?.badge === 'silver') {return '#C0C0C0';}
-      if (entry?.badge === 'bronze') {return '#CD7F32';}
-      return '#1890ff';
+      if (entry?.badge === 'gold') {return 'var(--warning)';}
+      if (entry?.badge === 'silver') {return 'var(--text-tertiary)';}
+      if (entry?.badge === 'bronze') {return 'var(--warning)';}
+      return 'var(--info)';
     },
     label: {
       position: 'right' as const,
@@ -176,16 +176,16 @@ export function ComparativeBenchmarkWidget() {
   };
 
   const getBadgeIcon = (badge?: 'gold' | 'silver' | 'bronze') => {
-    if (badge === 'gold') {return <TrophyOutlined style={{ color: '#FFD700', fontSize: 18 }} />;}
-    if (badge === 'silver') {return <TrophyOutlined style={{ color: '#C0C0C0', fontSize: 18 }} />;}
-    if (badge === 'bronze') {return <TrophyOutlined style={{ color: '#CD7F32', fontSize: 18 }} />;}
+    if (badge === 'gold') {return <TrophyOutlined style={{ color: 'var(--warning)', fontSize: 18 }} />;}
+    if (badge === 'silver') {return <TrophyOutlined style={{ color: 'var(--text-tertiary)', fontSize: 18 }} />;}
+    if (badge === 'bronze') {return <TrophyOutlined style={{ color: 'var(--warning)', fontSize: 18 }} />;}
     return null;
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) {return '#52c41a';}
-    if (score >= 60) {return '#faad14';}
-    return '#ff4d4f';
+    if (score >= 80) {return 'var(--success)';}
+    if (score >= 60) {return 'var(--warning)';}
+    return 'var(--error)';
   };
 
   const columns = [
@@ -231,7 +231,7 @@ export function ComparativeBenchmarkWidget() {
       render: (requests: number) => (
         <Tooltip title="Total requests">
           <Space>
-            <ThunderboltOutlined style={{ color: '#1890ff' }} />
+            <ThunderboltOutlined style={{ color: 'var(--info)' }} />
             <Text>{requests.toLocaleString()}</Text>
           </Space>
         </Tooltip>
@@ -243,7 +243,7 @@ export function ComparativeBenchmarkWidget() {
       dataIndex: 'avgLatency',
       key: 'avgLatency',
       render: (latency: number) => {
-        const color = latency < 200 ? '#52c41a' : latency < 500 ? '#faad14' : '#ff4d4f';
+        const color = latency < 200 ? 'var(--success)' : latency < 500 ? 'var(--warning)' : 'var(--error)';
         return (
           <Tooltip title="Average response time">
             <Space>
@@ -260,7 +260,7 @@ export function ComparativeBenchmarkWidget() {
       dataIndex: 'errorRate',
       key: 'errorRate',
       render: (errorRate: number) => {
-        const color = errorRate < 1 ? '#52c41a' : errorRate < 5 ? '#faad14' : '#ff4d4f';
+        const color = errorRate < 1 ? 'var(--success)' : errorRate < 5 ? 'var(--warning)' : 'var(--error)';
         return (
           <Tag color={color}>
             {errorRate.toFixed(2)}%
@@ -275,7 +275,7 @@ export function ComparativeBenchmarkWidget() {
     <Card
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: '#999' }} />
+          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
           <BarChartOutlined />
           <span>Comparative Benchmarks</span>
         </div>
@@ -308,12 +308,12 @@ export function ComparativeBenchmarkWidget() {
       {/* Top Performers Chart */}
       <div style={{ marginBottom: 16 }}>
         <Title level={5}>
-          <FireOutlined style={{ color: '#ff4d4f' }} /> Top 5 Performers
+          <FireOutlined style={{ color: 'var(--error)' }} /> Top 5 Performers
         </Title>
         {chartData.length > 0 ? (
           <KBBarChart {...chartConfig} />
         ) : (
-          <div style={{ textAlign: 'center', padding: 40, color: '#999' }}>
+          <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-tertiary)' }}>
             No data available
           </div>
         )}
@@ -330,9 +330,9 @@ export function ComparativeBenchmarkWidget() {
       />
 
       {/* Scoring Methodology */}
-      <div style={{ marginTop: 16, padding: 12, background: '#f0f5ff', borderRadius: 8 }}>
+      <div style={{ marginTop: 16, padding: 12, background: 'var(--accent-subtle)', borderRadius: 8 }}>
         <Text strong>Scoring Methodology:</Text>
-        <div style={{ marginTop: 8, fontSize: 12, color: '#666' }}>
+        <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text-secondary)' }}>
           {category === 'plugins' ? (
             <>
               • <b>Latency (40%)</b>: Lower is better (0ms=100pts, 1000ms=0pts)

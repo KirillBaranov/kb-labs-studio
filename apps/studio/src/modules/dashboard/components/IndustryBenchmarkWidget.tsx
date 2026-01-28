@@ -165,22 +165,22 @@ export function IndustryBenchmarkWidget() {
   const getStatusIcon = (status: MetricComparison['status']) => {
     switch (status) {
       case 'excellent':
-        return <CheckCircleOutlined style={{ color: '#52c41a' }} />;
+        return <CheckCircleOutlined style={{ color: 'var(--success)' }} />;
       case 'good':
-        return <CheckCircleOutlined style={{ color: '#1890ff' }} />;
+        return <CheckCircleOutlined style={{ color: 'var(--info)' }} />;
       case 'average':
-        return <WarningOutlined style={{ color: '#faad14' }} />;
+        return <WarningOutlined style={{ color: 'var(--warning)' }} />;
       case 'poor':
-        return <CloseCircleOutlined style={{ color: '#ff4d4f' }} />;
+        return <CloseCircleOutlined style={{ color: 'var(--error)' }} />;
     }
   };
 
   const getStatusColor = (status: MetricComparison['status']) => {
     switch (status) {
-      case 'excellent': return '#52c41a';
-      case 'good': return '#1890ff';
-      case 'average': return '#faad14';
-      case 'poor': return '#ff4d4f';
+      case 'excellent': return 'var(--success)';
+      case 'good': return 'var(--info)';
+      case 'average': return 'var(--warning)';
+      case 'poor': return 'var(--error)';
     }
   };
 
@@ -226,9 +226,9 @@ export function IndustryBenchmarkWidget() {
           <Space>
             <Text type="secondary">{formatValue(value, record.unit)}</Text>
             {better ? (
-              <ArrowUpOutlined style={{ color: '#52c41a', fontSize: 12 }} />
+              <ArrowUpOutlined style={{ color: 'var(--success)', fontSize: 12 }} />
             ) : (
-              <ArrowDownOutlined style={{ color: '#ff4d4f', fontSize: 12 }} />
+              <ArrowDownOutlined style={{ color: 'var(--error)', fontSize: 12 }} />
             )}
           </Space>
         );
@@ -295,29 +295,29 @@ export function IndustryBenchmarkWidget() {
         gap: 12,
         marginBottom: 16,
         padding: 16,
-        background: '#fafafa',
+        background: 'var(--bg-tertiary)',
         borderRadius: 8,
       }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: '#52c41a' }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--success)' }}>
             {comparisons.filter(c => c.status === 'excellent').length}
           </div>
           <Text type="secondary" style={{ fontSize: 12 }}>Excellent</Text>
         </div>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: '#1890ff' }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--info)' }}>
             {comparisons.filter(c => c.status === 'good').length}
           </div>
           <Text type="secondary" style={{ fontSize: 12 }}>Good</Text>
         </div>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: '#faad14' }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--warning)' }}>
             {comparisons.filter(c => c.status === 'average').length}
           </div>
           <Text type="secondary" style={{ fontSize: 12 }}>Average</Text>
         </div>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: '#ff4d4f' }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--error)' }}>
             {comparisons.filter(c => c.status === 'poor').length}
           </div>
           <Text type="secondary" style={{ fontSize: 12 }}>Needs Work</Text>
@@ -337,12 +337,12 @@ export function IndustryBenchmarkWidget() {
       <div style={{
         marginTop: 16,
         padding: 12,
-        background: '#f0f5ff',
+        background: 'var(--accent-subtle)',
         borderRadius: 8,
         fontSize: 12,
       }}>
         <Text strong>How to read:</Text>
-        <div style={{ marginTop: 8, color: '#666' }}>
+        <div style={{ marginTop: 8, color: 'var(--text-secondary)' }}>
           • <b>Industry Median</b>: Average performance across similar platforms
           <br />
           • <b>Top 10%</b>: Performance of top-performing platforms

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Card, Table } from 'antd';
+import { UICard } from '@kb-labs/studio-ui-kit';
+import { Table } from 'antd';
 import { HolderOutlined } from '@ant-design/icons';
 import { type MetricsSnapshot } from '../../../api/metrics';
 import { useDataSources } from '../../../providers/data-sources-provider';
@@ -64,7 +65,7 @@ export function DashboardPluginsWidget() {
     <Card
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: '#999' }} />
+          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
           <span>Plugin Performance</span>
         </div>
       }
@@ -78,6 +79,6 @@ export function DashboardPluginsWidget() {
         size="small"
         scroll={{ y: 240 }}
       />
-    </Card>
+    </UICard>
   );
 }

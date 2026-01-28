@@ -138,7 +138,7 @@ export function CostAttributionWidget() {
         content: `$${costData.totalCost.toFixed(2)}`,
       },
     },
-    color: ['#1890ff', '#52c41a', '#faad14'],
+    color: ['var(--info)', 'var(--success)', 'var(--warning)'],
     legend: {
       position: 'bottom' as const,
     },
@@ -195,7 +195,7 @@ export function CostAttributionWidget() {
     <Card
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: '#999' }} />
+          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
           <DollarOutlined />
           <span>Cost Attribution</span>
         </div>
@@ -208,7 +208,7 @@ export function CostAttributionWidget() {
         <Col span={24}>
           <div style={{
             padding: '12px 16px',
-            background: '#f0f5ff',
+            background: 'var(--accent-subtle)',
             borderRadius: 8,
             display: 'flex',
             justifyContent: 'space-between',
@@ -223,8 +223,8 @@ export function CostAttributionWidget() {
             <div style={{ textAlign: 'right' }}>
               <Text type="secondary">vs Yesterday</Text>
               <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
-                <RiseOutlined style={{ color: '#ff4d4f', fontSize: 16 }} />
-                <Text strong style={{ color: '#ff4d4f' }}>+12.3%</Text>
+                <RiseOutlined style={{ color: 'var(--error)', fontSize: 16 }} />
+                <Text strong style={{ color: 'var(--error)' }}>+12.3%</Text>
               </div>
             </div>
           </div>
@@ -240,7 +240,7 @@ export function CostAttributionWidget() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#999',
+              color: 'var(--text-tertiary)',
             }}>
               No cost data available
             </div>

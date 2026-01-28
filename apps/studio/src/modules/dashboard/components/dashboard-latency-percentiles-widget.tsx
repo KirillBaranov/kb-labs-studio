@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Card } from 'antd';
+import { UICard } from '@kb-labs/studio-ui-kit';
 import { HolderOutlined } from '@ant-design/icons';
 import { Column } from '@ant-design/plots';
 import { type MetricsSnapshot } from '../../../api/metrics';
@@ -33,12 +33,12 @@ export function DashboardLatencyPercentilesWidget() {
   const max = metrics?.latency?.max ?? 0;
 
   const chartData = [
-    { metric: 'Min', value: min, color: '#52c41a' },
-    { metric: 'Avg', value: average, color: '#1890ff' },
-    { metric: 'p50', value: p50, color: '#13c2c2' },
-    { metric: 'p95', value: p95, color: '#faad14' },
-    { metric: 'p99', value: p99, color: '#ff7a45' },
-    { metric: 'Max', value: max, color: '#f5222d' },
+    { metric: 'Min', value: min, color: 'var(--success)' },
+    { metric: 'Avg', value: average, color: 'var(--info)' },
+    { metric: 'p50', value: p50, color: 'var(--info)' },
+    { metric: 'p95', value: p95, color: 'var(--warning)' },
+    { metric: 'p99', value: p99, color: 'var(--warning)' },
+    { metric: 'Max', value: max, color: 'var(--error)' },
   ];
 
   const config = {
@@ -56,14 +56,14 @@ export function DashboardLatencyPercentilesWidget() {
       formatter: (datum: any) => `${datum.value.toFixed(1)}ms`,
       style: {
         fontSize: 12,
-        fill: '#666',
+        fill: 'var(--text-secondary)',
       },
     },
     xAxis: {
       label: {
         style: {
           fontSize: 12,
-          fill: '#666',
+          fill: 'var(--text-secondary)',
         },
       },
     },
@@ -72,7 +72,7 @@ export function DashboardLatencyPercentilesWidget() {
         formatter: (v: string) => `${v}ms`,
         style: {
           fontSize: 12,
-          fill: '#666',
+          fill: 'var(--text-secondary)',
         },
       },
     },
@@ -84,7 +84,7 @@ export function DashboardLatencyPercentilesWidget() {
     <Card
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: '#999' }} />
+          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
           <span>Latency Distribution (ms)</span>
         </div>
       }
@@ -97,6 +97,6 @@ export function DashboardLatencyPercentilesWidget() {
           Loading...
         </div>
       )}
-    </Card>
+    </UICard>
   );
 }

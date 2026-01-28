@@ -310,29 +310,29 @@ export function TimeTravelWidget() {
               gridTemplateColumns: 'repeat(4, 1fr)',
               gap: 12,
               padding: 16,
-              background: '#fafafa',
+              background: 'var(--bg-tertiary)',
               borderRadius: 8,
             }}>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 20, fontWeight: 700, color: '#1890ff' }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--info)' }}>
                   {currentSnapshot.metrics.requests.toLocaleString()}
                 </div>
                 <Text type="secondary" style={{ fontSize: 11 }}>Requests</Text>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 20, fontWeight: 700, color: '#ff4d4f' }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--error)' }}>
                   {currentSnapshot.metrics.errors}
                 </div>
                 <Text type="secondary" style={{ fontSize: 11 }}>Errors</Text>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 20, fontWeight: 700, color: '#faad14' }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--warning)' }}>
                   {currentSnapshot.metrics.latency}ms
                 </div>
                 <Text type="secondary" style={{ fontSize: 11 }}>Latency</Text>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 20, fontWeight: 700, color: '#52c41a' }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--success)' }}>
                   ${currentSnapshot.metrics.cost.toFixed(2)}
                 </div>
                 <Text type="secondary" style={{ fontSize: 11 }}>Cost</Text>
@@ -346,7 +346,7 @@ export function TimeTravelWidget() {
         <div style={{
           textAlign: 'center',
           padding: '40px 20px',
-          color: '#999',
+          color: 'var(--text-tertiary)',
         }}>
           <HistoryOutlined style={{ fontSize: 48, marginBottom: 16, opacity: 0.3 }} />
           <div>Select a date above to view historical metrics</div>

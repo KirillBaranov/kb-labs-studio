@@ -152,7 +152,7 @@ export function SmartIncidentsWidget() {
             {incidents.length > 0 && (
               <Badge
                 count={incidents.length}
-                style={{ backgroundColor: incidents.some(i => i.severity === 'critical') ? '#ff4d4f' : '#faad14' }}
+                style={{ backgroundColor: incidents.some(i => i.severity === 'critical') ? 'var(--error)' : 'var(--warning)' }}
               />
             )}
           </div>
@@ -178,7 +178,7 @@ export function SmartIncidentsWidget() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#999',
+          color: 'var(--text-tertiary)',
         }}>
           Loading incidents...
         </div>
@@ -188,7 +188,7 @@ export function SmartIncidentsWidget() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#ff4d4f',
+          color: 'var(--error)',
         }}>
           Failed to load incidents
         </div>
@@ -207,7 +207,7 @@ export function SmartIncidentsWidget() {
             const isExpanded = expandedIncidents.includes(incident.id);
 
             return (
-              <List.Item style={{ padding: '12px 0', borderBottom: '1px solid #f0f0f0' }}>
+              <List.Item style={{ padding: '12px 0', borderBottom: '1px solid var(--border-primary)' }}>
                 <div style={{ width: '100%' }}>
                   {/* Compact header - always visible */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -269,7 +269,7 @@ export function SmartIncidentsWidget() {
                   {isExpanded && (
                     <div style={{ marginTop: 12, paddingLeft: 32 }}>
                       {/* Summary */}
-                      <Paragraph style={{ marginBottom: 12, color: '#666', fontSize: 13 }}>
+                      <Paragraph style={{ marginBottom: 12, color: 'var(--text-secondary)', fontSize: 13 }}>
                         {incident.details}
                       </Paragraph>
 

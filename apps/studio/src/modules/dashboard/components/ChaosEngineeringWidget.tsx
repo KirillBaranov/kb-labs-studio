@@ -185,7 +185,7 @@ export function ChaosEngineeringWidget() {
       render: (name: string, record: ChaosExperiment) => (
         <div>
           <Text strong>{name}</Text>
-          <div style={{ fontSize: 12, color: '#666' }}>{record.target}</div>
+          <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{record.target}</div>
         </div>
       ),
     },
@@ -207,7 +207,7 @@ export function ChaosEngineeringWidget() {
         return (
           <div>
             <Tag color={getStatusColor(lastRun.status)}>{lastRun.status}</Tag>
-            <div style={{ fontSize: 11, color: '#999' }}>{daysAgo}d ago</div>
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>{daysAgo}d ago</div>
           </div>
         );
       },
@@ -243,7 +243,7 @@ export function ChaosEngineeringWidget() {
       }
       extra={
         <Space>
-          <SafetyOutlined style={{ color: resilienceScore >= 70 ? '#52c41a' : '#faad14' }} />
+          <SafetyOutlined style={{ color: resilienceScore >= 70 ? 'var(--success)' : 'var(--warning)' }} />
           <Text strong>Resilience: {resilienceScore}%</Text>
         </Space>
       }
@@ -274,29 +274,29 @@ export function ChaosEngineeringWidget() {
         gap: 16,
         marginBottom: 16,
         padding: 16,
-        background: '#fafafa',
+        background: 'var(--bg-tertiary)',
         borderRadius: 8,
       }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: resilienceScore >= 70 ? '#52c41a' : '#faad14' }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: resilienceScore >= 70 ? 'var(--success)' : 'var(--warning)' }}>
             {resilienceScore}
           </div>
           <Text type="secondary" style={{ fontSize: 12 }}>Resilience Score</Text>
         </div>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: '#1890ff' }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--info)' }}>
             {experiments.filter(e => e.lastRun?.status === 'success').length}
           </div>
           <Text type="secondary" style={{ fontSize: 12 }}>Passed Tests</Text>
         </div>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: '#ff4d4f' }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--error)' }}>
             {experiments.filter(e => e.lastRun?.status === 'failed').length}
           </div>
           <Text type="secondary" style={{ fontSize: 12 }}>Failed Tests</Text>
         </div>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: '#595959' }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-secondary)' }}>
             {experiments.filter(e => !e.lastRun).length}
           </div>
           <Text type="secondary" style={{ fontSize: 12 }}>Not Tested</Text>
