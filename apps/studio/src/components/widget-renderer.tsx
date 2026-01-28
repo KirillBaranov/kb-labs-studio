@@ -8,12 +8,10 @@ import { useRegistry } from '../providers/registry-provider';
 import { useWidgetData } from '../hooks/useWidgetData';
 import type { StudioRegistryEntry } from '@kb-labs/rest-api-contracts';
 import { isCompositeWidget } from '@kb-labs/rest-api-contracts';
-import { WidgetPropsSchema, validateWidgetProps, type WidgetProps } from '@kb-labs/studio-contracts';
+import type { WidgetProps } from '@kb-labs/studio-contracts';
 import * as Widgets from './widgets/index';
-import { Skeleton, ErrorState } from './widgets/shared/index';
 import { trackWidgetEvent } from '../utils/analytics';
 import { studioConfig } from '../config/studio.config';
-import { HeaderPolicyCallout } from './header-policy-callout';
 import { WidgetErrorBoundary } from './widget-error-boundary';
  
 import { useWidgetEvents } from '../hooks/useWidgetEvents';
@@ -174,7 +172,7 @@ export function WidgetRenderer({
     }
 
     return source;
-  }, [widget?.data?.source, eventParams, widgetId]);
+  }, [widget?.data?.source, eventParams]);
 
   const widgetData = useWidgetData({
     widgetId,
@@ -192,45 +190,20 @@ export function WidgetRenderer({
     }
   }, [widgetData.error, widgetId, pluginId]);
 
-  // 🎯 REFACTOR: Determine component to use
-  const resolvedComponent: React.ComponentType<WidgetProps> | null =
-    (widget?.component && component) ? component :
-    (!widget?.component && widget) ? WIDGET_COMPONENTS[widget.kind] || null :
-    null;
-
-  // 🎯 REFACTOR: Use HOC for all validation/loading/error states
-  const EnhancedWidgetComponent = React.useMemo(
-    () => WithWidgetState({
-      component: resolvedComponent,
-      widgetId,
-      widget,
-      loadingComponent,
-      componentError,
-    }),
-    [resolvedComponent, widgetId, widget, loadingComponent, componentError]
-  );
-
-  // Early return if widget validation fails (HOC will render error state)
-  if (!widget || !widget.data || !widget.data.source || !resolvedComponent || componentError || loadingComponent) {
-    return <EnhancedWidgetComponent />;
-  }
-
-  // Widget is valid - get the actual component for rendering
-  const WidgetComponent = resolvedComponent;
+  // 🎯 REFACTOR: Call all hooks BEFORE any conditional returns
+  // These hooks must be called unconditionally to satisfy React Rules of Hooks
 
   // 🎯 REFACTOR: Use hook for header notice
   const headerNotice = useHeaderNotice(widget, widgetData, headerHints);
-
-  // Extract showTitle and showDescription from options
-  const widgetOptions = widget.options as Record<string, unknown> | undefined;
-  const showTitle = widgetOptions?.showTitle as boolean | undefined;
-  const showDescription = widgetOptions?.showDescription as boolean | undefined;
 
   // 🎯 REFACTOR: Use hook for change handler
   const handleChange = useWidgetChangeHandler(widget, widgetData.data, emit, widgetId);
 
   // 🎯 REFACTOR: Use extracted hook for circular dependency detection
   const { isCircular, markVisited, clearVisited } = useCircularDependencyDetection();
+
+  // 🎯 REFACTOR: Use extracted hook for data merging
+  const finalData = useWidgetDataMerger(eventData, widgetData.data);
 
   const renderChildren = React.useCallback((childrenIds: string[] | undefined): React.ReactNode => {
     if (!childrenIds || !Array.isArray(childrenIds) || childrenIds.length === 0) {
@@ -270,12 +243,40 @@ export function WidgetRenderer({
     });
   }, [registry.widgetMap, pluginId, isCircular, markVisited, clearVisited]);
 
+  // 🎯 REFACTOR: Determine component to use
+  const resolvedComponent: React.ComponentType<WidgetProps> | null =
+    (widget?.component && component) ? component :
+    (!widget?.component && widget) ? WIDGET_COMPONENTS[widget.kind] || null :
+    null;
+
+  // 🎯 REFACTOR: Use HOC for all validation/loading/error states
+  const EnhancedWidgetComponent = React.useMemo(
+    () => WithWidgetState({
+      component: resolvedComponent,
+      widgetId,
+      widget,
+      loadingComponent,
+      componentError,
+    }),
+    [resolvedComponent, widgetId, widget, loadingComponent, componentError]
+  );
+
+  // Early return if widget validation fails (HOC will render error state)
+  if (!widget || !widget.data || !widget.data.source || !resolvedComponent || componentError || loadingComponent) {
+    return <EnhancedWidgetComponent />;
+  }
+
+  // Widget is valid - get the actual component for rendering
+  const WidgetComponent = resolvedComponent;
+
+  // Extract showTitle and showDescription from options
+  const widgetOptions = widget.options as Record<string, unknown> | undefined;
+  const showTitle = widgetOptions?.showTitle as boolean | undefined;
+  const showDescription = widgetOptions?.showDescription as boolean | undefined;
+
   // Check if widget is composite and render children
   const isComposite = widget && isCompositeWidget(widget);
   const childrenNodes = isComposite ? renderChildren(widget.children) : null;
-
-  // 🎯 REFACTOR: Use extracted hook for data merging
-  const finalData = useWidgetDataMerger(eventData, widgetData.data);
 
   // Render widget with data, wrapped in error boundary
   return (
