@@ -1,0 +1,131 @@
+/**
+ * @module @kb-labs/studio-app/components/widgets/display/Json
+ * JSON Viewer widget - collapsed/expanded JSON with copy
+ */
+
+import * as React from 'react';
+import { Button, Space } from 'antd';
+import { CopyOutlined } from '@ant-design/icons';
+import { Skeleton, EmptyState, ErrorState } from '../shared/index';
+import type { BaseWidgetProps } from '../types';
+import type { JsonOptions as ContractOptions, JsonData } from '@kb-labs/studio-contracts';
+
+export interface JsonOptions extends ContractOptions {}
+
+export interface JsonProps extends BaseWidgetProps<JsonData, JsonOptions> {}
+
+function JsonNode({ value, path = '', level = 0, collapsed = false }: { value: unknown; path?: string; level?: number; collapsed?: boolean }) {
+  const [isExpanded, setIsExpanded] = React.useState(!collapsed || level < 2);
+
+  if (value === null) {
+    return <Typography.Text type="secondary">null</Typography.Text>;
+  }
+
+  if (typeof value === 'string') {
+    return <Typography.Text style={{ color: 'var(--success)' }}>"{value}"</Typography.Text>;
+  }
+
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return <Typography.Text style={{ color: 'var(--info)' }}>{String(value)}</Typography.Text>;
+  }
+
+  if (Array.isArray(value)) {
+    return (
+      <div>
+        <span onClick={() => setIsExpanded(!isExpanded)} style={{ cursor: 'pointer', userSelect: 'none' }}>
+          [{isExpanded ? '−' : '+'}]
+        </span>
+        <span>[</span>
+        {isExpanded && (
+          <div style={{ marginLeft: '1.5rem' }}>
+            {value.map((item, index) => (
+              <div key={index}>
+                <JsonNode value={item} path={`${path}[${index}]`} level={level + 1} collapsed={collapsed} />
+                {index < value.length - 1 && <span>,</span>}
+              </div>
+            ))}
+          </div>
+        )}
+        <span>]</span>
+      </div>
+    );
+  }
+
+  if (typeof value === 'object') {
+    const entries = Object.entries(value);
+    return (
+      <div>
+        <span onClick={() => setIsExpanded(!isExpanded)} style={{ cursor: 'pointer', userSelect: 'none' }}>
+          {isExpanded ? '−' : '+'}
+        </span>
+        <span>{'{'}</span>
+        {isExpanded && (
+          <div style={{ marginLeft: '1.5rem' }}>
+            {entries.map(([key, val], index) => (
+              <div key={key}>
+                <Typography.Text>"{key}"</Typography.Text>
+                <span>: </span>
+                <JsonNode value={val} path={`${path}.${key}`} level={level + 1} collapsed={collapsed} />
+                {index < entries.length - 1 && <span>,</span>}
+              </div>
+            ))}
+          </div>
+        )}
+        <span>{'}'}</span>
+      </div>
+    );
+  }
+
+  return <span>{String(value)}</span>;
+}
+
+export function Json({ data, loading, error, options }: JsonProps) {
+  const [copied, setCopied] = React.useState(false);
+
+  if (loading) {
+    return <Skeleton variant="text" rows={5} />;
+  }
+
+  if (error) {
+    return <ErrorState error={error} />;
+  }
+
+  if (data === undefined || data === null) {
+    return <EmptyState title="No data" description="No JSON data available" />;
+  }
+
+  const collapsed = options?.collapsed === true;
+  const copyable = options?.copyable !== false;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <Space direction="vertical" style={{ width: '100%', height: '100%' }}>
+      {copyable && (
+        <Button
+          icon={<CopyOutlined />}
+          onClick={handleCopy}
+          size="small"
+        >
+          {copied ? 'Copied!' : 'Copy'}
+        </Button>
+      )}
+      <UICard
+        style={{
+          flex: 1,
+          overflow: 'auto',
+          fontFamily: 'monospace',
+          fontSize: '0.875rem',
+          backgroundColor: 'var(--bg-tertiary)',
+        }}
+      >
+        <JsonNode value={data} collapsed={collapsed} />
+      </UICard>
+    </Space>
+  );
+}
+

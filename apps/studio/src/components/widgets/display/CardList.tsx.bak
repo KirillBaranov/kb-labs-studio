@@ -1,0 +1,85 @@
+/**
+ * @module @kb-labs/studio-app/components/widgets/CardList
+ * Card List widget - renders a list of cards
+ */
+
+import * as React from 'react';
+import { Space } from 'antd';
+import { Skeleton, EmptyState, ErrorState } from '../shared/index';
+import type { BaseWidgetProps } from '../types';
+import type { CardListDataData } from '@kb-labs/rest-api-contracts';
+
+export interface CardListOptions {
+  columns?: number;
+  compact?: boolean;
+  layout?: 'grid' | 'list';
+}
+
+export interface CardListProps extends BaseWidgetProps<UICardListDataListOptions> {
+  onCardClick?: (card: CardData) => void;
+}
+
+export function CardList({ data, loading, error, options, onCardClick }: CardListProps) {
+  if (loading) {
+    return <Skeleton variant="card" rows={3} />;
+  }
+
+  if (error) {
+    return <ErrorState error={error} />;
+  }
+
+  if (!data || !data.cards || data.cards.length === 0) {
+    return <EmptyState title="No cards" description="No card data available" />;
+  }
+
+  const { cards } = data;
+  const columns = options?.columns || 3;
+  const compact = options?.compact === true;
+  const layout = options?.layout || 'grid';
+
+  const statusColors: Record<string, string> = {
+    ok: 'var(--success)',
+    warn: 'var(--warning)',
+    crit: 'var(--error)',
+    error: 'var(--error)',
+    info: 'var(--info)',
+  };
+
+  const cardStyle: React.CSSProperties = layout === 'list'
+    ? { marginBottom: '1rem' }
+    : {};
+
+  return (
+    <div style={layout === 'grid'
+      ? { display: 'grid', gridTemplateColumns: `repeat(${columns}, 1fr)`, gap: '1rem' }
+      : { display: 'flex', flexDirection: 'column', gap: '1rem' }
+    }>
+      {cards.map((card, index) => (
+        <UICard
+          key={`card-${index}`}
+          size={compact ? 'small' : 'default'}
+          hoverable={!!onCardClick}
+          onClick={() => onCardClick?.(card)}
+          style={{
+            ...cardStyle,
+            borderLeft: card.status ? `4px solid ${statusColors[card.status] || 'var(--border-primary)'}` : undefined,
+          }}
+        >
+          <UICard.Meta
+            title={card.title}
+            description={
+              card.content ? (
+                <Typography.Paragraph
+                  style={{ margin: 0, whiteSpace: 'pre-wrap' }}
+                  ellipsis={{ rows: 3, expandable: true }}
+                >
+                  {card.content}
+                </Typography.Paragraph>
+              ) : undefined
+            }
+          />
+        </UICard>
+      ))}
+    </div>
+  );
+}
