@@ -14,7 +14,7 @@ export function DashboardKpisWidget() {
   const statusType = health?.ready ? 'success' : 'error';
 
   return (
-    <Card
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
