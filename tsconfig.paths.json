@@ -57,6 +57,12 @@
       "@kb-labs/studio-ui-core/*": [
         "packages/studio-ui-core/src/*"
       ],
+      "@kb-labs/studio-ui-kit": [
+        "packages/studio-ui-kit/src/index.ts"
+      ],
+      "@kb-labs/studio-ui-kit/*": [
+        "packages/studio-ui-kit/src/*"
+      ],
       "@kb-labs/studio-ui-react": [
         "packages/studio-ui-react/src/index.ts"
       ],
