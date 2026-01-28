@@ -43,7 +43,7 @@ export function ActionToolbar({
   basePath,
   callbacks,
   size = 'middle',
-  responsive = true,
+  _responsive = true,
   className,
 }: ActionToolbarProps): React.ReactElement {
   const { handleAction } = useWidgetActions({
