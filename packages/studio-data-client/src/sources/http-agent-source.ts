@@ -20,11 +20,11 @@ export class HttpAgentSource implements AgentDataSource {
   constructor(private readonly client: HttpClient) {}
 
   async listAgents(): Promise<ListAgentsResponse> {
-    return await this.client.fetch<ListAgentsResponse>('/plugins/agents');
+    return this.client.fetch<ListAgentsResponse>('/plugins/agents');
   }
 
   async runAgent(request: RunAgentRequest): Promise<RunAgentResponse | RunAgentErrorResponse> {
-    return await this.client.fetch<RunAgentResponse | RunAgentErrorResponse>('/plugins/agents/run', {
+    return this.client.fetch<RunAgentResponse | RunAgentErrorResponse>('/plugins/agents/run', {
       method: 'POST',
       data: request,
     });

@@ -43,7 +43,7 @@ export class HttpWorkflowSource implements WorkflowDataSource {
 
   async listRuns(filters?: WorkflowRunsFilters): Promise<WorkflowRunsListResponse> {
     const query = buildQuery(filters)
-    return await this.client.fetch<WorkflowRunsListResponse>(`/workflows/runs${query}`)
+    return this.client.fetch<WorkflowRunsListResponse>(`/workflows/runs${query}`)
   }
 
   async getRun(runId: string): Promise<WorkflowRun | null> {
@@ -93,7 +93,7 @@ export class HttpWorkflowSource implements WorkflowDataSource {
       params.set('limit', String(options.limit))
     }
     const query = params.toString()
-    return await this.client.fetch<{ events: WorkflowPresenterEvent[]; cursor: string | null }>(
+    return this.client.fetch<{ events: WorkflowPresenterEvent[]; cursor: string | null }>(
       `/workflows/runs/${runId}/events${query ? `?${query}` : ''}`,
     )
   }
@@ -101,7 +101,7 @@ export class HttpWorkflowSource implements WorkflowDataSource {
   // 🆕 NEW methods for UI
 
   async getStats(): Promise<DashboardStatsResponse> {
-    return await this.client.fetch<DashboardStatsResponse>('/plugins/workflow/stats')
+    return this.client.fetch<DashboardStatsResponse>('/plugins/workflow/stats')
   }
 
   async listWorkflows(filters?: { limit?: number }): Promise<WorkflowListResponse> {
@@ -110,14 +110,14 @@ export class HttpWorkflowSource implements WorkflowDataSource {
       params.set('limit', String(filters.limit))
     }
     const query = params.toString()
-    return await this.client.fetch<WorkflowListResponse>(
+    return this.client.fetch<WorkflowListResponse>(
       `/plugins/workflow/workflows${query ? `?${query}` : ''}`,
     )
   }
 
   async getWorkflow(workflowId: string): Promise<WorkflowInfo | null> {
     try {
-      return await this.client.fetch<WorkflowInfo>(
+      return this.client.fetch<WorkflowInfo>(
         `/plugins/workflow/workflows/${encodeURIComponent(workflowId)}`,
       )
     } catch (error) {
@@ -132,7 +132,7 @@ export class HttpWorkflowSource implements WorkflowDataSource {
     workflowId: string,
     input?: Record<string, string>,
   ): Promise<{ runId: string; status: string }> {
-    return await this.client.fetch<{ runId: string; status: string }>(
+    return this.client.fetch<{ runId: string; status: string }>(
       `/plugins/workflow/workflows/${encodeURIComponent(workflowId)}/run`,
       {
         method: 'POST',
@@ -156,14 +156,14 @@ export class HttpWorkflowSource implements WorkflowDataSource {
       params.set('offset', String(filters.offset))
     }
     const query = params.toString()
-    return await this.client.fetch<JobListResponse>(
+    return this.client.fetch<JobListResponse>(
       `/plugins/workflow/jobs${query ? `?${query}` : ''}`,
     )
   }
 
   async getJob(jobId: string): Promise<JobStatusInfo | null> {
     try {
-      return await this.client.fetch<JobStatusInfo>(
+      return this.client.fetch<JobStatusInfo>(
         `/plugins/workflow/jobs/${encodeURIComponent(jobId)}`,
       )
     } catch (error) {
@@ -175,7 +175,7 @@ export class HttpWorkflowSource implements WorkflowDataSource {
   }
 
   async getJobSteps(jobId: string): Promise<JobStepsResponse> {
-    return await this.client.fetch<JobStepsResponse>(
+    return this.client.fetch<JobStepsResponse>(
       `/plugins/workflow/jobs/${encodeURIComponent(jobId)}/steps`,
     )
   }
@@ -195,13 +195,13 @@ export class HttpWorkflowSource implements WorkflowDataSource {
       params.set('level', filters.level)
     }
     const query = params.toString()
-    return await this.client.fetch<JobLogsResponse>(
+    return this.client.fetch<JobLogsResponse>(
       `/plugins/workflow/jobs/${encodeURIComponent(jobId)}/logs${query ? `?${query}` : ''}`,
     )
   }
 
   async listCronJobs(): Promise<CronListResponse> {
-    return await this.client.fetch<CronListResponse>('/plugins/workflow/cron')
+    return this.client.fetch<CronListResponse>('/plugins/workflow/cron')
   }
 
   async getWorkflowRuns(
@@ -219,7 +219,7 @@ export class HttpWorkflowSource implements WorkflowDataSource {
       params.set('status', filters.status)
     }
     const query = params.toString()
-    return await this.client.fetch<WorkflowRunHistoryResponse>(
+    return this.client.fetch<WorkflowRunHistoryResponse>(
       `/plugins/workflow/workflows/${encodeURIComponent(workflowId)}/runs${query ? `?${query}` : ''}`,
     )
   }

@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Badge, Dropdown, Button, List, Typography, Tag, Empty, Divider, Space, Tooltip } from 'antd';
-import type { MenuProps } from 'antd';
 import { Bell, AlertTriangle, XCircle, X, CheckCheck } from 'lucide-react';
 
 const { Text, Paragraph } = Typography;

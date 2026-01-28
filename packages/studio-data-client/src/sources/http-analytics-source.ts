@@ -38,17 +38,17 @@ export class HttpAnalyticsSource implements AnalyticsDataSource {
     if (query?.offset) {params.set('offset', String(query.offset));}
 
     const path = `/analytics/events${params.toString() ? `?${params}` : ''}`;
-    return await this.client.fetch<EventsResponse>(path);
+    return this.client.fetch<EventsResponse>(path);
   }
 
   async getStats(): Promise<EventsStats> {
-    return await this.client.fetch<EventsStats>('/analytics/stats');
+    return this.client.fetch<EventsStats>('/analytics/stats');
   }
 
   async getBufferStatus(): Promise<BufferStatus | null> {
     try {
-      return await this.client.fetch<BufferStatus>('/analytics/buffer/status');
-    } catch (error) {
+      return this.client.fetch<BufferStatus>('/analytics/buffer/status');
+    } catch (_error) {
       // Analytics not configured or buffer not applicable (501)
       return null;
     }
@@ -56,8 +56,8 @@ export class HttpAnalyticsSource implements AnalyticsDataSource {
 
   async getDlqStatus(): Promise<DlqStatus | null> {
     try {
-      return await this.client.fetch<DlqStatus>('/analytics/dlq/status');
-    } catch (error) {
+      return this.client.fetch<DlqStatus>('/analytics/dlq/status');
+    } catch (_error) {
       // Analytics not configured or DLQ not applicable (501)
       return null;
     }

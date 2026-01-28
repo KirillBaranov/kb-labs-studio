@@ -46,7 +46,7 @@ export function UITitle({
   className,
   style,
 }: UITitleProps) {
-  const { token } = useToken();
+  const { token: _token } = useToken();
 
   if (subtitle) {
     return (

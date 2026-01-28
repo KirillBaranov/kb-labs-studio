@@ -17,7 +17,9 @@ import type {
 export class MockAgentSource implements AgentDataSource {
   async listAgents(): Promise<ListAgentsResponse> {
     // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await new Promise<void>((resolve) => {
+      setTimeout(() => resolve(), 300);
+    });
 
     return {
       agents: [
@@ -46,7 +48,9 @@ export class MockAgentSource implements AgentDataSource {
 
   async runAgent(request: RunAgentRequest): Promise<RunAgentResponse | RunAgentErrorResponse> {
     // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await new Promise<void>((resolve) => {
+      setTimeout(() => resolve(), 1500);
+    });
 
     // Mock successful response
     return {

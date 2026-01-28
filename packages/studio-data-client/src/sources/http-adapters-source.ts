@@ -37,51 +37,51 @@ export class HttpAdaptersSource implements AdaptersDataSource {
 
   async getLLMUsage(options?: DateRangeOptions): Promise<LLMUsageStats> {
     const query = this.buildQueryString(options);
-    return await this.client.fetch<LLMUsageStats>(`/adapters/llm/usage${query}`);
+    return this.client.fetch<LLMUsageStats>(`/adapters/llm/usage${query}`);
   }
 
   async getEmbeddingsUsage(options?: DateRangeOptions): Promise<EmbeddingsUsageStats> {
     const query = this.buildQueryString(options);
-    return await this.client.fetch<EmbeddingsUsageStats>(`/adapters/embeddings/usage${query}`);
+    return this.client.fetch<EmbeddingsUsageStats>(`/adapters/embeddings/usage${query}`);
   }
 
   async getVectorStoreUsage(options?: DateRangeOptions): Promise<VectorStoreUsageStats> {
     const query = this.buildQueryString(options);
-    return await this.client.fetch<VectorStoreUsageStats>(`/adapters/vectorstore/usage${query}`);
+    return this.client.fetch<VectorStoreUsageStats>(`/adapters/vectorstore/usage${query}`);
   }
 
   async getCacheUsage(options?: DateRangeOptions): Promise<CacheUsageStats> {
     const query = this.buildQueryString(options);
-    return await this.client.fetch<CacheUsageStats>(`/adapters/cache/usage${query}`);
+    return this.client.fetch<CacheUsageStats>(`/adapters/cache/usage${query}`);
   }
 
   async getStorageUsage(options?: DateRangeOptions): Promise<StorageUsageStats> {
     const query = this.buildQueryString(options);
-    return await this.client.fetch<StorageUsageStats>(`/adapters/storage/usage${query}`);
+    return this.client.fetch<StorageUsageStats>(`/adapters/storage/usage${query}`);
   }
 
   async getLLMDailyStats(options?: DateRangeOptions): Promise<DailyStats[]> {
     const query = this.buildQueryString(options);
-    return await this.client.fetch<DailyStats[]>(`/adapters/llm/daily-stats${query}`);
+    return this.client.fetch<DailyStats[]>(`/adapters/llm/daily-stats${query}`);
   }
 
   async getEmbeddingsDailyStats(options?: DateRangeOptions): Promise<DailyStats[]> {
     const query = this.buildQueryString(options);
-    return await this.client.fetch<DailyStats[]>(`/adapters/embeddings/daily-stats${query}`);
+    return this.client.fetch<DailyStats[]>(`/adapters/embeddings/daily-stats${query}`);
   }
 
   async getVectorStoreDailyStats(options?: DateRangeOptions): Promise<DailyStats[]> {
     const query = this.buildQueryString(options);
-    return await this.client.fetch<DailyStats[]>(`/adapters/vectorstore/daily-stats${query}`);
+    return this.client.fetch<DailyStats[]>(`/adapters/vectorstore/daily-stats${query}`);
   }
 
   async getCacheDailyStats(options?: DateRangeOptions): Promise<DailyStats[]> {
     const query = this.buildQueryString(options);
-    return await this.client.fetch<DailyStats[]>(`/adapters/cache/daily-stats${query}`);
+    return this.client.fetch<DailyStats[]>(`/adapters/cache/daily-stats${query}`);
   }
 
   async getStorageDailyStats(options?: DateRangeOptions): Promise<DailyStats[]> {
     const query = this.buildQueryString(options);
-    return await this.client.fetch<DailyStats[]>(`/adapters/storage/daily-stats${query}`);
+    return this.client.fetch<DailyStats[]>(`/adapters/storage/daily-stats${query}`);
   }
 }

@@ -47,7 +47,7 @@ export class HttpSystemSource implements SystemDataSource {
    */
   async getReady(): Promise<ReadyResponse | NotReadyResponse> {
     try {
-      return await this.client.fetch<ReadyResponse>('/ready');
+      return this.client.fetch<ReadyResponse>('/ready');
     } catch (error) {
       if (error instanceof KBError && error.status === 503) {
         const payload = (error.cause as { data?: unknown } | undefined)?.data;

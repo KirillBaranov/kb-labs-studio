@@ -8,8 +8,6 @@ import type { AgentDataSource } from '../sources/agent-source';
 import type {
   RunAgentRequest,
   RunAgentResponse,
-  RunAgentErrorResponse,
-  ListAgentsResponse,
 } from '@kb-labs/agent-contracts';
 
 /**

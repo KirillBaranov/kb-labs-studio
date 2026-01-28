@@ -103,9 +103,11 @@ export interface StudioMenuDecl {
  * Studio configuration for a plugin.
  * Contains all widgets, layouts, and menus.
  */
+import type { StudioWidgetDecl } from './widget.js';
+
 export interface StudioConfig {
   /** All widget declarations */
-  widgets: import('./widget.js').StudioWidgetDecl[];
+  widgets: StudioWidgetDecl[];
   /** All layout declarations */
   layouts: StudioLayoutDecl[];
   /** All menu declarations */

@@ -51,7 +51,7 @@ export interface UIJsonViewerProps {
  */
 export function UIJsonViewer({
   data,
-  collapsed = false,
+  collapsed: _collapsed = false,
   indent = 2,
   showLineNumbers = false,
   className,
@@ -59,7 +59,8 @@ export function UIJsonViewer({
 }: UIJsonViewerProps) {
   const { token } = useToken();
 
-  const [isCollapsed, setIsCollapsed] = React.useState(collapsed);
+  // TODO: Implement collapse/expand functionality
+  // const [isCollapsed, setIsCollapsed] = React.useState(_collapsed);
 
   const jsonString = React.useMemo(() => {
     try {

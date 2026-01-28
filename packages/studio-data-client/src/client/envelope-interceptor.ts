@@ -4,7 +4,6 @@
  */
 
 import type { ResponseInterceptor } from './types';
-import type { SuccessEnvelope, ErrorEnvelope } from '@kb-labs/rest-api-contracts';
 
 /**
  * Envelope response structure
@@ -76,7 +75,7 @@ export function createEnvelopeInterceptor(): ResponseInterceptor {
 
       // Not an envelope, return as is
       return response;
-    } catch (error) {
+    } catch (_error) {
       // If parsing fails, return original response
       return response;
     }

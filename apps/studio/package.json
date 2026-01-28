@@ -21,6 +21,7 @@
     "@kb-labs/rest-api-contracts": "link:../../../kb-labs-rest-api/packages/rest-api-contracts",
     "@kb-labs/studio-data-client": "link:../../packages/studio-data-client",
     "@kb-labs/studio-ui-core": "link:../../packages/studio-ui-core",
+    "@kb-labs/studio-ui-kit": "link:../../packages/studio-ui-kit",
     "@kb-labs/studio-ui-react": "link:../../packages/studio-ui-react",
     "@tanstack/react-query": "^5.62.23",
     "@tanstack/react-query-devtools": "^5.62.23",

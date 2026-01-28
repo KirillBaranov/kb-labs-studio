@@ -5,7 +5,9 @@ import auditSummaryFixture from './fixtures/audit-summary.json';
 import auditPackageFixture from './fixtures/audit-package-report.json';
 
 function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise<void>((resolve) => {
+    setTimeout(() => resolve(), ms);
+  });
 }
 
 export class MockAuditSource implements AuditDataSource {

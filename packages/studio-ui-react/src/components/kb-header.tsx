@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Layout, Dropdown, Avatar, Button, Tooltip } from 'antd';
-import type { MenuProps } from 'antd';
 import { User, Search } from 'lucide-react';
 import { KBThemeToggle } from './kb-theme-toggle';
 import { KBSystemHealthIndicator, type SystemHealthData } from './kb-system-health-indicator';

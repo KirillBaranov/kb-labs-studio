@@ -7,7 +7,7 @@ export function useHealthStatus(source: SystemDataSource) {
     queryKey: qk.system.health.live(),
     queryFn: async () => {
       try {
-        return await source.getHealth();
+        return source.getHealth();
       } catch (error) {
         // If HTTP source fails, return degraded status
         return {
@@ -35,7 +35,7 @@ export function useReadyStatus(source: SystemDataSource) {
     queryKey: qk.system.health.ready(),
     queryFn: async () => {
       if (httpSource.getReady) {
-        return await httpSource.getReady();
+        return httpSource.getReady();
       }
       // Fallback for mock sources
       return {
@@ -56,7 +56,7 @@ export function useSystemInfo(source: SystemDataSource) {
     queryKey: qk.system.info(),
     queryFn: async () => {
       if (httpSource.getInfo) {
-        return await httpSource.getInfo();
+        return httpSource.getInfo();
       }
       // Fallback for mock sources
       return {
@@ -78,7 +78,7 @@ export function useCapabilities(source: SystemDataSource) {
     queryKey: qk.system.capabilities(),
     queryFn: async () => {
       if (httpSource.getCapabilities) {
-        return await httpSource.getCapabilities();
+        return httpSource.getCapabilities();
       }
       // Fallback for mock sources
       return {

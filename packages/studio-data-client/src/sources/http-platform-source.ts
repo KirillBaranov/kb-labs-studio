@@ -18,6 +18,6 @@ export class HttpPlatformSource implements PlatformDataSource {
    */
   async getConfig(): Promise<PlatformConfigPayload> {
     // Envelope is already unwrapped by envelope interceptor
-    return await this.client.fetch<PlatformConfigPayload>('/platform/config');
+    return this.client.fetch<PlatformConfigPayload>('/platform/config');
   }
 }

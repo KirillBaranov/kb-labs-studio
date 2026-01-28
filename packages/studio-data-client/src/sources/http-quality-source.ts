@@ -31,7 +31,7 @@ export class HttpQualitySource implements QualityDataSource {
     }
     const query = params.toString();
 
-    return await this.client.fetch<StatsResponse>(
+    return this.client.fetch<StatsResponse>(
       `${this.basePath}${QUALITY_ROUTES.STATS}${query ? `?${query}` : ''}`
     );
   }
@@ -43,13 +43,13 @@ export class HttpQualitySource implements QualityDataSource {
     }
     const query = params.toString();
 
-    return await this.client.fetch<HealthResponse>(
+    return this.client.fetch<HealthResponse>(
       `${this.basePath}${QUALITY_ROUTES.HEALTH}${query ? `?${query}` : ''}`
     );
   }
 
   async getDependencies(): Promise<DependenciesResponse> {
-    return await this.client.fetch<DependenciesResponse>(
+    return this.client.fetch<DependenciesResponse>(
       `${this.basePath}${QUALITY_ROUTES.DEPENDENCIES}`
     );
   }
@@ -61,13 +61,13 @@ export class HttpQualitySource implements QualityDataSource {
     }
     const query = params.toString();
 
-    return await this.client.fetch<BuildOrderResponse>(
+    return this.client.fetch<BuildOrderResponse>(
       `${this.basePath}${QUALITY_ROUTES.BUILD_ORDER}${query ? `?${query}` : ''}`
     );
   }
 
   async getCycles(): Promise<CyclesResponse> {
-    return await this.client.fetch<CyclesResponse>(
+    return this.client.fetch<CyclesResponse>(
       `${this.basePath}${QUALITY_ROUTES.CYCLES}`
     );
   }
@@ -80,7 +80,7 @@ export class HttpQualitySource implements QualityDataSource {
     }
     const query = params.toString();
 
-    return await this.client.fetch<GraphResponse>(
+    return this.client.fetch<GraphResponse>(
       `${this.basePath}${QUALITY_ROUTES.GRAPH}${query ? `?${query}` : ''}`
     );
   }
@@ -92,7 +92,7 @@ export class HttpQualitySource implements QualityDataSource {
     }
     const query = params.toString();
 
-    return await this.client.fetch<StaleResponse>(
+    return this.client.fetch<StaleResponse>(
       `${this.basePath}${QUALITY_ROUTES.STALE}${query ? `?${query}` : ''}`
     );
   }
