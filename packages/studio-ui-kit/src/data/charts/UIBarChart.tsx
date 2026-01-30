@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Bar } from '@ant-design/charts';
 import { theme } from 'antd';
 import type { BarConfig } from '@ant-design/charts';
+import { useChartColors } from './useChartColors';
 
 const { useToken } = theme;
 
@@ -14,40 +15,6 @@ function useChartTheme() {
   return React.useMemo(
     () => ({
       defaultColor: token.colorPrimary,
-      colors10: [
-        token.colorInfo,
-        token.colorSuccess,
-        token.colorWarning,
-        token.colorError,
-        token.colorPrimary,
-        token.colorInfoBg,
-        token.colorSuccessBg,
-        token.colorWarningBg,
-        token.colorErrorBg,
-        token.colorPrimaryBg,
-      ],
-      colors20: [
-        token.colorInfo,
-        token.colorSuccess,
-        token.colorWarning,
-        token.colorError,
-        token.colorPrimary,
-        token.colorInfoBg,
-        token.colorSuccessBg,
-        token.colorWarningBg,
-        token.colorErrorBg,
-        token.colorPrimaryBg,
-        token.colorInfoBorder,
-        token.colorSuccessBorder,
-        token.colorWarningBorder,
-        token.colorErrorBorder,
-        token.colorPrimaryBorder,
-        token.colorInfoText,
-        token.colorSuccessText,
-        token.colorWarningText,
-        token.colorErrorText,
-        token.colorPrimaryText,
-      ],
       styleSheet: {
         backgroundColor: token.colorBgContainer,
         fontFamily: token.fontFamily,
@@ -62,37 +29,65 @@ function useChartTheme() {
 export interface UIBarChartProps extends Omit<BarConfig, 'theme'> {
   /**
    * Custom colors to override theme colors
+   * If not provided, automatic color palette will be used
    */
   colors?: string[];
+  /**
+   * Disable automatic color mapping
+   * Set to true if you want to handle colors manually
+   */
+  disableAutoColors?: boolean;
 }
 
 /**
- * UIBarChart - Horizontal bar chart with automatic theming
+ * UIBarChart - Horizontal bar chart with automatic theming and color mapping
  *
  * Wrapper around @ant-design/charts Bar component that uses theme tokens
- * for automatic light/dark mode support.
+ * for automatic light/dark mode support and automatic color mapping.
  *
  * @example
  * ```tsx
+ * // Automatic color mapping (recommended)
  * <UIBarChart
  *   data={data}
  *   xField="value"
  *   yField="category"
- *   colorField="type"
+ *   seriesField="type"
+ * />
+ *
+ * // Custom colors
+ * <UIBarChart
+ *   data={data}
+ *   xField="value"
+ *   yField="category"
+ *   seriesField="type"
+ *   colors={['#ff0000', '#00ff00']}
  * />
  * ```
  */
-export function UIBarChart({ colors, ...props }: UIBarChartProps) {
+export function UIBarChart({ colors, disableAutoColors, ...props }: UIBarChartProps) {
   const chartTheme = useChartTheme();
+  const palette = useChartColors();
 
-  // Merge theme with custom colors if provided
-  const mergedTheme = colors
-    ? {
-        ...chartTheme,
-        colors10: colors,
-        colors20: colors,
-      }
-    : chartTheme;
+  // Auto-map colors if seriesField is provided and auto-colors are not disabled
+  const enhancedProps = React.useMemo(() => {
+    if (disableAutoColors || !props.seriesField || !props.data) {
+      return props;
+    }
 
-  return <Bar {...props} theme={mergedTheme} />;
+    // Use custom colors if provided, otherwise use palette
+    const colorSource = colors || palette.colors;
+
+    return {
+      ...props,
+      scale: {
+        ...props.scale,
+        color: {
+          range: colorSource,
+        },
+      },
+    };
+  }, [props, colors, palette.colors, disableAutoColors]);
+
+  return <Bar {...enhancedProps} theme={chartTheme} />;
 }

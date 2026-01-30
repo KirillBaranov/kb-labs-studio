@@ -1,11 +1,10 @@
 import * as React from 'react';
-import { Card, theme } from 'antd';
+import { Card } from 'antd';
 import dayjs from 'dayjs';
 import { UILineChart } from './UILineChart';
 import { UIText } from '../../primitives';
+import { useChartColors } from './useChartColors';
 import type { LineConfig } from '@ant-design/charts';
-
-const { useToken } = theme;
 
 /**
  * Configuration for chart metrics
@@ -146,10 +145,13 @@ export function UIStatisticsChart({
   showLegend = true,
   chartProps,
 }: UIStatisticsChartProps) {
-  const { token } = useToken();
+  const palette = useChartColors();
 
-  // Chart colors using theme tokens
-  const chartColors = [token.colorInfo, token.colorSuccess, token.colorWarning];
+  // Chart colors from centralized palette
+  const chartColors = React.useMemo(
+    () => palette.colors.slice(0, Math.max(metrics.length, 3)),
+    [palette.colors, metrics.length]
+  );
 
   // Transform data if metrics are provided (raw DailyStats format)
   const chartData = React.useMemo(() => {

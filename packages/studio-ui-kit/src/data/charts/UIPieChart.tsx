@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Pie } from '@ant-design/charts';
 import { theme } from 'antd';
 import type { PieConfig } from '@ant-design/charts';
+import { useChartColors } from './useChartColors';
 
 const { useToken } = theme;
 
@@ -14,40 +15,6 @@ function useChartTheme() {
   return React.useMemo(
     () => ({
       defaultColor: token.colorPrimary,
-      colors10: [
-        token.colorInfo,
-        token.colorSuccess,
-        token.colorWarning,
-        token.colorError,
-        token.colorPrimary,
-        token.colorInfoBg,
-        token.colorSuccessBg,
-        token.colorWarningBg,
-        token.colorErrorBg,
-        token.colorPrimaryBg,
-      ],
-      colors20: [
-        token.colorInfo,
-        token.colorSuccess,
-        token.colorWarning,
-        token.colorError,
-        token.colorPrimary,
-        token.colorInfoBg,
-        token.colorSuccessBg,
-        token.colorWarningBg,
-        token.colorErrorBg,
-        token.colorPrimaryBg,
-        token.colorInfoBorder,
-        token.colorSuccessBorder,
-        token.colorWarningBorder,
-        token.colorErrorBorder,
-        token.colorPrimaryBorder,
-        token.colorInfoText,
-        token.colorSuccessText,
-        token.colorWarningText,
-        token.colorErrorText,
-        token.colorPrimaryText,
-      ],
       styleSheet: {
         backgroundColor: token.colorBgContainer,
         fontFamily: token.fontFamily,
@@ -62,18 +29,25 @@ function useChartTheme() {
 export interface UIPieChartProps extends Omit<PieConfig, 'theme'> {
   /**
    * Custom colors to override theme colors
+   * If not provided, automatic color palette will be used
    */
   colors?: string[];
+  /**
+   * Disable automatic color mapping
+   * Set to true if you want to handle colors manually
+   */
+  disableAutoColors?: boolean;
 }
 
 /**
- * UIPieChart - Pie/Donut chart with automatic theming
+ * UIPieChart - Pie/Donut chart with automatic theming and color mapping
  *
  * Wrapper around @ant-design/charts Pie component that uses theme tokens
- * for automatic light/dark mode support.
+ * for automatic light/dark mode support and automatic color mapping.
  *
  * @example
  * ```tsx
+ * // Automatic color mapping (recommended)
  * <UIPieChart
  *   data={data}
  *   angleField="value"
@@ -91,17 +65,29 @@ export interface UIPieChartProps extends Omit<PieConfig, 'theme'> {
  * />
  * ```
  */
-export function UIPieChart({ colors, ...props }: UIPieChartProps) {
+export function UIPieChart({ colors, disableAutoColors, ...props }: UIPieChartProps) {
   const chartTheme = useChartTheme();
+  const palette = useChartColors();
 
-  // Merge theme with custom colors if provided
-  const mergedTheme = colors
-    ? {
-        ...chartTheme,
-        colors10: colors,
-        colors20: colors,
-      }
-    : chartTheme;
+  // Auto-map colors if colorField is provided and auto-colors are not disabled
+  const enhancedProps = React.useMemo(() => {
+    if (disableAutoColors || !props.colorField || !props.data) {
+      return props;
+    }
 
-  return <Pie {...props} theme={mergedTheme} />;
+    // Use custom colors if provided, otherwise use palette
+    const colorSource = colors || palette.colors;
+
+    return {
+      ...props,
+      scale: {
+        ...props.scale,
+        color: {
+          range: colorSource,
+        },
+      },
+    };
+  }, [props, colors, palette.colors, disableAutoColors]);
+
+  return <Pie {...enhancedProps} theme={chartTheme} />;
 }

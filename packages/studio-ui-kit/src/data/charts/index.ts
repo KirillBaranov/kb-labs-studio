@@ -11,3 +11,4 @@ export * from './UIAreaChart';
 export * from './UIPieChart';
 export * from './UIBarChart';
 export * from './UIStatisticsChart';
+export * from './useChartColors';
