@@ -9,7 +9,7 @@
  */
 
 import * as React from 'react';
-import { Button as AntButton, ButtonProps as AntButtonProps } from 'antd';
+import { Button as AntButton, type ButtonProps as AntButtonProps } from 'antd';
 import styles from './UIButton.module.css';
 
 export type UIButtonVariant = 'primary' | 'default' | 'dashed' | 'text' | 'link';

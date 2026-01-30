@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { HolderOutlined } from '@ant-design/icons';
-import { KBCard, KBLineChart } from '@kb-labs/studio-ui-react';
+import { KBCard } from '@kb-labs/studio-ui-react';
+import { UILineChart } from '@kb-labs/studio-ui-kit';
 import { type MetricsSnapshot } from '../../../api/metrics';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { Spin } from 'antd';
@@ -71,7 +72,7 @@ export function DashboardRequestsWidget() {
       style={{ height: '100%' }}
     >
       {chartData.length > 0 ? (
-        <KBLineChart {...config} />
+        <UILineChart {...config} />
       ) : (
         <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-tertiary)' }}>
           No request data available
