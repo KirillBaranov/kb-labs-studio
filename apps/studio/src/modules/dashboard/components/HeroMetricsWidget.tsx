@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import {
   ThunderboltOutlined,
   RiseOutlined,
@@ -9,9 +10,10 @@ import {
 import { HeroMetricCard } from './HeroMetricCard';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import {
-  useDevKitHealth,
   usePrometheusMetrics,
   useStateBrokerStats,
+  useQualityHealth,
+  useQualityStale,
 } from '@kb-labs/studio-data-client';
 
 interface MetricsHistoryPoint {
@@ -22,9 +24,11 @@ interface MetricsHistoryPoint {
 
 export function HeroMetricsWidget() {
   const sources = useDataSources();
+  const navigate = useNavigate();
 
   // Data hooks with auto-refresh
-  const devkit = useDevKitHealth(sources.observability);
+  const quality = useQualityHealth(sources.quality, false);
+  const stale = useQualityStale(sources.quality, false);
   const metrics = usePrometheusMetrics(sources.observability);
   const stateBroker = useStateBrokerStats(sources.observability);
 
@@ -96,8 +100,9 @@ export function HeroMetricsWidget() {
   const requestsTrend = calculateTrend(requestsSparkline);
 
   // Metric values
-  const healthScore = devkit.data?.healthScore ?? 0;
-  const healthGrade = devkit.data?.grade ?? 'F';
+  const healthScore = quality.data?.score ?? 0;
+  const healthGrade = quality.data?.grade ?? 'F';
+  const staleCount = stale.data?.totalStale ?? 0;
   const currentUptime = calculateUptime(metrics.data);
   const totalRequests = metrics.data?.requests?.total ?? 0;
   const runtimeSeconds = metrics.data?.uptime?.seconds ?? 0;
@@ -119,15 +124,12 @@ export function HeroMetricsWidget() {
     <Row gutter={[16, 16]}>
       <Col xs={24} sm={12} lg={6}>
         <HeroMetricCard
-          title="System Health"
+          title="Code Quality"
           value={`${healthScore}/100`}
-          subtitle={`Grade ${healthGrade}`}
+          subtitle={staleCount > 0 ? `Stale: ${staleCount} pkg` : `Grade ${healthGrade}`}
           status={getHealthStatus()}
           icon={<ThunderboltOutlined />}
-          onClick={() => {
-            // Navigate to DevKit health page
-            window.location.hash = '#/platform';
-          }}
+          onClick={() => navigate('/quality')}
         />
       </Col>
 
