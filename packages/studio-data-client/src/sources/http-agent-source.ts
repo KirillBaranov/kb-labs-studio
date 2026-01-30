@@ -6,10 +6,9 @@
 import type { HttpClient } from '../client/http-client';
 import type { AgentDataSource } from './agent-source';
 import type {
-  RunAgentRequest,
-  RunAgentResponse,
-  RunAgentErrorResponse,
-  ListAgentsResponse,
+  AgentRequest,
+  AgentSession,
+  AgentSpecification,
 } from '@kb-labs/agent-contracts';
 
 /**
@@ -19,12 +18,12 @@ import type {
 export class HttpAgentSource implements AgentDataSource {
   constructor(private readonly client: HttpClient) {}
 
-  async listAgents(): Promise<ListAgentsResponse> {
-    return this.client.fetch<ListAgentsResponse>('/plugins/agents');
+  async listAgents(): Promise<AgentSpecification[]> {
+    return this.client.fetch<AgentSpecification[]>('/plugins/agents');
   }
 
-  async runAgent(request: RunAgentRequest): Promise<RunAgentResponse | RunAgentErrorResponse> {
-    return this.client.fetch<RunAgentResponse | RunAgentErrorResponse>('/plugins/agents/run', {
+  async runAgent(request: AgentRequest): Promise<AgentSession> {
+    return this.client.fetch<AgentSession>('/plugins/agents/run', {
       method: 'POST',
       data: request,
     });

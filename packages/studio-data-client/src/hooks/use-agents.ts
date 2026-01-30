@@ -30,7 +30,13 @@ export function useAgentRun(
   options?: UseMutationOptions<RunAgentResponse, Error, RunAgentRequest>
 ) {
   return useMutation({
-    mutationFn: (request: RunAgentRequest) => source.runAgent(request),
+    mutationFn: async (request: RunAgentRequest) => {
+      const response = await source.runAgent(request);
+      if (!response.success) {
+        throw new Error(response.error.message);
+      }
+      return response;
+    },
     ...options,
   });
 }

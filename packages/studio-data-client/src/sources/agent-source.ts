@@ -4,10 +4,9 @@
  */
 
 import type {
-  RunAgentRequest,
-  RunAgentResponse,
-  RunAgentErrorResponse,
-  ListAgentsResponse,
+  AgentRequest,
+  AgentSession,
+  AgentSpecification,
 } from '@kb-labs/agent-contracts';
 
 /**
@@ -17,10 +16,10 @@ export interface AgentDataSource {
   /**
    * List all available agents
    */
-  listAgents(): Promise<ListAgentsResponse>;
+  listAgents(): Promise<AgentSpecification[]>;
 
   /**
    * Execute an agent with a task
    */
-  runAgent(request: RunAgentRequest): Promise<RunAgentResponse | RunAgentErrorResponse>;
+  runAgent(request: AgentRequest): Promise<AgentSession>;
 }
