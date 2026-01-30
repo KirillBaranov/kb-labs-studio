@@ -252,12 +252,12 @@ describe('PluginPage', () => {
       const mockWidget = {
         id: 'main-widget',
         kind: 'metric',
-        plugin: { id: 'simple-plugin' },
+        plugin: { pluginId: 'simple-plugin' },
       };
 
       mockUseRegistry.mockReturnValue({
         registry: {
-          plugins: [{ id: 'simple-plugin', widgets: [mockWidget] }],
+          plugins: [{ pluginId: 'simple-plugin', widgets: [mockWidget] }],
           widgets: [],
           layouts: [
             {
@@ -286,13 +286,13 @@ describe('PluginPage', () => {
       const mockWidget = {
         id: 'widget-1',
         kind: 'metric',
-        plugin: { id: 'test' },
+        plugin: { pluginId: 'test' },
         layoutHint: { w: 6, h: 4 },
       };
 
       mockUseRegistry.mockReturnValue({
         registry: {
-          plugins: [{ id: 'test', widgets: [mockWidget] }],
+          plugins: [{ pluginId: 'test', widgets: [mockWidget] }],
           widgets: [],
           layouts: [
             {

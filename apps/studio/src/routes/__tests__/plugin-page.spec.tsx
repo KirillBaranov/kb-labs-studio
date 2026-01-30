@@ -42,8 +42,8 @@ import { PluginPage } from '../plugin-page';
 import { useParams } from 'react-router-dom';
 import { useRegistry } from '../../providers/registry-provider';
 
-const mockUseParams = vi.mocked(useParams);
-const mockUseRegistry = vi.mocked(useRegistry);
+const mockUseParams = useParams as ReturnType<typeof vi.fn>;
+const mockUseRegistry = useRegistry as ReturnType<typeof vi.fn>;
 
 describe('PluginPage', () => {
   beforeEach(() => {
@@ -127,7 +127,7 @@ describe('PluginPage', () => {
         registry: {
           plugins: [
             {
-              id: '@kb-labs/analytics',
+              pluginId: '@kb-labs/analytics',
               widgets: [mockWidget],
             },
           ],
@@ -160,7 +160,7 @@ describe('PluginPage', () => {
 
       mockUseRegistry.mockReturnValue({
         registry: {
-          plugins: [{ id: '@kb-labs/analytics', widgets: [] }],
+          plugins: [{ pluginId: '@kb-labs/analytics', widgets: [] }],
           widgets: [],
           layouts: [{ id: 'analytics.dashboard', widgets: [] }],
           menus: [],
@@ -183,7 +183,7 @@ describe('PluginPage', () => {
         registry: {
           plugins: [
             {
-              id: '@kb-labs/analytics',
+              pluginId: '@kb-labs/analytics',
               widgets: [
                 { id: 'metrics-chart', kind: 'chart-line', plugin: { id: '@kb-labs/analytics' } },
               ],
@@ -224,7 +224,7 @@ describe('PluginPage', () => {
 
       mockUseRegistry.mockReturnValue({
         registry: {
-          plugins: [{ id: '@kb-labs/mind', widgets: [mockWidget] }],
+          plugins: [{ pluginId: '@kb-labs/mind', widgets: [mockWidget] }],
           widgets: [],
           layouts: [
             {
@@ -257,7 +257,7 @@ describe('PluginPage', () => {
 
       mockUseRegistry.mockReturnValue({
         registry: {
-          plugins: [{ id: 'simple-plugin', widgets: [mockWidget] }],
+          plugins: [{ pluginId: 'simple-plugin', widgets: [mockWidget] }],
           widgets: [],
           layouts: [
             {
@@ -292,7 +292,7 @@ describe('PluginPage', () => {
 
       mockUseRegistry.mockReturnValue({
         registry: {
-          plugins: [{ id: 'test', widgets: [mockWidget] }],
+          plugins: [{ pluginId: 'test', widgets: [mockWidget] }],
           widgets: [],
           layouts: [
             {
