@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ConfigProvider } from 'antd';
 import type { ConfigProviderProps, ThemeConfig } from 'antd';
-import { getAntDesignTokens, getAntDesignComponents, getThemeAlgorithm } from '../lib/theme-adapter';
+import { getAntDesignTokens, getAntDesignComponents } from '../lib/theme-adapter';
 import { ThemeTransitionOverlay } from './theme-transition-overlay';
 
 export type ThemeMode = 'light' | 'dark' | 'auto';

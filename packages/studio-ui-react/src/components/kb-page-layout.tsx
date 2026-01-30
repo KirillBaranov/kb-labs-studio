@@ -3,7 +3,6 @@ import { Layout as AntLayout } from 'antd';
 import { KBHeader, type KBHeaderProps } from './kb-header';
 import { KBSidebar, type KBSidebarProps, type NavigationItem } from './kb-sidebar';
 import { KBContent, type KBContentProps } from './kb-content';
-import { KBStatusBar } from './kb-status-bar';
 
 export interface KBPageLayoutProps {
   headerProps?: KBHeaderProps;

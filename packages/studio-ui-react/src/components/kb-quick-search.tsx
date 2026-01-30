@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Modal, Input, List, Empty, Badge } from 'antd';
-import { Search, Command, FileText, Box, Settings, BarChart, Activity, Navigation, Zap } from 'lucide-react';
+import { Search, FileText, Box, Settings, BarChart, Activity, Navigation, Zap } from 'lucide-react';
 
 export interface SearchableItem {
   id: string;

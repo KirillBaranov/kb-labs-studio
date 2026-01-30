@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Badge, Dropdown, List, Typography, Tag, Empty, Divider, Space, Tooltip } from 'antd';
+import { Badge, Dropdown, List, Typography, Tag, Empty, Space, Tooltip } from 'antd';
 import { Bell, AlertTriangle, XCircle, X, CheckCheck } from 'lucide-react';
 import { UIButton } from '@kb-labs/studio-ui-kit';
 

@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Badge, Tag } from 'antd';
-import type { BadgeProps } from 'antd';
 import type { TagProps } from 'antd';
 
 export interface KBBadgeProps extends Omit<TagProps, 'color'> {
