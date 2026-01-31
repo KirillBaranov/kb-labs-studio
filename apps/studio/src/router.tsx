@@ -41,7 +41,7 @@ import { AnalyticsEmbeddingsPage } from './modules/analytics/pages/analytics-emb
 import { AnalyticsVectorStorePage } from './modules/analytics/pages/analytics-vectorstore-page';
 import { AnalyticsCachePage } from './modules/analytics/pages/analytics-cache-page';
 import { AnalyticsStoragePage } from './modules/analytics/pages/analytics-storage-page';
-import { AssistantPage } from './modules/assistant/pages/assistant-page';
+import { AgentsPage } from './modules/agents/pages/agents-page';
 // TODO: TEMPORARY - Remove after commit plugin UI is polished
 import { CommitPage } from './modules/commit/pages/commit-page';
 import { ReleasePage } from './modules/release/pages/release-page';
@@ -165,10 +165,10 @@ function LayoutContent() {
         path: '/plugins',
       },
       {
-        key: 'assistant',
-        label: 'AI Assistant',
+        key: 'agents',
+        label: 'Agents',
         icon: renderPluginIcon('RobotOutlined'),
-        path: '/assistant',
+        path: '/agents',
       },
       // TODO: TEMPORARY - Remove after commit plugin UI is polished
       {
@@ -495,8 +495,8 @@ export const router = createBrowserRouter([
         errorElement: <ErrorBoundary />,
       },
       {
-        path: '/assistant',
-        element: <AssistantPage />,
+        path: '/agents',
+        element: <AgentsPage />,
         errorElement: <ErrorBoundary />,
       },
       {
