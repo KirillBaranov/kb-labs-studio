@@ -69,6 +69,7 @@ export * from './hooks/use-analytics';
 export * from './hooks/use-adapters';
 export * from './hooks/use-platform';
 export * from './hooks/use-agents';
+export * from './hooks/use-agent-websocket';
 export * from './hooks/use-commit';
 export * from './hooks/use-quality';
 export * from './hooks/types';
