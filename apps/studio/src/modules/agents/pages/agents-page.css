@@ -1,0 +1,18 @@
+/**
+ * Agent chat page styles
+ */
+
+/* Override markdown-viewer styles for chat messages */
+.chat-message-markdown.markdown-viewer {
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+}
+
+.chat-message-markdown.markdown-viewer > *:first-child {
+  margin-top: 0;
+}
+
+.chat-message-markdown.markdown-viewer > *:last-child {
+  margin-bottom: 0;
+}
