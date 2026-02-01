@@ -24,6 +24,12 @@ export interface DateRangeOptions {
    * End date (ISO 8601 timestamp)
    */
   to?: string;
+
+  /**
+   * Optional model filter (LLM analytics only)
+   * Can be a single model or multiple models
+   */
+  models?: string | string[];
 }
 
 /**

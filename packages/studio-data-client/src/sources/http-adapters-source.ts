@@ -24,13 +24,21 @@ export class HttpAdaptersSource implements AdaptersDataSource {
    * Build query string from date range options
    */
   private buildQueryString(options?: DateRangeOptions): string {
-    if (!options?.from && !options?.to) {
+    if (!options?.from && !options?.to && !options?.models) {
       return '';
     }
 
     const params = new URLSearchParams();
-    if (options.from) {params.append('from', options.from);}
-    if (options.to) {params.append('to', options.to);}
+    if (options?.from) {params.append('from', options.from);}
+    if (options?.to) {params.append('to', options.to);}
+
+    // Handle models parameter
+    if (options?.models) {
+      const modelsArray = Array.isArray(options.models) ? options.models : [options.models];
+      if (modelsArray.length > 0) {
+        params.append('models', modelsArray.join(','));
+      }
+    }
 
     return `?${params.toString()}`;
   }
