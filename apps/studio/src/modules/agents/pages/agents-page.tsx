@@ -13,111 +13,204 @@ import {
   useAgentSessionEvents,
 } from '@kb-labs/studio-data-client';
 import { useDataSources } from '@/providers/data-sources-provider';
-import { MarkdownViewer } from '@/components/markdown';
 import { SessionSelector } from '../components/session-selector';
-import { ToolCallItem } from '../components/tool-call-item';
+import { ResearchBlock } from '../components/research-block';
+import { AnswerBlock } from '../components/answer-block';
+import type { ResearchStep } from '../components/step-item';
+import type { ToolCall } from '../components/tool-item';
 import type { AgentEvent, AgentSessionInfo } from '@kb-labs/agent-contracts';
 import './agents-page.css';
 
 const { Text } = Typography;
-const { useToken } = theme;
 
 type RunStatus = 'idle' | 'running' | 'completed' | 'failed' | 'stopped';
 
-type MessageType = 'user' | 'agent' | 'tool' | 'error';
-
-interface ChatMessage {
+interface ConversationTurn {
   id: string;
-  content: string;
-  type: MessageType;
+  userMessage: string;
   timestamp: string;
-  toolName?: string;
-  toolInput?: Record<string, unknown>;
+  steps: ResearchStep[];
+  answer?: string;
+  isRunning: boolean;
 }
 
 /**
- * Extract displayable messages from events
- *
- * Note: Events may arrive out of order due to parallel tool execution.
- * We use tool:end as the primary source (has output), and try to find
- * matching tool:start for input metadata.
+ * Build conversation turns from events
+ * Groups events by orchestrator:start → orchestrator:end
  */
-function getMessages(events: AgentEvent[]): ChatMessage[] {
-  const messages: ChatMessage[] = [];
+function buildConversationTurns(events: AgentEvent[]): ConversationTurn[] {
+  const turns: ConversationTurn[] = [];
+  let currentTurn: ConversationTurn | null = null;
 
-  // Build a map of tool:start events by toolName for input lookup
-  // Since multiple calls to same tool are possible, we use an array
-  const toolStartInputs = new Map<string, Array<Record<string, unknown>>>();
+  // Maps for correlation
+  const stepsByAgentId = new Map<string, ResearchStep>();
+  const toolsByCallId = new Map<string, ToolCall>();
 
   for (const event of events) {
-    if (event.type === 'tool:start') {
-      const inputs = toolStartInputs.get(event.data.toolName) || [];
-      inputs.push(event.data.input || {});
-      toolStartInputs.set(event.data.toolName, inputs);
+    // New conversation turn starts with orchestrator:start
+    if (event.type === 'orchestrator:start') {
+      // Save previous turn if exists
+      if (currentTurn) {
+        turns.push(currentTurn);
+      }
+      currentTurn = {
+        id: `turn-${event.timestamp}`,
+        userMessage: event.data.task,
+        timestamp: event.timestamp,
+        steps: [],
+        isRunning: true,
+      };
+      // Reset maps for new turn
+      stepsByAgentId.clear();
+      toolsByCallId.clear();
+      continue;
+    }
+
+    // Skip events without a current turn
+    if (!currentTurn) continue;
+
+    // Child agent starts (research step)
+    if (event.type === 'agent:start' && event.parentAgentId) {
+      const step: ResearchStep = {
+        id: event.agentId || `step-${event.timestamp}`,
+        task: event.data.task,
+        status: 'running',
+        tools: [],
+      };
+      stepsByAgentId.set(step.id, step);
+      currentTurn.steps.push(step);
+      continue;
+    }
+
+    // Child agent ends
+    if (event.type === 'agent:end' && event.agentId && stepsByAgentId.has(event.agentId)) {
+      const step = stepsByAgentId.get(event.agentId)!;
+      step.status = event.data.success ? 'done' : 'error';
+      step.duration = event.data.durationMs;
+      if (!event.data.success) {
+        step.error = event.data.summary;
+      }
+      continue;
+    }
+
+    // Agent error
+    if (event.type === 'agent:error' && event.agentId && stepsByAgentId.has(event.agentId)) {
+      const step = stepsByAgentId.get(event.agentId)!;
+      step.status = 'error';
+      step.error = event.data.error;
+      continue;
+    }
+
+    // Tool starts
+    if (event.type === 'tool:start' && event.agentId) {
+      const step = stepsByAgentId.get(event.agentId);
+      if (step) {
+        const tool: ToolCall = {
+          id: event.toolCallId || `tool-${event.timestamp}`,
+          name: event.data.toolName,
+          status: 'running',
+          preview: '',
+          input: event.data.input,
+        };
+        toolsByCallId.set(tool.id, tool);
+        step.tools.push(tool);
+      }
+      continue;
+    }
+
+    // Tool ends
+    if (event.type === 'tool:end' && event.toolCallId) {
+      const tool = toolsByCallId.get(event.toolCallId);
+      if (tool) {
+        tool.status = event.data.success ? 'done' : 'error';
+        tool.output = event.data.output;
+        tool.preview = generateToolPreview(event.data.toolName, event.data.output);
+      }
+      continue;
+    }
+
+    // Tool error
+    if (event.type === 'tool:error' && event.toolCallId) {
+      const tool = toolsByCallId.get(event.toolCallId);
+      if (tool) {
+        tool.status = 'error';
+        tool.error = event.data.error;
+      }
+      continue;
+    }
+
+    // LLM end - capture agent thoughts/reasoning (from child agents only)
+    if (event.type === 'llm:end' && event.agentId && stepsByAgentId.has(event.agentId)) {
+      const content = event.data.content;
+      // Only capture meaningful thoughts (not just "[Executing tools...]" markers)
+      if (content && content.length > 50 && !content.startsWith('[Executing')) {
+        const step = stepsByAgentId.get(event.agentId)!;
+        if (!step.thoughts) {
+          step.thoughts = [];
+        }
+        // Only add if it's different from the last thought (avoid duplicates)
+        const lastThought = step.thoughts[step.thoughts.length - 1];
+        if (lastThought !== content) {
+          step.thoughts.push(content);
+        }
+      }
+      continue;
+    }
+
+    // Orchestrator answer - capture synthesized response
+    if (event.type === 'orchestrator:answer') {
+      currentTurn.answer = event.data.answer;
+      continue;
+    }
+
+    // Orchestrator ends - mark turn as complete
+    if (event.type === 'orchestrator:end') {
+      currentTurn.isRunning = false;
+      continue;
     }
   }
 
-  // Track which tool:start inputs we've consumed (by tool name)
-  const consumedInputs = new Map<string, number>();
-
-  for (const event of events) {
-    // User task (from agent:start)
-    if (event.type === 'agent:start') {
-      messages.push({
-        id: `user-${event.timestamp}`,
-        content: event.data.task,
-        type: 'user',
-        timestamp: event.timestamp,
-      });
-    }
-
-    // Tool usage - use tool:end as primary (it always has output)
-    if (event.type === 'tool:end') {
-      const toolName = event.data.toolName;
-
-      // Try to get input from matching tool:start
-      const inputs = toolStartInputs.get(toolName) || [];
-      const consumedCount = consumedInputs.get(toolName) || 0;
-      const toolInput = inputs[consumedCount];
-      consumedInputs.set(toolName, consumedCount + 1);
-
-      messages.push({
-        id: `tool-${event.timestamp}`,
-        content: event.data.output || '',
-        type: 'tool',
-        timestamp: event.timestamp,
-        toolName,
-        toolInput,
-      });
-    }
-
-    // LLM responses (agent thinking/answers)
-    if (event.type === 'llm:end' && event.data.content) {
-      messages.push({
-        id: `agent-${event.timestamp}`,
-        content: event.data.content,
-        type: 'agent',
-        timestamp: event.timestamp,
-      });
-    }
-
-    // Errors
-    if (event.type === 'agent:error') {
-      messages.push({
-        id: `error-${event.timestamp}`,
-        content: event.data.error,
-        type: 'error',
-        timestamp: event.timestamp,
-      });
-    }
+  // Don't forget the last turn
+  if (currentTurn) {
+    turns.push(currentTurn);
   }
 
-  return messages;
+  return turns;
+}
+
+/**
+ * Generate preview text for tool output
+ */
+function generateToolPreview(toolName: string, output?: string): string {
+  if (!output) return 'done';
+
+  const baseName = toolName.split(':').pop() || toolName;
+
+  switch (baseName) {
+    case 'read': {
+      const lines = output.split('\n').length;
+      return `${lines} lines`;
+    }
+    case 'rag-query': {
+      const match = output.match(/Found (\d+)/i) || output.match(/(\d+) result/i);
+      return match ? `${match[1]} results` : 'done';
+    }
+    case 'glob': {
+      const files = output.split('\n').filter(Boolean).length;
+      return `${files} files`;
+    }
+    case 'grep': {
+      const matches = output.split('\n').filter(Boolean).length;
+      return `${matches} matches`;
+    }
+    default:
+      return 'done';
+  }
 }
 
 export function AgentsPage() {
   const sources = useDataSources();
-  const { token } = useToken();
+  const { token } = theme.useToken();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Session state
@@ -133,21 +226,30 @@ export function AgentsPage() {
   const agentId = 'mind-assistant';
 
   // Fetch session history when session changes
+  // Note: Large limit to ensure we get all events including orchestrator:answer at the end
   const sessionEventsQuery = useAgentSessionEvents(
     sources.agent,
     currentSessionId,
-    { limit: 200, enabled: !!currentSessionId }
+    { limit: 1000, enabled: !!currentSessionId }
   );
 
   // Mutations
   const startRunMutation = useAgentStartRun(sources.agent);
   const stopMutation = useAgentStop(sources.agent);
 
+  // Fallback summary from run:completed (when orchestrator:end not in events yet)
+  const [fallbackSummary, setFallbackSummary] = useState<string | null>(null);
+
   // WebSocket connection for real-time events
   const ws = useAgentWebSocket({
     url: eventsUrl,
-    onComplete: (success) => {
+    onComplete: (success, summary) => {
       setRunStatus(success ? 'completed' : 'failed');
+      // Store summary as fallback (in case orchestrator:end event not captured)
+      if (summary) {
+        setFallbackSummary(summary);
+        console.log('[AgentsPage] run:completed summary:', summary.slice(0, 100) + '...');
+      }
       // Refetch session events to get persisted history
       void sessionEventsQuery.refetch();
     },
@@ -156,6 +258,12 @@ export function AgentsPage() {
       message.error(`Connection error: ${error.message}`);
     },
   });
+
+  // Clear stale events on mount (fresh start)
+  useEffect(() => {
+    ws.clearEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -229,16 +337,33 @@ export function AgentsPage() {
   const isRunning = runStatus === 'running' || startRunMutation.isPending;
 
   // Combine historical events with live WebSocket events
-  const historicalEvents = sessionEventsQuery.data?.events ?? [];
+  const historicalEvents = currentSessionId ? (sessionEventsQuery.data?.events ?? []) : [];
   const liveEvents = ws.events;
 
+  // Generate unique event ID for deduplication
+  const getEventId = (e: AgentEvent): string => {
+    const base = `${e.type}-${e.timestamp}`;
+    const agentPart = e.agentId ? `-${e.agentId}` : '';
+    const toolPart = e.toolCallId ? `-${e.toolCallId}` : '';
+    return `${base}${agentPart}${toolPart}`;
+  };
+
   // Deduplicate: use historical events + any new live events not in history
-  const historicalIds = new Set(historicalEvents.map((e) => `${e.type}-${e.timestamp}`));
-  const newLiveEvents = liveEvents.filter(
-    (e) => !historicalIds.has(`${e.type}-${e.timestamp}`)
-  );
-  const allEvents = [...historicalEvents, ...newLiveEvents];
-  const messages = getMessages(allEvents);
+  const historicalIds = new Set(historicalEvents.map(getEventId));
+  const newLiveEvents = liveEvents.filter((e) => !historicalIds.has(getEventId(e)));
+
+  // Merge and sort by seq (primary) or timestamp (fallback)
+  const allEvents = [...historicalEvents, ...newLiveEvents].sort((a, b) => {
+    // Primary: sort by seq if both have it
+    if (a.seq !== undefined && b.seq !== undefined) {
+      return a.seq - b.seq;
+    }
+    // Fallback: sort by timestamp
+    return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+  });
+
+  // Build conversation turns from events
+  const turns = buildConversationTurns(allEvents);
 
   return (
     <div style={{ padding: 16, height: '100%' }}>
@@ -282,7 +407,7 @@ export function AgentsPage() {
             padding: '24px 20px',
           }}
         >
-          {messages.length === 0 && !isRunning && (
+          {turns.length === 0 && !isRunning && (
             <div
               style={{
                 textAlign: 'center',
@@ -298,180 +423,76 @@ export function AgentsPage() {
             </div>
           )}
 
-          {/* Messages */}
-          {messages.map((msg) => (
-            <div key={msg.id}>
-              {msg.type === 'user' ? (
-                /* User message - bubble on the right */
+          {/* Conversation turns */}
+          {turns.map((turn) => (
+            <div key={turn.id} style={{ marginBottom: 24 }}>
+              {/* User message */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  marginBottom: 16,
+                }}
+              >
                 <div
                   style={{
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    marginBottom: 16,
+                    maxWidth: '80%',
+                    padding: '10px 14px',
+                    borderRadius: 16,
+                    background: token.colorPrimary,
+                    color: '#fff',
                   }}
                 >
-                  <div
-                    style={{
-                      maxWidth: '80%',
-                      padding: '10px 14px',
-                      borderRadius: 16,
-                      background: token.colorPrimary,
-                      color: '#fff',
-                    }}
-                  >
-                    {msg.content}
+                  {turn.userMessage}
+                </div>
+              </div>
+
+              {/* Agent response */}
+              <div
+                style={{
+                  background: token.colorBgContainer,
+                  border: `1px solid ${token.colorBorderSecondary}`,
+                  borderRadius: 12,
+                  padding: 16,
+                }}
+              >
+                {/* Research steps */}
+                <ResearchBlock
+                  steps={turn.steps}
+                  isRunning={turn.isRunning}
+                />
+
+                {/* Final answer */}
+                {turn.answer && (
+                  <AnswerBlock content={turn.answer} />
+                )}
+
+                {/* Loading state when no answer yet */}
+                {turn.isRunning && !turn.answer && turn.steps.length > 0 && (
+                  <div style={{ marginTop: 12 }}>
+                    <Space>
+                      <LoadingOutlined style={{ color: token.colorPrimary }} />
+                      <Text type="secondary">Synthesizing answer...</Text>
+                    </Space>
                   </div>
-                </div>
-              ) : msg.type === 'tool' ? (
-                /* Tool usage - with timeline dot */
-                <div
-                  style={{
-                    position: 'relative',
-                    paddingLeft: 24,
-                    marginBottom: 8,
-                  }}
-                >
-                  {/* Vertical line */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      left: 5,
-                      top: 0,
-                      bottom: -8,
-                      width: 2,
-                      background: token.colorBorderSecondary,
-                    }}
-                  />
-                  {/* Small dot */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      left: 2,
-                      top: 6,
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      background: token.colorBorderSecondary,
-                      zIndex: 1,
-                    }}
-                  />
-                  <ToolCallItem
-                    toolName={msg.toolName || 'unknown'}
-                    input={msg.toolInput}
-                    output={msg.content}
-                  />
-                </div>
-              ) : msg.type === 'error' ? (
-                /* Error message */
-                <div
-                  style={{
-                    position: 'relative',
-                    paddingLeft: 24,
-                    marginBottom: 16,
-                  }}
-                >
-                  <div
-                    style={{
-                      position: 'absolute',
-                      left: 5,
-                      top: 0,
-                      bottom: -16,
-                      width: 2,
-                      background: token.colorError,
-                    }}
-                  />
-                  <div
-                    style={{
-                      position: 'absolute',
-                      left: 0,
-                      top: 4,
-                      width: 12,
-                      height: 12,
-                      borderRadius: '50%',
-                      background: token.colorError,
-                      zIndex: 1,
-                    }}
-                  />
-                  <Text type="danger">{msg.content}</Text>
-                </div>
-              ) : (
-                /* Agent message - timeline style */
-                <div
-                  style={{
-                    position: 'relative',
-                    paddingLeft: 24,
-                    marginBottom: 16,
-                    marginTop: 8,
-                  }}
-                >
-                  {/* Vertical line */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      left: 5,
-                      top: 0,
-                      bottom: -16,
-                      width: 2,
-                      background: token.colorBorderSecondary,
-                    }}
-                  />
-                  {/* Dot */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      left: 0,
-                      top: 4,
-                      width: 12,
-                      height: 12,
-                      borderRadius: '50%',
-                      background: token.colorBgContainer,
-                      border: `2px solid ${token.colorBorderSecondary}`,
-                      zIndex: 1,
-                    }}
-                  />
-                  <MarkdownViewer className="chat-message-markdown">{msg.content}</MarkdownViewer>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           ))}
 
-          {/* Thinking indicator */}
-          {isRunning && (
+          {/* Initial loading state (before any steps) */}
+          {isRunning && turns.length > 0 && turns[turns.length - 1].steps.length === 0 && (
             <div
               style={{
-                position: 'relative',
-                paddingLeft: 24,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '12px 16px',
+                color: token.colorTextSecondary,
               }}
             >
-              {/* Vertical line */}
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 5,
-                  top: 0,
-                  height: 20,
-                  width: 2,
-                  background: token.colorBorderSecondary,
-                }}
-              />
-              {/* Animated dot */}
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  top: 4,
-                  width: 12,
-                  height: 12,
-                  borderRadius: '50%',
-                  background: token.colorPrimary,
-                  border: `2px solid ${token.colorPrimary}`,
-                  zIndex: 1,
-                }}
-              />
-              <Space>
-                <LoadingOutlined spin style={{ color: token.colorPrimary }} />
-                <Text type="secondary">Thinking...</Text>
-              </Space>
+              <LoadingOutlined style={{ color: token.colorPrimary }} />
+              <Text type="secondary">Planning research...</Text>
             </div>
           )}
 
