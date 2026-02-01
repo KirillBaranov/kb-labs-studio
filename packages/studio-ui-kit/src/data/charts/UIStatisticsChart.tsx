@@ -225,33 +225,25 @@ export function UIStatisticsChart({
     );
   };
 
-  // Render loading state
-  if (loading) {
-    return (
-      <Card title={title} style={{ marginTop: 16, ...style }}>
+  // Render function for content
+  const renderContent = () => (
+    <>
+      {loading && (
         <div style={{ textAlign: 'center', padding: '40px 0' }}>
           <UIText color="secondary">Loading chart data...</UIText>
         </div>
-      </Card>
-    );
-  }
+      )}
 
-  // Render empty state
-  if (!chartData || chartData.length === 0) {
-    return (
-      <Card title={title} style={{ marginTop: 16, ...style }}>
+      {!loading && (!chartData || chartData.length === 0) && (
         <div style={{ textAlign: 'center', padding: '40px 0' }}>
           <UIText color="secondary">No data available for the selected date range</UIText>
         </div>
-      </Card>
-    );
-  }
+      )}
 
-  // Render chart
-  return (
-    <Card title={title} style={{ marginTop: 16, ...style }}>
+      {!loading && chartData && chartData.length > 0 && (
       <div>
         {renderLegend()}
+
 
         <UILineChart
           data={chartData}
@@ -260,6 +252,7 @@ export function UIStatisticsChart({
           colorField={colorField}
           height={height}
           colors={chartColors}
+          smooth
           scale={{
             color: {
               range: chartColors,
@@ -313,6 +306,19 @@ export function UIStatisticsChart({
           {...chartProps}
         />
       </div>
-    </Card>
+      )}
+    </>
   );
+
+  // Render with or without Card wrapper depending on title
+  if (title) {
+    return (
+      <Card title={title} style={{ marginTop: 16, ...style }}>
+        {renderContent()}
+      </Card>
+    );
+  }
+
+  // No title - render content directly
+  return <div style={style}>{renderContent()}</div>;
 }
