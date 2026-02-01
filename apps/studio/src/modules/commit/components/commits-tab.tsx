@@ -4,10 +4,11 @@
  */
 
 import { useState } from 'react';
-import { Button, Card, Empty, Alert, Spin, Collapse, Typography, Badge, message } from 'antd';
+import { Button, Card, Empty, Alert, Spin, Collapse, Typography, Badge, message, Checkbox, Space, Modal } from 'antd';
 import {
   ThunderboltOutlined,
   RightOutlined,
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -23,6 +24,7 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
   const sources = useDataSources();
   const queryClient = useQueryClient();
   const [expandedCommits, setExpandedCommits] = useState<string[]>([]);
+  const [allowSecrets, setAllowSecrets] = useState(false);
 
   // Fetch status (includes filesChanged, commitsInPlan, hasPlan)
   const { data: statusData, isLoading: statusLoading } = useQuery({
@@ -43,13 +45,116 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
 
   // Generate plan mutation
   const generateMutation = useMutation({
-    mutationFn: () => sources.commit.generatePlan({ scope: selectedScope }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['commit', 'plan', selectedScope] });
-      queryClient.invalidateQueries({ queryKey: ['commit', 'status', selectedScope] });
-      queryClient.invalidateQueries({ queryKey: ['commit', 'git-status', selectedScope] });
+    mutationFn: (params: { allowSecrets: boolean; autoConfirm: boolean }) =>
+      sources.commit.generatePlan({
+        scope: selectedScope,
+        allowSecrets: params.allowSecrets,
+        autoConfirm: params.autoConfirm,
+      }),
+    onSuccess: (data) => {
+      // Check if secrets were detected
+      if (data.secretsDetected && data.secrets) {
+        // Show detailed modal with detected secrets
+        showSecretsModal(data.secrets, data.message || 'Secrets detected in your changes');
+      } else if (data.success) {
+        // Success - invalidate queries
+        queryClient.invalidateQueries({ queryKey: ['commit', 'plan', selectedScope] });
+        queryClient.invalidateQueries({ queryKey: ['commit', 'status', selectedScope] });
+        queryClient.invalidateQueries({ queryKey: ['commit', 'git-status', selectedScope] });
+      }
     },
   });
+
+  // Show secrets detection modal with list of detected secrets
+  const showSecretsModal = (secrets: any[], message: string) => {
+    Modal.error({
+      title: 'Secrets Detected',
+      icon: <ExclamationCircleOutlined />,
+      width: 700,
+      content: (
+        <div>
+          <Alert
+            message={message}
+            type="error"
+            showIcon
+            style={{ marginBottom: 16 }}
+          />
+          <div style={{ marginBottom: 16 }}>
+            <Text strong>Detected {secrets.length} potential secret(s):</Text>
+          </div>
+          <div style={{ maxHeight: 400, overflow: 'auto', marginBottom: 16 }}>
+            {secrets.map((secret, idx) => (
+              <Card key={idx} size="small" style={{ marginBottom: 8 }}>
+                <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                  <Text strong>
+                    📄 {secret.file}:{secret.line}:{secret.column}
+                  </Text>
+                  <Text type="secondary">
+                    Type: {secret.type}
+                  </Text>
+                  <Text code style={{ whiteSpace: 'pre-wrap' }}>
+                    {secret.context}
+                  </Text>
+                  <Text type="danger" strong>
+                    Matched: {secret.matched}
+                  </Text>
+                </Space>
+              </Card>
+            ))}
+          </div>
+          <Alert
+            message="What to do?"
+            description={
+              <div>
+                <p>1. Review each detected secret above</p>
+                <p>2. If real secrets: Remove them and use environment variables</p>
+                <p>3. If false positives: Check "Allow secrets" and try again</p>
+              </div>
+            }
+            type="info"
+            showIcon
+          />
+        </div>
+      ),
+      okText: 'Close',
+      okType: 'default',
+    });
+  };
+
+  // Handle generate click with confirmation modal
+  const handleGenerateClick = () => {
+    if (allowSecrets) {
+      // Show confirmation modal for secrets
+      Modal.confirm({
+        title: 'Allow Secrets Confirmation',
+        icon: <ExclamationCircleOutlined />,
+        content: (
+          <div>
+            <p>
+              You are about to generate commits for files that may contain secrets (API keys, tokens, passwords).
+            </p>
+            <p>
+              <Text type="danger" strong>
+                Warning: This bypasses security checks!
+              </Text>
+            </p>
+            <p>
+              Make sure you have reviewed the detected secrets and confirmed they are false positives before proceeding.
+            </p>
+          </div>
+        ),
+        okText: 'Yes, Proceed',
+        okType: 'danger',
+        cancelText: 'Cancel',
+        onOk: () => {
+          generateMutation.mutate({ allowSecrets: true, autoConfirm: true });
+        },
+      });
+    } else {
+      // Normal generation without secrets
+      generateMutation.mutate({ allowSecrets: false, autoConfirm: false });
+    }
+  };
 
   // Apply commits mutation
   const applyMutation = useMutation({
@@ -149,7 +254,7 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
                 {pushMutation.isPending ? 'Pushing...' : 'Push'}
               </Link>
               <Text type="secondary">•</Text>
-              <Link onClick={() => generateMutation.mutate()} disabled={generateMutation.isPending}>
+              <Link onClick={handleGenerateClick} disabled={generateMutation.isPending}>
                 {generateMutation.isPending ? 'Regenerating...' : 'Regenerate'}
               </Link>
             </div>
@@ -199,15 +304,26 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
               </div>
             }
           >
-            <Button
-              type="primary"
-              icon={<ThunderboltOutlined />}
-              onClick={() => generateMutation.mutate()}
-              loading={generateMutation.isPending}
-              disabled={filesChanged === 0}
-            >
-              Generate Plan
-            </Button>
+            <Space direction="vertical" align="center">
+              <Checkbox
+                checked={allowSecrets}
+                onChange={(e) => setAllowSecrets(e.target.checked)}
+                style={{ marginBottom: 12 }}
+              >
+                <Text type="secondary" style={{ fontSize: 13 }}>
+                  Allow secrets (requires confirmation)
+                </Text>
+              </Checkbox>
+              <Button
+                type="primary"
+                icon={<ThunderboltOutlined />}
+                onClick={handleGenerateClick}
+                loading={generateMutation.isPending}
+                disabled={filesChanged === 0}
+              >
+                Generate Plan
+              </Button>
+            </Space>
           </Empty>
         </Card>
       ) : (
