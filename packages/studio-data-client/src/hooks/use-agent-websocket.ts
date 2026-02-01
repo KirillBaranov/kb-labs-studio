@@ -77,6 +77,7 @@ export function useAgentWebSocket(options: UseAgentWebSocketOptions): UseAgentWe
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSeqRef = useRef<number>(0); // Track last received seq for gap detection
 
   // Update status and notify
   const updateStatus = useCallback((newStatus: ConnectionStatus) => {
@@ -89,6 +90,15 @@ export function useAgentWebSocket(options: UseAgentWebSocketOptions): UseAgentWe
     switch (data.type) {
       case 'agent:event': {
         const event = data.payload;
+
+        // Gap detection: check if we missed events
+        if (event.seq !== undefined) {
+          if (lastSeqRef.current > 0 && event.seq > lastSeqRef.current + 1) {
+            console.warn(`[useAgentWebSocket] Gap detected: expected seq ${lastSeqRef.current + 1}, got ${event.seq}`);
+          }
+          lastSeqRef.current = event.seq;
+        }
+
         setEvents((prev) => [...prev, event]);
         setLastEvent(event);
         onEvent?.(event);
@@ -211,6 +221,7 @@ export function useAgentWebSocket(options: UseAgentWebSocketOptions): UseAgentWe
     setError(null);
     setIsCompleted(false);
     setCompletionResult(null);
+    lastSeqRef.current = 0; // Reset sequence tracking
   }, []);
 
   // Connect when URL changes
