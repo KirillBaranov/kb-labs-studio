@@ -105,10 +105,12 @@ export function useGeneratePlan(source: CommitDataSource) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (request: Omit<GenerateRequest, 'dryRun'> & { dryRun?: boolean }) => {
+    mutationFn: (request: Omit<GenerateRequest, 'dryRun' | 'allowSecrets' | 'autoConfirm'> & { dryRun?: boolean; allowSecrets?: boolean; autoConfirm?: boolean }) => {
       const fullRequest: GenerateRequest = {
         scope: request.scope,
         dryRun: request.dryRun ?? false,
+        allowSecrets: request.allowSecrets ?? false,
+        autoConfirm: request.autoConfirm ?? false,
       };
       return source.generatePlan(fullRequest);
     },
