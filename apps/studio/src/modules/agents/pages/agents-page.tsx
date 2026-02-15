@@ -67,7 +67,7 @@ function buildConversationTurns(events: AgentEvent[]): ConversationTurn[] {
     }
 
     // Skip events without a current turn
-    if (!currentTurn) continue;
+    if (!currentTurn) {continue;}
 
     // Child agent starts (research step)
     if (event.type === 'agent:start' && event.parentAgentId) {
@@ -182,7 +182,7 @@ function buildConversationTurns(events: AgentEvent[]): ConversationTurn[] {
  * Generate preview text for tool output
  */
 function generateToolPreview(toolName: string, output?: string): string {
-  if (!output) return 'done';
+  if (!output) {return 'done';}
 
   const baseName = toolName.split(':').pop() || toolName;
 
@@ -289,7 +289,7 @@ export function AgentsPage() {
 
   // Run handlers
   const handleStart = useCallback(async () => {
-    if (!task.trim()) return;
+    if (!task.trim()) {return;}
 
     try {
       setRunStatus('running');
@@ -315,7 +315,7 @@ export function AgentsPage() {
   }, [task, agentId, currentSessionId, startRunMutation]);
 
   const handleStop = useCallback(async () => {
-    if (!currentRunId) return;
+    if (!currentRunId) {return;}
 
     try {
       await stopMutation.mutateAsync({ runId: currentRunId, reason: 'Stopped by user' });

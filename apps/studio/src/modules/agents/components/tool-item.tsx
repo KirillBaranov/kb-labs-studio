@@ -89,8 +89,8 @@ function formatToolName(toolName: string, input?: Record<string, unknown>): stri
  * Generate short status text (shown on the right)
  */
 function generateStatusText(tool: ToolCall): string {
-  if (tool.status === 'running') return '';
-  if (tool.status === 'error') return 'error';
+  if (tool.status === 'running') {return '';}
+  if (tool.status === 'error') {return 'error';}
 
   const output = tool.output || '';
   const baseName = tool.name.split(':').pop() || tool.name;
@@ -135,7 +135,7 @@ function generateStatusText(tool: ToolCall): string {
  * Returns null if no preview should be shown
  */
 function generateCompactPreview(tool: ToolCall): string[] | null {
-  if (tool.status !== 'done') return null;
+  if (tool.status !== 'done') {return null;}
 
   const output = tool.output || '';
   const baseName = tool.name.split(':').pop() || tool.name;
@@ -146,7 +146,7 @@ function generateCompactPreview(tool: ToolCall): string[] | null {
     case 'glob_search': {
       // Show file list (max 5)
       const files = output.split('\n').filter(Boolean);
-      if (files.length === 0) return null;
+      if (files.length === 0) {return null;}
       return files.slice(0, 5).map(f => f.split('/').pop() || f);
     }
 
@@ -160,21 +160,21 @@ function generateCompactPreview(tool: ToolCall): string[] | null {
       // Show what changed
       const oldStr = (input.old_string as string) || '';
       const newStr = (input.new_string as string) || '';
-      if (!oldStr || !newStr) return null;
+      if (!oldStr || !newStr) {return null;}
       const result: string[] = [];
       // Show first line of old (removed)
       const oldFirst = oldStr.split('\n')[0];
-      if (oldFirst) result.push(`- ${oldFirst.slice(0, 50)}${oldFirst.length > 50 ? '…' : ''}`);
+      if (oldFirst) {result.push(`- ${oldFirst.slice(0, 50)}${oldFirst.length > 50 ? '…' : ''}`);}
       // Show first line of new (added)
       const newFirst = newStr.split('\n')[0];
-      if (newFirst) result.push(`+ ${newFirst.slice(0, 50)}${newFirst.length > 50 ? '…' : ''}`);
+      if (newFirst) {result.push(`+ ${newFirst.slice(0, 50)}${newFirst.length > 50 ? '…' : ''}`);}
       return result.length > 0 ? result : null;
     }
 
     case 'grep': {
       // Show first 3 matches
       const matches = output.split('\n').filter(Boolean).slice(0, 3);
-      if (matches.length === 0) return null;
+      if (matches.length === 0) {return null;}
       return matches.map(m => {
         // Format: file:line:content -> show just file:line
         const parts = m.split(':');
@@ -190,7 +190,7 @@ function generateCompactPreview(tool: ToolCall): string[] | null {
     case 'memory-get': {
       // Show first line of memory content
       const firstLine = output.split('\n').find(l => l.trim());
-      if (!firstLine) return null;
+      if (!firstLine) {return null;}
       return [firstLine.slice(0, 60) + (firstLine.length > 60 ? '…' : '')];
     }
 

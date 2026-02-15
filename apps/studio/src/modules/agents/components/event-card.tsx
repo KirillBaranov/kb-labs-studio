@@ -39,8 +39,8 @@ interface EventCardProps {
  * Format duration in ms to human readable
  */
 function formatDuration(ms: number): string {
-  if (ms < 1000) return `${ms}ms`;
-  if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
+  if (ms < 1000) {return `${ms}ms`;}
+  if (ms < 60000) {return `${(ms / 1000).toFixed(1)}s`;}
   return `${Math.floor(ms / 60000)}m ${Math.floor((ms % 60000) / 1000)}s`;
 }
 
@@ -48,7 +48,7 @@ function formatDuration(ms: number): string {
  * Format tokens count
  */
 function formatTokens(tokens: number): string {
-  if (tokens < 1000) return tokens.toString();
+  if (tokens < 1000) {return tokens.toString();}
   return `${(tokens / 1000).toFixed(1)}k`;
 }
 
@@ -56,7 +56,7 @@ function formatTokens(tokens: number): string {
  * Truncate text with ellipsis
  */
 function truncate(text: string, maxLength: number): string {
-  if (text.length <= maxLength) return text;
+  if (text.length <= maxLength) {return text;}
   return text.slice(0, maxLength - 3) + '...';
 }
 
@@ -505,7 +505,7 @@ function ToolInputDisplay({ input, metadata }: { input: Record<string, unknown>;
 
   // Fallback: show collapsible JSON
   const keys = Object.keys(input);
-  if (keys.length === 0) return null;
+  if (keys.length === 0) {return null;}
 
   if (keys.length <= 2) {
     return (

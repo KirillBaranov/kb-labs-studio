@@ -46,8 +46,8 @@ function getStatusDisplay(status: RunStatsProps['status']): {
 }
 
 function formatDuration(ms: number): string {
-  if (ms < 1000) return `${ms}ms`;
-  if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
+  if (ms < 1000) {return `${ms}ms`;}
+  if (ms < 60000) {return `${(ms / 1000).toFixed(1)}s`;}
   const minutes = Math.floor(ms / 60000);
   const seconds = Math.floor((ms % 60000) / 1000);
   return `${minutes}m ${seconds}s`;
@@ -58,7 +58,7 @@ export function RunStats({ events, status, startTime, endTime }: RunStatsProps) 
 
   // Live elapsed time
   useEffect(() => {
-    if (status !== 'running' || !startTime) return;
+    if (status !== 'running' || !startTime) {return;}
 
     const interval = setInterval(() => {
       setElapsed(Date.now() - startTime);
