@@ -1,9 +1,6 @@
 /**
  * @module @kb-labs/studio-app/modules/commit/pages/commit-page
- * Commit plugin main page - GitHub/GitLab style
- *
- * TODO: TEMPORARY - Remove after commit plugin UI is polished and re-enabled in manifest
- * This is a temporary solution to provide custom commit page while widget UI is being improved
+ * Commit plugin main page
  */
 
 import * as React from 'react';
@@ -11,7 +8,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Tabs, Select } from 'antd';
 import { KBPageContainer, KBPageHeader } from '@kb-labs/studio-ui-react';
 import { useDataSources } from '@/providers/data-sources-provider';
-import { useQuery } from '@tanstack/react-query';
+import { useScopes } from '@kb-labs/studio-data-client';
 import { CommitsTab } from '../components/commits-tab';
 import { FilesTabNew } from '../components/files-tab-new';
 
@@ -23,11 +20,7 @@ export function CommitPage() {
 
   const activeTab = params.tab || 'commits';
 
-  // Fetch scopes
-  const { data: scopesData, isLoading: scopesLoading } = useQuery({
-    queryKey: ['commit', 'scopes'],
-    queryFn: () => sources.commit.getScopes(),
-  });
+  const { data: scopesData, isLoading: scopesLoading } = useScopes(sources.commit);
 
   // Auto-select first scope
   React.useEffect(() => {
@@ -57,7 +50,7 @@ export function CommitPage() {
     <KBPageContainer>
       <KBPageHeader
         title="Commit"
-        description="AI-powered commit generation with conventional commit support"
+        description="AI-powered commit generation"
         extra={
           <Select
             style={{ width: 300 }}
