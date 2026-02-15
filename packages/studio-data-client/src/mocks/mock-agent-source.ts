@@ -257,8 +257,8 @@ export class MockAgentSource implements AgentDataSource {
     let events = mockEvents.get(sessionId) ?? [];
     const total = events.length;
 
-    if (offset) events = events.slice(offset);
-    if (limit) events = events.slice(0, limit);
+    if (offset) {events = events.slice(offset);}
+    if (limit) {events = events.slice(0, limit);}
 
     return { events, total };
   }

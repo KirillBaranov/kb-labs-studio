@@ -1,9 +1,6 @@
 /**
  * @module @kb-labs/studio-data-client/sources/http-commit-source
  * HTTP implementation of CommitDataSource
- *
- * TODO: TEMPORARY - Remove after commit plugin UI is polished and re-enabled in manifest
- * This is a temporary solution to provide custom commit page while widget UI is being improved
  */
 
 import type { HttpClient } from '../client/http-client';
@@ -14,6 +11,10 @@ import type {
   GenerateRequest,
   GenerateResponse,
   PlanResponse,
+  PatchPlanRequest,
+  PatchPlanResponse,
+  RegenerateCommitRequest,
+  RegenerateCommitResponse,
   ApplyRequest,
   ApplyResponse,
   PushRequest,
@@ -34,7 +35,7 @@ export class HttpCommitSource implements CommitDataSource {
   constructor(private client: HttpClient) {}
 
   async getScopes(): Promise<ScopesResponse> {
-    // Backend returns SelectData format, adapt to ScopesResponse
+    // Backend returns SelectData with folder-based scope IDs
     const selectData = await this.client.fetch<{
       value: string;
       options: Array<{ value: string; label: string; description?: string }>;
@@ -86,6 +87,20 @@ export class HttpCommitSource implements CommitDataSource {
 
   async generatePlan(request: GenerateRequest): Promise<GenerateResponse> {
     return this.client.fetch<GenerateResponse>(`${this.basePath}/generate`, {
+      method: 'POST',
+      data: request,
+    });
+  }
+
+  async patchPlan(request: PatchPlanRequest): Promise<PatchPlanResponse> {
+    return this.client.fetch<PatchPlanResponse>(`${this.basePath}/plan`, {
+      method: 'PATCH',
+      data: request,
+    });
+  }
+
+  async regenerateCommit(request: RegenerateCommitRequest): Promise<RegenerateCommitResponse> {
+    return this.client.fetch<RegenerateCommitResponse>(`${this.basePath}/regenerate-commit`, {
       method: 'POST',
       data: request,
     });

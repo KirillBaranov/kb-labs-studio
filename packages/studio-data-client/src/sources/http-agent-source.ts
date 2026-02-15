@@ -71,10 +71,10 @@ export class HttpAgentSource implements AgentDataSource {
 
   async listSessions(request?: ListSessionsRequest): Promise<ListSessionsResponse> {
     const params = new URLSearchParams();
-    if (request?.agentId) params.set('agentId', request.agentId);
-    if (request?.limit) params.set('limit', String(request.limit));
-    if (request?.offset) params.set('offset', String(request.offset));
-    if (request?.status) params.set('status', request.status);
+    if (request?.agentId) {params.set('agentId', request.agentId);}
+    if (request?.limit) {params.set('limit', String(request.limit));}
+    if (request?.offset) {params.set('offset', String(request.offset));}
+    if (request?.status) {params.set('status', request.status);}
 
     const query = params.toString();
     const url = `/plugins/agents/sessions${query ? `?${query}` : ''}`;
@@ -91,8 +91,8 @@ export class HttpAgentSource implements AgentDataSource {
     offset?: number
   ): Promise<GetSessionEventsResponse> {
     const params = new URLSearchParams();
-    if (limit) params.set('limit', String(limit));
-    if (offset) params.set('offset', String(offset));
+    if (limit) {params.set('limit', String(limit));}
+    if (offset) {params.set('offset', String(offset));}
 
     const query = params.toString();
     const url = `/plugins/agents/sessions/${sessionId}/events${query ? `?${query}` : ''}`;

@@ -137,7 +137,7 @@ export function useAgentWebSocket(options: UseAgentWebSocketOptions): UseAgentWe
 
   // Connect to WebSocket
   const connect = useCallback(() => {
-    if (!url) return;
+    if (!url) {return;}
 
     // Close existing connection
     if (wsRef.current) {
