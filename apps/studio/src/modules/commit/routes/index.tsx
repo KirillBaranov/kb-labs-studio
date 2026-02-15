@@ -1,8 +1,6 @@
 /**
  * @module @kb-labs/studio-app/modules/commit/routes
  * Commit module routing configuration
- *
- * @note TEMPORARY - Remove after commit plugin UI is polished
  */
 
 import type { RouteObject } from 'react-router-dom';
@@ -40,7 +38,6 @@ export const commitRoutes: RouteObject[] = [
 
 /**
  * Commit navigation item for sidebar
- * @note TEMPORARY - Remove after commit plugin UI is polished
  */
 export const commitNavigation: NavigationItem = {
   key: KEYS.MODULE,
