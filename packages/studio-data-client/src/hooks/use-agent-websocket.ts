@@ -15,6 +15,8 @@ export interface UseAgentWebSocketOptions {
   reconnectDelay?: number;
   /** Max reconnect attempts (default: 5) */
   maxReconnectAttempts?: number;
+  /** Event batching interval in ms (default: 100) */
+  batchInterval?: number;
   /** Callback for events */
   onEvent?: (event: AgentEvent) => void;
   /** Callback for connection status changes */
@@ -61,6 +63,7 @@ export function useAgentWebSocket(options: UseAgentWebSocketOptions): UseAgentWe
     autoReconnect = true,
     reconnectDelay = 1000,
     maxReconnectAttempts = 5,
+    batchInterval = 100, // Default 100ms batching
     onEvent,
     onStatusChange,
     onComplete,
@@ -78,6 +81,32 @@ export function useAgentWebSocket(options: UseAgentWebSocketOptions): UseAgentWe
   const reconnectAttemptsRef = useRef(0);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSeqRef = useRef<number>(0); // Track last received seq for gap detection
+
+  // Event batching: buffer events and flush periodically
+  const eventBufferRef = useRef<AgentEvent[]>([]);
+  const flushTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Flush buffered events to state
+  const flushEvents = useCallback(() => {
+    if (eventBufferRef.current.length === 0) return;
+
+    const buffered = eventBufferRef.current;
+    eventBufferRef.current = [];
+
+    // Batch update: add all buffered events at once
+    setEvents((prev) => [...prev, ...buffered]);
+
+    // Set last event
+    const last = buffered[buffered.length - 1];
+    if (last) {
+      setLastEvent(last);
+    }
+
+    // Call onEvent callback for each event
+    buffered.forEach((event) => {
+      onEvent?.(event);
+    });
+  }, [onEvent]);
 
   // Update status and notify
   const updateStatus = useCallback((newStatus: ConnectionStatus) => {
@@ -99,9 +128,16 @@ export function useAgentWebSocket(options: UseAgentWebSocketOptions): UseAgentWe
           lastSeqRef.current = event.seq;
         }
 
-        setEvents((prev) => [...prev, event]);
-        setLastEvent(event);
-        onEvent?.(event);
+        // Add to buffer instead of immediate state update (prevents rapid re-renders)
+        eventBufferRef.current.push(event);
+
+        // Schedule flush if not already scheduled
+        if (!flushTimeoutRef.current) {
+          flushTimeoutRef.current = setTimeout(() => {
+            flushTimeoutRef.current = null;
+            flushEvents();
+          }, batchInterval);
+        }
         break;
       }
 
@@ -231,6 +267,13 @@ export function useAgentWebSocket(options: UseAgentWebSocketOptions): UseAgentWe
     }
 
     return () => {
+      // Cleanup: flush any remaining events before disconnect
+      if (flushTimeoutRef.current) {
+        clearTimeout(flushTimeoutRef.current);
+        flushTimeoutRef.current = null;
+      }
+      flushEvents();
+
       disconnect();
     };
   }, [url]); // eslint-disable-line react-hooks/exhaustive-deps
