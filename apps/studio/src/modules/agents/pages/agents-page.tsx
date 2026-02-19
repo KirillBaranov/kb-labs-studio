@@ -36,7 +36,14 @@ interface ConversationTurn {
 
 /**
  * Build conversation turns from events
- * Groups events by orchestrator:start → orchestrator:end
+ *
+ * Turn boundaries:
+ * - agent:start (without parentAgentId) = new turn (main agent)
+ * - agent:start (with parentAgentId) = research step within turn (sub-agent)
+ * - agent:end (without parentAgentId) = turn complete, answer = summary
+ *
+ * Main agent tools are shown inline as a "Working..." step.
+ * Sub-agent tools are shown under their respective research steps.
  */
 function buildConversationTurns(events: AgentEvent[]): ConversationTurn[] {
   const turns: ConversationTurn[] = [];
@@ -45,16 +52,21 @@ function buildConversationTurns(events: AgentEvent[]): ConversationTurn[] {
   // Maps for correlation
   const stepsByAgentId = new Map<string, ResearchStep>();
   const toolsByCallId = new Map<string, ToolCall>();
+  // Track main agent ID for each turn
+  let mainAgentId: string | null = null;
+  // Track last direct LLM response from main agent (no tool calls = final answer)
+  let lastDirectLLMContent: string | null = null;
 
   for (const event of events) {
-    // New conversation turn starts with orchestrator:start
-    if (event.type === 'orchestrator:start') {
+    // New turn starts with agent:start of MAIN agent (no parentAgentId)
+    if (event.type === 'agent:start' && !event.parentAgentId) {
       // Save previous turn if exists
       if (currentTurn) {
         turns.push(currentTurn);
       }
+      mainAgentId = event.agentId || null;
       currentTurn = {
-        id: `turn-${event.timestamp}`,
+        id: `turn-${event.agentId || event.timestamp}`,
         userMessage: event.data.task,
         timestamp: event.timestamp,
         steps: [],
@@ -63,13 +75,14 @@ function buildConversationTurns(events: AgentEvent[]): ConversationTurn[] {
       // Reset maps for new turn
       stepsByAgentId.clear();
       toolsByCallId.clear();
+      lastDirectLLMContent = null;
       continue;
     }
 
     // Skip events without a current turn
     if (!currentTurn) {continue;}
 
-    // Child agent starts (research step)
+    // Sub-agent starts (research step)
     if (event.type === 'agent:start' && event.parentAgentId) {
       const step: ResearchStep = {
         id: event.agentId || `step-${event.timestamp}`,
@@ -82,7 +95,15 @@ function buildConversationTurns(events: AgentEvent[]): ConversationTurn[] {
       continue;
     }
 
-    // Child agent ends
+    // Main agent ends — turn complete
+    // Prefer direct LLM content over validation summary (summary is often meta-description)
+    if (event.type === 'agent:end' && !event.parentAgentId) {
+      currentTurn.isRunning = false;
+      currentTurn.answer = lastDirectLLMContent || event.data.summary || undefined;
+      continue;
+    }
+
+    // Sub-agent ends
     if (event.type === 'agent:end' && event.agentId && stepsByAgentId.has(event.agentId)) {
       const step = stepsByAgentId.get(event.agentId)!;
       step.status = event.data.success ? 'done' : 'error';
@@ -103,7 +124,24 @@ function buildConversationTurns(events: AgentEvent[]): ConversationTurn[] {
 
     // Tool starts
     if (event.type === 'tool:start' && event.agentId) {
-      const step = stepsByAgentId.get(event.agentId);
+      let step = stepsByAgentId.get(event.agentId);
+
+      // Tool from main agent — create inline "Working..." step
+      if (!step && event.agentId === mainAgentId) {
+        const mainStepId = '__main__';
+        step = stepsByAgentId.get(mainStepId);
+        if (!step) {
+          step = {
+            id: mainStepId,
+            task: 'Working...',
+            status: 'running',
+            tools: [],
+          };
+          stepsByAgentId.set(mainStepId, step);
+          currentTurn.steps.push(step);
+        }
+      }
+
       if (step) {
         const tool: ToolCall = {
           id: event.toolCallId || `tool-${event.timestamp}`,
@@ -139,31 +177,37 @@ function buildConversationTurns(events: AgentEvent[]): ConversationTurn[] {
       continue;
     }
 
-    // LLM end - capture agent thoughts/reasoning (from child agents only)
-    if (event.type === 'llm:end' && event.agentId && stepsByAgentId.has(event.agentId)) {
+    // LLM end - capture direct answer or agent thoughts
+    if (event.type === 'llm:end' && event.agentId) {
       const content = event.data.content;
-      // Only capture meaningful thoughts (not just "[Executing tools...]" markers)
-      if (content && content.length > 50 && !content.startsWith('[Executing')) {
-        const step = stepsByAgentId.get(event.agentId)!;
-        if (!step.thoughts) {
-          step.thoughts = [];
-        }
-        // Only add if it's different from the last thought (avoid duplicates)
-        const lastThought = step.thoughts[step.thoughts.length - 1];
-        if (lastThought !== content) {
-          step.thoughts.push(content);
+
+      // Main agent's LLM response without tool calls = direct answer text
+      if (event.agentId === mainAgentId && !event.data.hasToolCalls && content) {
+        lastDirectLLMContent = content;
+      }
+
+      // Sub-agent thoughts
+      const step = stepsByAgentId.get(event.agentId);
+      if (step) {
+        // Only capture meaningful thoughts (not just "[Executing tools...]" markers)
+        if (content && content.length > 50 && !content.startsWith('[Executing')) {
+          if (!step.thoughts) {
+            step.thoughts = [];
+          }
+          const lastThought = step.thoughts[step.thoughts.length - 1];
+          if (lastThought !== content) {
+            step.thoughts.push(content);
+          }
         }
       }
       continue;
     }
 
-    // Orchestrator answer - capture synthesized response
+    // Legacy orchestrator events — handle for backward compatibility
     if (event.type === 'orchestrator:answer') {
-      currentTurn.answer = event.data.answer;
+      currentTurn.answer = (event as { data: { answer: string } }).data.answer;
       continue;
     }
-
-    // Orchestrator ends - mark turn as complete
     if (event.type === 'orchestrator:end') {
       currentTurn.isRunning = false;
       continue;
@@ -172,6 +216,13 @@ function buildConversationTurns(events: AgentEvent[]): ConversationTurn[] {
 
   // Don't forget the last turn
   if (currentTurn) {
+    // Mark main step as done if turn is complete
+    if (!currentTurn.isRunning) {
+      const mainStep = stepsByAgentId.get('__main__');
+      if (mainStep && mainStep.status === 'running') {
+        mainStep.status = 'done';
+      }
+    }
     turns.push(currentTurn);
   }
 
@@ -222,11 +273,14 @@ export function AgentsPage() {
   const [eventsUrl, setEventsUrl] = useState<string | null>(null);
   const [runStatus, setRunStatus] = useState<RunStatus>('idle');
 
+  // Optimistic turns: shown instantly before events arrive
+  const [optimisticTurns, setOptimisticTurns] = useState<ConversationTurn[]>([]);
+
   // Hardcoded agent for simplicity
   const agentId = 'mind-assistant';
 
   // Fetch session history when session changes
-  // Note: Large limit to ensure we get all events including orchestrator:answer at the end
+  // Note: Large limit to ensure we get all events including agent:end with summary
   const sessionEventsQuery = useAgentSessionEvents(
     sources.agent,
     currentSessionId,
@@ -237,7 +291,7 @@ export function AgentsPage() {
   const startRunMutation = useAgentStartRun(sources.agent);
   const stopMutation = useAgentStop(sources.agent);
 
-  // Fallback summary from run:completed (when orchestrator:end not in events yet)
+  // Fallback summary from run:completed (when agent:end not yet in events)
   const [fallbackSummary, setFallbackSummary] = useState<string | null>(null);
 
   // WebSocket connection for real-time events
@@ -245,7 +299,7 @@ export function AgentsPage() {
     url: eventsUrl,
     onComplete: (success, summary) => {
       setRunStatus(success ? 'completed' : 'failed');
-      // Store summary as fallback (in case orchestrator:end event not captured)
+      // Store summary as fallback (in case agent:end not yet captured)
       if (summary) {
         setFallbackSummary(summary);
         console.log('[AgentsPage] run:completed summary:', summary.slice(0, 100) + '...');
@@ -276,6 +330,7 @@ export function AgentsPage() {
     setCurrentRunId(null);
     setEventsUrl(null);
     setRunStatus('idle');
+    setOptimisticTurns([]);
     ws.clearEvents();
   }, [ws]);
 
@@ -284,6 +339,7 @@ export function AgentsPage() {
     setCurrentRunId(null);
     setEventsUrl(null);
     setRunStatus('idle');
+    setOptimisticTurns([]);
     ws.clearEvents();
   }, [ws]);
 
@@ -291,11 +347,23 @@ export function AgentsPage() {
   const handleStart = useCallback(async () => {
     if (!task.trim()) {return;}
 
-    try {
-      setRunStatus('running');
+    const userMessage = task.trim();
 
+    // Optimistic: show user message INSTANTLY (before POST completes)
+    const optimisticTurn: ConversationTurn = {
+      id: `turn-optimistic-${Date.now()}`,
+      userMessage,
+      timestamp: new Date().toISOString(),
+      steps: [],
+      isRunning: true,
+    };
+    setOptimisticTurns((prev) => [...prev, optimisticTurn]);
+    setTask('');
+    setRunStatus('running');
+
+    try {
       const response = await startRunMutation.mutateAsync({
-        task: task.trim(),
+        task: userMessage,
         agentId,
         sessionId: currentSessionId ?? undefined,
       });
@@ -307,9 +375,13 @@ export function AgentsPage() {
 
       setCurrentRunId(response.runId);
       setEventsUrl(response.eventsUrl);
-      setTask('');
+
+      // Once real events start arriving, optimistic turn will be replaced
+      // by event-based turn via buildConversationTurns
     } catch (error) {
       setRunStatus('failed');
+      // Remove optimistic turn on failure
+      setOptimisticTurns((prev) => prev.filter((t) => t.id !== optimisticTurn.id));
       message.error(`Failed to start: ${error instanceof Error ? error.message : String(error)}`);
     }
   }, [task, agentId, currentSessionId, startRunMutation]);
@@ -340,8 +412,9 @@ export function AgentsPage() {
   const historicalEvents = currentSessionId ? (sessionEventsQuery.data?.events ?? []) : [];
   const liveEvents = ws.events;
 
-  // Generate unique event ID for deduplication
+  // Generate unique event ID for deduplication (prefer seq for reliability)
   const getEventId = (e: AgentEvent): string => {
+    if (e.seq != null) return `seq:${e.seq}`;
     const base = `${e.type}-${e.timestamp}`;
     const agentPart = e.agentId ? `-${e.agentId}` : '';
     const toolPart = e.toolCallId ? `-${e.toolCallId}` : '';
@@ -363,7 +436,13 @@ export function AgentsPage() {
   });
 
   // Build conversation turns from events
-  const turns = buildConversationTurns(allEvents);
+  const eventTurns = buildConversationTurns(allEvents);
+
+  // Merge optimistic turns with event-based turns:
+  // If event-based turns cover the same user messages, remove matching optimistic turns
+  const eventMessages = new Set(eventTurns.map((t) => t.userMessage));
+  const remainingOptimistic = optimisticTurns.filter((t) => !eventMessages.has(t.userMessage));
+  const turns = [...eventTurns, ...remainingOptimistic];
 
   return (
     <div style={{ padding: 16, height: '100%' }}>
@@ -456,6 +535,16 @@ export function AgentsPage() {
                   padding: 16,
                 }}
               >
+                {/* Initial loader: waiting for first event */}
+                {turn.isRunning && turn.steps.length === 0 && !turn.answer && (
+                  <div style={{ padding: '8px 0' }}>
+                    <Space>
+                      <LoadingOutlined style={{ color: token.colorPrimary }} />
+                      <Text type="secondary">Thinking...</Text>
+                    </Space>
+                  </div>
+                )}
+
                 {/* Research steps */}
                 <ResearchBlock
                   steps={turn.steps}
@@ -467,7 +556,7 @@ export function AgentsPage() {
                   <AnswerBlock content={turn.answer} />
                 )}
 
-                {/* Loading state when no answer yet */}
+                {/* Loading state: steps exist but no answer yet */}
                 {turn.isRunning && !turn.answer && turn.steps.length > 0 && (
                   <div style={{ marginTop: 12 }}>
                     <Space>
@@ -479,22 +568,6 @@ export function AgentsPage() {
               </div>
             </div>
           ))}
-
-          {/* Initial loading state (before any steps) */}
-          {isRunning && turns.length > 0 && turns[turns.length - 1].steps.length === 0 && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '12px 16px',
-                color: token.colorTextSecondary,
-              }}
-            >
-              <LoadingOutlined style={{ color: token.colorPrimary }} />
-              <Text type="secondary">Planning research...</Text>
-            </div>
-          )}
 
           <div ref={messagesEndRef} />
         </div>

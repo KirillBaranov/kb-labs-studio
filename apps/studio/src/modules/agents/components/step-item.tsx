@@ -1,18 +1,11 @@
 /**
  * @module StepItem
- * Single research step (agent) with expandable tool calls
+ * Tree node for research step with visual tree lines (CSS-based)
  */
 
 import React, { useState } from 'react';
-import { Typography, theme, Tooltip } from 'antd';
-import {
-  CheckCircleFilled,
-  CloseCircleFilled,
-  LoadingOutlined,
-  ClockCircleOutlined,
-  DownOutlined,
-  RightOutlined,
-} from '@ant-design/icons';
+import { Typography, theme } from 'antd';
+import { MarkdownViewer } from '@/components/markdown';
 import { ToolItem, type ToolCall } from './tool-item';
 
 const { Text } = Typography;
@@ -24,110 +17,115 @@ export interface ResearchStep {
   duration?: number;
   tools: ToolCall[];
   error?: string;
-  /** Agent's reasoning/thoughts from llm:end events */
   thoughts?: string[];
 }
 
 interface StepItemProps {
   step: ResearchStep;
   isLast: boolean;
+  level: number;
 }
 
-export function StepItem({ step, isLast }: StepItemProps) {
-  const { token } = theme.useToken();
-  const [isExpanded, setIsExpanded] = useState(step.status === 'running' || step.status === 'error');
+function formatDuration(ms?: number): string {
+  if (!ms) return '';
+  if (ms < 1000) return `${ms}ms`;
+  return `${(ms / 1000).toFixed(1)}s`;
+}
 
+function getStatusIcon(status: string, token: any): { emoji: string; color: string } {
+  switch (status) {
+    case 'done':
+      return { emoji: '✓', color: token.colorSuccess };
+    case 'error':
+      return { emoji: '✗', color: token.colorError };
+    case 'running':
+      return { emoji: '⚡', color: token.colorPrimary };
+    case 'pending':
+      return { emoji: '○', color: token.colorTextDisabled };
+    default:
+      return { emoji: '○', color: token.colorTextSecondary };
+  }
+}
+
+export function StepItem({ step, isLast, level }: StepItemProps) {
+  const { token } = theme.useToken();
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  const { emoji, color } = getStatusIcon(step.status, token);
   const hasTools = step.tools.length > 0;
   const hasThoughts = step.thoughts && step.thoughts.length > 0;
-  const canExpand = hasTools || step.error || hasThoughts;
-
-  // Status icon
-  const StatusIcon = () => {
-    switch (step.status) {
-      case 'done':
-        return <CheckCircleFilled style={{ color: token.colorSuccess, fontSize: 14 }} />;
-      case 'error':
-        return <CloseCircleFilled style={{ color: token.colorError, fontSize: 14 }} />;
-      case 'running':
-        return <LoadingOutlined style={{ color: token.colorPrimary, fontSize: 14 }} spin />;
-      default:
-        return <ClockCircleOutlined style={{ color: token.colorTextDisabled, fontSize: 14 }} />;
-    }
-  };
-
-  // Format duration
-  const formatDuration = (ms?: number) => {
-    if (!ms) {return '';}
-    if (ms < 1000) {return `${ms}ms`;}
-    return `${(ms / 1000).toFixed(1)}s`;
-  };
+  const hasContent = hasTools || step.error || hasThoughts;
 
   return (
     <div
       style={{
         position: 'relative',
-        paddingLeft: 20,
-        paddingBottom: isLast ? 0 : 8,
+        marginBottom: isLast ? 0 : 8,
       }}
     >
-      {/* Vertical connector line */}
+      {/* Vertical line (if not last) */}
       {!isLast && (
         <div
           style={{
             position: 'absolute',
-            left: 6,
-            top: 18,
-            bottom: 0,
-            width: 1,
+            left: 8,
+            top: 24,
+            bottom: -8,
+            width: 2,
             background: token.colorBorderSecondary,
+            borderRadius: 1,
           }}
         />
       )}
 
       {/* Step header */}
       <div
-        onClick={() => canExpand && setIsExpanded(!isExpanded)}
+        onClick={() => hasContent && setIsExpanded(!isExpanded)}
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 8,
-          cursor: canExpand ? 'pointer' : 'default',
-          padding: '4px 0',
+          gap: 10,
+          cursor: hasContent ? 'pointer' : 'default',
+          paddingTop: 4,
+          paddingBottom: 4,
         }}
       >
-        {/* Expand arrow */}
-        <div style={{ width: 12, display: 'flex', justifyContent: 'center' }}>
-          {canExpand ? (
-            isExpanded ? (
-              <DownOutlined style={{ fontSize: 9, color: token.colorTextSecondary }} />
-            ) : (
-              <RightOutlined style={{ fontSize: 9, color: token.colorTextSecondary }} />
-            )
-          ) : null}
+        {/* Status circle with emoji */}
+        <div
+          style={{
+            width: 18,
+            height: 18,
+            borderRadius: '50%',
+            background: token.colorBgLayout,
+            border: `2px solid ${color}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 10,
+            flexShrink: 0,
+            zIndex: 1,
+            position: 'relative',
+          }}
+        >
+          {emoji}
         </div>
-
-        {/* Status icon */}
-        <StatusIcon />
 
         {/* Task name */}
         <Text
           style={{
             flex: 1,
             fontSize: 13,
+            fontWeight: 500,
             color: step.status === 'pending' ? token.colorTextDisabled : token.colorText,
           }}
-          ellipsis
         >
           {step.task}
         </Text>
 
-        {/* Duration / Status */}
-        <Text
-          type="secondary"
-          style={{ fontSize: 12, minWidth: 50, textAlign: 'right' }}
-        >
+        {/* Duration/status */}
+        <Text type="secondary" style={{ fontSize: 12 }}>
           {step.status === 'running' ? (
-            <span style={{ color: token.colorPrimary }}>running</span>
+            <span style={{ color: token.colorPrimary }}>running...</span>
           ) : step.status === 'error' ? (
             <span style={{ color: token.colorError }}>error</span>
           ) : step.status === 'pending' ? (
@@ -138,60 +136,48 @@ export function StepItem({ step, isLast }: StepItemProps) {
         </Text>
       </div>
 
-      {/* Expanded content: thoughts, tools, or error */}
-      {isExpanded && canExpand && (
-        <div style={{ paddingLeft: 20, paddingTop: 4 }}>
-          {/* Error message */}
+      {/* Expanded content */}
+      {isExpanded && hasContent && (
+        <div style={{ marginLeft: 28, marginTop: 4 }}>
+          {/* Error */}
           {step.error && (
             <div
               style={{
                 padding: '6px 10px',
+                marginBottom: 6,
                 background: token.colorErrorBg,
-                borderRadius: 4,
-                marginBottom: 8,
+                border: `1px solid ${token.colorErrorBorder}`,
+                borderRadius: 6,
               }}
             >
-              <Text type="danger" style={{ fontSize: 12 }}>
+              <Text style={{ color: token.colorError, fontSize: 12 }}>
                 ⚠️ {step.error}
               </Text>
             </div>
           )}
 
-          {/* Agent thoughts/reasoning */}
-          {hasThoughts && (
-            <div
-              style={{
-                padding: '8px 12px',
-                background: token.colorFillQuaternary,
-                borderRadius: 6,
-                marginBottom: 8,
-                borderLeft: `3px solid ${token.colorPrimary}`,
-              }}
-            >
-              {step.thoughts!.map((thought, idx) => (
-                <Text
-                  key={idx}
-                  style={{
-                    display: 'block',
-                    fontSize: 12,
-                    color: token.colorTextSecondary,
-                    lineHeight: 1.5,
-                    marginBottom: idx < step.thoughts!.length - 1 ? 8 : 0,
-                  }}
-                >
-                  💭 {thought.length > 300 ? thought.slice(0, 300) + '...' : thought}
-                </Text>
-              ))}
-            </div>
-          )}
-
-          {/* Tool calls */}
+          {/* Tools */}
           {step.tools.map((tool, index) => (
             <ToolItem
               key={tool.id}
               tool={tool}
-              isLast={index === step.tools.length - 1 && !hasThoughts}
+              isLast={index === step.tools.length - 1}
             />
+          ))}
+
+          {/* Thoughts (agent answer - after tools) */}
+          {hasThoughts && step.thoughts!.map((thought, idx) => (
+            <div
+              key={idx}
+              style={{
+                marginTop: 12,
+                marginBottom: 12,
+              }}
+            >
+              <MarkdownViewer className="chat-message-markdown">
+                {thought}
+              </MarkdownViewer>
+            </div>
           ))}
         </div>
       )}

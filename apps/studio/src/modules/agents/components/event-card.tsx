@@ -204,8 +204,16 @@ function getStatusStyle(status: string): EventStyle {
   switch (status) {
     case 'thinking':
       return { icon: <BulbOutlined />, color: 'purple', title: 'Thinking', showInCompact: false };
+    case 'analyzing':
+      return { icon: <SearchOutlined />, color: 'cyan', title: 'Analyzing', showInCompact: true };
+    case 'planning':
+      return { icon: <FileTextOutlined />, color: 'blue', title: 'Planning', showInCompact: true };
+    case 'researching':
+      return { icon: <DatabaseOutlined />, color: 'purple', title: 'Researching', showInCompact: true };
     case 'executing':
       return { icon: <ThunderboltOutlined />, color: 'blue', title: 'Executing', showInCompact: false };
+    case 'finalizing':
+      return { icon: <EditOutlined />, color: 'green', title: 'Finalizing', showInCompact: true };
     case 'waiting':
       return { icon: <PauseCircleOutlined />, color: 'orange', title: 'Waiting', showInCompact: false };
     case 'done':
