@@ -252,7 +252,6 @@ export function UIStatisticsChart({
           colorField={colorField}
           height={height}
           colors={chartColors}
-          smooth
           scale={{
             color: {
               range: chartColors,
@@ -280,6 +279,7 @@ export function UIStatisticsChart({
             },
           }}
           style={{
+            shape: 'smooth',
             lineWidth: 2,
           }}
           legend={false}
