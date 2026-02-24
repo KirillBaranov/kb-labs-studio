@@ -16,7 +16,6 @@ import type {
   ListSessionsRequest,
   ListSessionsResponse,
   GetSessionResponse,
-  GetSessionEventsResponse,
   CreateSessionRequest,
   CreateSessionResponse,
 } from '@kb-labs/agent-contracts';
@@ -123,23 +122,6 @@ export function useAgentSession(
     queryFn: () => source.getSession(sessionId!),
     enabled: (options?.enabled ?? true) && !!sessionId,
     staleTime: 30000,
-    retry: 2,
-  });
-}
-
-/**
- * Hook to get session events (chat history)
- */
-export function useAgentSessionEvents(
-  source: AgentDataSource,
-  sessionId: string | null,
-  options?: { limit?: number; offset?: number; enabled?: boolean }
-) {
-  return useQuery<GetSessionEventsResponse>({
-    queryKey: ['agents', 'session', sessionId, 'events', options?.limit, options?.offset],
-    queryFn: () => source.getSessionEvents(sessionId!, options?.limit, options?.offset),
-    enabled: (options?.enabled ?? true) && !!sessionId,
-    staleTime: 10000, // Refresh more often for chat
     retry: 2,
   });
 }
