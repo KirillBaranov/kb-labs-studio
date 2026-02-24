@@ -12,24 +12,40 @@ import type {
 } from '../contracts/adapters';
 
 /**
- * Date range options for analytics queries
+ * Date range and aggregation options for analytics queries
  */
 export interface DateRangeOptions {
-  /**
-   * Start date (ISO 8601 timestamp)
-   */
+  /** Start date (ISO 8601 timestamp) */
   from?: string;
 
-  /**
-   * End date (ISO 8601 timestamp)
-   */
+  /** End date (ISO 8601 timestamp) */
   to?: string;
 
   /**
-   * Optional model filter (LLM analytics only)
-   * Can be a single model or multiple models
+   * Optional model filter (LLM analytics only, legacy).
+   * Prefer breakdownBy='payload.model' for universal breakdown support.
    */
   models?: string | string[];
+
+  /**
+   * Time bucket granularity. Default: 'day'.
+   * Controls the format of DailyStats.date in the response.
+   */
+  groupBy?: 'hour' | 'day' | 'week' | 'month';
+
+  /**
+   * Dot-notation path to split results by (e.g. 'payload.model', 'payload.tier').
+   * When specified, each time bucket returns multiple rows — one per unique value.
+   * Rows include a `breakdown` field with the field value.
+   * Adapters that don't support this silently return data without breakdown.
+   */
+  breakdownBy?: string;
+
+  /**
+   * Specific metric field names to aggregate (e.g. ['totalCost', 'totalTokens']).
+   * When omitted, adapters return all known metrics for the event type.
+   */
+  metrics?: string[];
 }
 
 /**
@@ -37,19 +53,22 @@ export interface DateRangeOptions {
  */
 export interface DailyStats {
   /**
-   * Date in YYYY-MM-DD format
+   * Bucket key — format depends on groupBy:
+   * 'YYYY-MM-DD' (day, default), 'YYYY-MM-DDTHH' (hour), 'YYYY-WXX' (week), 'YYYY-MM' (month)
    */
   date: string;
 
-  /**
-   * Number of events on this day
-   */
+  /** Number of events in this bucket */
   count: number;
 
-  /**
-   * Event-specific metrics (e.g., totalTokens, totalCost, avgDurationMs)
-   */
+  /** Event-specific metrics (e.g., totalTokens, totalCost, avgDurationMs) */
   metrics?: Record<string, number>;
+
+  /**
+   * Present when DateRangeOptions.breakdownBy is specified.
+   * The value of the breakdown field for this row.
+   */
+  breakdown?: string;
 }
 
 /**
