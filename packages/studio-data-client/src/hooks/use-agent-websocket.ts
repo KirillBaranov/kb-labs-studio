@@ -1,10 +1,13 @@
 /**
  * @module @kb-labs/studio-data-client/hooks/use-agent-websocket
- * React hook for WebSocket connection to agent event stream
+ * React hook for WebSocket connection to agent turn snapshots
+ *
+ * SIMPLIFIED (Phase 2): Receives ready-made Turn snapshots from backend
+ * No more event reconstruction, deduplication, or complex merging!
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import type { ServerMessage, AgentEvent } from '@kb-labs/agent-contracts';
+import type { ServerMessage, Turn } from '@kb-labs/agent-contracts';
 
 export interface UseAgentWebSocketOptions {
   /** WebSocket URL for event streaming */
@@ -15,14 +18,12 @@ export interface UseAgentWebSocketOptions {
   reconnectDelay?: number;
   /** Max reconnect attempts (default: 5) */
   maxReconnectAttempts?: number;
-  /** Event batching interval in ms (default: 100) */
-  batchInterval?: number;
-  /** Callback for events */
-  onEvent?: (event: AgentEvent) => void;
   /** Callback for connection status changes */
   onStatusChange?: (status: ConnectionStatus) => void;
   /** Callback for run completion */
   onComplete?: (success: boolean, summary: string) => void;
+  /** Callback when turn data changed (conversation snapshot or turn snapshot) */
+  onTurnsChanged?: () => void;
   /** Callback for errors */
   onError?: (error: { code: string; message: string }) => void;
 }
@@ -34,10 +35,8 @@ export interface UseAgentWebSocketReturn {
   status: ConnectionStatus;
   /** Whether connected */
   isConnected: boolean;
-  /** All received events */
-  events: AgentEvent[];
-  /** Last received event */
-  lastEvent: AgentEvent | null;
+  /** All turns (ready-made from backend) */
+  turns: Turn[];
   /** Last error */
   error: { code: string; message: string } | null;
   /** Whether run is completed */
@@ -50,12 +49,16 @@ export interface UseAgentWebSocketReturn {
   disconnect: () => void;
   /** Manually reconnect */
   reconnect: () => void;
-  /** Clear events */
-  clearEvents: () => void;
+  /** Clear turns */
+  clearTurns: () => void;
 }
 
 /**
- * React hook for managing WebSocket connection to agent event stream
+ * React hook for managing WebSocket connection to agent turn snapshots.
+ *
+ * All mutable connection state lives in refs to avoid stale-closure bugs
+ * inside ws.onclose / ws.onmessage callbacks.  React state is only used
+ * for values that need to trigger a re-render.
  */
 export function useAgentWebSocket(options: UseAgentWebSocketOptions): UseAgentWebSocketReturn {
   const {
@@ -63,232 +66,253 @@ export function useAgentWebSocket(options: UseAgentWebSocketOptions): UseAgentWe
     autoReconnect = true,
     reconnectDelay = 1000,
     maxReconnectAttempts = 5,
-    batchInterval = 100, // Default 100ms batching
-    onEvent,
     onStatusChange,
     onComplete,
+    onTurnsChanged,
     onError,
   } = options;
 
   const [status, setStatus] = useState<ConnectionStatus>('disconnected');
-  const [events, setEvents] = useState<AgentEvent[]>([]);
-  const [lastEvent, setLastEvent] = useState<AgentEvent | null>(null);
+  const [turns, setTurns] = useState<Turn[]>([]);
   const [error, setError] = useState<{ code: string; message: string } | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const [completionResult, setCompletionResult] = useState<{ success: boolean; summary: string } | null>(null);
 
+  // Refs that hold mutable connection state — never stale inside callbacks
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectAttemptsRef = useRef(0);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const lastSeqRef = useRef<number>(0); // Track last received seq for gap detection
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // shouldReconnectRef is the single source of truth for whether reconnection is allowed.
+  // Set to false when we intentionally close (url change, disconnect()) so onclose won't loop.
+  const shouldReconnectRef = useRef(false);
+  const isCompletedRef = useRef(false);  // mirrors isCompleted state without closure staleness
 
-  // Event batching: buffer events and flush periodically
-  const eventBufferRef = useRef<AgentEvent[]>([]);
-  const flushTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Keep latest callbacks in refs so ws.onmessage never captures a stale version
+  const onCompleteRef = useRef(onComplete);
+  const onErrorRef = useRef(onError);
+  const onTurnsChangedRef = useRef(onTurnsChanged);
+  const onStatusChangeRef = useRef(onStatusChange);
+  useEffect(() => { onCompleteRef.current = onComplete; }, [onComplete]);
+  useEffect(() => { onErrorRef.current = onError; }, [onError]);
+  useEffect(() => { onTurnsChangedRef.current = onTurnsChanged; }, [onTurnsChanged]);
+  useEffect(() => { onStatusChangeRef.current = onStatusChange; }, [onStatusChange]);
 
-  // Flush buffered events to state
-  const flushEvents = useCallback(() => {
-    if (eventBufferRef.current.length === 0) return;
-
-    const buffered = eventBufferRef.current;
-    eventBufferRef.current = [];
-
-    // Batch update: add all buffered events at once
-    setEvents((prev) => [...prev, ...buffered]);
-
-    // Set last event
-    const last = buffered[buffered.length - 1];
-    if (last) {
-      setLastEvent(last);
-    }
-
-    // Call onEvent callback for each event
-    buffered.forEach((event) => {
-      onEvent?.(event);
-    });
-  }, [onEvent]);
-
-  // Update status and notify
   const updateStatus = useCallback((newStatus: ConnectionStatus) => {
     setStatus(newStatus);
-    onStatusChange?.(newStatus);
-  }, [onStatusChange]);
+    onStatusChangeRef.current?.(newStatus);
+  }, []);
 
-  // Handle incoming message
-  const handleMessage = useCallback((data: ServerMessage) => {
-    switch (data.type) {
-      case 'agent:event': {
-        const event = data.payload;
-
-        // Gap detection: check if we missed events
-        if (event.seq !== undefined) {
-          if (lastSeqRef.current > 0 && event.seq > lastSeqRef.current + 1) {
-            console.warn(`[useAgentWebSocket] Gap detected: expected seq ${lastSeqRef.current + 1}, got ${event.seq}`);
-          }
-          lastSeqRef.current = event.seq;
-        }
-
-        // Add to buffer instead of immediate state update (prevents rapid re-renders)
-        eventBufferRef.current.push(event);
-
-        // Schedule flush if not already scheduled
-        if (!flushTimeoutRef.current) {
-          flushTimeoutRef.current = setTimeout(() => {
-            flushTimeoutRef.current = null;
-            flushEvents();
-          }, batchInterval);
-        }
-        break;
-      }
-
-      case 'connection:ready': {
-        updateStatus('connected');
-        reconnectAttemptsRef.current = 0;
-        break;
-      }
-
-      case 'run:completed': {
-        const { success, summary } = data.payload;
-        setIsCompleted(true);
-        setCompletionResult({ success, summary });
-        onComplete?.(success, summary);
-        break;
-      }
-
-      case 'error': {
-        const { code, message } = data.payload;
-        setError({ code, message });
-        onError?.({ code, message });
-        break;
-      }
-
-      case 'correction:ack': {
-        // Could emit an event or update state here
-        // For now, just log
-        console.log('[useAgentWebSocket] Correction acknowledged:', data.payload);
-        break;
-      }
+  // Tear down the current socket and any pending reconnect timer.
+  // Does NOT touch React state — callers decide what state changes are needed.
+  const closeSocket = useCallback(() => {
+    if (reconnectTimeoutRef.current !== null) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
     }
-  }, [onEvent, onComplete, onError, updateStatus]);
-
-  // Connect to WebSocket
-  const connect = useCallback(() => {
-    if (!url) {return;}
-
-    // Close existing connection
     if (wsRef.current) {
+      wsRef.current.onclose = null; // prevent onclose from firing after intentional close
+      wsRef.current.onerror = null;
+      wsRef.current.onmessage = null;
       wsRef.current.close();
+      wsRef.current = null;
     }
+  }, []);
 
+  // Open a new WebSocket to the given URL.
+  // shouldReconnectRef must already be set by the caller before calling openSocket.
+  const openSocket = useCallback((wsUrl: string) => {
+    closeSocket();
     updateStatus('connecting');
+    reconnectAttemptsRef.current = 0;
 
-    const ws = new WebSocket(url);
+    const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 
     ws.onopen = () => {
-      // Status will be updated when we receive 'connection:ready'
-      console.log('[useAgentWebSocket] WebSocket opened');
+      console.log('[useAgentWebSocket] Connected:', wsUrl);
     };
 
     ws.onmessage = (event) => {
       try {
-        const data = JSON.parse(event.data) as ServerMessage;
-        handleMessage(data);
+        const data = JSON.parse(event.data as string) as ServerMessage;
+
+        switch (data.type) {
+          case 'conversation:snapshot': {
+            const { completedTurns, activeTurns } = data.payload;
+            const incoming = [...completedTurns, ...activeTurns].sort((a, b) => a.sequence - b.sequence);
+            console.log(`[useAgentWebSocket] conversation:snapshot — ${incoming.length} turns`);
+            isCompletedRef.current = false;
+            setIsCompleted(false);
+            setCompletionResult(null);
+            setTurns((prev) => {
+              if (prev.length === 0) return incoming;
+              // Keep any locally-streamed turn that has more steps than the snapshot
+              const merged = new Map<string, Turn>();
+              for (const t of incoming) merged.set(t.id, t);
+              for (const t of prev) {
+                const snap = merged.get(t.id);
+                if (snap && t.status === 'streaming' && snap.status === 'streaming' && t.steps.length > snap.steps.length) {
+                  merged.set(t.id, t);
+                }
+              }
+              return [...merged.values()].sort((a, b) => a.sequence - b.sequence);
+            });
+            onTurnsChangedRef.current?.();
+            break;
+          }
+
+          case 'turn:snapshot': {
+            const { turn } = data.payload;
+            isCompletedRef.current = false;
+            setIsCompleted(false);
+            setCompletionResult(null);
+            setTurns((prev) => {
+              const updated = [...prev];
+              const idx = updated.findIndex((t) => t.id === turn.id);
+              if (idx >= 0) {
+                const existing = updated[idx]!;
+                if (existing.status === 'streaming' && turn.status === 'streaming' && turn.steps.length < existing.steps.length) {
+                  return prev; // discard stale snapshot
+                }
+                updated[idx] = turn;
+              } else {
+                const insertAt = updated.findIndex((t) => t.sequence > turn.sequence);
+                if (insertAt >= 0) updated.splice(insertAt, 0, turn);
+                else updated.push(turn);
+              }
+              return updated;
+            });
+            onTurnsChangedRef.current?.();
+            break;
+          }
+
+          case 'connection:ready': {
+            reconnectAttemptsRef.current = 0;
+            updateStatus('connected');
+            break;
+          }
+
+          case 'run:completed': {
+            const { success, summary } = data.payload;
+            isCompletedRef.current = true;
+            setIsCompleted(true);
+            setCompletionResult({ success, summary });
+            onCompleteRef.current?.(success, summary);
+            break;
+          }
+
+          case 'error': {
+            const { code, message } = data.payload;
+            setError({ code, message });
+            onErrorRef.current?.({ code, message });
+            break;
+          }
+
+          case 'correction:ack': {
+            console.log('[useAgentWebSocket] correction:ack', data.payload);
+            break;
+          }
+        }
       } catch (err) {
         console.error('[useAgentWebSocket] Failed to parse message:', err);
       }
     };
 
-    ws.onerror = (event) => {
-      console.error('[useAgentWebSocket] WebSocket error:', event);
+    ws.onerror = () => {
       updateStatus('error');
     };
 
     ws.onclose = (event) => {
-      console.log('[useAgentWebSocket] WebSocket closed:', event.code, event.reason);
+      console.log('[useAgentWebSocket] Closed:', event.code, event.reason);
 
-      if (!isCompleted && autoReconnect && reconnectAttemptsRef.current < maxReconnectAttempts) {
-        updateStatus('reconnecting');
+      // Only reconnect if explicitly allowed AND run is not done AND we haven't hit the limit
+      if (
+        shouldReconnectRef.current &&
+        !isCompletedRef.current &&
+        autoReconnect &&
+        reconnectAttemptsRef.current < maxReconnectAttempts
+      ) {
         reconnectAttemptsRef.current++;
-
+        updateStatus('reconnecting');
         reconnectTimeoutRef.current = setTimeout(() => {
-          connect();
+          if (shouldReconnectRef.current) {
+            openSocket(wsUrl);
+          }
         }, reconnectDelay * reconnectAttemptsRef.current);
       } else {
         updateStatus('disconnected');
       }
     };
-  }, [url, autoReconnect, reconnectDelay, maxReconnectAttempts, handleMessage, updateStatus, isCompleted]);
+  }, [autoReconnect, closeSocket, maxReconnectAttempts, reconnectDelay, updateStatus]);
 
-  // Disconnect
+  // Public disconnect — permanently stops reconnection for current session
   const disconnect = useCallback(() => {
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = null;
-    }
-
-    if (wsRef.current) {
-      wsRef.current.close();
-      wsRef.current = null;
-    }
-
+    shouldReconnectRef.current = false;
+    closeSocket();
     updateStatus('disconnected');
-  }, [updateStatus]);
+  }, [closeSocket, updateStatus]);
 
-  // Reconnect
+  // Public reconnect — re-enables reconnection and opens socket
   const reconnect = useCallback(() => {
+    if (!url) return;
+    shouldReconnectRef.current = true;
     reconnectAttemptsRef.current = 0;
-    connect();
-  }, [connect]);
+    openSocket(url);
+  }, [url, openSocket]);
 
-  // Send message
-  const send = useCallback((message: unknown) => {
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify(message));
+  const send = useCallback((msg: unknown) => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify(msg));
     } else {
-      console.warn('[useAgentWebSocket] Cannot send - WebSocket not connected');
+      console.warn('[useAgentWebSocket] Cannot send — not connected');
     }
   }, []);
 
-  // Clear events
-  const clearEvents = useCallback(() => {
-    setEvents([]);
-    setLastEvent(null);
+  const clearTurns = useCallback(() => {
+    setTurns([]);
     setError(null);
+    isCompletedRef.current = false;
     setIsCompleted(false);
     setCompletionResult(null);
-    lastSeqRef.current = 0; // Reset sequence tracking
   }, []);
 
-  // Connect when URL changes
+  // React to URL changes: tear down old socket, reset state, connect to new URL
   useEffect(() => {
+    // Stop any reconnect loop from the previous URL immediately
+    shouldReconnectRef.current = false;
+    closeSocket();
+
+    // Reset all state for the new session
+    setTurns([]);
+    setError(null);
+    isCompletedRef.current = false;
+    setIsCompleted(false);
+    setCompletionResult(null);
+
     if (url) {
-      connect();
+      shouldReconnectRef.current = true;
+      openSocket(url);
+    } else {
+      updateStatus('disconnected');
     }
 
     return () => {
-      // Cleanup: flush any remaining events before disconnect
-      if (flushTimeoutRef.current) {
-        clearTimeout(flushTimeoutRef.current);
-        flushTimeoutRef.current = null;
-      }
-      flushEvents();
-
-      disconnect();
+      // Component unmounting or url changing again — stop reconnects and close
+      shouldReconnectRef.current = false;
+      closeSocket();
     };
   }, [url]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     status,
     isConnected: status === 'connected',
-    events,
-    lastEvent,
+    turns,
     error,
     isCompleted,
     completionResult,
     send,
     disconnect,
     reconnect,
-    clearEvents,
+    clearTurns,
   };
 }
