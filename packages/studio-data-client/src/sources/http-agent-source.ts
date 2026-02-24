@@ -16,7 +16,6 @@ import type {
   ListSessionsRequest,
   ListSessionsResponse,
   GetSessionResponse,
-  GetSessionEventsResponse,
   CreateSessionRequest,
   CreateSessionResponse,
 } from '@kb-labs/agent-contracts';
@@ -57,12 +56,13 @@ export class HttpAgentSource implements AgentDataSource {
     });
   }
 
-  getEventsUrl(runId: string): string {
-    // Get base URL from client and construct WebSocket URL
+  getEventsUrl(sessionId: string): string {
+    // HTTP base is http://host/api/v1, WS endpoint lives at ws://host/v1/ws/...
+    // Strip /api segment so the path becomes /v1/ws/...
     const baseUrl = this.client.getBaseUrl();
     const wsProtocol = baseUrl.startsWith('https') ? 'wss' : 'ws';
-    const wsBase = baseUrl.replace(/^https?/, wsProtocol);
-    return `${wsBase}/ws/plugins/agents/events/${runId}`;
+    const wsBase = baseUrl.replace(/^https?/, wsProtocol).replace(/\/api(?=\/|$)/, '');
+    return `${wsBase}/ws/plugins/agents/session/${sessionId}`;
   }
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -85,22 +85,69 @@ export class HttpAgentSource implements AgentDataSource {
     return this.client.fetch<GetSessionResponse>(`/plugins/agents/sessions/${sessionId}`);
   }
 
-  async getSessionEvents(
+  async getSessionTurns(
     sessionId: string,
     limit?: number,
     offset?: number
-  ): Promise<GetSessionEventsResponse> {
+  ): Promise<{ turns: import('@kb-labs/agent-contracts').Turn[]; total: number }> {
     const params = new URLSearchParams();
     if (limit) {params.set('limit', String(limit));}
     if (offset) {params.set('offset', String(offset));}
 
     const query = params.toString();
-    const url = `/plugins/agents/sessions/${sessionId}/events${query ? `?${query}` : ''}`;
-    return this.client.fetch<GetSessionEventsResponse>(url);
+    const url = `/plugins/agents/sessions/${sessionId}/turns${query ? `?${query}` : ''}`;
+    return this.client.fetch<{ turns: import('@kb-labs/agent-contracts').Turn[]; total: number }>(url);
   }
 
   async createSession(request: CreateSessionRequest): Promise<CreateSessionResponse> {
     return this.client.fetch<CreateSessionResponse>('/plugins/agents/sessions', {
+      method: 'POST',
+      data: request,
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // File Change History (Rollback & Approve)
+  // ═══════════════════════════════════════════════════════════════════════
+
+  async listFileChanges(sessionId: string, runId?: string): Promise<{ changes: import('@kb-labs/agent-contracts').FileChangeSummary[]; total: number; sessionId: string; runId?: string }> {
+    const query = runId ? `?runId=${encodeURIComponent(runId)}` : '';
+    return this.client.fetch(`/plugins/agents/sessions/${sessionId}/changes${query}`);
+  }
+
+  async getFileDiff(sessionId: string, changeId: string): Promise<{
+    changeId: string;
+    filePath: string;
+    operation: 'write' | 'patch' | 'delete';
+    diff: string;
+    before?: { hash: string; size: number };
+    after: { hash: string; size: number };
+    linesAdded: number;
+    linesRemoved: number;
+    isNew: boolean;
+    timestamp: string;
+  }> {
+    return this.client.fetch(`/plugins/agents/sessions/${sessionId}/changes/${encodeURIComponent(changeId)}/diff`);
+  }
+
+  async rollbackChanges(sessionId: string, request: { runId?: string; changeIds?: string[]; skipConflicts?: boolean }): Promise<{
+    rolledBack: number;
+    skipped: number;
+    conflicts: Array<{ filePath: string; changeId: string; reason: string }>;
+    success: boolean;
+  }> {
+    return this.client.fetch(`/plugins/agents/sessions/${sessionId}/rollback`, {
+      method: 'POST',
+      data: request,
+    });
+  }
+
+  async approveChanges(sessionId: string, request: { runId?: string; changeIds?: string[] }): Promise<{
+    approved: number;
+    changeIds: string[];
+    approvedAt: string;
+  }> {
+    return this.client.fetch(`/plugins/agents/sessions/${sessionId}/approve`, {
       method: 'POST',
       data: request,
     });
