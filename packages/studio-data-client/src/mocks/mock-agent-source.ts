@@ -15,11 +15,9 @@ import type {
   ListSessionsRequest,
   ListSessionsResponse,
   GetSessionResponse,
-  GetSessionEventsResponse,
   CreateSessionRequest,
   CreateSessionResponse,
   AgentSessionInfo,
-  AgentEvent,
 } from '@kb-labs/agent-contracts';
 
 // Mock run state for simulating async execution
@@ -36,7 +34,6 @@ interface MockRunState {
 
 const mockRuns = new Map<string, MockRunState>();
 const mockSessions = new Map<string, AgentSessionInfo>();
-const mockEvents = new Map<string, AgentEvent[]>();
 
 /**
  * Mock agent data source for development without backend
@@ -116,7 +113,7 @@ export class MockAgentSource implements AgentDataSource {
     return {
       runId,
       sessionId,
-      eventsUrl: `ws://localhost:5050/ws/agents/events/${runId}`,
+      eventsUrl: `ws://localhost:5050/ws/plugins/agents/session/${sessionId}`,
       status: 'started',
       startedAt,
     };
@@ -203,8 +200,8 @@ export class MockAgentSource implements AgentDataSource {
     };
   }
 
-  getEventsUrl(runId: string): string {
-    return `ws://localhost:5050/ws/agents/events/${runId}`;
+  getEventsUrl(sessionId: string): string {
+    return `ws://localhost:5050/ws/plugins/agents/session/${sessionId}`;
   }
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -247,22 +244,6 @@ export class MockAgentSource implements AgentDataSource {
     return { session };
   }
 
-  async getSessionEvents(
-    sessionId: string,
-    limit?: number,
-    offset?: number
-  ): Promise<GetSessionEventsResponse> {
-    await this.delay(100);
-
-    let events = mockEvents.get(sessionId) ?? [];
-    const total = events.length;
-
-    if (offset) {events = events.slice(offset);}
-    if (limit) {events = events.slice(0, limit);}
-
-    return { events, total };
-  }
-
   async createSession(request: CreateSessionRequest): Promise<CreateSessionResponse> {
     await this.delay(100);
 
@@ -284,9 +265,69 @@ export class MockAgentSource implements AgentDataSource {
     };
 
     mockSessions.set(sessionId, session);
-    mockEvents.set(sessionId, []);
 
     return { session };
+  }
+
+  async getSessionTurns(
+    _sessionId: string,
+    _limit?: number,
+    _offset?: number
+  ): Promise<{ turns: import('@kb-labs/agent-contracts').Turn[]; total: number }> {
+    return { turns: [], total: 0 };
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // File Change History (Mock stubs)
+  // ═══════════════════════════════════════════════════════════════════════
+
+  async listFileChanges(
+    sessionId: string,
+    _runId?: string
+  ): Promise<{ changes: import('@kb-labs/agent-contracts').FileChangeSummary[]; total: number; sessionId: string; runId?: string }> {
+    return { changes: [], total: 0, sessionId };
+  }
+
+  async getFileDiff(
+    _sessionId: string,
+    changeId: string
+  ): Promise<{
+    changeId: string;
+    filePath: string;
+    operation: 'write' | 'patch' | 'delete';
+    diff: string;
+    before?: { hash: string; size: number };
+    after: { hash: string; size: number };
+    linesAdded: number;
+    linesRemoved: number;
+    isNew: boolean;
+    timestamp: string;
+  }> {
+    return {
+      changeId,
+      filePath: 'mock/file.ts',
+      operation: 'write',
+      diff: '',
+      after: { hash: '', size: 0 },
+      linesAdded: 0,
+      linesRemoved: 0,
+      isNew: false,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  async rollbackChanges(
+    _sessionId: string,
+    _request: { runId?: string; changeIds?: string[]; skipConflicts?: boolean }
+  ): Promise<{ rolledBack: number; skipped: number; conflicts: Array<{ filePath: string; changeId: string; reason: string }>; success: boolean }> {
+    return { rolledBack: 0, skipped: 0, conflicts: [], success: true };
+  }
+
+  async approveChanges(
+    _sessionId: string,
+    _request: { runId?: string; changeIds?: string[] }
+  ): Promise<{ approved: number; changeIds: string[]; approvedAt: string }> {
+    return { approved: 0, changeIds: [], approvedAt: new Date().toISOString() };
   }
 
   private delay(ms: number): Promise<void> {
