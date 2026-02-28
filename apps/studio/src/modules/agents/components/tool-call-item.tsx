@@ -4,11 +4,7 @@
  */
 
 import { useState } from 'react';
-import { Typography, theme } from 'antd';
-import { RightOutlined, DownOutlined } from '@ant-design/icons';
-
-const { Text } = Typography;
-const { useToken } = theme;
+import { UITypographyText, UIIcon, useUITheme } from '@kb-labs/studio-ui-kit';
 
 interface ToolCallItemProps {
   toolName: string;
@@ -56,7 +52,7 @@ function formatToolDisplay(toolName: string, input?: Record<string, unknown>): {
 }
 
 export function ToolCallItem({ toolName, input, output }: ToolCallItemProps) {
-  const { token } = useToken();
+  const { token } = useUITheme();
   const [expanded, setExpanded] = useState(false);
 
   const hasOutput = output && output.length > 0 && output !== 'Completed';
@@ -77,19 +73,19 @@ export function ToolCallItem({ toolName, input, output }: ToolCallItemProps) {
       >
         {/* Expand/collapse arrow */}
         <span style={{ fontSize: 10, width: 10, color: token.colorTextSecondary }}>
-          {hasOutput && (expanded ? <DownOutlined /> : <RightOutlined />)}
+          {hasOutput && (expanded ? <UIIcon name="DownOutlined" /> : <UIIcon name="RightOutlined" />)}
         </span>
 
         {/* Tool name - bold */}
-        <Text strong style={{ fontSize: 13 }}>
+        <UITypographyText strong style={{ fontSize: 13 }}>
           {name}
-        </Text>
+        </UITypographyText>
 
         {/* Detail (file name, query, etc) */}
         {detail && (
-          <Text type="secondary" style={{ fontSize: 13 }}>
+          <UITypographyText type="secondary" style={{ fontSize: 13 }}>
             {detail}
-          </Text>
+          </UITypographyText>
         )}
       </div>
 

@@ -1,33 +1,25 @@
-import { Space, theme } from 'antd';
-import {
-  CheckCircleOutlined,
-  WarningOutlined,
-  DatabaseOutlined,
-} from '@ant-design/icons';
-import { UICard, UIText, UITag } from '@kb-labs/studio-ui-kit';
-
-const { useToken } = theme;
+import { UISpace, UICard, UIText, UITag, UIIcon, useUITheme } from '@kb-labs/studio-ui-kit';
 
 interface PlatformServicesProps {
   permissions: any;
 }
 
 export function PlatformServices({ permissions }: PlatformServicesProps) {
-  const { token } = useToken();
+  const { token } = useUITheme();
 
   return (
     <UICard
       title={
-        <Space>
-          <DatabaseOutlined />
+        <UISpace>
+          <UIIcon name="DatabaseOutlined" />
           <span>Platform Services</span>
-        </Space>
+        </UISpace>
       }
     >
       <UIText color="secondary" style={{ marginBottom: 16, display: 'block' }}>
         Access to KB Labs platform services like LLM, vector store, cache, and analytics.
       </UIText>
-      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+      <UISpace direction="vertical" size="middle" style={{ width: '100%' }}>
         <div
           style={{
             display: 'grid',
@@ -38,47 +30,47 @@ export function PlatformServices({ permissions }: PlatformServicesProps) {
           {/* LLM Service */}
           {permissions.llm !== undefined && (
             <UICard size="small">
-              <Space direction="vertical" size="small">
-                <Space>
+              <UISpace direction="vertical" size="small">
+                <UISpace>
                   {permissions.llm ? (
-                    <CheckCircleOutlined style={{ color: token.colorSuccess }} />
+                    <UIIcon name="CheckCircleOutlined" style={{ color: token.colorSuccess }} />
                   ) : (
-                    <WarningOutlined style={{ color: token.colorTextDisabled }} />
+                    <UIIcon name="WarningOutlined" style={{ color: token.colorTextDisabled }} />
                   )}
                   <UIText weight="semibold">LLM Service</UIText>
-                </Space>
+                </UISpace>
                 {typeof permissions.llm === 'object' && permissions.llm.models && (
                   <div>
                     <UIText color="secondary" style={{ fontSize: token.fontSizeSM }}>
                       Models:
                     </UIText>
                     <div style={{ marginTop: 4 }}>
-                      <Space wrap size="small">
+                      <UISpace wrap size="small">
                         {permissions.llm.models.map((model: string, idx: number) => (
                           <UITag key={idx} color="blue" style={{ fontSize: 11 }}>
                             {model}
                           </UITag>
                         ))}
-                      </Space>
+                      </UISpace>
                     </div>
                   </div>
                 )}
-              </Space>
+              </UISpace>
             </UICard>
           )}
 
           {/* Vector Store */}
           {permissions.vectorStore !== undefined && (
             <UICard size="small">
-              <Space direction="vertical" size="small">
-                <Space>
+              <UISpace direction="vertical" size="small">
+                <UISpace>
                   {permissions.vectorStore ? (
-                    <CheckCircleOutlined style={{ color: token.colorSuccess }} />
+                    <UIIcon name="CheckCircleOutlined" style={{ color: token.colorSuccess }} />
                   ) : (
-                    <WarningOutlined style={{ color: token.colorTextDisabled }} />
+                    <UIIcon name="WarningOutlined" style={{ color: token.colorTextDisabled }} />
                   )}
                   <UIText weight="semibold">Vector Store</UIText>
-                </Space>
+                </UISpace>
                 {typeof permissions.vectorStore === 'object' &&
                   permissions.vectorStore.collections && (
                     <div>
@@ -86,124 +78,124 @@ export function PlatformServices({ permissions }: PlatformServicesProps) {
                         Collections:
                       </UIText>
                       <div style={{ marginTop: 4 }}>
-                        <Space wrap size="small">
+                        <UISpace wrap size="small">
                           {permissions.vectorStore.collections.map((col: string, idx: number) => (
                             <UITag key={idx} color="purple" style={{ fontSize: 11 }}>
                               {col}
                             </UITag>
                           ))}
-                        </Space>
+                        </UISpace>
                       </div>
                     </div>
                   )}
-              </Space>
+              </UISpace>
             </UICard>
           )}
 
           {/* Cache */}
           {permissions.cache !== undefined && (
             <UICard size="small">
-              <Space direction="vertical" size="small">
-                <Space>
+              <UISpace direction="vertical" size="small">
+                <UISpace>
                   {permissions.cache ? (
-                    <CheckCircleOutlined style={{ color: token.colorSuccess }} />
+                    <UIIcon name="CheckCircleOutlined" style={{ color: token.colorSuccess }} />
                   ) : (
-                    <WarningOutlined style={{ color: token.colorTextDisabled }} />
+                    <UIIcon name="WarningOutlined" style={{ color: token.colorTextDisabled }} />
                   )}
                   <UIText weight="semibold">Cache</UIText>
-                </Space>
+                </UISpace>
                 {typeof permissions.cache === 'object' && permissions.cache.namespaces && (
                   <div>
                     <UIText color="secondary" style={{ fontSize: token.fontSizeSM }}>
                       Namespaces:
                     </UIText>
                     <div style={{ marginTop: 4 }}>
-                      <Space wrap size="small">
+                      <UISpace wrap size="small">
                         {permissions.cache.namespaces.map((ns: string, idx: number) => (
                           <UITag key={idx} color="cyan" style={{ fontSize: 11 }}>
                             {ns}
                           </UITag>
                         ))}
-                      </Space>
+                      </UISpace>
                     </div>
                   </div>
                 )}
-              </Space>
+              </UISpace>
             </UICard>
           )}
 
           {/* Storage */}
           {permissions.storage !== undefined && (
             <UICard size="small">
-              <Space direction="vertical" size="small">
-                <Space>
+              <UISpace direction="vertical" size="small">
+                <UISpace>
                   {permissions.storage ? (
-                    <CheckCircleOutlined style={{ color: token.colorSuccess }} />
+                    <UIIcon name="CheckCircleOutlined" style={{ color: token.colorSuccess }} />
                   ) : (
-                    <WarningOutlined style={{ color: token.colorTextDisabled }} />
+                    <UIIcon name="WarningOutlined" style={{ color: token.colorTextDisabled }} />
                   )}
                   <UIText weight="semibold">Storage</UIText>
-                </Space>
+                </UISpace>
                 {typeof permissions.storage === 'object' && permissions.storage.paths && (
                   <div>
                     <UIText color="secondary" style={{ fontSize: token.fontSizeSM }}>
                       Paths:
                     </UIText>
                     <div style={{ marginTop: 4 }}>
-                      <Space wrap size="small">
+                      <UISpace wrap size="small">
                         {permissions.storage.paths.map((path: string, idx: number) => (
                           <UITag key={idx} color="orange" style={{ fontSize: 11 }}>
                             {path}
                           </UITag>
                         ))}
-                      </Space>
+                      </UISpace>
                     </div>
                   </div>
                 )}
-              </Space>
+              </UISpace>
             </UICard>
           )}
 
           {/* Analytics */}
           {permissions.analytics !== undefined && (
             <UICard size="small">
-              <Space>
+              <UISpace>
                 {permissions.analytics ? (
-                  <CheckCircleOutlined style={{ color: token.colorSuccess }} />
+                  <UIIcon name="CheckCircleOutlined" style={{ color: token.colorSuccess }} />
                 ) : (
-                  <WarningOutlined style={{ color: token.colorTextDisabled }} />
+                  <UIIcon name="WarningOutlined" style={{ color: token.colorTextDisabled }} />
                 )}
                 <UIText weight="semibold">Analytics</UIText>
-              </Space>
+              </UISpace>
             </UICard>
           )}
 
           {/* Embeddings */}
           {permissions.embeddings !== undefined && (
             <UICard size="small">
-              <Space>
+              <UISpace>
                 {permissions.embeddings ? (
-                  <CheckCircleOutlined style={{ color: token.colorSuccess }} />
+                  <UIIcon name="CheckCircleOutlined" style={{ color: token.colorSuccess }} />
                 ) : (
-                  <WarningOutlined style={{ color: token.colorTextDisabled }} />
+                  <UIIcon name="WarningOutlined" style={{ color: token.colorTextDisabled }} />
                 )}
                 <UIText weight="semibold">Embeddings</UIText>
-              </Space>
+              </UISpace>
             </UICard>
           )}
 
           {/* Events */}
           {permissions.events !== undefined && (
             <UICard size="small">
-              <Space direction="vertical" size="small">
-                <Space>
+              <UISpace direction="vertical" size="small">
+                <UISpace>
                   {permissions.events ? (
-                    <CheckCircleOutlined style={{ color: token.colorSuccess }} />
+                    <UIIcon name="CheckCircleOutlined" style={{ color: token.colorSuccess }} />
                   ) : (
-                    <WarningOutlined style={{ color: token.colorTextDisabled }} />
+                    <UIIcon name="WarningOutlined" style={{ color: token.colorTextDisabled }} />
                   )}
                   <UIText weight="semibold">Event Bus</UIText>
-                </Space>
+                </UISpace>
                 {typeof permissions.events === 'object' && (
                   <div>
                     {permissions.events.publish && permissions.events.publish.length > 0 && (
@@ -212,13 +204,13 @@ export function PlatformServices({ permissions }: PlatformServicesProps) {
                           Publish:
                         </UIText>
                         <div style={{ marginTop: 4 }}>
-                          <Space wrap size="small">
+                          <UISpace wrap size="small">
                             {permissions.events.publish.map((evt: string, idx: number) => (
                               <UITag key={idx} color="green" style={{ fontSize: 11 }}>
                                 {evt}
                               </UITag>
                             ))}
-                          </Space>
+                          </UISpace>
                         </div>
                       </div>
                     )}
@@ -228,23 +220,23 @@ export function PlatformServices({ permissions }: PlatformServicesProps) {
                           Subscribe:
                         </UIText>
                         <div style={{ marginTop: 4 }}>
-                          <Space wrap size="small">
+                          <UISpace wrap size="small">
                             {permissions.events.subscribe.map((evt: string, idx: number) => (
                               <UITag key={idx} color="blue" style={{ fontSize: 11 }}>
                                 {evt}
                               </UITag>
                             ))}
-                          </Space>
+                          </UISpace>
                         </div>
                       </div>
                     )}
                   </div>
                 )}
-              </Space>
+              </UISpace>
             </UICard>
           )}
         </div>
-      </Space>
+      </UISpace>
     </UICard>
   );
 }

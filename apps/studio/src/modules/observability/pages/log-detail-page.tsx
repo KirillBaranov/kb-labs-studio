@@ -1,39 +1,30 @@
 import {
-  Card,
-  Alert,
-  Badge,
-  Tag,
-  Typography,
-  Space,
-  Row,
-  Col,
-  Button,
-  Descriptions,
-  Tooltip,
-  message,
-  Spin,
-  Divider,
-  Timeline,
-  Empty,
-} from 'antd';
-import {
-  InfoCircleOutlined,
-  WarningOutlined,
-  CloseCircleOutlined,
-  BugOutlined,
-  CopyOutlined,
-  ArrowLeftOutlined,
-  ClockCircleOutlined,
-  LinkOutlined,
-  FileTextOutlined,
-} from '@ant-design/icons';
+  UICard,
+  UIAlert,
+  UIBadge,
+  UITag,
+  UITypographyText,
+  UITypographyParagraph,
+  UITitle,
+  UISpace,
+  UIRow,
+  UICol,
+  UIButton,
+  UIDescriptions,
+  UIDescriptionsItem,
+  UITooltip,
+  UIMessage,
+  UISpin,
+  UIDivider,
+  UITimeline,
+  UIEmptyState,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { KBPageContainer, KBPageHeader } from '@kb-labs/studio-ui-react';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import type { LogRecord } from '@kb-labs/studio-data-client';
-
-const { Text, Paragraph, Title } = Typography;
+import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
 /**
  * Format timestamp to full datetime with milliseconds
@@ -71,14 +62,14 @@ function getLevelIcon(level: LogRecord['level']) {
   switch (level) {
     case 'trace':
     case 'debug':
-      return <BugOutlined style={{ fontSize: 20, color: '#8c8c8c' }} />;
+      return <UIIcon name="BugOutlined" style={{ fontSize: 20, color: '#8c8c8c' }} />;
     case 'info':
-      return <InfoCircleOutlined style={{ fontSize: 20, color: '#1890ff' }} />;
+      return <UIIcon name="InfoCircleOutlined" style={{ fontSize: 20, color: '#1890ff' }} />;
     case 'warn':
-      return <WarningOutlined style={{ fontSize: 20, color: '#faad14' }} />;
+      return <UIIcon name="WarningOutlined" style={{ fontSize: 20, color: '#faad14' }} />;
     case 'error':
     case 'fatal':
-      return <CloseCircleOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />;
+      return <UIIcon name="CloseCircleOutlined" style={{ fontSize: 20, color: '#ff4d4f' }} />;
   }
 }
 
@@ -105,7 +96,7 @@ function getLevelColor(level: LogRecord['level']): string {
  */
 function copyToClipboard(text: string, label: string) {
   navigator.clipboard.writeText(text);
-  message.success(`${label} copied to clipboard`);
+  UIMessage.success(`${label} copied to clipboard`);
 }
 
 /**
@@ -172,7 +163,7 @@ export function LogDetailPage() {
     return (
       <KBPageContainer>
         <div style={{ textAlign: 'center', padding: '100px 0' }}>
-          <Spin size="large" tip="Loading log details..." />
+          <UISpin size="large" tip="Loading log details..." />
         </div>
       </KBPageContainer>
     );
@@ -186,7 +177,7 @@ export function LogDetailPage() {
           description="The requested log could not be found"
           onBack={() => navigate('/observability/logs')}
         />
-        <Alert
+        <UIAlert
           message={error ? 'Error loading log' : 'Log not found'}
           description={error ? error.message : `Log with ID '${id}' does not exist`}
           type="error"
@@ -220,149 +211,149 @@ export function LogDetailPage() {
         description={`Viewing log from ${formatRelativeTime(log.time)}`}
         onBack={() => navigate('/observability/logs')}
         extra={[
-          <Button
+          <UIButton
             key="copy-link"
-            icon={<LinkOutlined />}
+            icon={<UIIcon name="LinkOutlined" />}
             onClick={() => copyToClipboard(window.location.href, 'Link')}
           >
             Copy Link
-          </Button>,
-          <Button
+          </UIButton>,
+          <UIButton
             key="copy-json"
-            icon={<CopyOutlined />}
+            icon={<UIIcon name="CopyOutlined" />}
             onClick={() => copyToClipboard(JSON.stringify(log, null, 2), 'JSON')}
           >
             Export JSON
-          </Button>,
+          </UIButton>,
         ]}
       />
 
       {/* Log Overview Card */}
-      <Card
+      <UICard
         style={{ marginBottom: 16 }}
         title={
-          <Space>
+          <UISpace>
             {getLevelIcon(log.level)}
             <span>Log Overview</span>
-            <Tag color={getLevelColor(log.level)}>{log.level.toUpperCase()}</Tag>
-          </Space>
+            <UITag color={getLevelColor(log.level)}>{log.level.toUpperCase()}</UITag>
+          </UISpace>
         }
       >
-        <Descriptions column={2} bordered>
-          <Descriptions.Item label="Timestamp">
-            <Space>
-              <ClockCircleOutlined />
-              <Text code>{formatDateTime(log.time)}</Text>
-              <Text type="secondary">({formatRelativeTime(log.time)})</Text>
-            </Space>
-          </Descriptions.Item>
+        <UIDescriptions column={2} bordered>
+          <UIDescriptionsItem label="Timestamp">
+            <UISpace>
+              <UIIcon name="ClockCircleOutlined" />
+              <UITypographyText code>{formatDateTime(log.time)}</UITypographyText>
+              <UITypographyText type="secondary">({formatRelativeTime(log.time)})</UITypographyText>
+            </UISpace>
+          </UIDescriptionsItem>
 
-          <Descriptions.Item label="Source">
-            <Tag color="purple">{log.plugin || log.source || 'unknown'}</Tag>
-          </Descriptions.Item>
+          <UIDescriptionsItem label="Source">
+            <UITag color="purple">{log.plugin || log.source || 'unknown'}</UITag>
+          </UIDescriptionsItem>
 
-          <Descriptions.Item label="Message" span={2}>
-            <Text strong style={{ fontSize: 14 }}>
+          <UIDescriptionsItem label="Message" span={2}>
+            <UITypographyText strong style={{ fontSize: 14 }}>
               {log.msg || '(no message)'}
-            </Text>
-          </Descriptions.Item>
+            </UITypographyText>
+          </UIDescriptionsItem>
 
           {/* Correlation IDs */}
           {log.traceId && (
-            <Descriptions.Item label="Trace ID">
-              <Space>
-                <Text code>{log.traceId}</Text>
-                <Tooltip title="Copy trace ID">
-                  <Button
+            <UIDescriptionsItem label="Trace ID">
+              <UISpace>
+                <UITypographyText code>{log.traceId}</UITypographyText>
+                <UITooltip title="Copy trace ID">
+                  <UIButton
                     size="small"
-                    icon={<CopyOutlined />}
+                    icon={<UIIcon name="CopyOutlined" />}
                     onClick={() => copyToClipboard(String(log.traceId), 'Trace ID')}
                   />
-                </Tooltip>
-              </Space>
-            </Descriptions.Item>
+                </UITooltip>
+              </UISpace>
+            </UIDescriptionsItem>
           )}
 
           {log.executionId && (
-            <Descriptions.Item label="Execution ID">
-              <Space>
-                <Text code>{log.executionId}</Text>
-                <Tooltip title="Copy execution ID">
-                  <Button
+            <UIDescriptionsItem label="Execution ID">
+              <UISpace>
+                <UITypographyText code>{log.executionId}</UITypographyText>
+                <UITooltip title="Copy execution ID">
+                  <UIButton
                     size="small"
-                    icon={<CopyOutlined />}
+                    icon={<UIIcon name="CopyOutlined" />}
                     onClick={() => copyToClipboard(String(log.executionId), 'Execution ID')}
                   />
-                </Tooltip>
-              </Space>
-            </Descriptions.Item>
+                </UITooltip>
+              </UISpace>
+            </UIDescriptionsItem>
           )}
 
           {log.requestId && (
-            <Descriptions.Item label="Request ID">
-              <Space>
-                <Text code>{log.requestId}</Text>
-                <Tooltip title="Copy request ID">
-                  <Button
+            <UIDescriptionsItem label="Request ID">
+              <UISpace>
+                <UITypographyText code>{log.requestId}</UITypographyText>
+                <UITooltip title="Copy request ID">
+                  <UIButton
                     size="small"
-                    icon={<CopyOutlined />}
+                    icon={<UIIcon name="CopyOutlined" />}
                     onClick={() => copyToClipboard(String(log.requestId), 'Request ID')}
                   />
-                </Tooltip>
-              </Space>
-            </Descriptions.Item>
+                </UITooltip>
+              </UISpace>
+            </UIDescriptionsItem>
           )}
 
           {log.sessionId && (
-            <Descriptions.Item label="Session ID">
-              <Space>
-                <Text code>{log.sessionId}</Text>
-                <Tooltip title="Copy session ID">
-                  <Button
+            <UIDescriptionsItem label="Session ID">
+              <UISpace>
+                <UITypographyText code>{log.sessionId}</UITypographyText>
+                <UITooltip title="Copy session ID">
+                  <UIButton
                     size="small"
-                    icon={<CopyOutlined />}
+                    icon={<UIIcon name="CopyOutlined" />}
                     onClick={() => copyToClipboard(String(log.sessionId), 'Session ID')}
                   />
-                </Tooltip>
-              </Space>
-            </Descriptions.Item>
+                </UITooltip>
+              </UISpace>
+            </UIDescriptionsItem>
           )}
-        </Descriptions>
-      </Card>
+        </UIDescriptions>
+      </UICard>
 
       {/* Error Details Card (if error exists) */}
       {hasError && (
-        <Card
+        <UICard
           style={{ marginBottom: 16 }}
           title={
-            <Space>
-              <CloseCircleOutlined style={{ color: '#ff4d4f' }} />
+            <UISpace>
+              <UIIcon name="CloseCircleOutlined" style={{ color: '#ff4d4f' }} />
               <span>Error Details</span>
-            </Space>
+            </UISpace>
           }
           type="inner"
         >
-          <Space direction="vertical" style={{ width: '100%' }} size="middle">
+          <UISpace direction="vertical" style={{ width: '100%' }} size="middle">
             {errorDetails.name && (
               <div>
-                <Text type="secondary">Error Type:</Text>
+                <UITypographyText type="secondary">Error Type:</UITypographyText>
                 <br />
-                <Tag color="red">{errorDetails.name}</Tag>
+                <UITag color="red">{errorDetails.name}</UITag>
               </div>
             )}
 
             {errorDetails.message && (
               <div>
-                <Text type="secondary">Error Message:</Text>
+                <UITypographyText type="secondary">Error Message:</UITypographyText>
                 <br />
-                <Text strong>{errorDetails.message}</Text>
+                <UITypographyText strong>{errorDetails.message}</UITypographyText>
               </div>
             )}
 
             {errorDetails.stack && (
               <div>
-                <Text type="secondary">Stack Trace:</Text>
-                <Paragraph
+                <UITypographyText type="secondary">Stack Trace:</UITypographyText>
+                <UITypographyParagraph
                   copyable
                   code
                   style={{
@@ -378,51 +369,51 @@ export function LogDetailPage() {
                   }}
                 >
                   {errorDetails.stack}
-                </Paragraph>
+                </UITypographyParagraph>
               </div>
             )}
-          </Space>
-        </Card>
+          </UISpace>
+        </UICard>
       )}
 
       {/* Related Logs Timeline */}
-      <Card
+      <UICard
         style={{ marginBottom: 16 }}
         title={
-          <Space>
-            <ClockCircleOutlined />
+          <UISpace>
+            <UIIcon name="ClockCircleOutlined" />
             <span>Related Logs Timeline</span>
             {relatedLogs.length > 0 && (
-              <Badge count={relatedLogs.length} style={{ backgroundColor: '#52c41a' }} />
+              <UIBadge count={relatedLogs.length} style={{ backgroundColor: '#52c41a' }} />
             )}
-          </Space>
+          </UISpace>
         }
       >
         {relatedLogs.length === 0 ? (
-          <Empty
+          <UIEmptyState
             description="No related logs found"
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            image={UIEmptyState.PRESENTED_IMAGE_SIMPLE}
           />
         ) : (
           <>
             {correlationKeys && (
-              <Alert
+              <UIAlert
                 message="Correlation Keys"
                 description={
-                  <Space wrap>
+                  <UISpace wrap>
                     {correlationKeys.requestId && (
-                      <Tag>Request: {correlationKeys.requestId}</Tag>
+                      <UITag>Request: {correlationKeys.requestId}</UITag>
                     )}
                     {correlationKeys.traceId && (
-                      <Tag>Trace: {correlationKeys.traceId}</Tag>
+                      <UITag>Trace: {correlationKeys.traceId}</UITag>
                     )}
                     {correlationKeys.executionId && (
-                      <Tag>Execution: {correlationKeys.executionId}</Tag>
+                      <UITag>Execution: {correlationKeys.executionId}</UITag>
                     )}
                     {correlationKeys.sessionId && (
-                      <Tag>Session: {correlationKeys.sessionId}</Tag>
+                      <UITag>Session: {correlationKeys.sessionId}</UITag>
                     )}
-                  </Space>
+                  </UISpace>
                 }
                 type="info"
                 style={{ marginBottom: 16 }}
@@ -430,7 +421,7 @@ export function LogDetailPage() {
               />
             )}
 
-            <Timeline
+            <UITimeline
               mode="left"
               items={relatedLogs.map((relatedLog) => {
                 const isCurrentLog = relatedLog.id === id;
@@ -438,61 +429,61 @@ export function LogDetailPage() {
                 return {
                   color: isCurrentLog ? 'red' : getLevelColor(relatedLog.level),
                   dot: isCurrentLog ? (
-                    <Badge status="processing" />
+                    <UIBadge status="processing" />
                   ) : (
                     getLevelIcon(relatedLog.level)
                   ),
                   label: (
-                    <Text type="secondary" style={{ fontSize: 12 }}>
+                    <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                       {formatDateTime(relatedLog.time)}
-                    </Text>
+                    </UITypographyText>
                   ),
                   children: (
-                    <Card
+                    <UICard
                       size="small"
                       style={{
                         backgroundColor: isCurrentLog ? '#fff7e6' : undefined,
                         borderColor: isCurrentLog ? '#ffa940' : undefined,
                       }}
                     >
-                      <Space direction="vertical" style={{ width: '100%' }} size="small">
-                        <Space>
-                          <Tag color={getLevelColor(relatedLog.level)}>
+                      <UISpace direction="vertical" style={{ width: '100%' }} size="small">
+                        <UISpace>
+                          <UITag color={getLevelColor(relatedLog.level)}>
                             {relatedLog.level.toUpperCase()}
-                          </Tag>
+                          </UITag>
                           {relatedLog.plugin && (
-                            <Tag color="purple">{relatedLog.plugin}</Tag>
+                            <UITag color="purple">{relatedLog.plugin}</UITag>
                           )}
                           {isCurrentLog && (
-                            <Tag color="orange">YOU ARE HERE</Tag>
+                            <UITag color="orange">YOU ARE HERE</UITag>
                           )}
-                        </Space>
-                        <Text>{relatedLog.msg || '(no message)'}</Text>
+                        </UISpace>
+                        <UITypographyText>{relatedLog.msg || '(no message)'}</UITypographyText>
                         {relatedLog.err && (
-                          <Tag color="red" icon={<CloseCircleOutlined />}>
+                          <UITag color="red" icon={<UIIcon name="CloseCircleOutlined" />}>
                             {String(relatedLog.err.name || relatedLog.err.type || 'Error')}
-                          </Tag>
+                          </UITag>
                         )}
-                      </Space>
-                    </Card>
+                      </UISpace>
+                    </UICard>
                   ),
                 };
               })}
             />
           </>
         )}
-      </Card>
+      </UICard>
 
       {/* All Log Fields */}
-      <Card
+      <UICard
         title={
-          <Space>
-            <FileTextOutlined />
+          <UISpace>
+            <UIIcon name="FileTextOutlined" />
             <span>All Log Fields</span>
-          </Space>
+          </UISpace>
         }
       >
-        <Paragraph
+        <UITypographyParagraph
           copyable
           code
           style={{
@@ -507,8 +498,8 @@ export function LogDetailPage() {
           }}
         >
           {JSON.stringify(log, null, 2)}
-        </Paragraph>
-      </Card>
+        </UITypographyParagraph>
+      </UICard>
     </KBPageContainer>
   );
 }

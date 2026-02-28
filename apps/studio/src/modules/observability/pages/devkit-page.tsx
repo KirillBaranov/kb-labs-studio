@@ -1,14 +1,17 @@
-import { Row, Col, Table, Card, Statistic, Tag, Alert, Progress } from 'antd';
 import {
-  CheckCircleOutlined,
-  WarningOutlined,
-  CloseCircleOutlined,
-  ExclamationCircleOutlined,
-  CodeOutlined,
-} from '@ant-design/icons';
-import { KBPageContainer, KBPageHeader } from '@kb-labs/studio-ui-react';
+  UIRow,
+  UICol,
+  UITable,
+  UICard,
+  UIStatistic,
+  UITag,
+  UIAlert,
+  UIProgress,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useDevKitHealth } from '@kb-labs/studio-data-client';
 import { useDataSources } from '../../../providers/data-sources-provider';
+import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
 /**
  * Get color for health grade
@@ -35,17 +38,17 @@ function getGradeColor(grade: string): string {
 function getGradeIcon(grade: string) {
   switch (grade) {
     case 'A':
-      return <CheckCircleOutlined style={{ color: '#52c41a' }} />;
+      return <UIIcon name="CheckCircleOutlined" style={{ color: '#52c41a' }} />;
     case 'B':
-      return <CheckCircleOutlined style={{ color: '#1890ff' }} />;
+      return <UIIcon name="CheckCircleOutlined" style={{ color: '#1890ff' }} />;
     case 'C':
-      return <WarningOutlined style={{ color: '#faad14' }} />;
+      return <UIIcon name="WarningOutlined" style={{ color: '#faad14' }} />;
     case 'D':
-      return <ExclamationCircleOutlined style={{ color: '#ff7a45' }} />;
+      return <UIIcon name="ExclamationCircleOutlined" style={{ color: '#ff7a45' }} />;
     case 'F':
-      return <CloseCircleOutlined style={{ color: '#ff4d4f' }} />;
+      return <UIIcon name="CloseCircleOutlined" style={{ color: '#ff4d4f' }} />;
     default:
-      return <ExclamationCircleOutlined />;
+      return <UIIcon name="ExclamationCircleOutlined" />;
   }
 }
 
@@ -87,7 +90,7 @@ export function DevKitPage() {
           title="DevKit Health"
           description="Monorepo health and quality metrics"
         />
-        <Alert
+        <UIAlert
           message="Failed to load DevKit health"
           description={error instanceof Error ? error.message : 'Unknown error. Make sure DevKit is installed and executable.'}
           type="error"
@@ -122,10 +125,10 @@ export function DevKitPage() {
       />
 
       {/* Overview Stats */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col xs={24} sm={12} lg={8}>
-          <Card>
-            <Statistic
+      <UIRow gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <UICol xs={24} sm={12} lg={8}>
+          <UICard>
+            <UIStatistic
               title="Health Score"
               value={data.healthScore}
               suffix="/ 100"
@@ -137,36 +140,36 @@ export function DevKitPage() {
               }}
             />
             <div style={{ marginTop: 8 }}>
-              <Tag color={getGradeColor(data.grade)} style={{ fontSize: 14 }}>
+              <UITag color={getGradeColor(data.grade)} style={{ fontSize: 14 }}>
                 Grade {data.grade}
-              </Tag>
+              </UITag>
             </div>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={8}>
-          <Card>
-            <Statistic
+          </UICard>
+        </UICol>
+        <UICol xs={24} sm={12} lg={8}>
+          <UICard>
+            <UIStatistic
               title="Total Packages"
               value={data.packages}
-              prefix={<CodeOutlined />}
+              prefix={<UIIcon name="CodeOutlined" />}
             />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={8}>
-          <Card>
-            <Statistic
+          </UICard>
+        </UICol>
+        <UICol xs={24} sm={12} lg={8}>
+          <UICard>
+            <UIStatistic
               title="Total Issues"
               value={totalIssues}
-              prefix={<WarningOutlined />}
+              prefix={<UIIcon name="WarningOutlined" />}
               valueStyle={{ color: totalIssues > 100 ? '#ff4d4f' : '#faad14' }}
             />
-          </Card>
-        </Col>
-      </Row>
+          </UICard>
+        </UICol>
+      </UIRow>
 
       {/* Health Score Progress */}
-      <Card title="Health Score Breakdown" style={{ marginBottom: 24 }}>
-        <Progress
+      <UICard title="Health Score Breakdown" style={{ marginBottom: 24 }}>
+        <UIProgress
           percent={data.healthScore}
           status={getScoreStatus(data.healthScore)}
           strokeColor={
@@ -176,20 +179,20 @@ export function DevKitPage() {
           }
         />
         <div style={{ marginTop: 16, fontSize: 12, color: '#8c8c8c' }}>
-          {data.healthScore >= 90 ? '🎉 Excellent monorepo health!' :
-           data.healthScore >= 80 ? '✅ Good health - minor improvements needed' :
-           data.healthScore >= 70 ? '⚠️  Moderate health - some issues to address' :
-           data.healthScore >= 60 ? '⚠️  Fair health - significant issues present' :
-           '❌ Poor health - urgent attention required'}
+          {data.healthScore >= 90 ? 'Excellent monorepo health!' :
+           data.healthScore >= 80 ? 'Good health - minor improvements needed' :
+           data.healthScore >= 70 ? 'Moderate health - some issues to address' :
+           data.healthScore >= 60 ? 'Fair health - significant issues present' :
+           'Poor health - urgent attention required'}
         </div>
-      </Card>
+      </UICard>
 
       {/* Type Coverage (if available) */}
       {data.avgTypeCoverage !== undefined && (
-        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          <Col span={24}>
-            <Card title="TypeScript Type Coverage">
-              <Progress
+        <UIRow gutter={[16, 16]} style={{ marginBottom: 24 }}>
+          <UICol span={24}>
+            <UICard title="TypeScript Type Coverage">
+              <UIProgress
                 percent={Math.round(data.avgTypeCoverage)}
                 status={data.avgTypeCoverage >= 90 ? 'success' : data.avgTypeCoverage >= 70 ? 'normal' : 'exception'}
                 strokeColor={data.avgTypeCoverage >= 90 ? '#52c41a' : data.avgTypeCoverage >= 70 ? '#1890ff' : '#faad14'}
@@ -197,14 +200,14 @@ export function DevKitPage() {
               <div style={{ marginTop: 8, fontSize: 12, color: '#8c8c8c' }}>
                 Average type coverage across all packages
               </div>
-            </Card>
-          </Col>
-        </Row>
+            </UICard>
+          </UICol>
+        </UIRow>
       )}
 
       {/* Issues Breakdown Table */}
-      <Card title="Issues Breakdown">
-        <Table
+      <UICard title="Issues Breakdown">
+        <UITable
           dataSource={Object.entries(data.issues)
             .map(([key, count]) => ({
               key,
@@ -247,14 +250,14 @@ export function DevKitPage() {
                   low: { color: 'success', label: 'Low' },
                 }[severity] || { color: 'default', label: 'Unknown' };
 
-                return <Tag color={config.color}>{config.label}</Tag>;
+                return <UITag color={config.color}>{config.label}</UITag>;
               },
             },
           ]}
           pagination={false}
           size="small"
         />
-      </Card>
+      </UICard>
     </KBPageContainer>
   );
 }

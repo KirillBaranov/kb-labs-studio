@@ -1,9 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import {
-  KBPageContainer,
-  KBPageHeader,
-} from '@kb-labs/studio-ui-react';
+import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
 export function DashboardLayout() {
   return (

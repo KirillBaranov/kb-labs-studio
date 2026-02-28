@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Statistic } from 'antd';
+import { UICard, UIStatistic } from '@kb-labs/studio-ui-kit';
 import './AnimatedMetricCard.css';
 
 export interface AnimatedMetricCardProps {
@@ -65,7 +65,7 @@ export function AnimatedMetricCard({
   const isIncrease = changePercent > 0;
 
   return (
-    <Card
+    <UICard
       bordered={false}
       className={`animated-metric-card ${isAnimating ? 'animating' : ''}`}
       style={{
@@ -76,7 +76,7 @@ export function AnimatedMetricCard({
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ flex: 1 }}>
-          <Statistic
+          <UIStatistic
             title={title}
             value={displayValue}
             precision={precision}
@@ -120,6 +120,6 @@ export function AnimatedMetricCard({
           </div>
         )}
       </div>
-    </Card>
+    </UICard>
   );
 }

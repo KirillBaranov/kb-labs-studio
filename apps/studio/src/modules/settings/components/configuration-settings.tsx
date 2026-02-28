@@ -4,25 +4,26 @@
  */
 
 import * as React from 'react';
-import { Space, Typography, Tag, Button, message, Alert, Collapse, Card, Row, Col, Descriptions } from 'antd';
 import {
-  CopyOutlined,
-  CheckOutlined,
-  ThunderboltOutlined,
-  DatabaseOutlined,
-  CloudOutlined,
-  FileTextOutlined,
-  BulbOutlined,
-  ApiOutlined,
-  RocketOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-} from '@ant-design/icons';
+  UISpace,
+  UITypographyText,
+  UITitle,
+  UITypographyParagraph,
+  UITag,
+  UIButton,
+  UIMessage,
+  UIAlert,
+  UIAccordion,
+  UICard,
+  UIRow,
+  UICol,
+  UIDescriptions,
+  UIDescriptionsItem,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { usePlatformConfig } from '@kb-labs/studio-data-client';
-import { KBSkeleton, KBStack } from '@kb-labs/studio-ui-react';
-
-const { Text, Title, Paragraph } = Typography;
+import { UISkeleton, UIStack } from '@kb-labs/studio-ui-kit';
 
 export function ConfigurationSettings() {
   const sources = useDataSources();
@@ -32,29 +33,29 @@ export function ConfigurationSettings() {
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
     setCopiedKey(key);
-    message.success('Copied to clipboard');
+    UIMessage.success('Copied to clipboard');
     setTimeout(() => setCopiedKey(null), 2000);
   };
 
   if (isLoading) {
     return (
-      <KBStack>
-        <KBSkeleton active paragraph={{ rows: 5 }} />
-      </KBStack>
+      <UIStack>
+        <UISkeleton active paragraph={{ rows: 5 }} />
+      </UIStack>
     );
   }
 
   if (error) {
     return (
-      <Alert
+      <UIAlert
         message="Failed to load platform configuration"
         description={
-          <Space direction="vertical" size="small">
-            <Text>{error instanceof Error ? error.message : 'Unknown error'}</Text>
-            <Text type="secondary" style={{ fontSize: '0.875rem' }}>
+          <UISpace direction="vertical" size="small">
+            <UITypographyText>{error instanceof Error ? error.message : 'Unknown error'}</UITypographyText>
+            <UITypographyText type="secondary" style={{ fontSize: '0.875rem' }}>
               Make sure the REST API server is running and accessible.
-            </Text>
-          </Space>
+            </UITypographyText>
+          </UISpace>
         }
         type="error"
         showIcon
@@ -65,7 +66,7 @@ export function ConfigurationSettings() {
   if (!data) {
     return (
       <div>
-        <Paragraph type="secondary">No platform configuration available</Paragraph>
+        <UITypographyParagraph type="secondary">No platform configuration available</UITypographyParagraph>
       </div>
     );
   }
@@ -101,25 +102,25 @@ export function ConfigurationSettings() {
   const categories = [
     {
       name: 'AI & Intelligence',
-      icon: <BulbOutlined />,
+      icon: <UIIcon name="BulbOutlined" />,
       color: 'purple',
       adapters: ['llm', 'embeddings', 'vectorStore'],
     },
     {
       name: 'Database',
-      icon: <DatabaseOutlined />,
+      icon: <UIIcon name="DatabaseOutlined" />,
       color: 'blue',
       adapters: ['database', 'db', 'documentDb'],
     },
     {
       name: 'Infrastructure',
-      icon: <CloudOutlined />,
+      icon: <UIIcon name="CloudOutlined" />,
       color: 'green',
       adapters: ['storage', 'cache'],
     },
     {
       name: 'Observability',
-      icon: <ThunderboltOutlined />,
+      icon: <UIIcon name="ThunderboltOutlined" />,
       color: 'orange',
       adapters: ['logger', 'analytics', 'logRingBuffer', 'logPersistence'],
     },
@@ -136,49 +137,49 @@ export function ConfigurationSettings() {
   });
 
   return (
-    <Space direction="vertical" size="large" style={{ width: '100%' }}>
+    <UISpace direction="vertical" size="large" style={{ width: '100%' }}>
       {/* System Information */}
-      <Card size="small" title="System Information">
-        <Descriptions column={{ xs: 1, sm: 2 }} size="small">
-          <Descriptions.Item label="Execution Mode">
-            <Tag color="blue" icon={<RocketOutlined />}>
+      <UICard size="small" title="System Information">
+        <UIDescriptions column={{ xs: 1, sm: 2 }} size="small">
+          <UIDescriptionsItem label="Execution Mode">
+            <UITag color="blue" icon={<UIIcon name="RocketOutlined" />}>
               {data.execution.mode}
-            </Tag>
-          </Descriptions.Item>
-          <Descriptions.Item label="Total Adapters">
-            <Space size={4}>
-              <Text>{totalAdaptersCount}</Text>
-              <Text type="secondary">
+            </UITag>
+          </UIDescriptionsItem>
+          <UIDescriptionsItem label="Total Adapters">
+            <UISpace size={4}>
+              <UITypographyText>{totalAdaptersCount}</UITypographyText>
+              <UITypographyText type="secondary">
                 ({activeAdaptersCount} active)
-              </Text>
-            </Space>
-          </Descriptions.Item>
-        </Descriptions>
-      </Card>
+              </UITypographyText>
+            </UISpace>
+          </UIDescriptionsItem>
+        </UIDescriptions>
+      </UICard>
 
       {/* Platform Adapters by Category */}
       <div>
-        <Title level={4}>Platform Adapters</Title>
-        <Paragraph type="secondary">
+        <UITitle level={4}>Platform Adapters</UITitle>
+        <UITypographyParagraph type="secondary">
           Adapters are organized by category for better clarity.
-        </Paragraph>
+        </UITypographyParagraph>
 
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <UISpace direction="vertical" size="middle" style={{ width: '100%' }}>
           {groupedAdapters.map((category) => (
-            <Card
+            <UICard
               key={category.name}
               size="small"
               title={
-                <Space>
+                <UISpace>
                   <span style={{ fontSize: '1.1rem', color: `var(--ant-${category.color}-6)` }}>
                     {category.icon}
                   </span>
-                  <Text strong>{category.name}</Text>
-                  <Tag color={category.color}>{category.count}</Tag>
-                </Space>
+                  <UITypographyText strong>{category.name}</UITypographyText>
+                  <UITag color={category.color}>{category.count}</UITag>
+                </UISpace>
               }
             >
-              <Space direction="vertical" size="small" style={{ width: '100%' }}>
+              <UISpace direction="vertical" size="small" style={{ width: '100%' }}>
                 {category.items.map(([name, packageName]) => {
                   // Helper to render a single adapter item
                   const renderAdapterItem = (itemName: string, itemPackage: string, itemKey: string) => {
@@ -196,9 +197,9 @@ export function ConfigurationSettings() {
                           borderLeft: isEnabled ? `3px solid var(--ant-${category.color}-6)` : '3px solid var(--ant-border-color)',
                         }}
                       >
-                        <Space style={{ flex: 1, minWidth: 0 }}>
-                          <Text strong style={{ minWidth: 100 }}>{itemName}</Text>
-                          <Text
+                        <UISpace style={{ flex: 1, minWidth: 0 }}>
+                          <UITypographyText strong style={{ minWidth: 100 }}>{itemName}</UITypographyText>
+                          <UITypographyText
                             code
                             style={{
                               fontSize: '0.85rem',
@@ -208,25 +209,25 @@ export function ConfigurationSettings() {
                             }}
                           >
                             {itemPackage || 'null'}
-                          </Text>
-                        </Space>
-                        <Space>
+                          </UITypographyText>
+                        </UISpace>
+                        <UISpace>
                           {isEnabled ? (
                             <>
-                              <CheckCircleOutlined style={{ color: 'var(--ant-success-color)' }} />
-                              <Button
+                              <UIIcon name="CheckCircleOutlined" style={{ color: 'var(--ant-success-color)' }} />
+                              <UIButton
                                 size="small"
                                 type="text"
-                                icon={copiedKey === itemKey ? <CheckOutlined /> : <CopyOutlined />}
+                                icon={copiedKey === itemKey ? <UIIcon name="CheckOutlined" /> : <UIIcon name="CopyOutlined" />}
                                 onClick={() => handleCopy(itemPackage, itemKey)}
                               >
                                 {copiedKey === itemKey ? 'Copied' : 'Copy'}
-                              </Button>
+                              </UIButton>
                             </>
                           ) : (
-                            <CloseCircleOutlined style={{ color: 'var(--ant-text-secondary)' }} />
+                            <UIIcon name="CloseCircleOutlined" style={{ color: 'var(--ant-text-secondary)' }} />
                           )}
-                        </Space>
+                        </UISpace>
                       </div>
                     );
                   };
@@ -234,37 +235,37 @@ export function ConfigurationSettings() {
                   // Handle nested adapters (object with sub-adapters)
                   if (typeof packageName === 'object' && packageName !== null && !Array.isArray(packageName)) {
                     return (
-                      <Space key={name} direction="vertical" size="small" style={{ width: '100%' }}>
+                      <UISpace key={name} direction="vertical" size="small" style={{ width: '100%' }}>
                         {Object.entries(packageName as Record<string, string>).map(([subName, subPackage]) =>
                           renderAdapterItem(subName, subPackage, `${name}.${subName}`)
                         )}
-                      </Space>
+                      </UISpace>
                     );
                   }
 
                   // Regular adapter (string package name)
                   return renderAdapterItem(name, packageName as string, name);
                 })}
-              </Space>
-            </Card>
+              </UISpace>
+            </UICard>
           ))}
-        </Space>
+        </UISpace>
       </div>
 
       {/* Adapter Configuration */}
       {data.adapterOptions && Object.keys(data.adapterOptions).length > 0 && (
         <div>
-          <Title level={4}>Adapter Configuration</Title>
-          <Paragraph type="secondary">
+          <UITitle level={4}>Adapter Configuration</UITitle>
+          <UITypographyParagraph type="secondary">
             Detailed configuration options for each adapter.
             {hasRedacted && (
-              <Text type="warning" style={{ marginLeft: 8 }}>
-                ⚠️ Some sensitive values have been redacted for security.
-              </Text>
+              <UITypographyText type="warning" style={{ marginLeft: 8 }}>
+                Some sensitive values have been redacted for security.
+              </UITypographyText>
             )}
-          </Paragraph>
+          </UITypographyParagraph>
 
-          <Collapse
+          <UIAccordion
             accordion
             items={Object.entries(data.adapterOptions).map(([adapterName, options]) => {
               // Find category for this adapter
@@ -274,14 +275,14 @@ export function ConfigurationSettings() {
               return {
                 key: adapterName,
                 label: (
-                  <Space>
-                    <Text strong>{adapterName}</Text>
+                  <UISpace>
+                    <UITypographyText strong>{adapterName}</UITypographyText>
                     {options && (
-                      <Tag color={categoryColor}>
+                      <UITag color={categoryColor}>
                         {Object.keys(options as object).length} option(s)
-                      </Tag>
+                      </UITag>
                     )}
-                  </Space>
+                  </UISpace>
                 ),
                 children: options ? (
                   <pre
@@ -297,7 +298,7 @@ export function ConfigurationSettings() {
                     {JSON.stringify(options, null, 2)}
                   </pre>
                 ) : (
-                  <Text type="secondary">No options configured</Text>
+                  <UITypographyText type="secondary">No options configured</UITypographyText>
                 ),
               };
             })}
@@ -307,24 +308,24 @@ export function ConfigurationSettings() {
 
       {/* Redacted Fields Info */}
       {hasRedacted && (
-        <Alert
+        <UIAlert
           type="warning"
           showIcon
           message="Security Notice"
           description={
-            <Space direction="vertical" size="small">
-              <Text>The following sensitive fields were redacted from the configuration:</Text>
-              <Space wrap>
+            <UISpace direction="vertical" size="small">
+              <UITypographyText>The following sensitive fields were redacted from the configuration:</UITypographyText>
+              <UISpace wrap>
                 {data.redacted.map((field) => (
-                  <Tag key={field} color="orange">
+                  <UITag key={field} color="orange">
                     {field}
-                  </Tag>
+                  </UITag>
                 ))}
-              </Space>
-            </Space>
+              </UISpace>
+            </UISpace>
           }
         />
       )}
-    </Space>
+    </UISpace>
   );
 }

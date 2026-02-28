@@ -4,7 +4,7 @@
  */
 
 import * as React from 'react';
-import { Card, Table, Tag, Spin, Alert } from 'antd';
+import { UICard, UITable, UITag, UISpin, UIAlert } from '@kb-labs/studio-ui-kit';
 import type { ColumnsType } from 'antd/es/table';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useQualityDependencies } from '@kb-labs/studio-data-client';
@@ -22,13 +22,13 @@ export function DependenciesTab() {
   if (isLoading) {
     return (
       <div style={{ textAlign: 'center', padding: '40px' }}>
-        <Spin size="large" />
+        <UISpin size="large" />
       </div>
     );
   }
 
   if (error) {
-    return <Alert message="Failed to load dependencies" type="error" showIcon />;
+    return <UIAlert message="Failed to load dependencies" type="error" showIcon />;
   }
 
   const duplicatesColumns: ColumnsType<DuplicateDependency> = [
@@ -45,9 +45,9 @@ export function DependenciesTab() {
       render: (versions: VersionInfo[]) => (
         <>
           {versions.map((v) => (
-            <Tag key={v.version} color="orange">
+            <UITag key={v.version} color="orange">
               {v.version} ({v.count})
-            </Tag>
+            </UITag>
           ))}
         </>
       ),
@@ -99,7 +99,7 @@ export function DependenciesTab() {
   return (
     <div>
       {data && data.totalIssues === 0 && (
-        <Alert
+        <UIAlert
           message="No dependency issues found!"
           description="Your monorepo has no duplicate, unused, or missing dependencies."
           type="success"
@@ -109,40 +109,40 @@ export function DependenciesTab() {
       )}
 
       {/* Duplicates */}
-      <Card
+      <UICard
         title={`Duplicate Dependencies (${data?.duplicates?.length ?? 0})`}
         style={{ marginBottom: 24 }}
       >
-        <Table
+        <UITable
           dataSource={data?.duplicates ?? []}
           columns={duplicatesColumns}
           rowKey="name"
           pagination={{ pageSize: 10 }}
         />
-      </Card>
+      </UICard>
 
       {/* Unused */}
-      <Card
+      <UICard
         title={`Unused Dependencies (${data?.unused?.length ?? 0})`}
         style={{ marginBottom: 24 }}
       >
-        <Table
+        <UITable
           dataSource={data?.unused ?? []}
           columns={unusedColumns}
           rowKey="name"
           pagination={{ pageSize: 10 }}
         />
-      </Card>
+      </UICard>
 
       {/* Missing */}
-      <Card title={`Missing Dependencies (${data?.missing?.length ?? 0})`}>
-        <Table
+      <UICard title={`Missing Dependencies (${data?.missing?.length ?? 0})`}>
+        <UITable
           dataSource={data?.missing ?? []}
           columns={missingColumns}
           rowKey="name"
           pagination={{ pageSize: 10 }}
         />
-      </Card>
+      </UICard>
     </div>
   );
 }

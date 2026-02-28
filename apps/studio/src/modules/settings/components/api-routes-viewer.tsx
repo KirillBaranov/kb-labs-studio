@@ -1,35 +1,25 @@
 import * as React from 'react';
 import { useState, useEffect, useMemo } from 'react';
 import {
-  Input,
-  Tag,
-  Space,
-  Button,
-  Typography,
-  Alert,
-  Spin,
-  Empty,
-  Tooltip,
-  Select,
-  Tree,
-  Segmented,
-} from 'antd';
+  UIInput,
+  UITag,
+  UISpace,
+  UIButton,
+  UITypographyText,
+  UITitle,
+  UITypographyParagraph,
+  UIAlert,
+  UISpin,
+  UIEmptyState,
+  UITooltip,
+  UISelect,
+  UITree,
+  UISegmented,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import type { DataNode } from 'antd/es/tree';
-import {
-  ReloadOutlined,
-  SearchOutlined,
-  CopyOutlined,
-  CheckOutlined,
-  ApiOutlined,
-  FolderOutlined,
-  FileOutlined,
-  UnorderedListOutlined,
-  ApartmentOutlined,
-} from '@ant-design/icons';
 import { useDataSources } from '@/providers/data-sources-provider';
 import type { RoutesResponse, RouteInfo } from '@kb-labs/studio-data-client';
-
-const { Text, Title, Paragraph } = Typography;
 
 const METHOD_COLORS: Record<string, string> = {
   GET: 'green',
@@ -116,24 +106,24 @@ function treeNodeToAntdNode(
       return {
         key: `${route.method}-${route.url}`,
         title: (
-          <Space size="small">
+          <UISpace size="small">
             {route.method.split(',').map((m) => (
-              <Tag key={m} color={METHOD_COLORS[m.trim()] || 'default'} style={{ margin: 0 }}>
+              <UITag key={m} color={METHOD_COLORS[m.trim()] || 'default'} style={{ margin: 0 }}>
                 {m.trim()}
-              </Tag>
+              </UITag>
             ))}
-            <Text code style={{ fontSize: 12 }}>
+            <UITypographyText code style={{ fontSize: 12 }}>
               {route.url}
-            </Text>
-            <Tooltip title={copiedUrl === fullUrl ? 'Copied!' : 'Copy full URL'}>
-              <Button
+            </UITypographyText>
+            <UITooltip title={copiedUrl === fullUrl ? 'Copied!' : 'Copy full URL'}>
+              <UIButton
                 type="text"
                 size="small"
                 icon={
                   copiedUrl === fullUrl ? (
-                    <CheckOutlined style={{ color: '#52c41a' }} />
+                    <UIIcon name="CheckOutlined" style={{ color: '#52c41a' }} />
                   ) : (
-                    <CopyOutlined />
+                    <UIIcon name="CopyOutlined" />
                   )
                 }
                 onClick={(e) => {
@@ -141,11 +131,11 @@ function treeNodeToAntdNode(
                   onCopy(fullUrl);
                 }}
               />
-            </Tooltip>
-          </Space>
+            </UITooltip>
+          </UISpace>
         ),
         isLeaf: true,
-        icon: <FileOutlined />,
+        icon: <UIIcon name="FileOutlined" />,
       };
     });
 
@@ -153,18 +143,18 @@ function treeNodeToAntdNode(
       results.push({
         key: child.fullPath,
         title: (
-          <Space size="small">
-            <Text strong={hasChildren} type={isParam ? 'warning' : undefined}>
+          <UISpace size="small">
+            <UITypographyText strong={hasChildren} type={isParam ? 'warning' : undefined}>
               {segment}
-            </Text>
+            </UITypographyText>
             {hasRoutes && !hasChildren && (
-              <Text type="secondary" style={{ fontSize: 11 }}>
+              <UITypographyText type="secondary" style={{ fontSize: 11 }}>
                 ({child.routes.length})
-              </Text>
+              </UITypographyText>
             )}
-          </Space>
+          </UISpace>
         ),
-        icon: hasChildren ? <FolderOutlined /> : undefined,
+        icon: hasChildren ? <UIIcon name="FolderOutlined" /> : undefined,
         children: [...routeNodes, ...childNodes],
         isLeaf: !hasChildren && routeNodes.length === 0,
       });
@@ -267,28 +257,28 @@ export function ApiRoutesViewer() {
   }, [filteredRoutes]);
 
   return (
-    <Space direction="vertical" style={{ width: '100%' }} size="middle">
+    <UISpace direction="vertical" style={{ width: '100%' }} size="middle">
       <div>
-        <Title level={5}>
-          <ApiOutlined /> API Routes Explorer
-        </Title>
-        <Paragraph type="secondary">
+        <UITitle level={5}>
+          <UIIcon name="ApiOutlined" /> API Routes Explorer
+        </UITitle>
+        <UITypographyParagraph type="secondary">
           Browse all available REST API endpoints from the backend. Use search and filters to find
           specific routes.
-        </Paragraph>
+        </UITypographyParagraph>
       </div>
 
       {/* Controls */}
-      <Space wrap>
-        <Input
+      <UISpace wrap>
+        <UIInput
           placeholder="Search routes..."
-          prefix={<SearchOutlined />}
+          prefix={<UIIcon name="SearchOutlined" />}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{ width: 300 }}
           allowClear
         />
-        <Select
+        <UISelect
           placeholder="Filter by method"
           allowClear
           style={{ width: 150 }}
@@ -296,60 +286,60 @@ export function ApiRoutesViewer() {
           onChange={setMethodFilter}
           options={availableMethods.map((m) => ({ label: m, value: m }))}
         />
-        <Segmented
+        <UISegmented
           value={viewMode}
           onChange={(v) => setViewMode(v as ViewMode)}
           options={[
-            { label: 'Tree', value: 'tree', icon: <ApartmentOutlined /> },
-            { label: 'List', value: 'list', icon: <UnorderedListOutlined /> },
+            { label: 'Tree', value: 'tree', icon: <UIIcon name="ApartmentOutlined" /> },
+            { label: 'List', value: 'list', icon: <UIIcon name="UnorderedListOutlined" /> },
           ]}
         />
-        <Button icon={<ReloadOutlined />} onClick={fetchRoutes} loading={loading}>
+        <UIButton icon={<UIIcon name="ReloadOutlined" />} onClick={fetchRoutes} loading={loading}>
           Refresh
-        </Button>
-      </Space>
+        </UIButton>
+      </UISpace>
 
       {/* Stats */}
       {data && (
-        <Alert
+        <UIAlert
           type="info"
           showIcon={false}
           message={
-            <Space split={<span style={{ color: '#d9d9d9' }}>|</span>}>
+            <UISpace split={<span style={{ color: '#d9d9d9' }}>|</span>}>
               <span>
-                <Text strong>{data.count}</Text> total routes
+                <UITypographyText strong>{data.count}</UITypographyText> total routes
               </span>
               <span>
-                <Text strong>{filteredRoutes.length}</Text> shown
+                <UITypographyText strong>{filteredRoutes.length}</UITypographyText> shown
               </span>
               <span>
-                <Text type="secondary">
+                <UITypographyText type="secondary">
                   Last fetched: {new Date(data.ts).toLocaleTimeString()}
-                </Text>
+                </UITypographyText>
               </span>
               <span>
-                <Text type="secondary">Base: {baseUrl}</Text>
+                <UITypographyText type="secondary">Base: {baseUrl}</UITypographyText>
               </span>
-            </Space>
+            </UISpace>
           }
         />
       )}
 
       {/* Error */}
       {error && (
-        <Alert type="error" message="Failed to load routes" description={error} showIcon />
+        <UIAlert type="error" message="Failed to load routes" description={error} showIcon />
       )}
 
       {/* Loading */}
       {loading && !data && (
         <div style={{ textAlign: 'center', padding: 40 }}>
-          <Spin size="large" />
+          <UISpin size="large" />
         </div>
       )}
 
       {/* Tree View */}
       {data && viewMode === 'tree' && treeData.length > 0 && (
-        <Tree
+        <UITree
           treeData={treeData}
           showIcon
           showLine={{ showLeafIcon: false }}
@@ -365,7 +355,7 @@ export function ApiRoutesViewer() {
       {/* List View */}
       {data && viewMode === 'list' && (
         <div style={{ maxHeight: 500, overflow: 'auto' }}>
-          <Space direction="vertical" size="small" style={{ width: '100%' }}>
+          <UISpace direction="vertical" size="small" style={{ width: '100%' }}>
             {sortedRoutes.map((route) => {
               const fullUrl = route.url.startsWith('/api')
                 ? `http://localhost:5050${route.url}`
@@ -383,45 +373,45 @@ export function ApiRoutesViewer() {
                     background: 'rgba(0,0,0,0.02)',
                   }}
                 >
-                  <Space size={4}>
+                  <UISpace size={4}>
                     {route.method.split(',').map((m) => (
-                      <Tag
+                      <UITag
                         key={m}
                         color={METHOD_COLORS[m.trim()] || 'default'}
                         style={{ margin: 0, minWidth: 50, textAlign: 'center' }}
                       >
                         {m.trim()}
-                      </Tag>
+                      </UITag>
                     ))}
-                  </Space>
-                  <Text code style={{ fontSize: 12, flex: 1 }}>
+                  </UISpace>
+                  <UITypographyText code style={{ fontSize: 12, flex: 1 }}>
                     {route.url}
-                  </Text>
-                  <Tooltip title={copiedUrl === fullUrl ? 'Copied!' : 'Copy full URL'}>
-                    <Button
+                  </UITypographyText>
+                  <UITooltip title={copiedUrl === fullUrl ? 'Copied!' : 'Copy full URL'}>
+                    <UIButton
                       type="text"
                       size="small"
                       icon={
                         copiedUrl === fullUrl ? (
-                          <CheckOutlined style={{ color: '#52c41a' }} />
+                          <UIIcon name="CheckOutlined" style={{ color: '#52c41a' }} />
                         ) : (
-                          <CopyOutlined />
+                          <UIIcon name="CopyOutlined" />
                         )
                       }
                       onClick={() => handleCopyUrl(fullUrl)}
                     />
-                  </Tooltip>
+                  </UITooltip>
                 </div>
               );
             })}
-          </Space>
+          </UISpace>
         </div>
       )}
 
       {/* Empty */}
       {!loading && !error && filteredRoutes.length === 0 && data && (
-        <Empty description="No routes match your search" />
+        <UIEmptyState description="No routes match your search" />
       )}
-    </Space>
+    </UISpace>
   );
 }

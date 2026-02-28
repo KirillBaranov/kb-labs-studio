@@ -4,10 +4,8 @@
  */
 
 import React from 'react';
-import { Typography, theme } from 'antd';
+import { UITypographyText, useUITheme } from '@kb-labs/studio-ui-kit';
 import { StepItem, type ResearchStep } from './step-item';
-
-const { Text } = Typography;
 
 interface ResearchBlockProps {
   steps: ResearchStep[];
@@ -15,7 +13,7 @@ interface ResearchBlockProps {
 }
 
 export function ResearchBlock({ steps, isRunning }: ResearchBlockProps) {
-  const { token } = theme.useToken();
+  const { token } = useUITheme();
 
   if (steps.length === 0) {
     return null;
@@ -34,21 +32,21 @@ export function ResearchBlock({ steps, isRunning }: ResearchBlockProps) {
     >
       {/* Header */}
       <div style={{ marginBottom: 8 }}>
-        <Text strong style={{ fontSize: 13, color: token.colorTextSecondary }}>
-          🔬 Research
-        </Text>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12 }}>
+        <UITypographyText strong style={{ fontSize: 13, color: token.colorTextSecondary }}>
+          Research
+        </UITypographyText>
+        <UITypographyText type="secondary" style={{ fontSize: 12, marginLeft: 12 }}>
           {isRunning ? (
-            <span style={{ color: token.colorPrimary }}>● running</span>
+            <span style={{ color: token.colorPrimary }}>running</span>
           ) : (
-            `${completedCount}/${steps.length} steps • ${(totalDuration / 1000).toFixed(1)}s`
+            `${completedCount}/${steps.length} steps - ${(totalDuration / 1000).toFixed(1)}s`
           )}
           {errorCount > 0 && (
             <span style={{ color: token.colorError, marginLeft: 8 }}>
               {errorCount} failed
             </span>
           )}
-        </Text>
+        </UITypographyText>
       </div>
 
       {/* Tree */}

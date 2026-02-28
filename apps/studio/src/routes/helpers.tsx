@@ -4,7 +4,7 @@
  */
 
 import * as React from 'react';
-import { AVAILABLE_ICONS } from '@kb-labs/studio-ui-react';
+import { AVAILABLE_ICONS } from '@/components/ui';
 
 /**
  * Render icon from available icons registry

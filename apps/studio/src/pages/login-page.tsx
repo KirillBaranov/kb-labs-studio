@@ -5,11 +5,11 @@
 
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Button, Space, Typography, Select, Divider, message } from 'antd';
-import { UserOutlined, RocketOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons';
+import {
+  UICard, UIButton, UISpace, UITitle, UITypographyText, UITypographyParagraph,
+  UISelect, UIDivider, UIMessage, UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useAuth, type UserRole } from '@/providers/auth-provider';
-
-const { Title, Text, Paragraph } = Typography;
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ export function LoginPage() {
   };
 
   const handleSSOLogin = () => {
-    message.info('SSO аутентификация будет реализована позже');
+    UIMessage.info('SSO аутентификация будет реализована позже');
     // TODO: Implement SSO authentication
   };
 
@@ -37,7 +37,7 @@ export function LoginPage() {
         padding: '2rem',
       }}
     >
-      <Card
+      <UICard
         style={{
           maxWidth: '480px',
           width: '100%',
@@ -46,7 +46,7 @@ export function LoginPage() {
         }}
         bodyStyle={{ padding: '3rem' }}
       >
-        <Space direction="vertical" size="large" style={{ width: '100%', textAlign: 'center' }}>
+        <UISpace direction="vertical" size="large" style={{ width: '100%', textAlign: 'center' }}>
           {/* Logo */}
           <div
             style={{
@@ -61,18 +61,18 @@ export function LoginPage() {
               fontSize: '40px',
             }}
           >
-            <RocketOutlined style={{ color: 'white' }} />
+            <UIIcon name="RocketOutlined" style={{ color: 'white' }} />
           </div>
 
           {/* Title */}
           <div>
-            <Title level={2} style={{ marginBottom: 8 }}>
+            <UITitle level={2} style={{ marginBottom: 8 }}>
               KB Labs Studio
-            </Title>
-            <Text type="secondary">Добро пожаловать в платформу</Text>
+            </UITitle>
+            <UITypographyText type="secondary">Добро пожаловать в платформу</UITypographyText>
           </div>
 
-          <Divider style={{ margin: '8px 0' }} />
+          <UIDivider style={{ margin: '8px 0' }} />
 
           {/* Mock Auth Notice */}
           <div
@@ -83,28 +83,28 @@ export function LoginPage() {
               border: '1px solid var(--border-primary)',
             }}
           >
-            <Space direction="vertical" size="small" style={{ width: '100%' }}>
+            <UISpace direction="vertical" size="small" style={{ width: '100%' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <LockOutlined style={{ color: '#667eea' }} />
-                <Text strong style={{ color: '#667eea' }}>
+                <UIIcon name="LockOutlined" style={{ color: '#667eea' }} />
+                <UITypographyText strong style={{ color: '#667eea' }}>
                   Режим разработки
-                </Text>
+                </UITypographyText>
               </div>
-              <Paragraph
+              <UITypographyParagraph
                 type="secondary"
                 style={{ margin: 0, fontSize: '0.875rem', textAlign: 'left' }}
               >
                 Это заглушка для входа. Выберите роль и войдите без пароля.
-              </Paragraph>
-            </Space>
+              </UITypographyParagraph>
+            </UISpace>
           </div>
 
           {/* Role Selector */}
           <div style={{ width: '100%', textAlign: 'left' }}>
-            <Text strong style={{ display: 'block', marginBottom: 8 }}>
+            <UITypographyText strong style={{ display: 'block', marginBottom: 8 }}>
               Выберите роль:
-            </Text>
-            <Select
+            </UITypographyText>
+            <UISelect
               value={selectedRole}
               onChange={setSelectedRole}
               style={{ width: '100%' }}
@@ -112,35 +112,35 @@ export function LoginPage() {
               options={[
                 {
                   label: (
-                    <Space>
-                      <UserOutlined />
+                    <UISpace>
+                      <UIIcon name="UserOutlined" />
                       <span>
                         <strong>Viewer</strong> — Просмотр данных
                       </span>
-                    </Space>
-                  ),
+                    </UISpace>
+                  ) as unknown as string, // JSX label - UISelect wraps antd Select which supports ReactNode
                   value: 'viewer',
                 },
                 {
                   label: (
-                    <Space>
-                      <UserOutlined />
+                    <UISpace>
+                      <UIIcon name="UserOutlined" />
                       <span>
                         <strong>Operator</strong> — Управление системой
                       </span>
-                    </Space>
-                  ),
+                    </UISpace>
+                  ) as unknown as string, // JSX label - UISelect wraps antd Select which supports ReactNode
                   value: 'operator',
                 },
                 {
                   label: (
-                    <Space>
-                      <UserOutlined />
+                    <UISpace>
+                      <UIIcon name="UserOutlined" />
                       <span>
                         <strong>Admin</strong> — Полный доступ
                       </span>
-                    </Space>
-                  ),
+                    </UISpace>
+                  ) as unknown as string, // JSX label - UISelect wraps antd Select which supports ReactNode
                   value: 'admin',
                 },
               ]}
@@ -148,12 +148,12 @@ export function LoginPage() {
           </div>
 
           {/* Login Buttons */}
-          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-            <Button
-              type="primary"
+          <UISpace direction="vertical" size="middle" style={{ width: '100%' }}>
+            <UIButton
+              variant="primary"
               size="large"
               block
-              icon={<RocketOutlined />}
+              icon={<UIIcon name="RocketOutlined" />}
               onClick={handleLogin}
               style={{
                 height: '48px',
@@ -162,18 +162,18 @@ export function LoginPage() {
               }}
             >
               Войти в систему
-            </Button>
+            </UIButton>
 
-            <Divider style={{ margin: '8px 0' }}>
-              <Text type="secondary" style={{ fontSize: '0.75rem' }}>
+            <UIDivider style={{ margin: '8px 0' }}>
+              <UITypographyText type="secondary" style={{ fontSize: '0.75rem' }}>
                 или
-              </Text>
-            </Divider>
+              </UITypographyText>
+            </UIDivider>
 
-            <Button
+            <UIButton
               size="large"
               block
-              icon={<SafetyOutlined />}
+              icon={<UIIcon name="SafetyOutlined" />}
               onClick={handleSSOLogin}
               style={{
                 height: '48px',
@@ -182,17 +182,17 @@ export function LoginPage() {
               }}
             >
               Войти через SSO
-            </Button>
-          </Space>
+            </UIButton>
+          </UISpace>
 
           {/* Footer */}
           <div style={{ marginTop: '16px' }}>
-            <Text type="secondary" style={{ fontSize: '0.75rem' }}>
+            <UITypographyText type="secondary" style={{ fontSize: '0.75rem' }}>
               © 2025 KB Labs Studio. Development Preview.
-            </Text>
+            </UITypographyText>
           </div>
-        </Space>
-      </Card>
+        </UISpace>
+      </UICard>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Segmented } from 'antd';
+import { UICard, UISegmented } from '@kb-labs/studio-ui-kit';
 import { UIAreaChart, useChartColors } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { useMetricsHistory } from '@kb-labs/studio-data-client';
@@ -115,11 +115,11 @@ export function ActivityTimelineWidget() {
   const hasError = requestsQuery.isError || errorsQuery.isError;
 
   return (
-    <Card
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span>Requests & Errors</span>
-          <Segmented
+          <UISegmented
             options={Object.entries(TIME_RANGE_CONFIG).map(([key, cfg]) => ({
               label: cfg.label,
               value: key,
@@ -194,6 +194,6 @@ export function ActivityTimelineWidget() {
           No data available
         </div>
       )}
-    </Card>
+    </UICard>
   );
 }

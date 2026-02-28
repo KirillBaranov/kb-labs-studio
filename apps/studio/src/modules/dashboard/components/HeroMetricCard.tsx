@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card } from 'antd';
+import { UICard } from '@kb-labs/studio-ui-kit';
 import './HeroMetricCard.css';
 
 export type MetricStatus = 'healthy' | 'warning' | 'critical' | 'live' | 'default';
@@ -52,7 +52,7 @@ export function HeroMetricCard({
   const bgColor = statusBgColors[status];
 
   return (
-    <Card
+    <UICard
       className={`hero-metric-card ${onClick ? 'clickable' : ''} ${pulsing ? 'pulsing' : ''}`}
       style={{
         backgroundColor: bgColor,
@@ -98,7 +98,7 @@ export function HeroMetricCard({
           )}
         </div>
       </div>
-    </Card>
+    </UICard>
   );
 }
 

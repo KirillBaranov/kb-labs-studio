@@ -1,16 +1,13 @@
-import { Card, Tag, Space, Typography, Tooltip } from 'antd';
 import {
-  CodeOutlined,
-  ApiOutlined,
-  NodeIndexOutlined,
-  ClockCircleOutlined,
-  WarningOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-} from '@ant-design/icons';
+  UICard,
+  UITag,
+  UISpace,
+  UITypographyText,
+  UITypographyParagraph,
+  UITooltip,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import type { PluginManifestEntry } from '@kb-labs/studio-data-client';
-
-const { Text, Paragraph } = Typography;
 
 interface PluginCardProps {
   plugin: PluginManifestEntry;
@@ -31,38 +28,32 @@ export function PluginCard({ plugin, onClick }: PluginCardProps) {
   const hasValidationErrors = plugin.validation && !plugin.validation.valid;
 
   return (
-    <Card
+    <UICard
       hoverable
       onClick={onClick}
       style={{ height: '100%', cursor: 'pointer' }}
       styles={{ body: { display: 'flex', flexDirection: 'column', height: '100%' } }}
     >
-      <Space direction="vertical" size="small" style={{ width: '100%', flex: 1 }}>
+      <UISpace direction="vertical" size="small" style={{ width: '100%', flex: 1 }}>
         {/* Header: Icon + Name */}
-        <Space align="start" style={{ width: '100%' }}>
-          <div
-            style={{
-              fontSize: 32,
-              lineHeight: 1,
-              flexShrink: 0,
-            }}
-          >
-            {display?.icon || '📦'}
-          </div>
+        <UISpace align="center" style={{ width: '100%' }}>
+          <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0, opacity: display?.icon ? 1 : 0.4 }}>
+            {display?.icon || <UIIcon name="AppstoreOutlined" />}
+          </span>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <Text strong style={{ fontSize: 16 }}>
+            <UITypographyText strong style={{ fontSize: 14 }}>
               {display?.name || manifest.id}
-            </Text>
+            </UITypographyText>
             <br />
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               v{manifest.version}
-            </Text>
+            </UITypographyText>
           </div>
-        </Space>
+        </UISpace>
 
         {/* Description */}
         {display?.description && (
-          <Paragraph
+          <UITypographyParagraph
             type="secondary"
             style={{
               fontSize: 13,
@@ -72,80 +63,74 @@ export function PluginCard({ plugin, onClick }: PluginCardProps) {
             ellipsis={{ rows: 2, tooltip: display.description }}
           >
             {display.description}
-          </Paragraph>
+          </UITypographyParagraph>
         )}
 
         {/* Tags */}
         {display?.tags && display.tags.length > 0 && (
           <div style={{ marginBottom: 8 }}>
             {display.tags.slice(0, 3).map((tag) => (
-              <Tag key={tag} style={{ fontSize: 11, marginBottom: 4 }}>
+              <UITag key={tag} style={{ fontSize: 11, marginBottom: 4 }}>
                 {tag}
-              </Tag>
+              </UITag>
             ))}
             {display.tags.length > 3 && (
-              <Tag style={{ fontSize: 11 }}>+{display.tags.length - 3}</Tag>
+              <UITag style={{ fontSize: 11 }}>+{display.tags.length - 3}</UITag>
             )}
           </div>
         )}
 
         {/* Capabilities */}
-        <Space wrap size={4}>
+        <UISpace wrap size={4}>
           {cliCount > 0 && (
-            <Tooltip title={`${cliCount} CLI command${cliCount > 1 ? 's' : ''}`}>
-              <Tag icon={<CodeOutlined />} color="blue">
+            <UITooltip title={`${cliCount} CLI command${cliCount > 1 ? 's' : ''}`}>
+              <UITag icon={<UIIcon name="CodeOutlined" />} color="blue">
                 {cliCount}
-              </Tag>
-            </Tooltip>
+              </UITag>
+            </UITooltip>
           )}
           {restCount > 0 && (
-            <Tooltip title={`${restCount} REST route${restCount > 1 ? 's' : ''}`}>
-              <Tag icon={<ApiOutlined />} color="green">
+            <UITooltip title={`${restCount} REST route${restCount > 1 ? 's' : ''}`}>
+              <UITag icon={<UIIcon name="ApiOutlined" />} color="green">
                 {restCount}
-              </Tag>
-            </Tooltip>
+              </UITag>
+            </UITooltip>
           )}
           {workflowCount > 0 && (
-            <Tooltip title={`${workflowCount} workflow${workflowCount > 1 ? 's' : ''}`}>
-              <Tag icon={<NodeIndexOutlined />} color="purple">
+            <UITooltip title={`${workflowCount} workflow${workflowCount > 1 ? 's' : ''}`}>
+              <UITag icon={<UIIcon name="NodeIndexOutlined" />} color="purple">
                 {workflowCount}
-              </Tag>
-            </Tooltip>
+              </UITag>
+            </UITooltip>
           )}
           {jobCount > 0 && (
-            <Tooltip title={`${jobCount} scheduled job${jobCount > 1 ? 's' : ''}`}>
-              <Tag icon={<ClockCircleOutlined />} color="orange">
+            <UITooltip title={`${jobCount} scheduled job${jobCount > 1 ? 's' : ''}`}>
+              <UITag icon={<UIIcon name="ClockCircleOutlined" />} color="orange">
                 {jobCount}
-              </Tag>
-            </Tooltip>
+              </UITag>
+            </UITooltip>
           )}
-        </Space>
+        </UISpace>
 
         {/* Indicators */}
-        <Space wrap size={4} style={{ marginTop: 'auto' }}>
+        <UISpace wrap size={4} style={{ marginTop: 'auto' }}>
           {hasValidationErrors && (
-            <Tooltip title={`${plugin.validation!.errors.length} validation error${plugin.validation!.errors.length > 1 ? 's' : ''}`}>
-              <Tag icon={<CloseCircleOutlined />} color="red" style={{ fontSize: 11 }}>
-                Invalid
-              </Tag>
-            </Tooltip>
+            <UITooltip title={`${plugin.validation!.errors.length} validation error${plugin.validation!.errors.length > 1 ? 's' : ''}`}>
+              <UITag icon={<UIIcon name="CloseCircleOutlined" />} color="red" style={{ fontSize: 11 }}>Invalid</UITag>
+            </UITooltip>
           )}
           {hasPermissions && (
-            <Tooltip title="Requires permissions">
-              <Tag icon={<WarningOutlined />} color="gold" style={{ fontSize: 11 }}>
-                Permissions
-              </Tag>
-            </Tooltip>
+            <UITooltip title="Requires permissions">
+              <UITag icon={<UIIcon name="WarningOutlined" />} color="gold" style={{ fontSize: 11 }}>Permissions</UITag>
+            </UITooltip>
           )}
           {requiresPlatform && (
-            <Tooltip title={`Requires: ${manifest.platform!.requires!.join(', ')}`}>
-              <Tag icon={<CheckCircleOutlined />} color="cyan" style={{ fontSize: 11 }}>
-                Platform
-              </Tag>
-            </Tooltip>
+            <UITooltip title={`Requires: ${manifest.platform!.requires!.join(', ')}`}>
+              <UITag icon={<UIIcon name="CheckCircleOutlined" />} color="cyan" style={{ fontSize: 11 }}>Platform</UITag>
+            </UITooltip>
           )}
-        </Space>
-      </Space>
-    </Card>
+        </UISpace>
+      </UISpace>
+    </UICard>
   );
 }

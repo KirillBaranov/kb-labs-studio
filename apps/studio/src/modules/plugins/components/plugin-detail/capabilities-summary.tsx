@@ -1,13 +1,4 @@
-import { Space, Alert } from 'antd';
-import {
-  CodeOutlined,
-  ApiOutlined,
-  NodeIndexOutlined,
-  ClockCircleOutlined,
-  LockOutlined,
-  DatabaseOutlined,
-} from '@ant-design/icons';
-import { UICard, UITag } from '@kb-labs/studio-ui-kit';
+import { UISpace, UIAlert, UICard, UITag, UIIcon } from '@kb-labs/studio-ui-kit';
 
 interface CapabilitiesSummaryProps {
   cliCommands: any[];
@@ -30,12 +21,12 @@ export function CapabilitiesSummary({
 }: CapabilitiesSummaryProps) {
   return (
     <UICard title="Capabilities">
-      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-        <Space wrap size="large">
+      <UISpace direction="vertical" size="middle" style={{ width: '100%' }}>
+        <UISpace wrap size="large">
           {cliCommands.length > 0 && (
             <div>
               <UITag
-                icon={<CodeOutlined />}
+                icon={<UIIcon name="CodeOutlined" />}
                 color="blue"
                 style={{ fontSize: 14, padding: '4px 12px' }}
               >
@@ -46,7 +37,7 @@ export function CapabilitiesSummary({
           {restRoutes.length > 0 && (
             <div>
               <UITag
-                icon={<ApiOutlined />}
+                icon={<UIIcon name="ApiOutlined" />}
                 color="green"
                 style={{ fontSize: 14, padding: '4px 12px' }}
               >
@@ -57,7 +48,7 @@ export function CapabilitiesSummary({
           {workflowHandlers.length > 0 && (
             <div>
               <UITag
-                icon={<NodeIndexOutlined />}
+                icon={<UIIcon name="NodeIndexOutlined" />}
                 color="purple"
                 style={{ fontSize: 14, padding: '4px 12px' }}
               >
@@ -68,7 +59,7 @@ export function CapabilitiesSummary({
           {jobs.length > 0 && (
             <div>
               <UITag
-                icon={<ClockCircleOutlined />}
+                icon={<UIIcon name="ClockCircleOutlined" />}
                 color="orange"
                 style={{ fontSize: 14, padding: '4px 12px' }}
               >
@@ -76,11 +67,11 @@ export function CapabilitiesSummary({
               </UITag>
             </div>
           )}
-        </Space>
+        </UISpace>
 
         {permissions && (
-          <Alert
-            icon={<LockOutlined />}
+          <UIAlert
+            icon={<UIIcon name="LockOutlined" />}
             type="warning"
             message="This plugin requires permissions"
             description="See Permissions tab for details"
@@ -88,23 +79,23 @@ export function CapabilitiesSummary({
           />
         )}
         {platformReqs?.requires && platformReqs.requires.length > 0 && (
-          <Alert
-            icon={<DatabaseOutlined />}
+          <UIAlert
+            icon={<UIIcon name="DatabaseOutlined" />}
             type="info"
             message="Platform Requirements"
             description={
-              <Space wrap>
+              <UISpace wrap>
                 {platformReqs.requires.map((req) => (
                   <UITag key={req} color="cyan">
                     {req}
                   </UITag>
                 ))}
-              </Space>
+              </UISpace>
             }
             showIcon
           />
         )}
-      </Space>
+      </UISpace>
     </UICard>
   );
 }

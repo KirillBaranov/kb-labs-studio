@@ -1,4 +1,4 @@
-import { Empty, Button } from 'antd';
+import { UIEmptyState, UIButton, UIFlex } from '@kb-labs/studio-ui-kit';
 import { PlusOutlined } from '@ant-design/icons';
 
 interface DashboardEmptyProps {
@@ -7,22 +7,16 @@ interface DashboardEmptyProps {
 
 export function DashboardEmpty({ onAddWidget }: DashboardEmptyProps) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '400px',
-      }}
-    >
-      <Empty
+    <UIFlex align="center" justify="center" style={{ minHeight: '400px' }}>
+      <UIEmptyState
+        useDefaultImage
         description="No widgets added yet"
-        image={Empty.PRESENTED_IMAGE_SIMPLE}
-      >
-        <Button type="primary" icon={<PlusOutlined />} onClick={onAddWidget}>
-          Add Widget
-        </Button>
-      </Empty>
-    </div>
+        action={
+          <UIButton variant="primary" icon={<PlusOutlined />} onClick={onAddWidget}>
+            Add Widget
+          </UIButton>
+        }
+      />
+    </UIFlex>
   );
 }

@@ -4,12 +4,14 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import { Empty, Spin, Typography } from 'antd';
-import { LoadingOutlined } from '@ant-design/icons';
+import {
+  UIEmptyState,
+  UISpin,
+  UITypographyText,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import type { AgentEvent } from '@kb-labs/agent-contracts';
 import { EventCard } from './event-card';
-
-const { Text } = Typography;
 
 interface EventsStreamProps {
   events: AgentEvent[];
@@ -45,13 +47,13 @@ export function EventsStream({
           minHeight: 200,
         }}
       >
-        <Empty
+        <UIEmptyState
           description={
-            <Text type="secondary">
+            <UITypographyText type="secondary">
               {isConnected
                 ? 'Waiting for events...'
                 : 'Start a task to see agent events'}
-            </Text>
+            </UITypographyText>
           }
         />
       </div>
@@ -82,8 +84,8 @@ export function EventsStream({
             color: 'var(--ant-color-text-secondary)',
           }}
         >
-          <Spin indicator={<LoadingOutlined spin />} size="small" />
-          <Text type="secondary">Processing...</Text>
+          <UISpin indicator={<UIIcon name="LoadingOutlined" spin />} size="small" />
+          <UITypographyText type="secondary">Processing...</UITypographyText>
         </div>
       )}
     </div>

@@ -5,12 +5,12 @@
 
 import * as React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Tabs, Select } from 'antd';
-import { KBPageContainer, KBPageHeader } from '@kb-labs/studio-ui-react';
+import { UITabs, UISelect } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useScopes } from '@kb-labs/studio-data-client';
 import { CommitsTab } from '../components/commits-tab';
 import { FilesTabNew } from '../components/files-tab-new';
+import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
 export function CommitPage() {
   const params = useParams<{ tab?: string }>();
@@ -52,7 +52,7 @@ export function CommitPage() {
         title="Commit"
         description="AI-powered commit generation"
         extra={
-          <Select
+          <UISelect
             style={{ width: 300 }}
             placeholder="Select scope"
             value={selectedScope}
@@ -68,7 +68,7 @@ export function CommitPage() {
         }
       />
 
-      <Tabs
+      <UITabs
         activeKey={activeTab}
         onChange={handleTabChange}
         items={tabItems}

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { HolderOutlined } from '@ant-design/icons';
-import { KBCard } from '@kb-labs/studio-ui-react';
 import { UILineChart } from '@kb-labs/studio-ui-kit';
 import { type MetricsSnapshot } from '../../../api/metrics';
 import { useDataSources } from '../../../providers/data-sources-provider';
-import { Spin } from 'antd';
+import { UISpin } from '@kb-labs/studio-ui-kit';
+import { UICard } from '@kb-labs/studio-ui-kit';
 
 export function DashboardRequestsWidget() {
   const { metrics: metricsSource } = useDataSources();
@@ -61,12 +61,12 @@ export function DashboardRequestsWidget() {
   };
 
   return (
-    <KBCard
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
           <span>Top Routes</span>
-          {loading && <Spin size="small" />}
+          {loading && <UISpin size="small" />}
         </div>
       }
       style={{ height: '100%' }}
@@ -78,6 +78,6 @@ export function DashboardRequestsWidget() {
           No request data available
         </div>
       )}
-    </KBCard>
+    </UICard>
   );
 }

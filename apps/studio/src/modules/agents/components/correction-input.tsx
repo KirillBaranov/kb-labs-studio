@@ -4,10 +4,15 @@
  */
 
 import React, { useState } from 'react';
-import { Input, Button, Space, Select, Typography, message } from 'antd';
-import { SendOutlined, LoadingOutlined } from '@ant-design/icons';
-
-const { Text } = Typography;
+import {
+  UIInput,
+  UIButton,
+  UISpace,
+  UISelect,
+  UITypographyText,
+  UIMessage,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 
 interface CorrectionInputProps {
   onSend: (correction: string, targetAgentId?: string) => void;
@@ -27,7 +32,7 @@ export function CorrectionInput({
 
   const handleSend = () => {
     if (!correction.trim()) {
-      message.warning('Please enter a correction message');
+      UIMessage.warning('Please enter a correction message');
       return;
     }
 
@@ -43,49 +48,44 @@ export function CorrectionInput({
   };
 
   return (
-    <Space direction="vertical" size="small" style={{ width: '100%' }}>
-      <Space style={{ width: '100%' }}>
-        <Text strong style={{ fontSize: 12 }}>Correction:</Text>
+    <UISpace direction="vertical" size="small" style={{ width: '100%' }}>
+      <UISpace style={{ width: '100%' }}>
+        <UITypographyText strong style={{ fontSize: 12 }}>Correction:</UITypographyText>
         {activeAgents.length > 0 && (
-          <Select
+          <UISelect
             value={targetAgent}
-            onChange={setTargetAgent}
+            onChange={(v) => setTargetAgent(v as string | undefined)}
             allowClear
             placeholder="All agents"
             style={{ minWidth: 150 }}
             size="small"
             disabled={disabled || isPending}
-          >
-            {activeAgents.map((agent) => (
-              <Select.Option key={agent.id} value={agent.id}>
-                {agent.id}
-              </Select.Option>
-            ))}
-          </Select>
+            options={activeAgents.map((agent) => ({ value: agent.id, label: agent.id }))}
+          />
         )}
-      </Space>
+      </UISpace>
 
-      <Space.Compact style={{ width: '100%' }}>
-        <Input
+      <UISpace.Compact style={{ width: '100%' }}>
+        <UIInput
           value={correction}
           onChange={(e) => setCorrection(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Send a correction or feedback to the agent..."
           disabled={disabled || isPending}
         />
-        <Button
+        <UIButton
           type="primary"
-          icon={isPending ? <LoadingOutlined /> : <SendOutlined />}
+          icon={isPending ? <UIIcon name="LoadingOutlined" /> : <UIIcon name="SendOutlined" />}
           onClick={handleSend}
           disabled={!correction.trim() || disabled || isPending}
         >
           Send
-        </Button>
-      </Space.Compact>
+        </UIButton>
+      </UISpace.Compact>
 
-      <Text type="secondary" style={{ fontSize: 11 }}>
+      <UITypographyText type="secondary" style={{ fontSize: 11 }}>
         Tip: Corrections are routed by the orchestrator to the most relevant agent
-      </Text>
-    </Space>
+      </UITypographyText>
+    </UISpace>
   );
 }

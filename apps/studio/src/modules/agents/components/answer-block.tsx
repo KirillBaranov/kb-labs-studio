@@ -4,18 +4,15 @@
  */
 
 import React from 'react';
-import { Typography, theme } from 'antd';
-import { CheckCircleFilled } from '@ant-design/icons';
+import { UITypographyText, useUITheme } from '@kb-labs/studio-ui-kit';
 import { MarkdownViewer } from '@/components/markdown';
-
-const { Text } = Typography;
 
 interface AnswerBlockProps {
   content: string;
 }
 
 export function AnswerBlock({ content }: AnswerBlockProps) {
-  const { token } = theme.useToken();
+  const { token } = useUITheme();
 
   return (
     <div style={{ marginTop: 8 }}>

@@ -5,13 +5,13 @@
 
 import * as React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Tabs } from 'antd';
-import { KBPageContainer, KBPageHeader } from '@kb-labs/studio-ui-react';
+import { UITabs } from '@kb-labs/studio-ui-kit';
 import { OverviewTab } from '../components/overview-tab';
 import { DependenciesTab } from '../components/dependencies-tab';
 import { BuildOrderTab } from '../components/build-order-tab';
 import { GraphTab } from '../components/graph-tab';
 import { StaleTab } from '../components/stale-tab';
+import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
 export function QualityPage() {
   const params = useParams<{ tab?: string }>();
@@ -58,7 +58,7 @@ export function QualityPage() {
         description="Monorepo health metrics, dependency analysis, and build order visualization"
       />
 
-      <Tabs
+      <UITabs
         activeKey={activeTab}
         onChange={handleTabChange}
         items={tabItems}

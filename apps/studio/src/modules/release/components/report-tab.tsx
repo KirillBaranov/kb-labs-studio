@@ -3,12 +3,9 @@
  * Report Tab - Latest release report
  */
 
-import { Card, Empty, Spin, Descriptions, Tag, Typography } from 'antd';
-import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { UICard, UIEmptyState, UISpin, UIDescriptions, UIDescriptionsItem, UITag, UITitle, UIIcon } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useReleaseReport } from '@kb-labs/studio-data-client';
-
-const { Title } = Typography;
 
 export function ReportTab() {
   const sources = useDataSources();
@@ -17,14 +14,14 @@ export function ReportTab() {
   const { data: reportData, isLoading } = useReleaseReport(sources.release, true);
 
   if (isLoading) {
-    return <Spin size="large" style={{ display: 'block', margin: '48px auto' }} />;
+    return <UISpin size="large" style={{ display: 'block', margin: '48px auto' }} />;
   }
 
   if (!reportData?.hasReport || !reportData.report) {
     return (
-      <Card>
-        <Empty description="No release report available yet" image={Empty.PRESENTED_IMAGE_SIMPLE} />
-      </Card>
+      <UICard>
+        <UIEmptyState description="No release report available yet" image={UIEmptyState.PRESENTED_IMAGE_SIMPLE} />
+      </UICard>
     );
   }
 
@@ -33,11 +30,11 @@ export function ReportTab() {
   const getStatusIcon = (status: typeof report.status) => {
     switch (status) {
       case 'completed':
-        return <CheckCircleOutlined style={{ color: '#52c41a', fontSize: 48 }} />;
+        return <UIIcon name="CheckCircleOutlined" style={{ color: '#52c41a', fontSize: 48 }} />;
       case 'failed':
-        return <CloseCircleOutlined style={{ color: '#ff4d4f', fontSize: 48 }} />;
+        return <UIIcon name="CloseCircleOutlined" style={{ color: '#ff4d4f', fontSize: 48 }} />;
       default:
-        return <ClockCircleOutlined style={{ color: '#1890ff', fontSize: 48 }} />;
+        return <UIIcon name="ClockCircleOutlined" style={{ color: '#1890ff', fontSize: 48 }} />;
     }
   };
 
@@ -53,31 +50,31 @@ export function ReportTab() {
   };
 
   return (
-    <Card title={<Title level={4} style={{ margin: 0 }}>Latest Release Report</Title>}>
+    <UICard title={<UITitle level={4} style={{ margin: 0 }}>Latest Release Report</UITitle>}>
       <div style={{ textAlign: 'center', marginBottom: 24 }}>
         {getStatusIcon(report.status)}
         <div style={{ marginTop: 16 }}>
-          <Tag color={getStatusColor(report.status)} style={{ fontSize: 16, padding: '4px 16px' }}>
+          <UITag color={getStatusColor(report.status)} style={{ fontSize: 16, padding: '4px 16px' }}>
             {report.status.toUpperCase()}
-          </Tag>
+          </UITag>
         </div>
       </div>
 
-      <Descriptions bordered column={1}>
-        <Descriptions.Item label="Release ID">{report.releaseId}</Descriptions.Item>
-        <Descriptions.Item label="Scope">
-          <Tag color="blue">{report.scope}</Tag>
-        </Descriptions.Item>
-        <Descriptions.Item label="Status">
-          <Tag color={getStatusColor(report.status)}>{report.status}</Tag>
-        </Descriptions.Item>
-        <Descriptions.Item label="Timestamp">
+      <UIDescriptions bordered column={1}>
+        <UIDescriptionsItem label="Release ID">{report.releaseId}</UIDescriptionsItem>
+        <UIDescriptionsItem label="Scope">
+          <UITag color="blue">{report.scope}</UITag>
+        </UIDescriptionsItem>
+        <UIDescriptionsItem label="Status">
+          <UITag color={getStatusColor(report.status)}>{report.status}</UITag>
+        </UIDescriptionsItem>
+        <UIDescriptionsItem label="Timestamp">
           {new Date(report.timestamp).toLocaleString()}
-        </Descriptions.Item>
-        <Descriptions.Item label="Packages Released">{report.packagesReleased}</Descriptions.Item>
-        <Descriptions.Item label="Duration">{report.duration}ms ({(report.duration / 1000).toFixed(2)}s)</Descriptions.Item>
-        <Descriptions.Item label="Summary">{report.summary}</Descriptions.Item>
-      </Descriptions>
-    </Card>
+        </UIDescriptionsItem>
+        <UIDescriptionsItem label="Packages Released">{report.packagesReleased}</UIDescriptionsItem>
+        <UIDescriptionsItem label="Duration">{report.duration}ms ({(report.duration / 1000).toFixed(2)}s)</UIDescriptionsItem>
+        <UIDescriptionsItem label="Summary">{report.summary}</UIDescriptionsItem>
+      </UIDescriptions>
+    </UICard>
   );
 }

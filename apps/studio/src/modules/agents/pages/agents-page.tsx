@@ -6,8 +6,18 @@
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { Input, Button, Space, message, theme, Card, Select, Switch, Typography } from 'antd';
-import { SendOutlined, StopOutlined, LoadingOutlined, RobotOutlined } from '@ant-design/icons';
+import {
+  UIInput, UIInputTextArea,
+  UIButton,
+  UISpace,
+  UIMessage,
+  UICard,
+  UISelect,
+  UISwitch,
+  UITypographyText,
+  UIIcon,
+  useUITheme,
+} from '@kb-labs/studio-ui-kit';
 import { useSearchParams } from 'react-router-dom';
 import {
   useAgentStartRun,
@@ -41,10 +51,10 @@ function compareTurns(a: Turn, b: Turn): number {
 
 export function AgentsPage() {
   const sources = useDataSources();
-  const { token } = theme.useToken();
+  const { token } = useUITheme();
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
-  // Session state — synced with URL search param ?session=
+  // Session state -- synced with URL search param ?session=
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(
     () => searchParams.get('session')
@@ -65,7 +75,7 @@ export function AgentsPage() {
   const [enableEscalation, setEnableEscalation] = useState(true);
   const [agentMode, setAgentMode] = useState<'execute' | 'plan'>('execute');
 
-  // WS URL is session-level — built from sessionId, not runId
+  // WS URL is session-level -- built from sessionId, not runId
   const eventsUrl = currentSessionId
     ? sources.agent.getEventsUrl(currentSessionId)
     : null;
@@ -102,7 +112,7 @@ export function AgentsPage() {
     },
     onError: (error) => {
       console.error('[AgentsPage] WebSocket error:', error);
-      message.error(`Connection error: ${error.message}`);
+      UIMessage.error(`Connection error: ${error.message}`);
     },
   });
 
@@ -153,7 +163,7 @@ export function AgentsPage() {
       setCurrentRunId(response.runId);
     } catch (error) {
       setRunStatus('failed');
-      message.error(`Failed to start: ${error instanceof Error ? error.message : String(error)}`);
+      UIMessage.error(`Failed to start: ${error instanceof Error ? error.message : String(error)}`);
     }
   }, [
     task,
@@ -164,7 +174,7 @@ export function AgentsPage() {
     responseMode,
     setSearchParams,
     startRunMutation,
-  ]); // eslint-disable-line react-hooks/exhaustive-deps
+  ]);
 
   const handleStop = useCallback(async () => {
     if (!currentRunId) {return;}
@@ -172,9 +182,9 @@ export function AgentsPage() {
     try {
       await stopMutation.mutateAsync({ runId: currentRunId, reason: 'Stopped by user' });
       setRunStatus('stopped');
-      message.info('Stopped');
+      UIMessage.info('Stopped');
     } catch (error) {
-      message.error(`Failed to stop: ${error instanceof Error ? error.message : String(error)}`);
+      UIMessage.error(`Failed to stop: ${error instanceof Error ? error.message : String(error)}`);
     }
   }, [currentRunId, stopMutation]);
 
@@ -188,26 +198,26 @@ export function AgentsPage() {
   // Block input when running OR when mutation is in progress (prevents double-submit)
   const isRunning = runStatus === 'running' || startRunMutation.isPending;
 
-  // Whether we're in the middle of switching sessions — show loader, hide stale data
+  // Whether we're in the middle of switching sessions -- show loader, hide stale data
   const isSwitchingSession = currentSessionId !== null && currentSessionId !== loadedSessionId;
 
   // Merge REST history + live WS turns, but ONLY when both belong to the current session.
   // While switching sessions we show nothing (loader) to avoid cross-session flicker.
   const turns = (() => {
-    if (isSwitchingSession) return [];
+    if (isSwitchingSession) {return [];}
 
     const restTurns = sessionTurnsQuery.data?.turns ?? [];
     const wsTurns = ws.turns;
 
     if (wsTurns.length === 0) {
-      // No WS data yet — show REST history only
+      // No WS data yet -- show REST history only
       return [...restTurns].sort(compareTurns);
     }
 
     // Merge: REST as base, WS wins (more up-to-date during active run)
     const merged = new Map<string, Turn>();
-    for (const t of restTurns) merged.set(t.id, t);
-    for (const t of wsTurns) merged.set(t.id, t);
+    for (const t of restTurns) {merged.set(t.id, t);}
+    for (const t of wsTurns) {merged.set(t.id, t);}
 
     return [...merged.values()].sort(compareTurns);
   })();
@@ -245,12 +255,12 @@ export function AgentsPage() {
 
   return (
     <div style={{ padding: 16, height: '100%' }}>
-      <Card
+      <UICard
         title={
-          <Space>
-            <RobotOutlined />
+          <UISpace>
+            <UIIcon name="RobotOutlined" />
             <span>Agent</span>
-          </Space>
+          </UISpace>
         }
         extra={
           <SessionSelector
@@ -303,7 +313,7 @@ export function AgentsPage() {
           }}
         >
           <div className={`agent-input-box agent-input-box--${agentMode}`} style={{ width: '65%', maxWidth: 780 }}>
-            <Input.TextArea
+            <UIInputTextArea
               value={task}
               onChange={(e) => setTask(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -314,8 +324,8 @@ export function AgentsPage() {
               style={{ resize: 'none', padding: '10px 12px 4px' }}
             />
             <div className="agent-input-toolbar">
-              <Space size={6}>
-                <Select<'execute' | 'plan'>
+              <UISpace size={6}>
+                <UISelect<'execute' | 'plan'>
                   value={agentMode}
                   onChange={setAgentMode}
                   disabled={isRunning}
@@ -334,7 +344,7 @@ export function AgentsPage() {
                     },
                   ]}
                 />
-                <Select<AgentResponseMode>
+                <UISelect<AgentResponseMode>
                   value={responseMode}
                   onChange={setResponseMode}
                   disabled={isRunning}
@@ -347,7 +357,7 @@ export function AgentsPage() {
                     { value: 'deep', label: 'Deep' },
                   ]}
                 />
-                <Select<'small' | 'medium' | 'large'>
+                <UISelect<'small' | 'medium' | 'large'>
                   value={tier}
                   onChange={setTier}
                   disabled={isRunning}
@@ -360,45 +370,45 @@ export function AgentsPage() {
                     { value: 'large', label: 'Large' },
                   ]}
                 />
-                <Space size={4} align="center">
-                  <Switch
+                <UISpace size={4} align="center">
+                  <UISwitch
                     checked={enableEscalation}
                     onChange={setEnableEscalation}
                     disabled={isRunning || tier === 'large'}
                     size="small"
                   />
-                  <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                  <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                     Auto escalate
-                  </Typography.Text>
-                </Space>
-              </Space>
+                  </UITypographyText>
+                </UISpace>
+              </UISpace>
               <div>
                 {isRunning ? (
-                  <Button
+                  <UIButton
                     danger
                     size="small"
-                    icon={stopMutation.isPending ? <LoadingOutlined /> : <StopOutlined />}
+                    icon={stopMutation.isPending ? <UIIcon name="LoadingOutlined" /> : <UIIcon name="StopOutlined" />}
                     onClick={handleStop}
                     disabled={stopMutation.isPending}
                   >
                     Stop
-                  </Button>
+                  </UIButton>
                 ) : (
-                  <Button
+                  <UIButton
                     type="primary"
                     size="small"
-                    icon={startRunMutation.isPending ? <LoadingOutlined /> : <SendOutlined />}
+                    icon={startRunMutation.isPending ? <UIIcon name="LoadingOutlined" /> : <UIIcon name="SendOutlined" />}
                     onClick={handleStart}
                     disabled={!task.trim() || startRunMutation.isPending}
                   >
                     Send
-                  </Button>
+                  </UIButton>
                 )}
               </div>
             </div>
           </div>
         </div>
-      </Card>
+      </UICard>
     </div>
   );
 }

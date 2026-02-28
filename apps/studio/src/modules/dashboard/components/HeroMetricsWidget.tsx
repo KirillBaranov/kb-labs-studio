@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col } from 'antd';
+import { UIRow, UICol } from '@kb-labs/studio-ui-kit';
 import { useNavigate } from 'react-router-dom';
 import {
   ThunderboltOutlined,
@@ -121,8 +121,8 @@ export function HeroMetricsWidget() {
   };
 
   return (
-    <Row gutter={[16, 16]}>
-      <Col xs={24} sm={12} lg={6}>
+    <UIRow gutter={[16, 16]}>
+      <UICol xs={24} sm={12} lg={6}>
         <HeroMetricCard
           title="Code Quality"
           value={`${healthScore}/100`}
@@ -131,9 +131,9 @@ export function HeroMetricsWidget() {
           icon={<ThunderboltOutlined />}
           onClick={() => navigate('/quality')}
         />
-      </Col>
+      </UICol>
 
-      <Col xs={24} sm={12} lg={6}>
+      <UICol xs={24} sm={12} lg={6}>
         <HeroMetricCard
           title="Uptime"
           value={`${currentUptime.toFixed(2)}%`}
@@ -142,9 +142,9 @@ export function HeroMetricsWidget() {
           status={getUptimeStatus()}
           icon={<RiseOutlined />}
         />
-      </Col>
+      </UICol>
 
-      <Col xs={24} sm={12} lg={6}>
+      <UICol xs={24} sm={12} lg={6}>
         <HeroMetricCard
           title="Total Requests"
           value={totalRequests.toLocaleString()}
@@ -154,9 +154,9 @@ export function HeroMetricsWidget() {
           status="default"
           icon={<ApiOutlined />}
         />
-      </Col>
+      </UICol>
 
-      <Col xs={24} sm={12} lg={6}>
+      <UICol xs={24} sm={12} lg={6}>
         <HeroMetricCard
           title="Runtime"
           value={formatUptime(runtimeSeconds)}
@@ -165,7 +165,7 @@ export function HeroMetricsWidget() {
           pulsing={true}
           icon={<ClockCircleOutlined />}
         />
-      </Col>
-    </Row>
+      </UICol>
+    </UIRow>
   );
 }

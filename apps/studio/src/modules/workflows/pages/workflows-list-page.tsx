@@ -1,8 +1,8 @@
+import { KBPageContainer, KBPageHeader, KBSection } from '@/components/ui';
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Table, Button, Modal, Form, Input, message } from 'antd'
+import { UITable, UIButton, UIModal, UIForm, UIFormItem, useUIForm, UIInput, UIInputTextArea, UIMessage } from '@kb-labs/studio-ui-kit'
 import type { ColumnsType } from 'antd/es/table'
-import { KBPageContainer, KBPageHeader, KBSection } from '@kb-labs/studio-ui-react'
 import { useDataSources } from '@/providers/data-sources-provider'
 import { useWorkflowRuns, useRunWorkflow } from '@kb-labs/studio-data-client'
 import type { WorkflowRun, WorkflowSpec } from '@kb-labs/studio-data-client'
@@ -15,7 +15,7 @@ export function WorkflowsListPage() {
   const { data, isLoading, refetch } = useWorkflowRuns(sources.workflow, filters)
   const runWorkflowMutation = useRunWorkflow(sources.workflow)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [form] = Form.useForm()
+  const [form] = useUIForm()
 
   const handleRunWorkflow = async () => {
     try {
@@ -25,7 +25,7 @@ export function WorkflowsListPage() {
       try {
         spec = typeof values.spec === 'string' ? JSON.parse(values.spec) : values.spec
       } catch (error) {
-        message.error('Invalid JSON in workflow spec')
+        UIMessage.error('Invalid JSON in workflow spec')
         return
       }
 
@@ -34,13 +34,13 @@ export function WorkflowsListPage() {
         metadata: values.metadata ? (typeof values.metadata === 'string' ? JSON.parse(values.metadata) : values.metadata) : undefined,
       })
 
-      message.success(`Workflow run started: ${run.id}`)
+      UIMessage.success(`Workflow run started: ${run.id}`)
       setIsModalOpen(false)
       form.resetFields()
       void refetch()
       navigate(`/workflows/${run.id}`)
     } catch (error) {
-      message.error(`Failed to run workflow: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      UIMessage.error(`Failed to run workflow: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 
@@ -96,17 +96,17 @@ export function WorkflowsListPage() {
         description="Latest executions handled by the workflow engine"
         extra={
           <>
-            <Button onClick={() => setIsModalOpen(true)} type="primary" style={{ marginRight: 8 }}>
+            <UIButton onClick={() => setIsModalOpen(true)} type="primary" style={{ marginRight: 8 }}>
               Run Workflow
-            </Button>
-            <Button onClick={() => refetch()} disabled={isLoading}>
+            </UIButton>
+            <UIButton onClick={() => refetch()} disabled={isLoading}>
               Refresh
-            </Button>
+            </UIButton>
           </>
         }
       />
       <KBSection>
-        <Table
+        <UITable
           rowKey="id"
           columns={columns}
           dataSource={data?.runs ?? []}
@@ -118,7 +118,7 @@ export function WorkflowsListPage() {
         />
       </KBSection>
 
-      <Modal
+      <UIModal
         title="Run Workflow"
         open={isModalOpen}
         onOk={handleRunWorkflow}
@@ -129,14 +129,14 @@ export function WorkflowsListPage() {
         confirmLoading={runWorkflowMutation.isPending}
         width={800}
       >
-        <Form form={form} layout="vertical">
-          <Form.Item
+        <UIForm form={form} layout="vertical">
+          <UIFormItem
             name="spec"
             label="Workflow Spec (JSON)"
             rules={[{ required: true, message: 'Please provide workflow spec' }]}
             tooltip="Workflow specification in JSON format. Example: { 'name': 'my-workflow', 'version': '1.0.0', 'jobs': {...} }"
           >
-            <Input.TextArea
+            <UIInputTextArea
               rows={12}
               placeholder={`{
   "name": "my-workflow",
@@ -153,22 +153,22 @@ export function WorkflowsListPage() {
   }
 }`}
             />
-          </Form.Item>
-          <Form.Item
+          </UIFormItem>
+          <UIFormItem
             name="metadata"
             label="Metadata (JSON, optional)"
             tooltip="Optional metadata to attach to the workflow run"
           >
-            <Input.TextArea
+            <UIInputTextArea
               rows={4}
               placeholder={`{
   "source": "studio",
   "description": "Manual run from Studio"
 }`}
             />
-          </Form.Item>
-        </Form>
-      </Modal>
+          </UIFormItem>
+        </UIForm>
+      </UIModal>
     </KBPageContainer>
   )
 }

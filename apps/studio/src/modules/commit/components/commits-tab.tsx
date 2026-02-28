@@ -5,36 +5,24 @@
 
 import { useState } from 'react';
 import {
-  Button,
-  Card,
-  Empty,
-  Alert,
-  Spin,
-  Typography,
-  Badge,
-  message,
-  Checkbox,
-  Space,
-  Modal,
-  Dropdown,
-  Input,
-  Popconfirm,
-  Tag,
-  Tooltip,
-} from 'antd';
-import {
-  ThunderboltOutlined,
-  RightOutlined,
-  ExclamationCircleOutlined,
-  DeleteOutlined,
-  ReloadOutlined,
-  EditOutlined,
-  CheckOutlined,
-  CloseOutlined,
-  CloudUploadOutlined,
-  FileOutlined,
-  MoreOutlined,
-} from '@ant-design/icons';
+  UIButton,
+  UICard,
+  UIEmptyState,
+  UIAlert,
+  UISpin,
+  UITypographyText,
+  UIBadge,
+  UIMessage,
+  UICheckbox,
+  UISpace,
+  UIModal, UIModalError, UIModalConfirm,
+  UIDropdown,
+  UIInput,
+  UIPopconfirm,
+  UITag,
+  UITooltip,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import {
   useCommitStatus,
@@ -47,7 +35,7 @@ import {
   useRegenerateCommit,
 } from '@kb-labs/studio-data-client';
 
-const { Text } = Typography;
+const Text = UITypographyText;
 
 interface CommitsTabProps {
   selectedScope: string;
@@ -83,9 +71,9 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
   // Handlers
   const handleGenerateClick = () => {
     if (allowSecrets) {
-      Modal.confirm({
+      UIModalConfirm({
         title: 'Allow Secrets Confirmation',
-        icon: <ExclamationCircleOutlined />,
+        icon: <UIIcon name="ExclamationCircleOutlined" />,
         content: (
           <div>
             <p>You are about to generate commits for files that may contain secrets.</p>
@@ -112,27 +100,27 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
   };
 
   const showSecretsModal = (secrets: any[], msg: string) => {
-    Modal.error({
+    UIModalError({
       title: 'Secrets Detected',
-      icon: <ExclamationCircleOutlined />,
+      icon: <UIIcon name="ExclamationCircleOutlined" />,
       width: 700,
       content: (
         <div>
-          <Alert message={msg} type="error" showIcon style={{ marginBottom: 16 }} />
+          <UIAlert message={msg} type="error" showIcon style={{ marginBottom: 16 }} />
           <Text strong>Detected {secrets.length} potential secret(s):</Text>
           <div style={{ maxHeight: 400, overflow: 'auto', marginTop: 8, marginBottom: 16 }}>
             {secrets.map((secret, idx) => (
-              <Card key={idx} size="small" style={{ marginBottom: 8 }}>
-                <Space direction="vertical" size="small" style={{ width: '100%' }}>
+              <UICard key={idx} size="small" style={{ marginBottom: 8 }}>
+                <UISpace direction="vertical" size="small" style={{ width: '100%' }}>
                   <Text strong>{secret.file}:{secret.line}:{secret.column}</Text>
                   <Text type="secondary">Type: {secret.type}</Text>
                   <Text code style={{ whiteSpace: 'pre-wrap' }}>{secret.context}</Text>
                   <Text type="danger" strong>Matched: {secret.matched}</Text>
-                </Space>
-              </Card>
+                </UISpace>
+              </UICard>
             ))}
           </div>
-          <Alert
+          <UIAlert
             message="What to do?"
             description="1. Remove real secrets and use environment variables. 2. If false positives, check 'Allow secrets' and try again."
             type="info"
@@ -151,11 +139,11 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
       {
         onSuccess: (data) => {
           if (data.result.success) {
-            message.success(`${data.result.appliedCommits.length} commit(s) applied`);
+            UIMessage.success(`${data.result.appliedCommits.length} commit(s) applied`);
             setSelectedCommitIds(new Set());
           }
         },
-        onError: (error: Error) => message.error(`Apply failed: ${error.message}`),
+        onError: (error: Error) => UIMessage.error(`Apply failed: ${error.message}`),
       }
     );
   };
@@ -165,9 +153,9 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
       { scope: selectedScope },
       {
         onSuccess: (data) => {
-          if (data.result.success) message.success('Pushed to remote');
+          if (data.result.success) {UIMessage.success('Pushed to remote');}
         },
-        onError: (error: Error) => message.error(`Push failed: ${error.message}`),
+        onError: (error: Error) => UIMessage.error(`Push failed: ${error.message}`),
       }
     );
   };
@@ -177,11 +165,11 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
       { scope: selectedScope },
       {
         onSuccess: () => {
-          message.success('Plan reset');
+          UIMessage.success('Plan reset');
           setSelectedCommitIds(new Set());
           setExpandedCommits([]);
         },
-        onError: (error: Error) => message.error(`Reset failed: ${error.message}`),
+        onError: (error: Error) => UIMessage.error(`Reset failed: ${error.message}`),
       }
     );
   };
@@ -197,9 +185,9 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
       {
         onSuccess: () => {
           setEditingCommitId(null);
-          message.success('Commit message updated');
+          UIMessage.success('Commit message updated');
         },
-        onError: (error: Error) => message.error(`Update failed: ${error.message}`),
+        onError: (error: Error) => UIMessage.error(`Update failed: ${error.message}`),
       }
     );
   };
@@ -216,11 +204,11 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
       {
         onSuccess: () => {
           setRegeneratingCommitId(null);
-          message.success('Commit regenerated');
+          UIMessage.success('Commit regenerated');
         },
         onError: (error: Error) => {
           setRegeneratingCommitId(null);
-          message.error(`Regenerate failed: ${error.message}`);
+          UIMessage.error(`Regenerate failed: ${error.message}`);
         },
       }
     );
@@ -248,11 +236,11 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
 
   // Guards
   if (!selectedScope) {
-    return <Empty description="Select a scope to continue" style={{ marginTop: 48 }} />;
+    return <UIEmptyState description="Select a scope to continue" style={{ marginTop: 48 }} />;
   }
 
   if (statusLoading) {
-    return <Spin size="large" style={{ display: 'block', margin: '48px auto' }} />;
+    return <UISpin size="large" style={{ display: 'block', margin: '48px auto' }} />;
   }
 
   // Status badge
@@ -270,10 +258,10 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
   return (
     <div>
       {/* Summary Bar */}
-      <Card size="small" style={{ marginBottom: 16 }}>
+      <UICard size="small" style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
-            <Badge {...badge} />
+            <UIBadge {...badge} />
             <Text type="secondary">
               {commits.length} {commits.length === 1 ? 'commit' : 'commits'}
             </Text>
@@ -283,11 +271,11 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
           </div>
 
           {hasPlan && (
-            <Space size={8}>
+            <UISpace size={8}>
               {/* Apply button (with dropdown for selective) */}
               {planStatus === 'ready' && (
                 selectedCount > 0 ? (
-                  <Button
+                  <UIButton
                     type="primary"
                     size="small"
                     onClick={() => handleApply([...selectedCommitIds])}
@@ -295,9 +283,9 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
                     disabled={isAnyMutating}
                   >
                     Apply Selected ({selectedCount})
-                  </Button>
+                  </UIButton>
                 ) : (
-                  <Button
+                  <UIButton
                     type="primary"
                     size="small"
                     onClick={() => handleApply()}
@@ -305,60 +293,60 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
                     disabled={isAnyMutating}
                   >
                     Apply All
-                  </Button>
+                  </UIButton>
                 )
               )}
 
               {/* Push button */}
               {(planStatus === 'applied' || planStatus === 'pushed') && (
-                <Button
+                <UIButton
                   size="small"
-                  icon={<CloudUploadOutlined />}
+                  icon={<UIIcon name="CloudUploadOutlined" />}
                   onClick={handlePush}
                   loading={pushMutation.isPending}
                   disabled={isAnyMutating}
                 >
                   Push
-                </Button>
+                </UIButton>
               )}
 
               {/* Regenerate All */}
-              <Button
+              <UIButton
                 size="small"
-                icon={<ReloadOutlined />}
+                icon={<UIIcon name="ReloadOutlined" />}
                 onClick={handleGenerateClick}
                 loading={generateMutation.isPending}
                 disabled={isAnyMutating}
               >
                 Regenerate All
-              </Button>
+              </UIButton>
 
               {/* Reset Plan */}
-              <Popconfirm
+              <UIPopconfirm
                 title="Reset commit plan?"
                 description="This will delete the current plan. You can generate a new one."
                 onConfirm={handleReset}
                 okText="Reset"
                 okType="danger"
               >
-                <Button
+                <UIButton
                   size="small"
                   danger
-                  icon={<DeleteOutlined />}
+                  icon={<UIIcon name="DeleteOutlined" />}
                   loading={resetMutation.isPending}
                   disabled={isAnyMutating}
                 >
                   Reset
-                </Button>
-              </Popconfirm>
-            </Space>
+                </UIButton>
+              </UIPopconfirm>
+            </UISpace>
           )}
         </div>
-      </Card>
+      </UICard>
 
       {/* Error Banners */}
       {applyMutation.isSuccess && applyMutation.data?.result && !applyMutation.data.result.success && (
-        <Alert
+        <UIAlert
           message="Apply Failed"
           description={applyMutation.data.result.errors.map((e, i) => <div key={i}>{e}</div>)}
           type="error"
@@ -370,17 +358,17 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
 
       {/* Generating indicator */}
       {generateMutation.isPending && (
-        <Card style={{ marginBottom: 16, textAlign: 'center' }}>
-          <Spin style={{ marginRight: 12 }} />
+        <UICard style={{ marginBottom: 16, textAlign: 'center' }}>
+          <UISpin style={{ marginRight: 12 }} />
           <Text type="secondary">Analyzing {filesChanged} files and generating commit plan...</Text>
-        </Card>
+        </UICard>
       )}
 
       {/* Empty State */}
       {!hasPlan || commits.length === 0 ? (
         !generateMutation.isPending && (
-          <Card style={{ textAlign: 'center', padding: '48px 0' }}>
-            <FileOutlined style={{ fontSize: 48, color: '#8c8c8c', display: 'block', marginBottom: 16 }} />
+          <UICard style={{ textAlign: 'center', padding: '48px 0' }}>
+            <UIIcon name="FileOutlined" style={{ fontSize: 48, color: '#8c8c8c', display: 'block', marginBottom: 16 }} />
             <Text type="secondary" style={{ fontSize: 14, display: 'block', marginBottom: 4 }}>
               No commit plan yet
             </Text>
@@ -389,25 +377,25 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
                 {filesChanged} {filesChanged === 1 ? 'file' : 'files'} changed
               </Text>
             )}
-            <Space direction="vertical" align="center">
-              <Checkbox
+            <UISpace direction="vertical" align="center">
+              <UICheckbox
                 checked={allowSecrets}
                 onChange={(e) => setAllowSecrets(e.target.checked)}
                 style={{ marginBottom: 8 }}
               >
                 <Text type="secondary" style={{ fontSize: 13 }}>Allow secrets</Text>
-              </Checkbox>
-              <Button
+              </UICheckbox>
+              <UIButton
                 type="primary"
-                icon={<ThunderboltOutlined />}
+                icon={<UIIcon name="ThunderboltOutlined" />}
                 onClick={handleGenerateClick}
                 loading={generateMutation.isPending}
                 disabled={filesChanged === 0}
               >
                 Generate Plan
-              </Button>
-            </Space>
-          </Card>
+              </UIButton>
+            </UISpace>
+          </UICard>
         )
       ) : (
         /* Commit Cards */
@@ -420,12 +408,12 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
             const isSelected = selectedCommitIds.has(commitId);
 
             return (
-              <Card key={commitId} size="small" style={{ opacity: isRegenerating ? 0.6 : 1 }}>
+              <UICard key={commitId} size="small" style={{ opacity: isRegenerating ? 0.6 : 1 }}>
                 {/* Header Row */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: isExpanded ? 16 : 0 }}>
                   {/* Checkbox for selective apply (only in ready state) */}
                   {planStatus === 'ready' && (
-                    <Checkbox
+                    <UICheckbox
                       checked={isSelected}
                       onChange={() => toggleCommitSelection(commitId)}
                       onClick={(e) => e.stopPropagation()}
@@ -433,7 +421,7 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
                   )}
 
                   {/* Expand toggle */}
-                  <RightOutlined
+                  <UIIcon name="RightOutlined"
                     rotate={isExpanded ? 90 : 0}
                     style={{ fontSize: 11, cursor: 'pointer', color: '#8c8c8c' }}
                     onClick={() => toggleExpandCommit(commitId)}
@@ -452,7 +440,7 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
                   <div style={{ flex: 1, cursor: 'pointer', minWidth: 0 }} onClick={() => toggleExpandCommit(commitId)}>
                     {isEditing ? (
                       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }} onClick={(e) => e.stopPropagation()}>
-                        <Input
+                        <UIInput
                           size="small"
                           value={editMessage}
                           onChange={(e) => setEditMessage(e.target.value)}
@@ -460,17 +448,17 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
                           autoFocus
                           style={{ flex: 1 }}
                         />
-                        <Button
+                        <UIButton
                           size="small"
                           type="text"
-                          icon={<CheckOutlined />}
+                          icon={<UIIcon name="CheckOutlined" />}
                           onClick={() => handleSaveEdit(commitId)}
                           loading={patchMutation.isPending}
                         />
-                        <Button
+                        <UIButton
                           size="small"
                           type="text"
-                          icon={<CloseOutlined />}
+                          icon={<UIIcon name="CloseOutlined" />}
                           onClick={handleCancelEdit}
                         />
                       </div>
@@ -486,53 +474,53 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
 
                   {/* Breaking change badge */}
                   {commit.breaking && (
-                    <Tag color="red" style={{ margin: 0 }}>BREAKING</Tag>
+                    <UITag color="red" style={{ margin: 0 }}>BREAKING</UITag>
                   )}
 
                   {/* File count */}
-                  <Tooltip title={`${commit.files?.length || 0} files`}>
+                  <UITooltip title={`${commit.files?.length || 0} files`}>
                     <Text type="secondary" style={{ fontSize: 12, whiteSpace: 'nowrap' }}>
                       {commit.files?.length || 0} files
                     </Text>
-                  </Tooltip>
+                  </UITooltip>
 
                   {/* Confidence */}
                   {commit.reasoning?.confidence !== undefined && (
-                    <Tooltip title="AI confidence">
+                    <UITooltip title="AI confidence">
                       <Text type="secondary" style={{ fontSize: 12, whiteSpace: 'nowrap' }}>
                         {(commit.reasoning.confidence * 100).toFixed(0)}%
                       </Text>
-                    </Tooltip>
+                    </UITooltip>
                   )}
 
                   {/* Actions menu */}
                   {planStatus === 'ready' && !isEditing && (
-                    <Dropdown
+                    <UIDropdown
                       trigger={['click']}
                       menu={{
                         items: [
                           {
                             key: 'edit',
                             label: 'Edit message',
-                            icon: <EditOutlined />,
+                            icon: <UIIcon name="EditOutlined" />,
                             onClick: () => handleStartEdit(commitId, commit.message),
                           },
                           {
                             key: 'regenerate',
                             label: 'Regenerate commit',
-                            icon: <ReloadOutlined />,
+                            icon: <UIIcon name="ReloadOutlined" />,
                             onClick: () => handleRegenerate(commitId),
                           },
                         ],
                       }}
                     >
-                      <Button
+                      <UIButton
                         type="text"
                         size="small"
-                        icon={<MoreOutlined />}
+                        icon={<UIIcon name="MoreOutlined" />}
                         onClick={(e) => e.stopPropagation()}
                       />
-                    </Dropdown>
+                    </UIDropdown>
                   )}
                 </div>
 
@@ -542,7 +530,7 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
                     {/* Regenerating spinner */}
                     {isRegenerating && (
                       <div style={{ textAlign: 'center', padding: 16 }}>
-                        <Spin size="small" />
+                        <UISpin size="small" />
                         <Text type="secondary" style={{ marginLeft: 8 }}>Regenerating...</Text>
                       </div>
                     )}
@@ -560,19 +548,19 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
                         <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 8 }}>
                           {commit.files.length} {commit.files.length === 1 ? 'file' : 'files'}
                         </Text>
-                        <Card size="small" style={{ background: 'rgba(0,0,0,0.02)' }}>
+                        <UICard size="small" style={{ background: 'rgba(0,0,0,0.02)' }}>
                           {commit.files.map((file: string, i: number) => (
                             <div key={i} style={{ padding: '3px 0', fontFamily: 'monospace', fontSize: 12 }}>
                               {file}
                             </div>
                           ))}
-                        </Card>
+                        </UICard>
                       </div>
                     )}
 
                     {/* AI Reasoning */}
                     {commit.reasoning && (
-                      <Alert
+                      <UIAlert
                         message="AI Reasoning"
                         description={
                           <Text type="secondary">
@@ -588,7 +576,7 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
                     )}
                   </div>
                 )}
-              </Card>
+              </UICard>
             );
           })}
         </div>

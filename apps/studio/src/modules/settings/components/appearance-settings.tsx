@@ -1,10 +1,15 @@
 import * as React from 'react';
-import { Form, Radio, Switch, Space, Card, Typography } from 'antd';
+import {
+  UIRadio,
+  UISwitch,
+  UISpace,
+  UICard,
+  UITypographyText,
+  UITypographyParagraph,
+} from '@kb-labs/studio-ui-kit';
 import { Sun, Moon, Monitor } from 'lucide-react';
-import { useKBTheme } from '@kb-labs/studio-ui-react';
 import { useSettings } from '@/providers/settings-provider';
-
-const { Text, Paragraph } = Typography;
+import { useKBTheme } from '@/components/ui';
 
 const FONT_SIZES = [
   { value: 'small' as const, label: 'Small', description: '13px - Compact view' },
@@ -45,18 +50,18 @@ export function AppearanceSettings() {
   };
 
   return (
-    <Space direction="vertical" size="large" style={{ width: '100%' }}>
+    <UISpace direction="vertical" size="large" style={{ width: '100%' }}>
       {/* Theme Selection */}
       <div>
-        <Text strong style={{ fontSize: 16, display: 'block', marginBottom: 12 }}>
+        <UITypographyText strong style={{ fontSize: 16, display: 'block', marginBottom: 12 }}>
           Theme
-        </Text>
-        <Paragraph type="secondary" style={{ marginBottom: 16 }}>
+        </UITypographyText>
+        <UITypographyParagraph type="secondary" style={{ marginBottom: 16 }}>
           Choose how KB Studio looks to you. Select a single theme, or sync with your system.
-        </Paragraph>
+        </UITypographyParagraph>
 
-        <Space direction="horizontal" size="middle" style={{ width: '100%' }}>
-          <Card
+        <UISpace direction="horizontal" size="middle" style={{ width: '100%' }}>
+          <UICard
             hoverable
             onClick={() => handleThemeChange('light')}
             style={{
@@ -69,9 +74,9 @@ export function AppearanceSettings() {
             <div style={{ textAlign: 'center' }}>
               <Sun size={32} style={{ marginBottom: 8, color: '#F59E0B' }} />
               <div style={{ fontWeight: 600, marginBottom: 4 }}>Light</div>
-              <Text type="secondary" style={{ fontSize: 12 }}>
+              <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                 Bright and clean
-              </Text>
+              </UITypographyText>
             </div>
             <div
               style={{
@@ -82,9 +87,9 @@ export function AppearanceSettings() {
                 borderRadius: 4,
               }}
             />
-          </Card>
+          </UICard>
 
-          <Card
+          <UICard
             hoverable
             onClick={() => handleThemeChange('dark')}
             style={{
@@ -97,9 +102,9 @@ export function AppearanceSettings() {
             <div style={{ textAlign: 'center' }}>
               <Moon size={32} style={{ marginBottom: 8, color: '#6366F1' }} />
               <div style={{ fontWeight: 600, marginBottom: 4 }}>Dark</div>
-              <Text type="secondary" style={{ fontSize: 12 }}>
+              <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                 Easy on the eyes
-              </Text>
+              </UITypographyText>
             </div>
             <div
               style={{
@@ -110,9 +115,9 @@ export function AppearanceSettings() {
                 borderRadius: 4,
               }}
             />
-          </Card>
+          </UICard>
 
-          <Card
+          <UICard
             hoverable
             onClick={() => handleThemeChange('auto')}
             style={{
@@ -125,9 +130,9 @@ export function AppearanceSettings() {
             <div style={{ textAlign: 'center' }}>
               <Monitor size={32} style={{ marginBottom: 8, color: '#8B5CF6' }} />
               <div style={{ fontWeight: 600, marginBottom: 4 }}>Auto</div>
-              <Text type="secondary" style={{ fontSize: 12 }}>
+              <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                 Sync with system
-              </Text>
+              </UITypographyText>
             </div>
             <div
               style={{
@@ -138,22 +143,22 @@ export function AppearanceSettings() {
                 borderRadius: 4,
               }}
             />
-          </Card>
-        </Space>
+          </UICard>
+        </UISpace>
       </div>
 
       {/* Compact Mode */}
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <div>
-            <Text strong style={{ fontSize: 16, display: 'block' }}>
+            <UITypographyText strong style={{ fontSize: 16, display: 'block' }}>
               Compact Mode
-            </Text>
-            <Paragraph type="secondary" style={{ marginBottom: 0, marginTop: 4 }}>
+            </UITypographyText>
+            <UITypographyParagraph type="secondary" style={{ marginBottom: 0, marginTop: 4 }}>
               Reduce spacing and padding for a denser layout
-            </Paragraph>
+            </UITypographyParagraph>
           </div>
-          <Switch
+          <UISwitch
             checked={settings.appearance.compactMode}
             onChange={handleCompactModeChange}
           />
@@ -162,33 +167,33 @@ export function AppearanceSettings() {
 
       {/* Font Size */}
       <div>
-        <Text strong style={{ fontSize: 16, display: 'block', marginBottom: 12 }}>
+        <UITypographyText strong style={{ fontSize: 16, display: 'block', marginBottom: 12 }}>
           Font Size
-        </Text>
-        <Paragraph type="secondary" style={{ marginBottom: 16 }}>
+        </UITypographyText>
+        <UITypographyParagraph type="secondary" style={{ marginBottom: 16 }}>
           Adjust the base font size across the application
-        </Paragraph>
+        </UITypographyParagraph>
 
-        <Radio.Group
+        <UIRadio.Group
           value={settings.appearance.fontSize}
           onChange={handleFontSizeChange}
           style={{ width: '100%' }}
         >
-          <Space direction="vertical" style={{ width: '100%' }}>
+          <UISpace direction="vertical" style={{ width: '100%' }}>
             {FONT_SIZES.map((size) => (
-              <Radio key={size.value} value={size.value} style={{ display: 'flex', alignItems: 'center' }}>
+              <UIRadio key={size.value} value={size.value} style={{ display: 'flex', alignItems: 'center' }}>
                 <div>
-                  <Text strong>{size.label}</Text>
+                  <UITypographyText strong>{size.label}</UITypographyText>
                   <br />
-                  <Text type="secondary" style={{ fontSize: 12 }}>
+                  <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                     {size.description}
-                  </Text>
+                  </UITypographyText>
                 </div>
-              </Radio>
+              </UIRadio>
             ))}
-          </Space>
-        </Radio.Group>
+          </UISpace>
+        </UIRadio.Group>
       </div>
-    </Space>
+    </UISpace>
   );
 }

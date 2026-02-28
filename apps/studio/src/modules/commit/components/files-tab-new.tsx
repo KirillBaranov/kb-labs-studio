@@ -4,22 +4,16 @@
  */
 
 import { useState } from 'react';
-import { Card, Empty, Skeleton, Tag, Collapse, Typography, Button, Alert, message, Badge } from 'antd';
 import {
-  FileOutlined,
-  RobotOutlined,
-  CopyOutlined,
-  RightOutlined,
-  CheckCircleOutlined,
-  EditOutlined,
-  PlusOutlined,
-} from '@ant-design/icons';
+  UICard, UIEmptyState, UISkeleton, UITag, UIAccordion, UITypographyText,
+  UIButton, UIAlert, UIMessage, UIBadge, UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useQuery } from '@tanstack/react-query';
-import { KBDiffViewer } from '@kb-labs/studio-ui-react';
 import { useGitStatus, useSummarizeChanges } from '@kb-labs/studio-data-client';
+import { KBDiffViewer } from '@/components/ui';
 
-const { Text } = Typography;
+const Text = UITypographyText;
 
 interface FilesTabNewProps {
   selectedScope: string;
@@ -51,7 +45,7 @@ function FileDiffViewer({ scope, file }: { scope: string; file: string }) {
   if (isLoading) {
     return (
       <div style={{ padding: 16 }}>
-        <Skeleton active paragraph={{ rows: 8 }} />
+        <UISkeleton active paragraph={{ rows: 8 }} />
       </div>
     );
   }
@@ -88,9 +82,9 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
     try {
       const result = await summarizeMutation.mutateAsync({ scope: selectedScope });
       setOverallSummary(result.summary);
-      message.success('Summary generated');
+      UIMessage.success('Summary generated');
     } catch {
-      message.error('Failed to generate summary');
+      UIMessage.error('Failed to generate summary');
     } finally {
       setIsSummarizingAll(false);
     }
@@ -102,7 +96,7 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
       const result = await summarizeMutation.mutateAsync({ scope: selectedScope, file });
       setFileSummaries(prev => ({ ...prev, [file]: result.summary }));
     } catch {
-      message.error(`Failed to summarize ${file}`);
+      UIMessage.error(`Failed to summarize ${file}`);
     } finally {
       setSummarizingFile(null);
     }
@@ -128,21 +122,21 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
 
   // Guards
   if (!selectedScope) {
-    return <Empty description="Select a scope to continue" style={{ marginTop: 48 }} />;
+    return <UIEmptyState description="Select a scope to continue" style={{ marginTop: 48 }} />;
   }
 
   if (gitStatusLoading) {
-    return <Card><Skeleton active paragraph={{ rows: 5 }} /></Card>;
+    return <UICard><UISkeleton active paragraph={{ rows: 5 }} /></UICard>;
   }
 
   const files: FileEntry[] = (gitStatusData?.rows || []) as FileEntry[];
 
   if (files.length === 0) {
     return (
-      <Card style={{ textAlign: 'center', padding: '48px 0' }}>
-        <FileOutlined style={{ fontSize: 48, color: '#8c8c8c', display: 'block', marginBottom: 16 }} />
+      <UICard style={{ textAlign: 'center', padding: '48px 0' }}>
+        <UIIcon name="FileOutlined" style={{ fontSize: 48, color: '#8c8c8c', display: 'block', marginBottom: 16 }} />
         <Text type="secondary">No files changed</Text>
-      </Card>
+      </UICard>
     );
   }
 
@@ -150,7 +144,7 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
   const grouped: Record<string, FileEntry[]> = {};
   for (const file of files) {
     const status = file.status || 'modified';
-    if (!grouped[status]) grouped[status] = [];
+    if (!grouped[status]) {grouped[status] = [];}
     grouped[status]!.push(file);
   }
 
@@ -160,7 +154,7 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
       label: 'Staged',
       color: '#3fb950',
       tagColor: 'green',
-      icon: <CheckCircleOutlined style={{ color: '#3fb950' }} />,
+      icon: <UIIcon name="CheckCircleOutlined" style={{ color: '#3fb950' }} />,
       files: grouped['staged'] || [],
     },
     {
@@ -168,7 +162,7 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
       label: 'Modified',
       color: '#d29922',
       tagColor: 'orange',
-      icon: <EditOutlined style={{ color: '#d29922' }} />,
+      icon: <UIIcon name="EditOutlined" style={{ color: '#d29922' }} />,
       files: grouped['modified'] || [],
     },
     {
@@ -176,7 +170,7 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
       label: 'Untracked',
       color: '#8b949e',
       tagColor: 'default',
-      icon: <PlusOutlined style={{ color: '#8b949e' }} />,
+      icon: <UIIcon name="PlusOutlined" style={{ color: '#8b949e' }} />,
       files: grouped['untracked'] || [],
     },
   ].filter(g => g.files.length > 0);
@@ -184,39 +178,39 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
   return (
     <div>
       {/* Summary bar */}
-      <Card size="small" style={{ marginBottom: 16 }}>
+      <UICard size="small" style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
             <Text type="secondary">
               {files.length} {files.length === 1 ? 'file' : 'files'} changed
             </Text>
             {groups.map(g => (
-              <Tag key={g.key} color={g.tagColor} style={{ margin: 0 }}>
+              <UITag key={g.key} color={g.tagColor} style={{ margin: 0 }}>
                 {g.label}: {g.files.length}
-              </Tag>
+              </UITag>
             ))}
           </div>
-          <Button
+          <UIButton
             size="small"
-            icon={<RobotOutlined />}
+            icon={<UIIcon name="RobotOutlined" />}
             onClick={handleSummarizeAll}
             loading={isSummarizingAll}
           >
             Summarize All
-          </Button>
+          </UIButton>
         </div>
-      </Card>
+      </UICard>
 
       {/* Overall AI summary */}
       {overallSummary && (
-        <Alert
+        <UIAlert
           message="AI Summary"
           description={overallSummary}
           type="info"
           closable
           onClose={() => setOverallSummary(null)}
           style={{ marginBottom: 16, whiteSpace: 'pre-wrap' }}
-          icon={<RobotOutlined />}
+          icon={<UIIcon name="RobotOutlined" />}
         />
       )}
 
@@ -239,13 +233,13 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
               }}
               onClick={() => toggleGroup(group.key)}
             >
-              <RightOutlined
+              <UIIcon name="RightOutlined"
                 rotate={isCollapsed ? 0 : 90}
                 style={{ fontSize: 10, color: '#8c8c8c' }}
               />
               {group.icon}
               <Text strong>{group.label}</Text>
-              <Badge
+              <UIBadge
                 count={group.files.length}
                 style={{ backgroundColor: group.color }}
                 size="small"
@@ -274,11 +268,11 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
                         }}
                         onClick={() => toggleFile(file.path)}
                       >
-                        <RightOutlined
+                        <UIIcon name="RightOutlined"
                           rotate={isExpanded ? 90 : 0}
                           style={{ fontSize: 10, color: '#8c8c8c' }}
                         />
-                        <FileOutlined style={{ fontSize: 13, color: '#8c8c8c' }} />
+                        <UIIcon name="FileOutlined" style={{ fontSize: 13, color: '#8c8c8c' }} />
                         <Text
                           style={{ flex: 1, fontFamily: 'monospace', fontSize: 13 }}
                           ellipsis
@@ -291,19 +285,19 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
                           style={{ display: 'flex', gap: 4 }}
                           onClick={e => e.stopPropagation()}
                         >
-                          <Button
+                          <UIButton
                             type="text"
                             size="small"
-                            icon={<CopyOutlined />}
+                            icon={<UIIcon name="CopyOutlined" />}
                             onClick={() => {
                               navigator.clipboard.writeText(file.path);
-                              message.success('Copied');
+                              UIMessage.success('Copied');
                             }}
                           />
-                          <Button
+                          <UIButton
                             type="text"
                             size="small"
-                            icon={<RobotOutlined />}
+                            icon={<UIIcon name="RobotOutlined" />}
                             onClick={() => handleSummarizeFile(file.path)}
                             loading={isSummarizing}
                           />
@@ -314,7 +308,7 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
                       {isExpanded && (
                         <div style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                           {fileSummary && (
-                            <Alert
+                            <UIAlert
                               message="AI Summary"
                               description={fileSummary}
                               type="success"
@@ -327,7 +321,7 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
                                 });
                               }}
                               style={{ margin: '8px 12px', whiteSpace: 'pre-wrap' }}
-                              icon={<RobotOutlined />}
+                              icon={<UIIcon name="RobotOutlined" />}
                             />
                           )}
                           <FileDiffViewer scope={selectedScope} file={file.path} />

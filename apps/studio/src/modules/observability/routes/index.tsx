@@ -4,7 +4,6 @@
  */
 
 import type { RouteObject } from 'react-router-dom';
-import type { NavigationItem } from '@kb-labs/studio-ui-react';
 import { StateBrokerPage } from '../pages/state-broker-page';
 import { DevKitPage } from '../pages/devkit-page';
 import { PrometheusMetricsPage } from '../pages/prometheus-metrics-page';
@@ -15,6 +14,7 @@ import { IncidentsPage } from '../pages/incidents-page';
 import { IncidentDetailPage } from '../pages/incident-detail-page';
 import { ErrorBoundary } from '../../../components/error-boundary';
 import { renderIcon } from '../../../routes/helpers';
+import { NavigationItem } from '@/components/ui';
 
 // Route paths
 const PATHS = {

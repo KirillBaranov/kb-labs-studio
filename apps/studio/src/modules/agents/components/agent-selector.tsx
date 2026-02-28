@@ -4,11 +4,14 @@
  */
 
 import React from 'react';
-import { Select, Space, Typography, Tag, Spin } from 'antd';
-import { RobotOutlined } from '@ant-design/icons';
+import {
+  UISelect,
+  UISpace,
+  UITypographyText,
+  UITag,
+  UISpin,
+} from '@kb-labs/studio-ui-kit';
 import type { AgentSpecification } from '@kb-labs/agent-contracts';
-
-const { Text } = Typography;
 
 interface AgentSelectorProps {
   agents: AgentSpecification[];
@@ -28,54 +31,45 @@ export function AgentSelector({
   const selectedAgent = agents.find((a) => a.id === selectedAgentId);
 
   return (
-    <Space direction="vertical" size="small" style={{ width: '100%' }}>
-      <Space style={{ width: '100%' }}>
-        <RobotOutlined />
-        <Text strong>Agent:</Text>
-        <Select
+    <UISpace direction="vertical" size="small" style={{ width: '100%' }}>
+      <UISpace style={{ width: '100%' }}>
+        <UIIcon name="RobotOutlined" />
+        <UITypographyText strong>Agent:</UITypographyText>
+        <UISelect
           value={selectedAgentId}
           onChange={onSelect}
           loading={loading}
           disabled={disabled}
           style={{ minWidth: 200 }}
           placeholder="Select an agent"
-          notFoundContent={loading ? <Spin size="small" /> : 'No agents available'}
-        >
-          {agents.map((agent) => (
-            <Select.Option key={agent.id} value={agent.id}>
-              <Space>
-                {agent.name}
-                {agent.tier && (
-                  <Tag color="blue" style={{ marginLeft: 8 }}>
-                    {agent.tier}
-                  </Tag>
-                )}
-              </Space>
-            </Select.Option>
-          ))}
-        </Select>
-      </Space>
+          notFoundContent={loading ? <UISpin size="small" /> : 'No agents available'}
+          options={agents.map((agent) => ({
+            value: agent.id,
+            label: agent.name,
+          }))}
+        />
+      </UISpace>
 
       {selectedAgent && (
-        <Text type="secondary" style={{ fontSize: 12, paddingLeft: 22 }}>
+        <UITypographyText type="secondary" style={{ fontSize: 12, paddingLeft: 22 }}>
           {selectedAgent.description}
-        </Text>
+        </UITypographyText>
       )}
 
       {selectedAgent && selectedAgent.tools.length > 0 && (
         <div style={{ paddingLeft: 22 }}>
-          <Space size={[4, 4]} wrap>
+          <UISpace size={[4, 4]} wrap>
             {selectedAgent.tools.slice(0, 5).map((tool) => (
-              <Tag key={tool} style={{ fontSize: 11 }}>
+              <UITag key={tool} style={{ fontSize: 11 }}>
                 {tool}
-              </Tag>
+              </UITag>
             ))}
             {selectedAgent.tools.length > 5 && (
-              <Tag style={{ fontSize: 11 }}>+{selectedAgent.tools.length - 5} more</Tag>
+              <UITag style={{ fontSize: 11 }}>+{selectedAgent.tools.length - 5} more</UITag>
             )}
-          </Space>
+          </UISpace>
         </div>
       )}
-    </Space>
+    </UISpace>
   );
 }

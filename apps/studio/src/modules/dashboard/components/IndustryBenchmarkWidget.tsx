@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Card, Table, Tag, Typography, Tooltip, Progress, Space } from 'antd';
+import { UICard, UITable, UITag, UITypographyText, UITitle, UITooltip, UIProgress, UISpace } from '@kb-labs/studio-ui-kit';
 import {
   LineChartOutlined,
   ArrowUpOutlined,
@@ -15,7 +15,7 @@ import {
   useAdaptersLLMUsage,
 } from '@kb-labs/studio-data-client';
 
-const { Text, Title } = Typography;
+
 
 // Industry benchmark data (mock - in production would come from API)
 const INDUSTRY_BENCHMARKS = {
@@ -197,12 +197,12 @@ export function IndustryBenchmarkWidget() {
       dataIndex: 'name',
       key: 'name',
       render: (name: string, record: MetricComparison) => (
-        <Tooltip title={record.description}>
-          <Space>
+        <UITooltip title={record.description}>
+          <UISpace>
             {getStatusIcon(record.status)}
-            <Text strong>{name}</Text>
-          </Space>
-        </Tooltip>
+            <UITypographyText strong>{name}</UITypographyText>
+          </UISpace>
+        </UITooltip>
       ),
     },
     {
@@ -210,9 +210,9 @@ export function IndustryBenchmarkWidget() {
       dataIndex: 'yourValue',
       key: 'yourValue',
       render: (value: number, record: MetricComparison) => (
-        <Text strong style={{ color: getStatusColor(record.status) }}>
+        <UITypographyText strong style={{ color: getStatusColor(record.status) }}>
           {formatValue(value, record.unit)}
-        </Text>
+        </UITypographyText>
       ),
     },
     {
@@ -223,14 +223,14 @@ export function IndustryBenchmarkWidget() {
         const diff = record.yourValue - value;
         const better = record.lowerIsBetter ? diff < 0 : diff > 0;
         return (
-          <Space>
-            <Text type="secondary">{formatValue(value, record.unit)}</Text>
+          <UISpace>
+            <UITypographyText type="secondary">{formatValue(value, record.unit)}</UITypographyText>
             {better ? (
               <ArrowUpOutlined style={{ color: 'var(--success)', fontSize: 12 }} />
             ) : (
               <ArrowDownOutlined style={{ color: 'var(--error)', fontSize: 12 }} />
             )}
-          </Space>
+          </UISpace>
         );
       },
     },
@@ -239,7 +239,7 @@ export function IndustryBenchmarkWidget() {
       dataIndex: 'top10Value',
       key: 'top10Value',
       render: (value: number, record: MetricComparison) => (
-        <Text type="secondary">{formatValue(value, record.unit)}</Text>
+        <UITypographyText type="secondary">{formatValue(value, record.unit)}</UITypographyText>
       ),
     },
     {
@@ -249,14 +249,14 @@ export function IndustryBenchmarkWidget() {
       width: 150,
       render: (percentile: number, record: MetricComparison) => (
         <div>
-          <Progress
+          <UIProgress
             percent={percentile}
             size="small"
             strokeColor={getStatusColor(record.status)}
             format={() => (
-              <Tag color={getStatusColor(record.status)} style={{ marginLeft: 8 }}>
+              <UITag color={getStatusColor(record.status)} style={{ marginLeft: 8 }}>
                 P{Math.round(percentile)}
-              </Tag>
+              </UITag>
             )}
           />
         </div>
@@ -265,7 +265,7 @@ export function IndustryBenchmarkWidget() {
   ];
 
   return (
-    <Card
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <LineChartOutlined />
@@ -273,9 +273,9 @@ export function IndustryBenchmarkWidget() {
         </div>
       }
       extra={
-        <Space>
-          <Text type="secondary">Overall:</Text>
-          <Tag
+        <UISpace>
+          <UITypographyText type="secondary">Overall:</UITypographyText>
+          <UITag
             color={
               overallPercentile >= 90 ? 'green' :
               overallPercentile >= 70 ? 'blue' :
@@ -284,8 +284,8 @@ export function IndustryBenchmarkWidget() {
             style={{ fontSize: 14 }}
           >
             P{Math.round(overallPercentile)}
-          </Tag>
-        </Space>
+          </UITag>
+        </UISpace>
       }
     >
       {/* Summary Cards */}
@@ -302,30 +302,30 @@ export function IndustryBenchmarkWidget() {
           <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--success)' }}>
             {comparisons.filter(c => c.status === 'excellent').length}
           </div>
-          <Text type="secondary" style={{ fontSize: 12 }}>Excellent</Text>
+          <UITypographyText type="secondary" style={{ fontSize: 12 }}>Excellent</UITypographyText>
         </div>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--info)' }}>
             {comparisons.filter(c => c.status === 'good').length}
           </div>
-          <Text type="secondary" style={{ fontSize: 12 }}>Good</Text>
+          <UITypographyText type="secondary" style={{ fontSize: 12 }}>Good</UITypographyText>
         </div>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--warning)' }}>
             {comparisons.filter(c => c.status === 'average').length}
           </div>
-          <Text type="secondary" style={{ fontSize: 12 }}>Average</Text>
+          <UITypographyText type="secondary" style={{ fontSize: 12 }}>Average</UITypographyText>
         </div>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--error)' }}>
             {comparisons.filter(c => c.status === 'poor').length}
           </div>
-          <Text type="secondary" style={{ fontSize: 12 }}>Needs Work</Text>
+          <UITypographyText type="secondary" style={{ fontSize: 12 }}>Needs Work</UITypographyText>
         </div>
       </div>
 
       {/* Comparison Table */}
-      <Table
+      <UITable
         dataSource={comparisons}
         columns={columns}
         pagination={false}
@@ -341,7 +341,7 @@ export function IndustryBenchmarkWidget() {
         borderRadius: 8,
         fontSize: 12,
       }}>
-        <Text strong>How to read:</Text>
+        <UITypographyText strong>How to read:</UITypographyText>
         <div style={{ marginTop: 8, color: 'var(--text-secondary)' }}>
           • <b>Industry Median</b>: Average performance across similar platforms
           <br />
@@ -350,6 +350,6 @@ export function IndustryBenchmarkWidget() {
           • <b>Percentile</b>: Your ranking (P90 = better than 90% of platforms)
         </div>
       </div>
-    </Card>
+    </UICard>
   );
 }

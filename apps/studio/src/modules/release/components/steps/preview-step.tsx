@@ -5,32 +5,24 @@
 
 import * as React from 'react';
 import {
-  Card,
-  Space,
-  Typography,
-  Tag,
-  Spin,
-  Empty,
-  Table,
-  Progress,
-  Button,
-  Alert,
-  message,
-} from 'antd';
-import {
-  FolderOutlined,
-  FileOutlined,
-  CheckCircleOutlined,
-  BuildOutlined,
-  ReloadOutlined,
-  WarningOutlined,
-} from '@ant-design/icons';
+  UICard,
+  UISpace,
+  UITypographyText,
+  UITitle,
+  UITag,
+  UISpin,
+  UIEmptyState,
+  UITable,
+  UIProgress,
+  UIButton,
+  UIAlert,
+  UIMessage,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useReleasePreview, useTriggerBuild } from '@kb-labs/studio-data-client';
 import { useQueryClient } from '@tanstack/react-query';
 import type { PackageFile } from '@kb-labs/release-manager-contracts';
-
-const { Text, Title } = Typography;
 
 /**
  * Format bytes to human readable string
@@ -111,49 +103,49 @@ export function PreviewStep({ selectedScope, onPreviewReady }: PreviewStepProps)
     try {
       const result = await buildMutation.mutateAsync({ scope: selectedScope });
       if (result.success) {
-        message.success(`Build completed: ${result.builtCount}/${result.totalCount} packages`);
+        UIMessage.success(`Build completed: ${result.builtCount}/${result.totalCount} packages`);
         // Refetch preview to get updated file list
         refetch();
       } else {
-        message.error('Build failed');
+        UIMessage.error('Build failed');
       }
     } catch (err) {
-      message.error(`Build failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      UIMessage.error(`Build failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
 
   if (isLoading) {
     return (
-      <Card>
+      <UICard>
         <div style={{ textAlign: 'center', padding: 48 }}>
-          <Spin size="large" />
+          <UISpin size="large" />
           <div style={{ marginTop: 16 }}>
-            <Text type="secondary">Analyzing package contents...</Text>
+            <UITypographyText type="secondary">Analyzing package contents...</UITypographyText>
           </div>
         </div>
-      </Card>
+      </UICard>
     );
   }
 
   if (error) {
     return (
-      <Card>
-        <Empty
+      <UICard>
+        <UIEmptyState
           description={
-            <Text type="danger">
+            <UITypographyText type="danger">
               Failed to load package preview: {error instanceof Error ? error.message : 'Unknown error'}
-            </Text>
+            </UITypographyText>
           }
         />
-      </Card>
+      </UICard>
     );
   }
 
   if (!previewData || previewData.packages.length === 0) {
     return (
-      <Card>
-        <Empty description="No packages found in release plan. Generate a plan first." />
-      </Card>
+      <UICard>
+        <UIEmptyState description="No packages found in release plan. Generate a plan first." />
+      </UICard>
     );
   }
 
@@ -184,10 +176,10 @@ export function PreviewStep({ selectedScope, onPreviewReady }: PreviewStepProps)
       dataIndex: 'path',
       key: 'path',
       render: (path: string) => (
-        <Space size={4}>
-          <FileOutlined style={{ color: getFileTypeColor(path) }} />
-          <Text code style={{ fontSize: 12 }}>{path}</Text>
-        </Space>
+        <UISpace size={4}>
+          <UIIcon name="FileOutlined" style={{ color: getFileTypeColor(path) }} />
+          <UITypographyText code style={{ fontSize: 12 }}>{path}</UITypographyText>
+        </UISpace>
       ),
     },
     {
@@ -197,9 +189,9 @@ export function PreviewStep({ selectedScope, onPreviewReady }: PreviewStepProps)
       width: 100,
       align: 'right' as const,
       render: (size: number) => (
-        <Text type="secondary" style={{ fontSize: 12 }}>
+        <UITypographyText type="secondary" style={{ fontSize: 12 }}>
           {formatBytes(size)}
-        </Text>
+        </UITypographyText>
       ),
     },
   ];
@@ -207,73 +199,73 @@ export function PreviewStep({ selectedScope, onPreviewReady }: PreviewStepProps)
   return (
     <div>
       {/* Summary Card */}
-      <Card style={{ marginBottom: 16 }}>
+      <UICard style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Space size="large">
+          <UISpace size="large">
             <div>
-              <Text type="secondary" style={{ display: 'block', fontSize: 12 }}>
+              <UITypographyText type="secondary" style={{ display: 'block', fontSize: 12 }}>
                 Total Files
-              </Text>
-              <Title level={3} style={{ margin: 0 }}>
+              </UITypographyText>
+              <UITitle level={3} style={{ margin: 0 }}>
                 {totalFiles}
-              </Title>
+              </UITitle>
             </div>
             <div>
-              <Text type="secondary" style={{ display: 'block', fontSize: 12 }}>
+              <UITypographyText type="secondary" style={{ display: 'block', fontSize: 12 }}>
                 Total Size
-              </Text>
-              <Title level={3} style={{ margin: 0 }}>
+              </UITypographyText>
+              <UITitle level={3} style={{ margin: 0 }}>
                 {formatBytes(totalSize)}
-              </Title>
+              </UITitle>
             </div>
             <div>
-              <Text type="secondary" style={{ display: 'block', fontSize: 12 }}>
+              <UITypographyText type="secondary" style={{ display: 'block', fontSize: 12 }}>
                 Packages
-              </Text>
-              <Title level={3} style={{ margin: 0 }}>
+              </UITypographyText>
+              <UITitle level={3} style={{ margin: 0 }}>
                 {previewData.packages.length}
-              </Title>
+              </UITitle>
             </div>
-          </Space>
+          </UISpace>
 
-          <Space>
+          <UISpace>
             {allBuilt ? (
               <>
-                <CheckCircleOutlined style={{ color: '#52c41a', fontSize: 24 }} />
-                <Text strong style={{ color: '#52c41a' }}>Ready to publish</Text>
+                <UIIcon name="CheckCircleOutlined" style={{ color: '#52c41a', fontSize: 24 }} />
+                <UITypographyText strong style={{ color: '#52c41a' }}>Ready to publish</UITypographyText>
               </>
             ) : (
               <>
-                <WarningOutlined style={{ color: '#faad14', fontSize: 24 }} />
-                <Text strong style={{ color: '#faad14' }}>Build required</Text>
+                <UIIcon name="WarningOutlined" style={{ color: '#faad14', fontSize: 24 }} />
+                <UITypographyText strong style={{ color: '#faad14' }}>Build required</UITypographyText>
               </>
             )}
-          </Space>
+          </UISpace>
         </div>
 
         {/* Build action */}
         <div style={{ marginTop: 16 }}>
-          <Space>
-            <Button
+          <UISpace>
+            <UIButton
               type="primary"
-              icon={<BuildOutlined />}
+              icon={<UIIcon name="BuildOutlined" />}
               onClick={handleBuild}
               loading={buildMutation.isPending}
               size="small"
             >
               {buildMutation.isPending ? 'Building...' : needsBuild ? 'Build' : 'Rebuild'}
-            </Button>
-            <Button
-              icon={<ReloadOutlined />}
+            </UIButton>
+            <UIButton
+              icon={<UIIcon name="ReloadOutlined" />}
               onClick={() => refetch()}
               disabled={buildMutation.isPending}
               size="small"
             >
               Refresh
-            </Button>
-          </Space>
+            </UIButton>
+          </UISpace>
           {needsBuild && (
-            <Alert
+            <UIAlert
               type="warning"
               message="Some packages need to be built before publishing"
               style={{ marginTop: 12 }}
@@ -284,52 +276,52 @@ export function PreviewStep({ selectedScope, onPreviewReady }: PreviewStepProps)
 
         {/* File type breakdown */}
         <div style={{ marginTop: 24 }}>
-          <Text type="secondary" style={{ display: 'block', marginBottom: 8, fontSize: 12 }}>
+          <UITypographyText type="secondary" style={{ display: 'block', marginBottom: 8, fontSize: 12 }}>
             File Types
-          </Text>
-          <Space wrap>
+          </UITypographyText>
+          <UISpace wrap>
             {sortedFileTypes.map(([ext, stats]) => (
-              <Tag key={ext} style={{ margin: 0 }}>
+              <UITag key={ext} style={{ margin: 0 }}>
                 <span style={{ color: getFileTypeColor(`.${ext}`) }}>
                   .{ext}
                 </span>
                 {' '}{stats.count} ({formatBytes(stats.size)})
-              </Tag>
+              </UITag>
             ))}
-          </Space>
+          </UISpace>
         </div>
-      </Card>
+      </UICard>
 
       {/* Per-package breakdown */}
       {previewData.packages.map((pkg) => (
-        <Card
+        <UICard
           key={pkg.name}
           title={
-            <Space>
-              <FolderOutlined />
-              <Text strong>{pkg.name}</Text>
-              <Tag color="blue">v{pkg.version}</Tag>
-            </Space>
+            <UISpace>
+              <UIIcon name="FolderOutlined" />
+              <UITypographyText strong>{pkg.name}</UITypographyText>
+              <UITag color="blue">v{pkg.version}</UITag>
+            </UISpace>
           }
           extra={
-            <Space>
+            <UISpace>
               {pkg.buildStatus === 'ready' ? (
-                <Tag color="success">Built</Tag>
+                <UITag color="success">Built</UITag>
               ) : pkg.buildStatus === 'building' ? (
-                <Tag color="processing">Building...</Tag>
+                <UITag color="processing">Building...</UITag>
               ) : (
-                <Tag color="warning">Not built</Tag>
+                <UITag color="warning">Not built</UITag>
               )}
-              <Tag>{pkg.fileCount} files</Tag>
-              <Tag color="green">{formatBytes(pkg.totalSize)}</Tag>
-            </Space>
+              <UITag>{pkg.fileCount} files</UITag>
+              <UITag color="green">{formatBytes(pkg.totalSize)}</UITag>
+            </UISpace>
           }
           style={{ marginBottom: 16 }}
           size="small"
         >
           {/* Size breakdown bar */}
           <div style={{ marginBottom: 16 }}>
-            <Progress
+            <UIProgress
               percent={100}
               success={{ percent: (pkg.files.filter(f => f.path.endsWith('.js') || f.path.endsWith('.mjs')).reduce((s, f) => s + f.size, 0) / pkg.totalSize) * 100 }}
               strokeColor="#3178c6"
@@ -338,19 +330,19 @@ export function PreviewStep({ selectedScope, onPreviewReady }: PreviewStepProps)
               size="small"
             />
             <div style={{ display: 'flex', gap: 16, marginTop: 4, fontSize: 11 }}>
-              <Text type="secondary">
+              <UITypographyText type="secondary">
                 <span style={{ color: '#52c41a' }}>■</span> JS
-              </Text>
-              <Text type="secondary">
+              </UITypographyText>
+              <UITypographyText type="secondary">
                 <span style={{ color: '#3178c6' }}>■</span> Types
-              </Text>
-              <Text type="secondary">
+              </UITypographyText>
+              <UITypographyText type="secondary">
                 <span style={{ color: '#f0f0f0' }}>■</span> Other
-              </Text>
+              </UITypographyText>
             </div>
           </div>
 
-          <Table
+          <UITable
             dataSource={pkg.files}
             columns={columns}
             rowKey="path"
@@ -358,7 +350,7 @@ export function PreviewStep({ selectedScope, onPreviewReady }: PreviewStepProps)
             pagination={pkg.files.length > 10 ? { pageSize: 10, size: 'small' } : false}
             scroll={{ y: 300 }}
           />
-        </Card>
+        </UICard>
       ))}
     </div>
   );

@@ -4,13 +4,18 @@
  */
 
 import React from 'react';
-import { Select, Button, Space, Typography, Spin, Tooltip } from 'antd';
-import { PlusOutlined, HistoryOutlined } from '@ant-design/icons';
+import {
+  UISelect,
+  UIButton,
+  UISpace,
+  UITypographyText,
+  UISpin,
+  UITooltip,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useAgentSessions } from '@kb-labs/studio-data-client';
 import type { AgentSessionInfo } from '@kb-labs/agent-contracts';
-
-const { Text } = Typography;
 
 interface SessionSelectorProps {
   agentId: string;
@@ -57,10 +62,10 @@ export function SessionSelector({
   const sessions = sessionsQuery.data?.sessions ?? [];
 
   return (
-    <Space size="small" style={{ width: '100%' }}>
-      <HistoryOutlined style={{ opacity: 0.5 }} />
+    <UISpace size="small" style={{ width: '100%' }}>
+      <UIIcon name="HistoryOutlined" style={{ opacity: 0.5 }} />
 
-      <Select
+      <UISelect
         style={{ flex: 1, minWidth: 200 }}
         placeholder="New chat"
         value={currentSessionId ?? undefined}
@@ -70,9 +75,9 @@ export function SessionSelector({
         onClear={onNewChat}
         notFoundContent={
           sessionsQuery.isLoading ? (
-            <Spin size="small" />
+            <UISpin size="small" />
           ) : (
-            <Text type="secondary">No sessions yet</Text>
+            <UITypographyText type="secondary">No sessions yet</UITypographyText>
           )
         }
         optionLabelProp="label"
@@ -82,24 +87,24 @@ export function SessionSelector({
           lastActivityAt: session.lastActivityAt,
         }))}
         optionRender={(option) => (
-          <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-            <Text ellipsis style={{ maxWidth: 180 }}>
+          <UISpace style={{ width: '100%', justifyContent: 'space-between' }}>
+            <UITypographyText ellipsis style={{ maxWidth: 180 }}>
               {option.label}
-            </Text>
-            <Text type="secondary" style={{ fontSize: 11 }}>
+            </UITypographyText>
+            <UITypographyText type="secondary" style={{ fontSize: 11 }}>
               {formatRelativeTime(option.data.lastActivityAt)}
-            </Text>
-          </Space>
+            </UITypographyText>
+          </UISpace>
         )}
       />
 
-      <Tooltip title="New Chat">
-        <Button
+      <UITooltip title="New Chat">
+        <UIButton
           type="primary"
-          icon={<PlusOutlined />}
+          icon={<UIIcon name="PlusOutlined" />}
           onClick={onNewChat}
         />
-      </Tooltip>
-    </Space>
+      </UITooltip>
+    </UISpace>
   );
 }

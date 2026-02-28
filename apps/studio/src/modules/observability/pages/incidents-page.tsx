@@ -2,30 +2,21 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Card,
-  Alert,
-  Badge,
-  Tag,
-  Row,
-  Col,
-  Statistic,
-  Table,
-  Select,
-  Button,
-  Space,
-  Tooltip,
-  message,
-} from 'antd';
-import {
-  FireOutlined,
-  WarningOutlined,
-  InfoCircleOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  ReloadOutlined,
-  EyeOutlined,
-} from '@ant-design/icons';
-import { KBPageContainer, KBPageHeader } from '@kb-labs/studio-ui-react';
+  UICard,
+  UIAlert,
+  UIBadge,
+  UITag,
+  UIRow,
+  UICol,
+  UIStatistic,
+  UITable,
+  UISelect,
+  UIButton,
+  UISpace,
+  UITooltip,
+  UIMessage,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import type {
   Incident,
   IncidentQuery,
@@ -36,6 +27,7 @@ import type {
 import { useDataSources } from '../../../providers/data-sources-provider';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
 dayjs.extend(relativeTime);
 
@@ -66,11 +58,11 @@ function formatDuration(from: number, to: number): string {
 function getSeverityConfig(severity: IncidentSeverity): { icon: React.ReactElement; color: string } {
   switch (severity) {
     case 'critical':
-      return { icon: <FireOutlined />, color: '#ff4d4f' };
+      return { icon: <UIIcon name="FireOutlined" />, color: '#ff4d4f' };
     case 'warning':
-      return { icon: <WarningOutlined />, color: '#faad14' };
+      return { icon: <UIIcon name="WarningOutlined" />, color: '#faad14' };
     case 'info':
-      return { icon: <InfoCircleOutlined />, color: '#1890ff' };
+      return { icon: <UIIcon name="InfoCircleOutlined" />, color: '#1890ff' };
   }
 }
 
@@ -151,11 +143,11 @@ export function IncidentsPage() {
       render: (severity: IncidentSeverity) => {
         const config = getSeverityConfig(severity);
         return (
-          <Tooltip title={severity.toUpperCase()}>
-            <Tag color={config.color} icon={config.icon}>
+          <UITooltip title={severity.toUpperCase()}>
+            <UITag color={config.color} icon={config.icon}>
               {severity.toUpperCase()}
-            </Tag>
-          </Tooltip>
+            </UITag>
+          </UITooltip>
         );
       },
     },
@@ -165,7 +157,7 @@ export function IncidentsPage() {
       key: 'type',
       width: 140,
       render: (type: IncidentType) => (
-        <Tag>{getTypeLabel(type)}</Tag>
+        <UITag>{getTypeLabel(type)}</UITag>
       ),
     },
     {
@@ -180,9 +172,9 @@ export function IncidentsPage() {
       key: 'timestamp',
       width: 180,
       render: (timestamp: number) => (
-        <Tooltip title={formatTime(timestamp)}>
+        <UITooltip title={formatTime(timestamp)}>
           <span>{dayjs(timestamp).fromNow()}</span>
-        </Tooltip>
+        </UITooltip>
       ),
     },
     {
@@ -194,19 +186,19 @@ export function IncidentsPage() {
         if (resolvedAt) {
           const duration = formatDuration(record.timestamp, resolvedAt);
           return (
-            <Tooltip title={`Resolved in ${duration}`}>
-              <Tag color="success" icon={<CheckCircleOutlined />}>
+            <UITooltip title={`Resolved in ${duration}`}>
+              <UITag color="success" icon={<UIIcon name="CheckCircleOutlined" />}>
                 RESOLVED
-              </Tag>
-            </Tooltip>
+              </UITag>
+            </UITooltip>
           );
         }
         return (
-          <Tooltip title="Incident is still active">
-            <Tag color="error" icon={<ClockCircleOutlined />}>
+          <UITooltip title="Incident is still active">
+            <UITag color="error" icon={<UIIcon name="ClockCircleOutlined" />}>
               ACTIVE
-            </Tag>
-          </Tooltip>
+            </UITag>
+          </UITooltip>
         );
       },
     },
@@ -218,9 +210,9 @@ export function IncidentsPage() {
       align: 'center' as const,
       render: (aiAnalysis: any) => {
         if (aiAnalysis) {
-          return <Badge status="success" text="Yes" />;
+          return <UIBadge status="success" text="Yes" />;
         }
-        return <Badge status="default" text="No" />;
+        return <UIBadge status="default" text="No" />;
       },
     },
     {
@@ -229,13 +221,13 @@ export function IncidentsPage() {
       width: 100,
       align: 'center' as const,
       render: (_: any, record: Incident) => (
-        <Button
+        <UIButton
           type="link"
-          icon={<EyeOutlined />}
+          icon={<UIIcon name="EyeOutlined" />}
           onClick={() => handleViewIncident(record.id)}
         >
           View
-        </Button>
+        </UIButton>
       ),
     },
   ];
@@ -246,19 +238,19 @@ export function IncidentsPage() {
         title="Incidents"
         description="System incident history with AI-powered analysis"
         extra={[
-          <Button
+          <UIButton
             key="refresh"
-            icon={<ReloadOutlined />}
+            icon={<UIIcon name="ReloadOutlined" />}
             onClick={() => refetch()}
             loading={isLoading}
           >
             Refresh
-          </Button>,
+          </UIButton>,
         ]}
       />
 
       {error && (
-        <Alert
+        <UIAlert
           message="Failed to load incidents"
           description={(error as Error).message}
           type="error"
@@ -269,61 +261,61 @@ export function IncidentsPage() {
 
       {/* Summary Statistics */}
       {summary && (
-        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          <Col xs={24} sm={6}>
-            <Card>
-              <Statistic
+        <UIRow gutter={[16, 16]} style={{ marginBottom: 24 }}>
+          <UICol xs={24} sm={6}>
+            <UICard>
+              <UIStatistic
                 title="Total Incidents"
                 value={summary.total}
                 valueStyle={{ color: '#1890ff' }}
               />
-            </Card>
-          </Col>
-          <Col xs={24} sm={6}>
-            <Card>
-              <Statistic
+            </UICard>
+          </UICol>
+          <UICol xs={24} sm={6}>
+            <UICard>
+              <UIStatistic
                 title="Unresolved"
                 value={summary.unresolved}
                 valueStyle={{ color: summary.unresolved > 0 ? '#ff4d4f' : '#52c41a' }}
-                suffix={summary.unresolved > 0 ? <FireOutlined /> : <CheckCircleOutlined />}
+                suffix={summary.unresolved > 0 ? <UIIcon name="FireOutlined" /> : <UIIcon name="CheckCircleOutlined" />}
               />
-            </Card>
-          </Col>
-          <Col xs={24} sm={4}>
-            <Card>
-              <Statistic
+            </UICard>
+          </UICol>
+          <UICol xs={24} sm={4}>
+            <UICard>
+              <UIStatistic
                 title="Critical"
                 value={summary.bySeverity.critical}
                 valueStyle={{ color: '#ff4d4f' }}
               />
-            </Card>
-          </Col>
-          <Col xs={24} sm={4}>
-            <Card>
-              <Statistic
+            </UICard>
+          </UICol>
+          <UICol xs={24} sm={4}>
+            <UICard>
+              <UIStatistic
                 title="Warning"
                 value={summary.bySeverity.warning}
                 valueStyle={{ color: '#faad14' }}
               />
-            </Card>
-          </Col>
-          <Col xs={24} sm={4}>
-            <Card>
-              <Statistic
+            </UICard>
+          </UICol>
+          <UICol xs={24} sm={4}>
+            <UICard>
+              <UIStatistic
                 title="Info"
                 value={summary.bySeverity.info}
                 valueStyle={{ color: '#1890ff' }}
               />
-            </Card>
-          </Col>
-        </Row>
+            </UICard>
+          </UICol>
+        </UIRow>
       )}
 
       {/* Filters */}
-      <Card style={{ marginBottom: 24 }}>
-        <Space size="middle" wrap>
+      <UICard style={{ marginBottom: 24 }}>
+        <UISpace size="middle" wrap>
           <span>Filters:</span>
-          <Select
+          <UISelect
             style={{ width: 140 }}
             placeholder="Severity"
             allowClear
@@ -335,7 +327,7 @@ export function IncidentsPage() {
               { label: 'Info', value: 'info' },
             ]}
           />
-          <Select
+          <UISelect
             style={{ width: 160 }}
             placeholder="Type"
             allowClear
@@ -350,7 +342,7 @@ export function IncidentsPage() {
               { label: 'Custom', value: 'custom' },
             ]}
           />
-          <Select
+          <UISelect
             style={{ width: 180 }}
             value={filters.includeResolved ?? false}
             onChange={handleIncludeResolvedChange}
@@ -359,12 +351,12 @@ export function IncidentsPage() {
               { label: 'Include Resolved', value: true },
             ]}
           />
-        </Space>
-      </Card>
+        </UISpace>
+      </UICard>
 
       {/* Incidents Table */}
-      <Card>
-        <Table
+      <UICard>
+        <UITable
           dataSource={incidents}
           columns={columns}
           rowKey="id"
@@ -375,7 +367,7 @@ export function IncidentsPage() {
             showTotal: (total) => `Total ${total} incidents`,
           }}
         />
-      </Card>
+      </UICard>
     </KBPageContainer>
   );
 }

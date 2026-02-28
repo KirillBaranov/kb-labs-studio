@@ -4,10 +4,8 @@
  */
 
 import React from 'react';
-import { Typography, theme } from 'antd';
+import { UITypographyText, useUITheme } from '@kb-labs/studio-ui-kit';
 import type { AgentEvent } from '@kb-labs/agent-contracts';
-
-const { Text } = Typography;
 
 interface StatusIndicatorProps {
   events: AgentEvent[];
@@ -23,7 +21,7 @@ function getCurrentStatus(events: AgentEvent[]): { status: string; message: stri
     .reverse();
 
   const lastStatus = statusEvents[0];
-  if (!lastStatus) return null;
+  if (!lastStatus) {return null;}
 
   const data = lastStatus.data as { status: string; message?: string };
   return {
@@ -35,38 +33,38 @@ function getCurrentStatus(events: AgentEvent[]): { status: string; message: stri
 /**
  * Get icon and color for status
  */
-function getStatusStyle(status: string, token: any): { emoji: string; color: string } {
+function getStatusStyle(status: string, token: any): { label: string; color: string } {
   switch (status) {
     case 'analyzing':
-      return { emoji: '🔍', color: token.colorInfo };
+      return { label: 'Analyzing', color: token.colorInfo };
     case 'planning':
-      return { emoji: '📋', color: token.colorPrimary };
+      return { label: 'Planning', color: token.colorPrimary };
     case 'researching':
-      return { emoji: '🔬', color: token.colorPrimary };
+      return { label: 'Researching', color: token.colorPrimary };
     case 'executing':
-      return { emoji: '⚡', color: token.colorPrimary };
+      return { label: 'Executing', color: token.colorPrimary };
     case 'finalizing':
-      return { emoji: '✍️', color: token.colorSuccess };
+      return { label: 'Finalizing', color: token.colorSuccess };
     case 'thinking':
-      return { emoji: '💭', color: token.colorPrimary };
+      return { label: 'Thinking', color: token.colorPrimary };
     case 'waiting':
-      return { emoji: '⏸️', color: token.colorWarning };
+      return { label: 'Waiting', color: token.colorWarning };
     case 'done':
-      return { emoji: '✅', color: token.colorSuccess };
+      return { label: 'Done', color: token.colorSuccess };
     case 'error':
-      return { emoji: '❌', color: token.colorError };
+      return { label: 'Error', color: token.colorError };
     default:
-      return { emoji: '●', color: token.colorPrimary };
+      return { label: status, color: token.colorPrimary };
   }
 }
 
 export function StatusIndicator({ events }: StatusIndicatorProps) {
-  const { token } = theme.useToken();
+  const { token } = useUITheme();
   const currentStatus = getCurrentStatus(events);
 
-  if (!currentStatus) return null;
+  if (!currentStatus) {return null;}
 
-  const { emoji, color } = getStatusStyle(currentStatus.status, token);
+  const { label, color } = getStatusStyle(currentStatus.status, token);
 
   return (
     <div
@@ -81,14 +79,13 @@ export function StatusIndicator({ events }: StatusIndicatorProps) {
         border: `1px solid ${token.colorBorderSecondary}`,
       }}
     >
-      <Text style={{ fontSize: 14 }}>{emoji}</Text>
-      <Text strong style={{ fontSize: 13, color }}>
-        {currentStatus.status.charAt(0).toUpperCase() + currentStatus.status.slice(1)}
-      </Text>
+      <UITypographyText strong style={{ fontSize: 13, color }}>
+        {label}
+      </UITypographyText>
       {currentStatus.message && (
-        <Text type="secondary" style={{ fontSize: 12 }}>
+        <UITypographyText type="secondary" style={{ fontSize: 12 }}>
           {currentStatus.message}
-        </Text>
+        </UITypographyText>
       )}
     </div>
   );

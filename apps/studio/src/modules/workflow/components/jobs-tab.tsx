@@ -4,14 +4,20 @@
  */
 
 import * as React from 'react';
-import { Table, Tag, Space, Typography, Select, Row, Col } from 'antd';
-import { ClockCircleOutlined } from '@ant-design/icons';
+import {
+  UITable,
+  UITag,
+  UISpace,
+  UITypographyText,
+  UISelect,
+  UIRow,
+  UICol,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useQuery } from '@tanstack/react-query';
 import { useDataSources } from '@/providers/data-sources-provider';
-import { KBCard } from '@kb-labs/studio-ui-react';
 import type { JobStatusInfo, JobListFilter } from '@kb-labs/workflow-contracts';
-
-const { Text } = Typography;
+import { UICard } from '@kb-labs/studio-ui-kit';
 
 const STATUS_COLORS: Record<string, string> = {
   pending: 'default',
@@ -54,7 +60,7 @@ export function JobsTab() {
       dataIndex: 'id',
       key: 'id',
       render: (id: string) => (
-        <Text className="typo-caption" code>{id.slice(0, 12)}...</Text>
+        <UITypographyText className="typo-caption" code>{id.slice(0, 12)}...</UITypographyText>
       ),
     },
     {
@@ -62,7 +68,7 @@ export function JobsTab() {
       dataIndex: 'type',
       key: 'type',
       render: (type: string) => (
-        <Text className="typo-body">{type}</Text>
+        <UITypographyText className="typo-body">{type}</UITypographyText>
       ),
     },
     {
@@ -70,17 +76,17 @@ export function JobsTab() {
       dataIndex: 'status',
       key: 'status',
       render: (status: string, record: JobStatusInfo) => (
-        <Space direction="vertical" className="gap-tight">
-          <Tag color={STATUS_COLORS[status] || 'default'}>
+        <UISpace direction="vertical" className="gap-tight">
+          <UITag color={STATUS_COLORS[status] || 'default'}>
             {status.toUpperCase()}
-          </Tag>
+          </UITag>
           {record.progress !== undefined && status === 'running' && (
-            <Text className="typo-caption text-secondary">
+            <UITypographyText className="typo-caption text-secondary">
               {record.progress}%
               {record.progressMessage && ` - ${record.progressMessage}`}
-            </Text>
+            </UITypographyText>
           )}
-        </Space>
+        </UISpace>
       ),
     },
     {
@@ -88,28 +94,28 @@ export function JobsTab() {
       dataIndex: 'createdAt',
       key: 'createdAt',
       render: (date: Date | string | undefined) => (
-        <Space className="gap-tight">
-          <ClockCircleOutlined className="text-secondary" />
-          <Text className="typo-caption">{formatDate(date)}</Text>
-        </Space>
+        <UISpace className="gap-tight">
+          <UIIcon name="ClockCircleOutlined" className="text-secondary" />
+          <UITypographyText className="typo-caption">{formatDate(date)}</UITypographyText>
+        </UISpace>
       ),
     },
     {
       title: 'Duration',
       key: 'duration',
       render: (_: unknown, record: JobStatusInfo) => (
-        <Text className="typo-caption">
+        <UITypographyText className="typo-caption">
           {formatDuration(record.startedAt, record.finishedAt)}
-        </Text>
+        </UITypographyText>
       ),
     },
     {
       title: 'Attempts',
       key: 'attempts',
       render: (_: unknown, record: JobStatusInfo) => (
-        <Text className="typo-caption">
+        <UITypographyText className="typo-caption">
           {record.attempt || 0} / {record.maxRetries || 3}
-        </Text>
+        </UITypographyText>
       ),
     },
     {
@@ -118,23 +124,23 @@ export function JobsTab() {
       key: 'error',
       render: (error?: string) => (
         error ? (
-          <Text className="typo-caption text-error" ellipsis={{ tooltip: error }}>
+          <UITypographyText className="typo-caption text-error" ellipsis={{ tooltip: error }}>
             {error}
-          </Text>
+          </UITypographyText>
         ) : (
-          <Text className="typo-caption text-tertiary">—</Text>
+          <UITypographyText className="typo-caption text-tertiary">—</UITypographyText>
         )
       ),
     },
   ];
 
   return (
-    <Space direction="vertical" className="gap-section" style={{ width: '100%' }}>
-      <KBCard>
-        <Row gutter={16}>
-          <Col span={8}>
-            <Text className="typo-label">Filter by Status</Text>
-            <Select
+    <UISpace direction="vertical" className="gap-section" style={{ width: '100%' }}>
+      <UICard>
+        <UIRow gutter={16}>
+          <UICol span={8}>
+            <UITypographyText className="typo-label">Filter by Status</UITypographyText>
+            <UISelect
               style={{ width: '100%', marginTop: 8 }}
               placeholder="All statuses"
               allowClear
@@ -148,10 +154,10 @@ export function JobsTab() {
                 { label: 'Cancelled', value: 'cancelled' },
               ]}
             />
-          </Col>
-          <Col span={8}>
-            <Text className="typo-label">Filter by Type</Text>
-            <Select
+          </UICol>
+          <UICol span={8}>
+            <UITypographyText className="typo-label">Filter by Type</UITypographyText>
+            <UISelect
               style={{ width: '100%', marginTop: 8 }}
               placeholder="All types"
               allowClear
@@ -159,10 +165,10 @@ export function JobsTab() {
               value={filters.type}
               onChange={(type) => setFilters({ ...filters, type })}
             />
-          </Col>
-          <Col span={8}>
-            <Text className="typo-label">Limit</Text>
-            <Select
+          </UICol>
+          <UICol span={8}>
+            <UITypographyText className="typo-label">Limit</UITypographyText>
+            <UISelect
               style={{ width: '100%', marginTop: 8 }}
               value={filters.limit || 50}
               onChange={(limit) => setFilters({ ...filters, limit })}
@@ -173,12 +179,12 @@ export function JobsTab() {
                 { label: '200', value: 200 },
               ]}
             />
-          </Col>
-        </Row>
-      </KBCard>
+          </UICol>
+        </UIRow>
+      </UICard>
 
-      <KBCard>
-        <Table
+      <UICard>
+        <UITable
           dataSource={jobsData?.jobs || []}
           columns={columns}
           loading={isLoading}
@@ -186,11 +192,11 @@ export function JobsTab() {
           pagination={{
             pageSize: filters.limit || 50,
             showTotal: (total) => (
-              <Text className="typo-caption">Total {total} jobs</Text>
+              <UITypographyText className="typo-caption">Total {total} jobs</UITypographyText>
             ),
           }}
         />
-      </KBCard>
-    </Space>
+      </UICard>
+    </UISpace>
   );
 }

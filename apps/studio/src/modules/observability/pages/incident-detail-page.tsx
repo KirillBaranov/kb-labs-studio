@@ -2,39 +2,30 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  Card,
-  Alert,
-  Badge,
-  Tag,
-  Button,
-  Space,
-  Descriptions,
-  Timeline,
-  Progress,
-  Modal,
-  Input,
-  message,
-  Spin,
-  Divider,
-  Row,
-  Col,
-  Statistic,
-  Empty,
-  Table,
-  Tooltip,
-} from 'antd';
-import {
-  FireOutlined,
-  WarningOutlined,
-  InfoCircleOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  ArrowLeftOutlined,
-  ThunderboltOutlined,
-  BulbOutlined,
-  LineChartOutlined,
-} from '@ant-design/icons';
-import { KBPageContainer, KBPageHeader } from '@kb-labs/studio-ui-react';
+  UICard,
+  UIAlert,
+  UIBadge,
+  UITag,
+  UIButton,
+  UISpace,
+  UIDescriptions,
+  UIDescriptionsItem,
+  UITimeline,
+  UITimelineItem,
+  UIProgress,
+  UIModal,
+  UIInput, UIInputTextArea,
+  UIMessage,
+  UISpin,
+  UIDivider,
+  UIRow,
+  UICol,
+  UIStatistic,
+  UIEmptyState,
+  UITable,
+  UITooltip,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import type {
   Incident,
   IncidentDetailResponse,
@@ -46,6 +37,7 @@ import type {
 import { useDataSources } from '../../../providers/data-sources-provider';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
 dayjs.extend(relativeTime);
 
@@ -62,11 +54,11 @@ function formatTime(timestamp: number): string {
 function getSeverityConfig(severity: IncidentSeverity): { icon: React.ReactElement; color: string } {
   switch (severity) {
     case 'critical':
-      return { icon: <FireOutlined />, color: '#ff4d4f' };
+      return { icon: <UIIcon name="FireOutlined" />, color: '#ff4d4f' };
     case 'warning':
-      return { icon: <WarningOutlined />, color: '#faad14' };
+      return { icon: <UIIcon name="WarningOutlined" />, color: '#faad14' };
     case 'info':
-      return { icon: <InfoCircleOutlined />, color: '#1890ff' };
+      return { icon: <UIIcon name="InfoCircleOutlined" />, color: '#1890ff' };
   }
 }
 
@@ -144,13 +136,13 @@ export function IncidentDetailPage() {
       return sources.observability.resolveIncident(id, resolutionNotes);
     },
     onSuccess: () => {
-      message.success('Incident resolved successfully');
+      UIMessage.success('Incident resolved successfully');
       setResolveModalVisible(false);
       setResolutionNotes('');
       queryClient.invalidateQueries({ queryKey: ['incidents'] });
     },
     onError: (error: Error) => {
-      message.error(`Failed to resolve incident: ${error.message}`);
+      UIMessage.error(`Failed to resolve incident: ${error.message}`);
     },
   });
 
@@ -170,7 +162,7 @@ export function IncidentDetailPage() {
     return (
       <KBPageContainer>
         <div style={{ textAlign: 'center', padding: '100px 0' }}>
-          <Spin size="large" />
+          <UISpin size="large" />
         </div>
       </KBPageContainer>
     );
@@ -179,7 +171,7 @@ export function IncidentDetailPage() {
   if (incidentError || !incident) {
     return (
       <KBPageContainer>
-        <Alert
+        <UIAlert
           message="Failed to load incident"
           description={(incidentError as Error)?.message ?? 'Incident not found'}
           type="error"
@@ -195,95 +187,95 @@ export function IncidentDetailPage() {
     <KBPageContainer>
       <KBPageHeader
         title={
-          <Space>
-            <Button icon={<ArrowLeftOutlined />} onClick={handleGoBack} />
+          <UISpace>
+            <UIButton icon={<UIIcon name="ArrowLeftOutlined" />} onClick={handleGoBack} />
             {incident.title}
-          </Space>
+          </UISpace>
         }
         description={`Incident ID: ${incident.id}`}
         extra={[
           !incident.resolvedAt && (
-            <Button
+            <UIButton
               key="resolve"
               type="primary"
-              icon={<CheckCircleOutlined />}
+              icon={<UIIcon name="CheckCircleOutlined" />}
               onClick={() => setResolveModalVisible(true)}
             >
               Resolve
-            </Button>
+            </UIButton>
           ),
-          <Button
+          <UIButton
             key="analyze"
-            icon={<ThunderboltOutlined />}
+            icon={<UIIcon name="ThunderboltOutlined" />}
             onClick={handleAnalyze}
             loading={analysisLoading}
             disabled={!!analysis && !analysisData?.data.cached}
           >
             {analysis ? 'Re-analyze' : 'Analyze with AI'}
-          </Button>,
+          </UIButton>,
         ].filter(Boolean)}
       />
 
       {/* Overview */}
-      <Card title="Overview" style={{ marginBottom: 16 }}>
-        <Descriptions column={2} bordered>
-          <Descriptions.Item label="Severity">
-            <Tag color={severityConfig.color} icon={severityConfig.icon}>
+      <UICard title="Overview" style={{ marginBottom: 16 }}>
+        <UIDescriptions column={2} bordered>
+          <UIDescriptionsItem label="Severity">
+            <UITag color={severityConfig.color} icon={severityConfig.icon}>
               {incident.severity.toUpperCase()}
-            </Tag>
-          </Descriptions.Item>
-          <Descriptions.Item label="Type">
-            <Tag>{getTypeLabel(incident.type)}</Tag>
-          </Descriptions.Item>
-          <Descriptions.Item label="Time">
+            </UITag>
+          </UIDescriptionsItem>
+          <UIDescriptionsItem label="Type">
+            <UITag>{getTypeLabel(incident.type)}</UITag>
+          </UIDescriptionsItem>
+          <UIDescriptionsItem label="Time">
             {formatTime(incident.timestamp)}
             <span style={{ marginLeft: 8, color: '#888' }}>
               ({dayjs(incident.timestamp).fromNow()})
             </span>
-          </Descriptions.Item>
-          <Descriptions.Item label="Status">
+          </UIDescriptionsItem>
+          <UIDescriptionsItem label="Status">
             {incident.resolvedAt ? (
-              <Tag color="success" icon={<CheckCircleOutlined />}>
+              <UITag color="success" icon={<UIIcon name="CheckCircleOutlined" />}>
                 RESOLVED
-              </Tag>
+              </UITag>
             ) : (
-              <Tag color="error" icon={<ClockCircleOutlined />}>
+              <UITag color="error" icon={<UIIcon name="ClockCircleOutlined" />}>
                 ACTIVE
-              </Tag>
+              </UITag>
             )}
-          </Descriptions.Item>
+          </UIDescriptionsItem>
           {incident.resolvedAt && (
-            <Descriptions.Item label="Resolved At">
+            <UIDescriptionsItem label="Resolved At">
               {formatTime(incident.resolvedAt)}
               <span style={{ marginLeft: 8, color: '#888' }}>
                 (Duration: {Math.floor((incident.resolvedAt - incident.timestamp) / 60000)}m)
               </span>
-            </Descriptions.Item>
+            </UIDescriptionsItem>
           )}
           {incident.affectedServices && incident.affectedServices.length > 0 && (
-            <Descriptions.Item label="Affected Services" span={2}>
-              <Space wrap>
+            <UIDescriptionsItem label="Affected Services" span={2}>
+              <UISpace wrap>
                 {incident.affectedServices.map((service) => (
-                  <Tag key={service}>{service}</Tag>
+                  <UITag key={service}>{service}</UITag>
                 ))}
-              </Space>
-            </Descriptions.Item>
+              </UISpace>
+            </UIDescriptionsItem>
           )}
-          <Descriptions.Item label="Details" span={2}>
+          <UIDescriptionsItem label="Details" span={2}>
             {incident.details}
-          </Descriptions.Item>
+          </UIDescriptionsItem>
           {incident.resolutionNotes && (
-            <Descriptions.Item label="Resolution Notes" span={2}>
+            <UIDescriptionsItem label="Resolution Notes" span={2}>
               {incident.resolutionNotes}
-            </Descriptions.Item>
+            </UIDescriptionsItem>
           )}
-        </Descriptions>
-      </Card>
+        </UIDescriptions>
+      </UICard>
 
       {/* Related Data - Slow Requests (for latency incidents) */}
       {incident.type === 'latency_spike' && incident.relatedData?.metrics?.topSlowest && incident.relatedData.metrics.topSlowest.length > 0 && (
-        <Card title="Slowest Requests" style={{ marginBottom: 16 }}>
-          <Table
+        <UICard title="Slowest Requests" style={{ marginBottom: 16 }}>
+          <UITable
             dataSource={incident.relatedData.metrics.topSlowest}
             columns={[
               {
@@ -291,7 +283,7 @@ export function IncidentDetailPage() {
                 dataIndex: 'method',
                 key: 'method',
                 width: 80,
-                render: (method: string) => <Tag color="blue">{method}</Tag>,
+                render: (method: string) => <UITag color="blue">{method}</UITag>,
               },
               {
                 title: 'Endpoint',
@@ -318,9 +310,9 @@ export function IncidentDetailPage() {
                 width: 80,
                 render: (code?: number) => (
                   code ? (
-                    <Tag color={code >= 500 ? 'error' : code >= 400 ? 'warning' : 'success'}>
+                    <UITag color={code >= 500 ? 'error' : code >= 400 ? 'warning' : 'success'}>
                       {code}
-                    </Tag>
+                    </UITag>
                   ) : '-'
                 ),
               },
@@ -329,32 +321,32 @@ export function IncidentDetailPage() {
             size="small"
             rowKey={(record, index) => `${record.endpoint}-${index}`}
           />
-        </Card>
+        </UICard>
       )}
 
       {/* Related Data - Metrics Comparison */}
       {incident.relatedData?.metrics && (
-        <Card title={<><LineChartOutlined /> Metrics Comparison</>} style={{ marginBottom: 16 }}>
-          <Row gutter={16}>
+        <UICard title={<><UIIcon name="LineChartOutlined" /> Metrics Comparison</>} style={{ marginBottom: 16 }}>
+          <UIRow gutter={16}>
             {incident.relatedData.metrics.before && (
-              <Col span={12}>
-                <Card type="inner" title="Before Incident">
+              <UICol span={12}>
+                <UICard type="inner" title="Before Incident">
                   {Object.entries(incident.relatedData.metrics.before).map(([key, value]) => (
-                    <Statistic
+                    <UIStatistic
                       key={key}
                       title={key}
                       value={typeof value === 'number' ? value.toFixed(2) : value}
                       style={{ marginBottom: 8 }}
                     />
                   ))}
-                </Card>
-              </Col>
+                </UICard>
+              </UICol>
             )}
             {incident.relatedData.metrics.during && (
-              <Col span={12}>
-                <Card type="inner" title="During Incident">
+              <UICol span={12}>
+                <UICard type="inner" title="During Incident">
                   {Object.entries(incident.relatedData.metrics.during).map(([key, value]) => (
-                    <Statistic
+                    <UIStatistic
                       key={key}
                       title={key}
                       value={typeof value === 'number' ? value.toFixed(2) : value}
@@ -369,38 +361,38 @@ export function IncidentDetailPage() {
                       style={{ marginBottom: 8 }}
                     />
                   ))}
-                </Card>
-              </Col>
+                </UICard>
+              </UICol>
             )}
-          </Row>
-        </Card>
+          </UIRow>
+        </UICard>
       )}
 
       {/* Related Data - Timeline */}
       {incident.relatedData?.timeline && incident.relatedData.timeline.length > 0 && (
-        <Card title="Event Timeline" style={{ marginBottom: 16 }}>
-          <Timeline mode="left">
+        <UICard title="Event Timeline" style={{ marginBottom: 16 }}>
+          <UITimeline mode="left">
             {incident.relatedData.timeline.map((event, idx) => (
-              <Timeline.Item
+              <UITimelineItem
                 key={idx}
                 color={event.source === 'detector' ? 'red' : event.source === 'logs' ? 'orange' : 'blue'}
                 label={formatTime(event.timestamp)}
               >
-                <Badge
+                <UIBadge
                   status={event.source === 'detector' ? 'error' : 'processing'}
                   text={event.source.toUpperCase()}
                 />
                 <div style={{ marginTop: 4 }}>{event.event}</div>
-              </Timeline.Item>
+              </UITimelineItem>
             ))}
-          </Timeline>
-        </Card>
+          </UITimeline>
+        </UICard>
       )}
 
       {/* Related Data - Error Breakdown (top endpoints with errors) */}
       {incident.relatedData?.logs?.topEndpoints && incident.relatedData.logs.topEndpoints.length > 0 && (
-        <Card title="Error Breakdown by Endpoint" style={{ marginBottom: 16 }}>
-          <Table
+        <UICard title="Error Breakdown by Endpoint" style={{ marginBottom: 16 }}>
+          <UITable
             dataSource={incident.relatedData.logs.topEndpoints}
             columns={[
               {
@@ -416,7 +408,7 @@ export function IncidentDetailPage() {
                 width: 120,
                 sorter: (a: any, b: any) => b.count - a.count,
                 render: (count: number) => (
-                  <Badge count={count} style={{ backgroundColor: '#ff4d4f' }} />
+                  <UIBadge count={count} style={{ backgroundColor: '#ff4d4f' }} />
                 ),
               },
               {
@@ -425,9 +417,9 @@ export function IncidentDetailPage() {
                 key: 'sample',
                 ellipsis: true,
                 render: (sample: string) => (
-                  <Tooltip title={sample}>
+                  <UITooltip title={sample}>
                     <span style={{ color: '#666' }}>{sample}</span>
-                  </Tooltip>
+                  </UITooltip>
                 ),
               },
             ]}
@@ -435,15 +427,15 @@ export function IncidentDetailPage() {
             size="small"
             rowKey={(record, index) => `${record.endpoint}-${index}`}
           />
-        </Card>
+        </UICard>
       )}
 
       {/* Related Data - Error Logs */}
       {incident.relatedData?.logs && incident.relatedData.logs.sampleErrors.length > 0 && (
-        <Card title={`Error Logs (${incident.relatedData.logs.errorCount} total)`} style={{ marginBottom: 16 }}>
-          <Space direction="vertical" style={{ width: '100%' }}>
+        <UICard title={`Error Logs (${incident.relatedData.logs.errorCount} total)`} style={{ marginBottom: 16 }}>
+          <UISpace direction="vertical" style={{ width: '100%' }}>
             {incident.relatedData.logs.sampleErrors.map((error, idx) => (
-              <Alert
+              <UIAlert
                 key={idx}
                 message={`Error ${idx + 1}`}
                 description={<pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontSize: 12 }}>{error}</pre>}
@@ -451,61 +443,61 @@ export function IncidentDetailPage() {
                 showIcon
               />
             ))}
-          </Space>
-        </Card>
+          </UISpace>
+        </UICard>
       )}
 
       {/* AI Analysis */}
       {analysisLoading && (
-        <Card title={<><ThunderboltOutlined /> AI Analysis</>} style={{ marginBottom: 16 }}>
+        <UICard title={<><UIIcon name="ThunderboltOutlined" /> AI Analysis</>} style={{ marginBottom: 16 }}>
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <Spin size="large" tip="Analyzing incident with AI..." />
+            <UISpin size="large" tip="Analyzing incident with AI..." />
           </div>
-        </Card>
+        </UICard>
       )}
 
       {analysisError && (
-        <Card title={<><ThunderboltOutlined /> AI Analysis</>} style={{ marginBottom: 16 }}>
-          <Alert
+        <UICard title={<><UIIcon name="ThunderboltOutlined" /> AI Analysis</>} style={{ marginBottom: 16 }}>
+          <UIAlert
             message="Analysis Failed"
             description={(analysisError as Error).message}
             type="error"
             showIcon
           />
-        </Card>
+        </UICard>
       )}
 
       {analysis && !analysisLoading && (
-        <Card
-          title={<><ThunderboltOutlined /> AI Analysis</>}
+        <UICard
+          title={<><UIIcon name="ThunderboltOutlined" /> AI Analysis</>}
           style={{ marginBottom: 16 }}
           extra={
             analysisData?.data.cached && (
-              <Badge status="success" text="Cached" />
+              <UIBadge status="success" text="Cached" />
             )
           }
         >
           {/* Summary */}
-          <Alert
+          <UIAlert
             message="Summary"
             description={analysis.summary}
             type="info"
             showIcon
-            icon={<BulbOutlined />}
+            icon={<UIIcon name="BulbOutlined" />}
             style={{ marginBottom: 16 }}
           />
 
           {/* Root Causes */}
           {analysis.rootCauses && analysis.rootCauses.length > 0 && (
             <>
-              <Divider orientation="left">Root Causes</Divider>
-              <Space direction="vertical" style={{ width: '100%', marginBottom: 16 }}>
+              <UIDivider orientation="left">Root Causes</UIDivider>
+              <UISpace direction="vertical" style={{ width: '100%', marginBottom: 16 }}>
                 {analysis.rootCauses.map((cause: RootCauseItem, idx: number) => (
-                  <Card key={idx} type="inner" size="small">
-                    <Space direction="vertical" style={{ width: '100%' }}>
+                  <UICard key={idx} type="inner" size="small">
+                    <UISpace direction="vertical" style={{ width: '100%' }}>
                       <div>
                         <strong>{cause.factor}</strong>
-                        <Progress
+                        <UIProgress
                           percent={Math.round(cause.confidence * 100)}
                           size="small"
                           style={{ marginTop: 4 }}
@@ -519,17 +511,17 @@ export function IncidentDetailPage() {
                         />
                       </div>
                       <div style={{ color: '#666', fontSize: 13 }}>{cause.evidence}</div>
-                    </Space>
-                  </Card>
+                    </UISpace>
+                  </UICard>
                 ))}
-              </Space>
+              </UISpace>
             </>
           )}
 
           {/* Patterns */}
           {analysis.patterns && analysis.patterns.length > 0 && (
             <>
-              <Divider orientation="left">Detected Patterns</Divider>
+              <UIDivider orientation="left">Detected Patterns</UIDivider>
               <ul style={{ marginBottom: 16 }}>
                 {analysis.patterns.map((pattern: string, idx: number) => (
                   <li key={idx}>{pattern}</li>
@@ -541,10 +533,10 @@ export function IncidentDetailPage() {
           {/* Recommendations */}
           {analysis.recommendations && analysis.recommendations.length > 0 && (
             <>
-              <Divider orientation="left">Recommendations</Divider>
-              <Space direction="vertical" style={{ width: '100%' }}>
+              <UIDivider orientation="left">Recommendations</UIDivider>
+              <UISpace direction="vertical" style={{ width: '100%' }}>
                 {analysis.recommendations.map((rec: string, idx: number) => (
-                  <Alert
+                  <UIAlert
                     key={idx}
                     message={`Recommendation ${idx + 1}`}
                     description={rec}
@@ -552,18 +544,18 @@ export function IncidentDetailPage() {
                     showIcon
                   />
                 ))}
-              </Space>
+              </UISpace>
             </>
           )}
 
           {analysis.rootCauses.length === 0 && analysis.patterns.length === 0 && analysis.recommendations.length === 0 && (
-            <Empty description="No detailed analysis available" />
+            <UIEmptyState description="No detailed analysis available" />
           )}
-        </Card>
+        </UICard>
       )}
 
       {/* Resolve Modal */}
-      <Modal
+      <UIModal
         title="Resolve Incident"
         open={resolveModalVisible}
         onOk={handleResolve}
@@ -572,16 +564,16 @@ export function IncidentDetailPage() {
         okText="Resolve"
         okButtonProps={{ danger: false, type: 'primary' }}
       >
-        <Space direction="vertical" style={{ width: '100%' }}>
+        <UISpace direction="vertical" style={{ width: '100%' }}>
           <p>Are you sure you want to mark this incident as resolved?</p>
-          <Input.TextArea
+          <UIInputTextArea
             rows={4}
             placeholder="Resolution notes (optional)"
             value={resolutionNotes}
             onChange={(e) => setResolutionNotes(e.target.value)}
           />
-        </Space>
-      </Modal>
+        </UISpace>
+      </UIModal>
     </KBPageContainer>
   );
 }

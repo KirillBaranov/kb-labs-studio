@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Card, Row, Col, Statistic, Tag, Alert, Select, Typography, Space, Progress } from 'antd';
+import { UICard, UIRow, UICol, UIStatistic, UITag, UIAlert, UISelect, UITypographyText, UITitle, UISpace, UIProgress } from '@kb-labs/studio-ui-kit';
 import {
   HolderOutlined,
   ExperimentOutlined,
@@ -12,7 +12,7 @@ import { UILineChart } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { usePrometheusMetrics } from '@kb-labs/studio-data-client';
 
-const { Text, Title } = Typography;
+
 
 interface Prediction {
   timestamp: number;
@@ -177,7 +177,7 @@ export function PredictiveAnalyticsWidget() {
   }, [predictions, selectedMetric]);
 
   return (
-    <Card
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
@@ -188,11 +188,11 @@ export function PredictiveAnalyticsWidget() {
       style={{ height: '100%' }}
       bodyStyle={{ padding: '16px', maxHeight: 'calc(100% - 57px)', overflowY: 'auto' }}
     >
-      <Row gutter={[16, 16]}>
+      <UIRow gutter={[16, 16]}>
         {/* Controls */}
-        <Col span={24}>
-          <Space>
-            <Select
+        <UICol span={24}>
+          <UISpace>
+            <UISelect
               value={selectedMetric}
               onChange={setSelectedMetric}
               style={{ width: 150 }}
@@ -202,7 +202,7 @@ export function PredictiveAnalyticsWidget() {
                 { label: 'Latency (ms)', value: 'latency' },
               ]}
             />
-            <Select
+            <UISelect
               value={timeHorizon}
               onChange={setTimeHorizon}
               style={{ width: 120 }}
@@ -213,27 +213,27 @@ export function PredictiveAnalyticsWidget() {
                 { label: '2 hours', value: '2h' },
               ]}
             />
-          </Space>
-        </Col>
+          </UISpace>
+        </UICol>
 
         {/* Prediction Summary */}
-        <Col xs={24} md={8}>
+        <UICol xs={24} md={8}>
           <div style={{ padding: '12px', background: 'var(--accent-subtle)', borderRadius: 8, textAlign: 'center' }}>
-            <Text type="secondary">Prediction Confidence</Text>
-            <Title level={2} style={{ margin: '8px 0', color: overallConfidence > 70 ? 'var(--success)' : 'var(--warning)' }}>
+            <UITypographyText type="secondary">Prediction Confidence</UITypographyText>
+            <UITitle level={2} style={{ margin: '8px 0', color: overallConfidence > 70 ? 'var(--success)' : 'var(--warning)' }}>
               {overallConfidence.toFixed(0)}%
-            </Title>
-            <Progress
+            </UITitle>
+            <UIProgress
               percent={overallConfidence}
               showInfo={false}
               strokeColor={overallConfidence > 70 ? 'var(--success)' : 'var(--warning)'}
             />
           </div>
-        </Col>
+        </UICol>
 
-        <Col xs={24} md={8}>
+        <UICol xs={24} md={8}>
           <div style={{ padding: '12px', background: 'var(--bg-tertiary)', borderRadius: 8, textAlign: 'center' }}>
-            <Text type="secondary">Forecasted Trend</Text>
+            <UITypographyText type="secondary">Forecasted Trend</UITypographyText>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 8, gap: 8 }}>
               {trendAnalysis && (
                 <>
@@ -242,39 +242,39 @@ export function PredictiveAnalyticsWidget() {
                   ) : (
                     <FallOutlined style={{ fontSize: 32, color: trendAnalysis.isPositive ? 'var(--success)' : 'var(--error)' }} />
                   )}
-                  <Title
+                  <UITitle
                     level={2}
                     style={{ margin: 0, color: trendAnalysis.isPositive ? 'var(--success)' : 'var(--error)' }}
                   >
                     {trendAnalysis.percentage.toFixed(1)}%
-                  </Title>
+                  </UITitle>
                 </>
               )}
             </div>
-            <Text type="secondary">{timeHorizon} forecast</Text>
+            <UITypographyText type="secondary">{timeHorizon} forecast</UITypographyText>
           </div>
-        </Col>
+        </UICol>
 
-        <Col xs={24} md={8}>
+        <UICol xs={24} md={8}>
           <div style={{ padding: '12px', background: 'var(--bg-tertiary)', borderRadius: 8, textAlign: 'center' }}>
-            <Text type="secondary">Anomalies Detected</Text>
-            <Title level={2} style={{ margin: '8px 0', color: anomalies.length > 0 ? 'var(--error)' : 'var(--success)' }}>
+            <UITypographyText type="secondary">Anomalies Detected</UITypographyText>
+            <UITitle level={2} style={{ margin: '8px 0', color: anomalies.length > 0 ? 'var(--error)' : 'var(--success)' }}>
               {anomalies.length}
-            </Title>
-            <Text type="secondary">{anomalies.length > 0 ? 'Needs attention' : 'All clear'}</Text>
+            </UITitle>
+            <UITypographyText type="secondary">{anomalies.length > 0 ? 'Needs attention' : 'All clear'}</UITypographyText>
           </div>
-        </Col>
+        </UICol>
 
         {/* Forecast Chart */}
-        <Col span={24}>
-          <Title level={5}>Forecast: {selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</Title>
+        <UICol span={24}>
+          <UITitle level={5}>Forecast: {selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</UITitle>
           <UILineChart {...chartConfig} />
-        </Col>
+        </UICol>
 
         {/* Anomaly List */}
         {anomalies.length > 0 && (
-          <Col span={24}>
-            <Alert
+          <UICol span={24}>
+            <UIAlert
               message="Detected Anomalies"
               description={
                 <div style={{ marginTop: 8 }}>
@@ -292,10 +292,10 @@ export function PredictiveAnalyticsWidget() {
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                          <Tag color={config.color} icon={config.icon}>
+                          <UITag color={config.color} icon={config.icon}>
                             {anomaly.severity.toUpperCase()}
-                          </Tag>
-                          <Text strong>{anomaly.metric}</Text>
+                          </UITag>
+                          <UITypographyText strong>{anomaly.metric}</UITypographyText>
                         </div>
                         <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
                           Expected: {anomaly.expectedValue.toFixed(1)} | Actual: {anomaly.actualValue.toFixed(1)} |
@@ -309,12 +309,12 @@ export function PredictiveAnalyticsWidget() {
               type="warning"
               showIcon
             />
-          </Col>
+          </UICol>
         )}
 
         {/* Recommendations */}
-        <Col span={24}>
-          <Alert
+        <UICol span={24}>
+          <UIAlert
             message="ML Insights"
             description={
               <ul style={{ paddingLeft: 20, marginBottom: 0 }}>
@@ -339,9 +339,9 @@ export function PredictiveAnalyticsWidget() {
             type="info"
             showIcon
           />
-        </Col>
-      </Row>
-    </Card>
+        </UICol>
+      </UIRow>
+    </UICard>
   );
 }
 

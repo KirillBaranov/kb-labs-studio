@@ -4,19 +4,25 @@
  */
 
 import * as React from 'react';
-import { Table, Tag, Space, Typography, Button, Modal, message } from 'antd';
-import { EyeOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import {
+  UITable,
+  UITag,
+  UISpace,
+  UITypographyText,
+  UIButton,
+  UIModal, UIModalConfirm,
+  UIMessage,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDataSources } from '@/providers/data-sources-provider';
-import { KBCard } from '@kb-labs/studio-ui-react';
 import type { WorkflowInfo } from '@kb-labs/workflow-contracts';
-
-const { Text } = Typography;
+import { UICard } from '@kb-labs/studio-ui-kit';
 
 export function WorkflowsTab() {
   const sources = useDataSources();
   const queryClient = useQueryClient();
-  const [messageApi, contextHolder] = message.useMessage();
+  const [messageApi, contextHolder] = UIMessage.useMessage();
 
   const { data: workflowsData, isLoading } = useQuery({
     queryKey: ['workflow', 'workflows'],
@@ -35,7 +41,7 @@ export function WorkflowsTab() {
   });
 
   const handleRunWorkflow = (workflowId: string, workflowName: string) => {
-    Modal.confirm({
+    UIModalConfirm({
       title: 'Run Workflow',
       content: `Are you sure you want to run workflow "${workflowName}" (${workflowId})?`,
       okText: 'Run',
@@ -52,12 +58,12 @@ export function WorkflowsTab() {
       dataIndex: 'name',
       key: 'name',
       render: (name: string, record: WorkflowInfo) => (
-        <Space direction="vertical" className="gap-tight">
-          <Text className="typo-body" strong>{name}</Text>
+        <UISpace direction="vertical" className="gap-tight">
+          <UITypographyText className="typo-body" strong>{name}</UITypographyText>
           {record.description && (
-            <Text className="typo-description text-secondary">{record.description}</Text>
+            <UITypographyText className="typo-description text-secondary">{record.description}</UITypographyText>
           )}
-        </Space>
+        </UISpace>
       ),
     },
     {
@@ -65,7 +71,7 @@ export function WorkflowsTab() {
       dataIndex: 'id',
       key: 'id',
       render: (id: string) => (
-        <Text className="typo-caption text-tertiary" code>{id}</Text>
+        <UITypographyText className="typo-caption text-tertiary" code>{id}</UITypographyText>
       ),
     },
     {
@@ -73,9 +79,9 @@ export function WorkflowsTab() {
       dataIndex: 'source',
       key: 'source',
       render: (source: 'manifest' | 'standalone') => (
-        <Tag color={source === 'manifest' ? 'blue' : 'green'}>
+        <UITag color={source === 'manifest' ? 'blue' : 'green'}>
           {source === 'manifest' ? 'Plugin' : 'Standalone'}
-        </Tag>
+        </UITag>
       ),
     },
     {
@@ -84,9 +90,9 @@ export function WorkflowsTab() {
       key: 'pluginId',
       render: (pluginId?: string) => (
         pluginId ? (
-          <Text className="typo-caption">{pluginId}</Text>
+          <UITypographyText className="typo-caption">{pluginId}</UITypographyText>
         ) : (
-          <Text className="typo-caption text-tertiary">—</Text>
+          <UITypographyText className="typo-caption text-tertiary">—</UITypographyText>
         )
       ),
     },
@@ -95,11 +101,11 @@ export function WorkflowsTab() {
       dataIndex: 'status',
       key: 'status',
       render: (status?: 'active' | 'inactive') => {
-        if (!status) {return <Text className="typo-caption text-tertiary">—</Text>;}
+        if (!status) {return <UITypographyText className="typo-caption text-tertiary">—</UITypographyText>;}
         return (
-          <Tag color={status === 'active' ? 'success' : 'default'}>
+          <UITag color={status === 'active' ? 'success' : 'default'}>
             {status.toUpperCase()}
-          </Tag>
+          </UITag>
         );
       },
     },
@@ -108,45 +114,45 @@ export function WorkflowsTab() {
       dataIndex: 'tags',
       key: 'tags',
       render: (tags?: string[]) => (
-        <Space className="gap-tight">
+        <UISpace className="gap-tight">
           {tags && tags.length > 0 ? (
             tags.map((tag) => (
-              <Tag key={tag} style={{ borderColor: 'var(--border-primary)' }}>
+              <UITag key={tag} style={{ borderColor: 'var(--border-primary)' }}>
                 {tag}
-              </Tag>
+              </UITag>
             ))
           ) : (
-            <Text className="typo-caption text-tertiary">—</Text>
+            <UITypographyText className="typo-caption text-tertiary">—</UITypographyText>
           )}
-        </Space>
+        </UISpace>
       ),
     },
     {
       title: 'Actions',
       key: 'actions',
       render: (_: unknown, record: WorkflowInfo) => (
-        <Space className="gap-tight">
-          <Button
+        <UISpace className="gap-tight">
+          <UIButton
             type="link"
             size="small"
-            icon={<EyeOutlined />}
+            icon={<UIIcon name="EyeOutlined" />}
             onClick={() => {
               // TODO: Navigate to workflow detail page
               console.log('View workflow:', record.id);
             }}
           >
             View
-          </Button>
-          <Button
+          </UIButton>
+          <UIButton
             type="link"
             size="small"
-            icon={<PlayCircleOutlined />}
+            icon={<UIIcon name="PlayCircleOutlined" />}
             loading={runWorkflowMutation.isPending}
             onClick={() => handleRunWorkflow(record.id, record.name)}
           >
             Run
-          </Button>
-        </Space>
+          </UIButton>
+        </UISpace>
       ),
     },
   ];
@@ -154,8 +160,8 @@ export function WorkflowsTab() {
   return (
     <>
       {contextHolder}
-      <KBCard>
-        <Table
+      <UICard>
+        <UITable
           dataSource={workflowsData?.workflows || []}
           columns={columns}
           loading={isLoading}
@@ -163,11 +169,11 @@ export function WorkflowsTab() {
           pagination={{
             pageSize: 20,
             showTotal: (total) => (
-              <Text className="typo-caption">Total {total} workflows</Text>
+              <UITypographyText className="typo-caption">Total {total} workflows</UITypographyText>
             ),
           }}
         />
-      </KBCard>
+      </UICard>
     </>
   );
 }

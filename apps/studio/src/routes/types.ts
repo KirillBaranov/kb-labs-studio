@@ -4,7 +4,7 @@
  */
 
 import type { RouteObject } from 'react-router-dom';
-import type { NavigationItem } from '@kb-labs/studio-ui-react';
+import { NavigationItem } from '@/components/ui';
 
 /**
  * Module routes configuration

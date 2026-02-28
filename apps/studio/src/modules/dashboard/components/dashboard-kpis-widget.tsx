@@ -1,8 +1,7 @@
-import { Row, Col, Badge } from 'antd';
-import { UICard } from '@kb-labs/studio-ui-kit';
+import { UICard, UIBadge, UIRow, UICol } from '@kb-labs/studio-ui-kit';
 import { HolderOutlined } from '@ant-design/icons';
-import { KBStatCard } from '@kb-labs/studio-ui-react';
 import { useRegistry } from '../../../providers/registry-provider';
+import { KBStatCard } from '@/components/ui';
 
 export function DashboardKpisWidget() {
   const { health, registry } = useRegistry();
@@ -19,42 +18,42 @@ export function DashboardKpisWidget() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
           <span>System Status</span>
-          <Badge status={statusType as 'success' | 'error'} />
+          <UIBadge status={statusType as 'success' | 'error'} />
         </div>
       }
       style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
       bodyStyle={{ flex: 1, padding: '16px' }}
     >
-      <Row gutter={[16, 16]} style={{ height: '100%' }}>
-        <Col span={6}>
+      <UIRow gutter={[16, 16]} style={{ height: '100%' }}>
+        <UICol span={6}>
           <KBStatCard
             label="Status"
             value={systemStatus}
             valueColor={health?.ready ? 'var(--success)' : 'var(--error)'}
           />
-        </Col>
-        <Col span={6}>
+        </UICol>
+        <UICol span={6}>
           <KBStatCard
             label="Plugins Mounted"
             value={pluginsMounted.toString()}
             subValue={`of ${totalPlugins}`}
           />
-        </Col>
-        <Col span={6}>
+        </UICol>
+        <UICol span={6}>
           <KBStatCard
             label="Failed"
             value={pluginsFailed.toString()}
             valueColor={pluginsFailed > 0 ? 'var(--error)' : 'var(--success)'}
           />
-        </Col>
-        <Col span={6}>
+        </UICol>
+        <UICol span={6}>
           <KBStatCard
             label="Redis"
             value={health?.redisHealthy ? 'Healthy' : health?.redisEnabled ? 'Unhealthy' : 'Disabled'}
             valueColor={health?.redisHealthy ? 'var(--success)' : health?.redisEnabled ? 'var(--error)' : 'var(--text-tertiary)'}
           />
-        </Col>
-      </Row>
+        </UICol>
+      </UIRow>
     </UICard>
   );
 }

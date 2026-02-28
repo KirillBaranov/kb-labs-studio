@@ -7,30 +7,23 @@
 
 import React, { useState } from 'react';
 import {
-  Modal,
-  Input,
-  Button,
-  Space,
-  Typography,
-  Card,
-  Spin,
-  Alert,
-  Tag,
-  Divider,
-  Row,
-  Col,
-} from 'antd';
-import {
-  QuestionCircleOutlined,
-  ClockCircleOutlined,
-  RobotOutlined,
-  ThunderboltOutlined,
-} from '@ant-design/icons';
+  UIModal,
+  UIInput, UIInputTextArea,
+  UIButton,
+  UISpace,
+  UITypographyText,
+  UITypographyParagraph,
+  UICard,
+  UISpin,
+  UIAlert,
+  UITag,
+  UIDivider,
+  UIRow,
+  UICol,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import type { PluginAskResponse } from '@kb-labs/studio-data-client';
 import { MarkdownViewer } from '../../../components/markdown/markdown-viewer';
-
-const { TextArea } = Input;
-const { Text, Paragraph } = Typography;
 
 interface PluginAIAssistantModalProps {
   open: boolean;
@@ -106,75 +99,75 @@ export function PluginAIAssistantModal({
   };
 
   return (
-    <Modal
+    <UIModal
       title={
-        <Space>
-          <RobotOutlined />
+        <UISpace>
+          <UIIcon name="RobotOutlined" />
           <span>AI Assistant</span>
-        </Space>
+        </UISpace>
       }
       open={open}
       onCancel={onClose}
       width={800}
       footer={[
-        <Button key="cancel" onClick={onClose}>
+        <UIButton key="cancel" onClick={onClose}>
           Close
-        </Button>,
-        <Button
+        </UIButton>,
+        <UIButton
           key="ask"
           type="primary"
-          icon={<ThunderboltOutlined />}
+          icon={<UIIcon name="ThunderboltOutlined" />}
           loading={loading}
           onClick={handleSubmit}
           disabled={!customQuestion.trim()}
         >
           Ask Question
-        </Button>,
+        </UIButton>,
       ]}
     >
-      <Space direction="vertical" style={{ width: '100%' }} size="large">
+      <UISpace direction="vertical" style={{ width: '100%' }} size="large">
         {/* Plugin Preview */}
-        <Card size="small" style={{ backgroundColor: '#fafafa' }}>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Text type="secondary">Plugin:</Text>
+        <UICard size="small" style={{ backgroundColor: '#fafafa' }}>
+          <UIRow gutter={16}>
+            <UICol span={12}>
+              <UITypographyText type="secondary">Plugin:</UITypographyText>
               <div>
-                <Text strong>{pluginName}</Text>
+                <UITypographyText strong>{pluginName}</UITypographyText>
               </div>
-            </Col>
-            <Col span={12}>
-              <Text type="secondary">Plugin ID:</Text>
+            </UICol>
+            <UICol span={12}>
+              <UITypographyText type="secondary">Plugin ID:</UITypographyText>
               <div>
-                <Text code style={{ fontSize: 12 }}>{pluginId}</Text>
+                <UITypographyText code style={{ fontSize: 12 }}>{pluginId}</UITypographyText>
               </div>
-            </Col>
-          </Row>
-        </Card>
+            </UICol>
+          </UIRow>
+        </UICard>
 
         {/* Quick Templates */}
         <div>
-          <Text strong>Quick Questions:</Text>
+          <UITypographyText strong>Quick Questions:</UITypographyText>
           <div style={{ marginTop: 8 }}>
-            <Space wrap>
+            <UISpace wrap>
               {QUESTION_TEMPLATES.map((template) => (
-                <Button
+                <UIButton
                   key={template.label}
                   size="small"
                   onClick={() => handleTemplateClick(template.value)}
                 >
                   {template.label}
-                </Button>
+                </UIButton>
               ))}
-            </Space>
+            </UISpace>
           </div>
         </div>
 
-        <Divider style={{ margin: '8px 0' }} />
+        <UIDivider style={{ margin: '8px 0' }} />
 
         {/* Custom Question */}
         <div>
-          <Text strong>Your Question:</Text>
-          <TextArea
+          <UITypographyText strong>Your Question:</UITypographyText>
+          <UIInputTextArea
             value={customQuestion}
             onChange={(e) => setCustomQuestion(e.target.value)}
             placeholder="Ask anything about this plugin... (e.g., 'How do I use this plugin?')"
@@ -186,14 +179,14 @@ export function PluginAIAssistantModal({
               }
             }}
           />
-          <Text type="secondary" style={{ fontSize: 12, marginTop: 4, display: 'block' }}>
+          <UITypographyText type="secondary" style={{ fontSize: 12, marginTop: 4, display: 'block' }}>
             Press Ctrl/Cmd + Enter to ask
-          </Text>
+          </UITypographyText>
         </div>
 
         {/* Error Display */}
         {error && (
-          <Alert
+          <UIAlert
             message="Error"
             description={error}
             type="error"
@@ -206,19 +199,19 @@ export function PluginAIAssistantModal({
         {/* Loading State */}
         {loading && (
           <div style={{ textAlign: 'center', padding: '24px 0' }}>
-            <Spin tip="AI is thinking..." size="large" />
+            <UISpin tip="AI is thinking..." size="large" />
           </div>
         )}
 
         {/* Q&A History */}
         {history.length > 0 && !loading && (
           <div>
-            <Divider orientation="left" style={{ margin: '16px 0 8px 0' }}>
-              <Text strong>Conversation History</Text>
-            </Divider>
-            <Space direction="vertical" style={{ width: '100%' }} size="middle">
+            <UIDivider orientation="left" style={{ margin: '16px 0 8px 0' }}>
+              <UITypographyText strong>Conversation History</UITypographyText>
+            </UIDivider>
+            <UISpace direction="vertical" style={{ width: '100%' }} size="middle">
               {history.map((item, index) => (
-                <Card
+                <UICard
                   key={index}
                   size="small"
                   style={{
@@ -227,10 +220,10 @@ export function PluginAIAssistantModal({
                 >
                   {/* Question */}
                   <div style={{ marginBottom: 12 }}>
-                    <Space style={{ marginBottom: 4 }}>
-                      <QuestionCircleOutlined style={{ color: '#1890ff' }} />
-                      <Text strong>{item.question}</Text>
-                    </Space>
+                    <UISpace style={{ marginBottom: 4 }}>
+                      <UIIcon name="QuestionCircleOutlined" style={{ color: '#1890ff' }} />
+                      <UITypographyText strong>{item.question}</UITypographyText>
+                    </UISpace>
                   </div>
 
                   {/* Answer */}
@@ -250,18 +243,18 @@ export function PluginAIAssistantModal({
 
                   {/* Metadata */}
                   <div style={{ textAlign: 'right' }}>
-                    <Space size="small">
-                      <Tag icon={<ClockCircleOutlined />} color="blue">
+                    <UISpace size="small">
+                      <UITag icon={<UIIcon name="ClockCircleOutlined" />} color="blue">
                         {item.timestamp.toLocaleTimeString()}
-                      </Tag>
-                      <Tag color="green">
+                      </UITag>
+                      <UITag color="green">
                         {item.usage.promptTokens + item.usage.completionTokens} tokens
-                      </Tag>
-                    </Space>
+                      </UITag>
+                    </UISpace>
                   </div>
-                </Card>
+                </UICard>
               ))}
-            </Space>
+            </UISpace>
           </div>
         )}
 
@@ -276,13 +269,13 @@ export function PluginAIAssistantModal({
               border: '1px dashed #d9d9d9',
             }}
           >
-            <RobotOutlined style={{ fontSize: 48, color: '#d9d9d9', marginBottom: 16 }} />
+            <UIIcon name="RobotOutlined" style={{ fontSize: 48, color: '#d9d9d9', marginBottom: 16 }} />
             <div style={{ fontSize: 14, color: '#999' }}>
               Select a quick question or type your own to get started
             </div>
           </div>
         )}
-      </Space>
+      </UISpace>
 
       {/* Custom styles for markdown in modal context */}
       <style>{`
@@ -379,6 +372,6 @@ export function PluginAIAssistantModal({
           border-top: 1px solid #e8e8e8;
         }
       `}</style>
-    </Modal>
+    </UIModal>
   );
 }

@@ -4,19 +4,16 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { Space, Tag, Typography, Statistic, Row, Col } from 'antd';
 import {
-  ClockCircleOutlined,
-  ThunderboltOutlined,
-  NodeIndexOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  LoadingOutlined,
-  PauseCircleOutlined,
-} from '@ant-design/icons';
+  UISpace,
+  UITag,
+  UITypographyText,
+  UIStatistic,
+  UIRow,
+  UICol,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import type { AgentEvent } from '@kb-labs/agent-contracts';
-
-const { Text } = Typography;
 
 interface RunStatsProps {
   events: AgentEvent[];
@@ -32,13 +29,13 @@ function getStatusDisplay(status: RunStatsProps['status']): {
 } {
   switch (status) {
     case 'running':
-      return { icon: <LoadingOutlined spin />, color: 'processing', text: 'Running' };
+      return { icon: <UIIcon name="LoadingOutlined" spin />, color: 'processing', text: 'Running' };
     case 'completed':
-      return { icon: <CheckCircleOutlined />, color: 'success', text: 'Completed' };
+      return { icon: <UIIcon name="CheckCircleOutlined" />, color: 'success', text: 'Completed' };
     case 'failed':
-      return { icon: <CloseCircleOutlined />, color: 'error', text: 'Failed' };
+      return { icon: <UIIcon name="CloseCircleOutlined" />, color: 'error', text: 'Failed' };
     case 'stopped':
-      return { icon: <PauseCircleOutlined />, color: 'warning', text: 'Stopped' };
+      return { icon: <UIIcon name="PauseCircleOutlined" />, color: 'warning', text: 'Stopped' };
     case 'idle':
     default:
       return { icon: null, color: 'default', text: 'Idle' };
@@ -90,50 +87,50 @@ export function RunStats({ events, status, startTime, endTime }: RunStatsProps) 
   }
 
   return (
-    <Space direction="vertical" size="small" style={{ width: '100%' }}>
-      <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-        <Tag icon={statusDisplay.icon} color={statusDisplay.color}>
+    <UISpace direction="vertical" size="small" style={{ width: '100%' }}>
+      <UISpace style={{ width: '100%', justifyContent: 'space-between' }}>
+        <UITag icon={statusDisplay.icon} color={statusDisplay.color}>
           {statusDisplay.text}
-        </Tag>
+        </UITag>
         {duration > 0 && (
-          <Text type="secondary">
-            <ClockCircleOutlined style={{ marginRight: 4 }} />
+          <UITypographyText type="secondary">
+            <UIIcon name="ClockCircleOutlined" style={{ marginRight: 4 }} />
             {formatDuration(duration)}
-          </Text>
+          </UITypographyText>
         )}
-      </Space>
+      </UISpace>
 
-      <Row gutter={16}>
-        <Col span={8}>
-          <Statistic
+      <UIRow gutter={16}>
+        <UICol span={8}>
+          <UIStatistic
             title="Tool Calls"
             value={toolCalls}
-            prefix={<NodeIndexOutlined />}
+            prefix={<UIIcon name="NodeIndexOutlined" />}
             valueStyle={{ fontSize: 20 }}
           />
           {failedTools > 0 && (
-            <Text type="danger" style={{ fontSize: 12 }}>
+            <UITypographyText type="danger" style={{ fontSize: 12 }}>
               {failedTools} failed
-            </Text>
+            </UITypographyText>
           )}
-        </Col>
-        <Col span={8}>
-          <Statistic
+        </UICol>
+        <UICol span={8}>
+          <UIStatistic
             title="Events"
             value={events.length}
-            prefix={<ThunderboltOutlined />}
+            prefix={<UIIcon name="ThunderboltOutlined" />}
             valueStyle={{ fontSize: 20 }}
           />
-        </Col>
-        <Col span={8}>
-          <Statistic
+        </UICol>
+        <UICol span={8}>
+          <UIStatistic
             title="Tokens"
             value={tokensUsed}
             valueStyle={{ fontSize: 20 }}
             formatter={(value) => value ? Number(value).toLocaleString() : '-'}
           />
-        </Col>
-      </Row>
-    </Space>
+        </UICol>
+      </UIRow>
+    </UISpace>
   );
 }

@@ -1,15 +1,17 @@
-import { Row, Col, Table, Card, Statistic, Progress, Alert } from 'antd';
 import {
-  ClockCircleOutlined,
-  DatabaseOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  DeleteOutlined,
-} from '@ant-design/icons';
-import { KBPageContainer, KBPageHeader } from '@kb-labs/studio-ui-react';
+  UIRow,
+  UICol,
+  UITable,
+  UICard,
+  UIStatistic,
+  UIProgress,
+  UIAlert,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useStateBrokerStats } from '@kb-labs/studio-data-client';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import type { NamespaceStats } from '@kb-labs/studio-data-client';
+import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
 /**
  * Format uptime in milliseconds to human-readable string
@@ -54,7 +56,7 @@ export function StateBrokerPage() {
           title="State Broker"
           description="In-memory cache statistics"
         />
-        <Alert
+        <UIAlert
           message="Failed to load State Broker stats"
           description={error instanceof Error ? error.message : 'Unknown error. Make sure State Daemon is running on localhost:7777'}
           type="error"
@@ -90,50 +92,50 @@ export function StateBrokerPage() {
       />
 
       {/* Overview Stats */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <Statistic
+      <UIRow gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <UICol xs={24} sm={12} lg={6}>
+          <UICard>
+            <UIStatistic
               title="Uptime"
               value={formatUptime(data.uptime)}
-              prefix={<ClockCircleOutlined />}
+              prefix={<UIIcon name="ClockCircleOutlined" />}
             />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <Statistic
+          </UICard>
+        </UICol>
+        <UICol xs={24} sm={12} lg={6}>
+          <UICard>
+            <UIStatistic
               title="Cache Entries"
               value={data.totalEntries}
-              prefix={<DatabaseOutlined />}
+              prefix={<UIIcon name="DatabaseOutlined" />}
             />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <Statistic
+          </UICard>
+        </UICol>
+        <UICol xs={24} sm={12} lg={6}>
+          <UICard>
+            <UIStatistic
               title="Cache Size"
               value={formatBytes(data.totalSize)}
-              prefix={<DatabaseOutlined />}
+              prefix={<UIIcon name="DatabaseOutlined" />}
             />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <Statistic
+          </UICard>
+        </UICol>
+        <UICol xs={24} sm={12} lg={6}>
+          <UICard>
+            <UIStatistic
               title="Evictions"
               value={data.evictions}
-              prefix={<DeleteOutlined />}
+              prefix={<UIIcon name="DeleteOutlined" />}
             />
-          </Card>
-        </Col>
-      </Row>
+          </UICard>
+        </UICol>
+      </UIRow>
 
       {/* Hit/Miss Rate */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col xs={24} lg={12}>
-          <Card title="Cache Hit Rate" extra={<CheckCircleOutlined style={{ color: '#52c41a' }} />}>
-            <Progress
+      <UIRow gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <UICol xs={24} lg={12}>
+          <UICard title="Cache Hit Rate" extra={<UIIcon name="CheckCircleOutlined" style={{ color: '#52c41a' }} />}>
+            <UIProgress
               percent={hitRatePercent}
               status={hitRatePercent >= 70 ? 'success' : hitRatePercent >= 50 ? 'normal' : 'exception'}
               strokeColor={hitRatePercent >= 70 ? '#52c41a' : hitRatePercent >= 50 ? '#1890ff' : '#ff4d4f'}
@@ -143,11 +145,11 @@ export function StateBrokerPage() {
                hitRatePercent >= 50 ? 'Good cache performance' :
                'Poor cache performance - consider increasing TTL'}
             </div>
-          </Card>
-        </Col>
-        <Col xs={24} lg={12}>
-          <Card title="Cache Miss Rate" extra={<CloseCircleOutlined style={{ color: '#ff4d4f' }} />}>
-            <Progress
+          </UICard>
+        </UICol>
+        <UICol xs={24} lg={12}>
+          <UICard title="Cache Miss Rate" extra={<UIIcon name="CloseCircleOutlined" style={{ color: '#ff4d4f' }} />}>
+            <UIProgress
               percent={missRatePercent}
               status={missRatePercent <= 30 ? 'success' : missRatePercent <= 50 ? 'normal' : 'exception'}
               strokeColor={missRatePercent <= 30 ? '#52c41a' : missRatePercent <= 50 ? '#faad14' : '#ff4d4f'}
@@ -157,13 +159,13 @@ export function StateBrokerPage() {
                missRatePercent <= 50 ? 'Moderate miss rate' :
                'High miss rate - cache not effective'}
             </div>
-          </Card>
-        </Col>
-      </Row>
+          </UICard>
+        </UICol>
+      </UIRow>
 
       {/* Namespaces Table */}
-      <Card title="Namespaces Breakdown" style={{ marginBottom: 24 }}>
-        <Table<{ key: string; name: string } & NamespaceStats>
+      <UICard title="Namespaces Breakdown" style={{ marginBottom: 24 }}>
+        <UITable<{ key: string; name: string } & NamespaceStats>
           dataSource={Object.entries(data.namespaces).map(([name, stats]) => ({
             key: name,
             name,
@@ -221,7 +223,7 @@ export function StateBrokerPage() {
           pagination={false}
           size="small"
         />
-      </Card>
+      </UICard>
     </KBPageContainer>
   );
 }

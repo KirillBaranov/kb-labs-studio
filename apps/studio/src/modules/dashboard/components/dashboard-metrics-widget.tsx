@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { UICard } from '@kb-labs/studio-ui-kit';
-import { Row, Col } from 'antd';
+import { UICard, UIRow, UICol } from '@kb-labs/studio-ui-kit';
 import { HolderOutlined } from '@ant-design/icons';
-import { KBStatCard } from '@kb-labs/studio-ui-react';
 import { type MetricsSnapshot } from '../../../api/metrics';
 import { useDataSources } from '../../../providers/data-sources-provider';
+import { KBStatCard } from '@/components/ui';
 
 export function DashboardMetricsWidget() {
   const { metrics: metricsSource } = useDataSources();
@@ -55,47 +54,47 @@ export function DashboardMetricsWidget() {
       style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
       bodyStyle={{ flex: 1, padding: '16px' }}
     >
-      <Row gutter={[16, 16]} style={{ height: '100%' }}>
-        <Col span={6}>
+      <UIRow gutter={[16, 16]} style={{ height: '100%' }}>
+        <UICol span={6}>
           <KBStatCard
             label="Requests"
             value={totalRequests.toLocaleString()}
             valueColor="var(--info)"
           />
-        </Col>
-        <Col span={6}>
+        </UICol>
+        <UICol span={6}>
           <KBStatCard
             label="Error Rate"
             value={`${errorRate.toFixed(1)}%`}
             valueColor={errorRate > 5 ? 'var(--error)' : errorRate > 1 ? 'var(--warning)' : 'var(--success)'}
           />
-        </Col>
-        <Col span={6}>
+        </UICol>
+        <UICol span={6}>
           <KBStatCard
             label="Latency (avg)"
             value={`${avgLatency.toFixed(1)}ms`}
             subValue={`p50 ${p50.toFixed(1)}ms`}
             valueColor={avgLatency > 500 ? 'var(--error)' : avgLatency > 200 ? 'var(--warning)' : 'var(--success)'}
           />
-        </Col>
-        <Col span={6}>
+        </UICol>
+        <UICol span={6}>
           <KBStatCard
             label="Latency (p95/p99)"
             value={`${p95.toFixed(1)}ms`}
             subValue={`p99 ${p99.toFixed(1)}ms`}
             valueColor={p95 > 1000 ? 'var(--error)' : p95 > 500 ? 'var(--warning)' : 'var(--success)'}
           />
-        </Col>
-      </Row>
-      <Row gutter={[16, 16]} style={{ marginTop: '16px' }}>
-        <Col span={6}>
+        </UICol>
+      </UIRow>
+      <UIRow gutter={[16, 16]} style={{ marginTop: '16px' }}>
+        <UICol span={6}>
           <KBStatCard
             label="Uptime"
             value={formatUptime(uptime)}
             valueColor="var(--success)"
           />
-        </Col>
-      </Row>
+        </UICol>
+      </UIRow>
     </UICard>
   );
 }

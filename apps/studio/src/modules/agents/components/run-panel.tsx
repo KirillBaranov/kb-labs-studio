@@ -4,18 +4,15 @@
  */
 
 import React, { useState } from 'react';
-import { Input, Button, Space, Tag, Typography } from 'antd';
 import {
-  PlayCircleOutlined,
-  StopOutlined,
-  LoadingOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  SyncOutlined,
-} from '@ant-design/icons';
+  UIInput, UIInputTextArea,
+  UIButton,
+  UISpace,
+  UITag,
+  UITypographyText,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import type { ConnectionStatus } from '@kb-labs/studio-data-client';
-
-const { Text } = Typography;
 
 interface RunPanelProps {
   onStart: (task: string) => void;
@@ -30,13 +27,13 @@ interface RunPanelProps {
 function getStatusDisplay(status: ConnectionStatus): { icon: React.ReactNode; text: string; color: string } {
   switch (status) {
     case 'connected':
-      return { icon: <CheckCircleOutlined />, text: 'Connected', color: 'green' };
+      return { icon: <UIIcon name="CheckCircleOutlined" />, text: 'Connected', color: 'green' };
     case 'connecting':
-      return { icon: <LoadingOutlined spin />, text: 'Connecting...', color: 'blue' };
+      return { icon: <UIIcon name="LoadingOutlined" spin />, text: 'Connecting...', color: 'blue' };
     case 'reconnecting':
-      return { icon: <SyncOutlined spin />, text: 'Reconnecting...', color: 'orange' };
+      return { icon: <UIIcon name="SyncOutlined" spin />, text: 'Reconnecting...', color: 'orange' };
     case 'error':
-      return { icon: <CloseCircleOutlined />, text: 'Connection Error', color: 'red' };
+      return { icon: <UIIcon name="CloseCircleOutlined" />, text: 'Connection Error', color: 'red' };
     case 'disconnected':
     default:
       return { icon: null, text: 'Disconnected', color: 'default' };
@@ -70,8 +67,8 @@ export function RunPanel({
   const statusDisplay = getStatusDisplay(connectionStatus);
 
   return (
-    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-      <Input.TextArea
+    <UISpace direction="vertical" size="middle" style={{ width: '100%' }}>
+      <UIInputTextArea
         value={task}
         onChange={(e) => setTask(e.target.value)}
         onKeyDown={handleKeyDown}
@@ -81,43 +78,43 @@ export function RunPanel({
         style={{ fontSize: 14 }}
       />
 
-      <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-        <Space>
+      <UISpace style={{ width: '100%', justifyContent: 'space-between' }}>
+        <UISpace>
           {!isRunning ? (
-            <Button
+            <UIButton
               type="primary"
-              icon={isStarting ? <LoadingOutlined /> : <PlayCircleOutlined />}
+              icon={isStarting ? <UIIcon name="LoadingOutlined" /> : <UIIcon name="PlayCircleOutlined" />}
               onClick={handleStart}
               disabled={!task.trim() || disabled || isStarting}
               loading={isStarting}
             >
               {isStarting ? 'Starting...' : 'Start'}
-            </Button>
+            </UIButton>
           ) : (
-            <Button
+            <UIButton
               danger
-              icon={isStopping ? <LoadingOutlined /> : <StopOutlined />}
+              icon={isStopping ? <UIIcon name="LoadingOutlined" /> : <UIIcon name="StopOutlined" />}
               onClick={onStop}
               disabled={isStopping}
               loading={isStopping}
             >
               {isStopping ? 'Stopping...' : 'Stop'}
-            </Button>
+            </UIButton>
           )}
 
           {isRunning && (
-            <Tag icon={statusDisplay.icon} color={statusDisplay.color}>
+            <UITag icon={statusDisplay.icon} color={statusDisplay.color}>
               {statusDisplay.text}
-            </Tag>
+            </UITag>
           )}
-        </Space>
+        </UISpace>
 
         {isRunning && (
-          <Text type="secondary" style={{ fontSize: 12 }}>
+          <UITypographyText type="secondary" style={{ fontSize: 12 }}>
             Press Escape or click Stop to cancel
-          </Text>
+          </UITypographyText>
         )}
-      </Space>
-    </Space>
+      </UISpace>
+    </UISpace>
   );
 }

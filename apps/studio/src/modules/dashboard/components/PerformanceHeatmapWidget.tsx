@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { Card, Select, Space, Typography, Tooltip } from 'antd';
+import { UICard, UISelect, UISpace, UITypographyText, UITooltip } from '@kb-labs/studio-ui-kit';
 import { FireOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { useMetricsHeatmap } from '@kb-labs/studio-data-client';
 
-const { Text } = Typography;
+
 
 interface HeatmapCell {
   hour: number;
@@ -65,7 +65,7 @@ export function PerformanceHeatmapWidget() {
   const hasError = heatmapQuery.isError;
 
   return (
-    <Card
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <FireOutlined />
@@ -73,7 +73,7 @@ export function PerformanceHeatmapWidget() {
         </div>
       }
       extra={
-        <Select
+        <UISelect
           value={selectedMetric}
           onChange={setSelectedMetric}
           style={{ width: 120 }}
@@ -109,7 +109,7 @@ export function PerformanceHeatmapWidget() {
           Failed to load heatmap
         </div>
       ) : (
-      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+      <UISpace direction="vertical" size="middle" style={{ width: '100%' }}>
         {/* Stats Summary */}
         <div
           style={{
@@ -122,33 +122,33 @@ export function PerformanceHeatmapWidget() {
           }}
         >
           <div style={{ textAlign: 'center' }}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               Min
-            </Text>
+            </UITypographyText>
             <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--success)' }}>
               {formatValue(stats.min, selectedMetric)}
             </div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               Average
-            </Text>
+            </UITypographyText>
             <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--info)' }}>
               {formatValue(stats.avg, selectedMetric)}
             </div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               Max
-            </Text>
+            </UITypographyText>
             <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--error)' }}>
               {formatValue(stats.max, selectedMetric)}
             </div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               Peak Time
-            </Text>
+            </UITypographyText>
             <div style={{ fontSize: 14, fontWeight: 600 }}>
               {stats.peak.day} {stats.peak.hour}:00
             </div>
@@ -174,7 +174,7 @@ export function PerformanceHeatmapWidget() {
                   if (!cell) {return null;}
 
                   return (
-                    <Tooltip
+                    <UITooltip
                       key={`${day}-${hour}`}
                       title={
                         <div>
@@ -204,7 +204,7 @@ export function PerformanceHeatmapWidget() {
                           e.currentTarget.style.zIndex = '1';
                         }}
                       />
-                    </Tooltip>
+                    </UITooltip>
                   );
                 })}
               </div>
@@ -214,21 +214,21 @@ export function PerformanceHeatmapWidget() {
 
         {/* Legend */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 12 }}>
-          <Text type="secondary" style={{ fontSize: 12 }}>
+          <UITypographyText type="secondary" style={{ fontSize: 12 }}>
             <ClockCircleOutlined /> Data represents typical weekly patterns
-          </Text>
+          </UITypographyText>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               Low
-            </Text>
+            </UITypographyText>
             <div style={{ display: 'flex', gap: 2 }}>
               {['#f0f9ff', '#bae6fd', '#7dd3fc', '#38bdf8', '#0ea5e9', '#0284c7', '#0369a1'].map((color, i) => (
                 <div key={i} style={{ width: 16, height: 16, backgroundColor: color, borderRadius: 2 }} />
               ))}
             </div>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               High
-            </Text>
+            </UITypographyText>
           </div>
         </div>
 
@@ -241,9 +241,9 @@ export function PerformanceHeatmapWidget() {
             borderLeft: '3px solid var(--info)',
           }}
         >
-          <Text strong style={{ fontSize: 13 }}>
+          <UITypographyText strong style={{ fontSize: 13 }}>
             💡 Insights:
-          </Text>
+          </UITypographyText>
           <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text-secondary)' }}>
             {selectedMetric === 'latency' && (
               <>
@@ -268,9 +268,9 @@ export function PerformanceHeatmapWidget() {
             )}
           </div>
         </div>
-      </Space>
+      </UISpace>
       )}
-    </Card>
+    </UICard>
   );
 }
 

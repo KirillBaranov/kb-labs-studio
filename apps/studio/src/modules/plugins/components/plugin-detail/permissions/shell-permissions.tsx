@@ -1,8 +1,4 @@
-import { Space, Alert, theme } from 'antd';
-import { ConsoleSqlOutlined } from '@ant-design/icons';
-import { UICard, UIText } from '@kb-labs/studio-ui-kit';
-
-const { useToken } = theme;
+import { UISpace, UIAlert, UICard, UIText, UIIcon, useUITheme } from '@kb-labs/studio-ui-kit';
 
 interface ShellPermissionsProps {
   permissions: {
@@ -11,15 +7,15 @@ interface ShellPermissionsProps {
 }
 
 export function ShellPermissions({ permissions }: ShellPermissionsProps) {
-  const { token } = useToken();
+  const { token } = useUITheme();
 
   return (
     <UICard
       title={
-        <Space>
-          <ConsoleSqlOutlined />
+        <UISpace>
+          <UIIcon name="ConsoleSqlOutlined" />
           <span>Shell Permissions</span>
-        </Space>
+        </UISpace>
       }
     >
       <UIText color="secondary" style={{ marginBottom: 16, display: 'block' }}>
@@ -30,7 +26,7 @@ export function ShellPermissions({ permissions }: ShellPermissionsProps) {
         <div>
           <UIText weight="semibold">Allowed Commands:</UIText>
           <div style={{ marginTop: 8 }}>
-            <Space direction="vertical" style={{ width: '100%' }}>
+            <UISpace direction="vertical" style={{ width: '100%' }}>
               {permissions.allow.map((cmd: string, idx: number) => (
                 <div key={idx} style={{ marginBottom: 4 }}>
                   <UIText
@@ -43,11 +39,11 @@ export function ShellPermissions({ permissions }: ShellPermissionsProps) {
                   </UIText>
                 </div>
               ))}
-            </Space>
+            </UISpace>
           </div>
         </div>
       ) : (
-        <Alert
+        <UIAlert
           type="warning"
           message="Shell access disabled"
           description="This plugin has no shell execution permissions."

@@ -7,17 +7,16 @@
 
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Button, Space, Select, Divider, message, theme } from 'antd';
-import { UserOutlined, RocketOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons';
 import { useAuth, type UserRole } from '@/providers/auth-provider';
-import { UIBox, UIText, UITitle } from '@kb-labs/studio-ui-kit';
-
-const { useToken } = theme;
+import {
+  UIBox, UIText, UITitle, UICard, UIButton, UISpace, UISelect, UIDivider,
+  UIMessage, UIIcon, useUITheme,
+} from '@kb-labs/studio-ui-kit';
 
 export function LoginPage() {
   const navigate = useNavigate();
   const { setRole } = useAuth();
-  const { token } = useToken();
+  const { token } = useUITheme();
   const [selectedRole, setSelectedRole] = React.useState<UserRole>('operator');
 
   const handleLogin = () => {
@@ -26,7 +25,7 @@ export function LoginPage() {
   };
 
   const handleSSOLogin = () => {
-    message.info('SSO аутентификация будет реализована позже');
+    UIMessage.info('SSO аутентификация будет реализована позже');
     // TODO: Implement SSO authentication
   };
 
@@ -41,7 +40,7 @@ export function LoginPage() {
         backgroundColor: token.colorBgLayout,
       }}
     >
-      <Card
+      <UICard
         style={{
           maxWidth: '480px',
           width: '100%',
@@ -50,7 +49,7 @@ export function LoginPage() {
         }}
         bodyStyle={{ padding: token.paddingXL }}
       >
-        <Space direction="vertical" size="large" style={{ width: '100%', textAlign: 'center' }}>
+        <UISpace direction="vertical" size="large" style={{ width: '100%', textAlign: 'center' }}>
           {/* Logo */}
           <UIBox
             style={{
@@ -65,7 +64,7 @@ export function LoginPage() {
               fontSize: '40px',
             }}
           >
-            <RocketOutlined style={{ color: 'white' }} />
+            <UIIcon name="RocketOutlined" style={{ color: 'white' }} />
           </UIBox>
 
           {/* Title */}
@@ -76,7 +75,7 @@ export function LoginPage() {
             <UIText color="secondary">Добро пожаловать в платформу</UIText>
           </UIBox>
 
-          <Divider style={{ margin: `${token.marginXS}px 0` }} />
+          <UIDivider style={{ margin: `${token.marginXS}px 0` }} />
 
           {/* Mock Auth Notice */}
           <UIBox
@@ -87,9 +86,9 @@ export function LoginPage() {
               border: `1px solid ${token.colorBorder}`,
             }}
           >
-            <Space direction="vertical" size="small" style={{ width: '100%' }}>
+            <UISpace direction="vertical" size="small" style={{ width: '100%' }}>
               <UIBox style={{ display: 'flex', alignItems: 'center', gap: token.marginXS }}>
-                <LockOutlined style={{ color: token.colorPrimary }} />
+                <UIIcon name="LockOutlined" style={{ color: token.colorPrimary }} />
                 <UIText weight="semibold" style={{ color: token.colorPrimary }}>
                   Режим разработки
                 </UIText>
@@ -101,7 +100,7 @@ export function LoginPage() {
               >
                 Это заглушка для входа. Выберите роль и войдите без пароля.
               </UIText>
-            </Space>
+            </UISpace>
           </UIBox>
 
           {/* Role Selector */}
@@ -109,7 +108,7 @@ export function LoginPage() {
             <UIText weight="semibold" style={{ display: 'block', marginBottom: token.marginXS }}>
               Выберите роль:
             </UIText>
-            <Select
+            <UISelect
               value={selectedRole}
               onChange={setSelectedRole}
               style={{ width: '100%' }}
@@ -117,34 +116,34 @@ export function LoginPage() {
               options={[
                 {
                   label: (
-                    <Space>
-                      <UserOutlined />
+                    <UISpace>
+                      <UIIcon name="UserOutlined" />
                       <span>
                         <strong>Viewer</strong> — Просмотр данных
                       </span>
-                    </Space>
+                    </UISpace>
                   ),
                   value: 'viewer',
                 },
                 {
                   label: (
-                    <Space>
-                      <UserOutlined />
+                    <UISpace>
+                      <UIIcon name="UserOutlined" />
                       <span>
                         <strong>Operator</strong> — Управление системой
                       </span>
-                    </Space>
+                    </UISpace>
                   ),
                   value: 'operator',
                 },
                 {
                   label: (
-                    <Space>
-                      <UserOutlined />
+                    <UISpace>
+                      <UIIcon name="UserOutlined" />
                       <span>
                         <strong>Admin</strong> — Полный доступ
                       </span>
-                    </Space>
+                    </UISpace>
                   ),
                   value: 'admin',
                 },
@@ -153,12 +152,12 @@ export function LoginPage() {
           </UIBox>
 
           {/* Login Buttons */}
-          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-            <Button
+          <UISpace direction="vertical" size="middle" style={{ width: '100%' }}>
+            <UIButton
               type="primary"
               size="large"
               block
-              icon={<RocketOutlined />}
+              icon={<UIIcon name="RocketOutlined" />}
               onClick={handleLogin}
               style={{
                 height: '48px',
@@ -167,18 +166,18 @@ export function LoginPage() {
               }}
             >
               Войти в систему
-            </Button>
+            </UIButton>
 
-            <Divider style={{ margin: `${token.marginXS}px 0` }}>
+            <UIDivider style={{ margin: `${token.marginXS}px 0` }}>
               <UIText color="secondary" size="xs">
                 или
               </UIText>
-            </Divider>
+            </UIDivider>
 
-            <Button
+            <UIButton
               size="large"
               block
-              icon={<SafetyOutlined />}
+              icon={<UIIcon name="SafetyOutlined" />}
               onClick={handleSSOLogin}
               style={{
                 height: '48px',
@@ -187,8 +186,8 @@ export function LoginPage() {
               }}
             >
               Войти через SSO
-            </Button>
-          </Space>
+            </UIButton>
+          </UISpace>
 
           {/* Footer */}
           <UIBox mt={4}>
@@ -196,8 +195,8 @@ export function LoginPage() {
               © 2025 KB Labs Studio. Development Preview.
             </UIText>
           </UIBox>
-        </Space>
-      </Card>
+        </UISpace>
+      </UICard>
     </UIBox>
   );
 }

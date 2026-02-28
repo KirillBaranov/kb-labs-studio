@@ -1,5 +1,4 @@
-import { Space, Empty } from 'antd';
-import { UICard } from '@kb-labs/studio-ui-kit';
+import { UISpace, UIEmptyState, UICard } from '@kb-labs/studio-ui-kit';
 import { FilesystemPermissions } from './permissions/filesystem-permissions';
 import { NetworkPermissions } from './permissions/network-permissions';
 import { EnvPermissions } from './permissions/env-permissions';
@@ -15,13 +14,13 @@ export function PermissionsView({ permissions }: PermissionsViewProps) {
   if (!permissions) {
     return (
       <UICard>
-        <Empty description="No permissions specified for this plugin" />
+        <UIEmptyState description="No permissions specified for this plugin" />
       </UICard>
     );
   }
 
   return (
-    <Space direction="vertical" size="large" style={{ width: '100%' }}>
+    <UISpace direction="vertical" size="large" style={{ width: '100%' }}>
       {/* Filesystem Permissions */}
       {permissions.fs && <FilesystemPermissions permissions={permissions.fs} />}
 
@@ -43,6 +42,6 @@ export function PermissionsView({ permissions }: PermissionsViewProps) {
 
       {/* Quotas */}
       {permissions.quotas && <ResourceQuotas quotas={permissions.quotas} />}
-    </Space>
+    </UISpace>
   );
 }

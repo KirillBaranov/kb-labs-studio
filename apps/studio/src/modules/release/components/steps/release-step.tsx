@@ -5,38 +5,26 @@
 
 import * as React from 'react';
 import {
-  Button,
-  Card,
-  Space,
-  Typography,
-  Alert,
-  Input,
-  Result,
-  Collapse,
-  Tag,
-  Popconfirm,
-  Divider,
-  message,
-} from 'antd';
-import {
-  BuildOutlined,
-  SafetyCertificateOutlined,
-  LockOutlined,
-  RocketOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  LoadingOutlined,
-  RollbackOutlined,
-  ExclamationCircleOutlined,
-} from '@ant-design/icons';
+  UIButton,
+  UICard,
+  UISpace,
+  UITypographyText,
+  UIAlert,
+  UIInput,
+  UIResult,
+  UIAccordion,
+  UITag,
+  UIPopconfirm,
+  UIDivider,
+  UIMessage,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import {
   useReleasePlan,
   useRunRelease,
   useRollback,
 } from '@kb-labs/studio-data-client';
-
-const { Text } = Typography;
 
 type CheckStatus = 'pending' | 'running' | 'success' | 'error';
 
@@ -165,20 +153,20 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
       // Check if publish actually succeeded (not just HTTP 200)
       if (result.success) {
         setReleaseComplete(true);
-        message.success('Release published successfully!');
+        UIMessage.success('Release published successfully!');
         onReleaseComplete();
       } else {
         // Publish failed - extract error messages
         const errorMessage = result.errors?.join(', ') || 'Unknown publish error';
         setReleaseError(errorMessage);
         setReleaseStarted(false); // Allow retry
-        message.error(`Release failed: ${errorMessage}`);
+        UIMessage.error(`Release failed: ${errorMessage}`);
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       setReleaseError(errorMessage);
       setReleaseStarted(false); // Allow retry
-      message.error(`Release failed: ${errorMessage}`);
+      UIMessage.error(`Release failed: ${errorMessage}`);
     }
   };
 
@@ -187,7 +175,7 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
       await rollbackMutation.mutateAsync({
         scope: selectedScope,
       });
-      message.success('Rollback completed successfully');
+      UIMessage.success('Rollback completed successfully');
       // Reset state
       setReleaseComplete(false);
       setReleaseStarted(false);
@@ -195,7 +183,7 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
       setChecksComplete(false);
       setChecks(prev => prev.map(c => ({ ...c, status: 'pending', error: undefined, duration: undefined })));
     } catch (error) {
-      message.error(`Rollback failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      UIMessage.error(`Rollback failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -207,64 +195,64 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
   const getCheckIcon = (status: CheckStatus) => {
     switch (status) {
       case 'running':
-        return <LoadingOutlined style={{ color: '#1890ff' }} />;
+        return <UIIcon name="LoadingOutlined" style={{ color: '#1890ff' }} />;
       case 'success':
-        return <CheckCircleOutlined style={{ color: '#52c41a' }} />;
+        return <UIIcon name="CheckCircleOutlined" style={{ color: '#52c41a' }} />;
       case 'error':
-        return <CloseCircleOutlined style={{ color: '#ff4d4f' }} />;
+        return <UIIcon name="CloseCircleOutlined" style={{ color: '#ff4d4f' }} />;
       default:
-        return <SafetyCertificateOutlined style={{ color: '#8c8c8c' }} />;
+        return <UIIcon name="SafetyCertificateOutlined" style={{ color: '#8c8c8c' }} />;
     }
   };
 
   // Show release complete state
   if (releaseComplete) {
     return (
-      <Card>
-        <Result
+      <UICard>
+        <UIResult
           status="success"
           title="Release Published!"
           subTitle={`${planData?.plan?.packages.length ?? 0} package(s) published to npm`}
           extra={[
-            <Popconfirm
+            <UIPopconfirm
               key="rollback"
               title="Rollback Release"
               description="This will unpublish the packages. Are you sure?"
-              icon={<ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />}
+              icon={<UIIcon name="ExclamationCircleOutlined" style={{ color: '#ff4d4f' }} />}
               onConfirm={handleRollback}
               okText="Yes, Rollback"
               okButtonProps={{ danger: true }}
               cancelText="Cancel"
             >
-              <Button
-                icon={<RollbackOutlined />}
+              <UIButton
+                icon={<UIIcon name="RollbackOutlined" />}
                 loading={rollbackMutation.isPending}
                 danger
               >
                 Rollback
-              </Button>
-            </Popconfirm>,
+              </UIButton>
+            </UIPopconfirm>,
           ]}
         />
-      </Card>
+      </UICard>
     );
   }
 
   return (
     <div>
       {/* Pre-checks Card */}
-      <Card
+      <UICard
         title={
-          <Space>
-            <BuildOutlined />
+          <UISpace>
+            <UIIcon name="BuildOutlined" />
             <span>Pre-release Checks</span>
-            {allChecksPassed && <Tag color="success">All Passed</Tag>}
-            {anyCheckFailed && <Tag color="error">Failed</Tag>}
-          </Space>
+            {allChecksPassed && <UITag color="success">All Passed</UITag>}
+            {anyCheckFailed && <UITag color="error">Failed</UITag>}
+          </UISpace>
         }
         style={{ marginBottom: 16 }}
       >
-        <Space direction="vertical" style={{ width: '100%' }} size="middle">
+        <UISpace direction="vertical" style={{ width: '100%' }} size="middle">
           {checks.map((check) => (
             <div
               key={check.id}
@@ -278,52 +266,52 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
                 border: `1px solid ${check.status === 'error' ? '#ffccc7' : check.status === 'success' ? '#b7eb8f' : '#d9d9d9'}`,
               }}
             >
-              <Space>
+              <UISpace>
                 {getCheckIcon(check.status)}
                 <div>
-                  <Text strong>{check.name}</Text>
+                  <UITypographyText strong>{check.name}</UITypographyText>
                   <br />
-                  <Text type="secondary" style={{ fontSize: 12 }}>
+                  <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                     {check.error || check.description}
-                  </Text>
+                  </UITypographyText>
                 </div>
-              </Space>
+              </UISpace>
               {check.duration && (
-                <Tag>{(check.duration / 1000).toFixed(1)}s</Tag>
+                <UITag>{(check.duration / 1000).toFixed(1)}s</UITag>
               )}
             </div>
           ))}
 
           <div style={{ display: 'flex', gap: 8 }}>
-            <Button
+            <UIButton
               type="primary"
-              icon={<BuildOutlined />}
+              icon={<UIIcon name="BuildOutlined" />}
               onClick={runPreChecks}
               loading={checksRunning}
               disabled={checksComplete}
             >
               {checksRunning ? 'Running Checks...' : 'Run Checks'}
-            </Button>
+            </UIButton>
             {(checksComplete || anyCheckFailed) && (
-              <Button onClick={resetChecks}>
+              <UIButton onClick={resetChecks}>
                 Reset
-              </Button>
+              </UIButton>
             )}
           </div>
-        </Space>
-      </Card>
+        </UISpace>
+      </UICard>
 
       {/* OTP & Publish Card */}
-      <Card
+      <UICard
         title={
-          <Space>
-            <LockOutlined />
+          <UISpace>
+            <UIIcon name="LockOutlined" />
             <span>npm Publish</span>
-          </Space>
+          </UISpace>
         }
       >
         {!allChecksPassed && (
-          <Alert
+          <UIAlert
             message="Complete pre-release checks first"
             description="All checks must pass before you can publish to npm."
             type="info"
@@ -333,7 +321,7 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
         )}
 
         {releaseError && (
-          <Alert
+          <UIAlert
             message="Release Failed"
             description={releaseError}
             type="error"
@@ -344,27 +332,27 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
           />
         )}
 
-        <Space direction="vertical" style={{ width: '100%' }} size="middle">
+        <UISpace direction="vertical" style={{ width: '100%' }} size="middle">
           {/* Summary */}
           {planData?.plan && (
-            <Collapse
+            <UIAccordion
               size="small"
               items={[
                 {
                   key: 'summary',
                   label: (
-                    <Space>
+                    <UISpace>
                       <span>Release Summary</span>
-                      <Tag color="blue">{planData.plan.packages.length} package(s)</Tag>
-                    </Space>
+                      <UITag color="blue">{planData.plan.packages.length} package(s)</UITag>
+                    </UISpace>
                   ),
                   children: (
                     <div>
                       {planData.plan.packages.map((pkg) => (
                         <div key={pkg.name} style={{ marginBottom: 4 }}>
-                          <Text code>{pkg.name}</Text>
-                          <Text type="secondary"> {pkg.currentVersion} → </Text>
-                          <Text strong style={{ color: '#52c41a' }}>{pkg.nextVersion}</Text>
+                          <UITypographyText code>{pkg.name}</UITypographyText>
+                          <UITypographyText type="secondary"> {pkg.currentVersion} → </UITypographyText>
+                          <UITypographyText strong style={{ color: '#52c41a' }}>{pkg.nextVersion}</UITypographyText>
                         </div>
                       ))}
                     </div>
@@ -374,18 +362,18 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
             />
           )}
 
-          <Divider style={{ margin: '8px 0' }} />
+          <UIDivider style={{ margin: '8px 0' }} />
 
           {/* OTP Input */}
           <div>
-            <Text strong style={{ display: 'block', marginBottom: 8 }}>
+            <UITypographyText strong style={{ display: 'block', marginBottom: 8 }}>
               npm One-Time Password (OTP)
-            </Text>
-            <Text type="secondary" style={{ display: 'block', marginBottom: 8, fontSize: 12 }}>
+            </UITypographyText>
+            <UITypographyText type="secondary" style={{ display: 'block', marginBottom: 8, fontSize: 12 }}>
               Enter the 6-digit code from your authenticator app
-            </Text>
-            <Input
-              prefix={<LockOutlined />}
+            </UITypographyText>
+            <UIInput
+              prefix={<UIIcon name="LockOutlined" />}
               placeholder="123456"
               value={otp}
               onChange={(e) => {
@@ -398,32 +386,32 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
               disabled={!allChecksPassed || releaseStarted}
             />
             {otpError && (
-              <Text type="danger" style={{ display: 'block', marginTop: 4, fontSize: 12 }}>
+              <UITypographyText type="danger" style={{ display: 'block', marginTop: 4, fontSize: 12 }}>
                 {otpError}
-              </Text>
+              </UITypographyText>
             )}
           </div>
 
-          <Divider style={{ margin: '8px 0' }} />
+          <UIDivider style={{ margin: '8px 0' }} />
 
           {/* Publish Button */}
-          <Button
+          <UIButton
             type="primary"
             size="large"
-            icon={<RocketOutlined />}
+            icon={<UIIcon name="RocketOutlined" />}
             onClick={handleRunRelease}
             loading={runReleaseMutation.isPending}
             disabled={!allChecksPassed || !otp || releaseStarted}
             block
           >
             Publish to npm
-          </Button>
+          </UIButton>
 
-          <Text type="secondary" style={{ textAlign: 'center', display: 'block', fontSize: 12 }}>
+          <UITypographyText type="secondary" style={{ textAlign: 'center', display: 'block', fontSize: 12 }}>
             This action will publish packages to the npm registry
-          </Text>
-        </Space>
-      </Card>
+          </UITypographyText>
+        </UISpace>
+      </UICard>
     </div>
   );
 }

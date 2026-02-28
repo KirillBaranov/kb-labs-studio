@@ -1,14 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Row, Col, Input, Select, Spin, Empty, message } from 'antd';
-import { SearchOutlined, AppstoreOutlined, UnorderedListOutlined } from '@ant-design/icons';
-import { KBPageContainer, KBPageHeader } from '@kb-labs/studio-ui-react';
+import {
+  UIRow,
+  UICol,
+  UIInput, UIInputSearch,
+  UISelect,
+  UISpin,
+  UIEmptyState,
+  UIMessage,
+} from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import type { PluginManifestEntry } from '@kb-labs/studio-data-client';
 import { PluginGrid } from '../components/plugin-grid';
 import { PluginTable } from '../components/plugin-table';
-
-const { Search } = Input;
+import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
 type ViewMode = 'grid' | 'table';
 
@@ -37,7 +42,7 @@ export function PluginsPage() {
       setPlugins(result.manifests);
       setFilteredPlugins(result.manifests);
     } catch (err) {
-      message.error('Failed to load plugins');
+      UIMessage.error('Failed to load plugins');
       console.error(err);
     } finally {
       setLoading(false);
@@ -94,7 +99,7 @@ export function PluginsPage() {
           description="Discovered plugins and their capabilities"
         />
         <div style={{ textAlign: 'center', padding: '80px 0' }}>
-          <Spin size="large" />
+          <UISpin size="large" />
         </div>
       </KBPageContainer>
     );
@@ -107,17 +112,17 @@ export function PluginsPage() {
         description={`${plugins.length} plugin${plugins.length === 1 ? '' : 's'} discovered via auto-discovery`}
       />
 
-      <Row gutter={[16, 16]} style={{ marginTop: 24, marginBottom: 24 }}>
-        <Col xs={24} sm={12} md={8}>
-          <Search
+      <UIRow gutter={[16, 16]} style={{ marginTop: 24, marginBottom: 24 }}>
+        <UICol xs={24} sm={12} md={8}>
+          <UIInputSearch
             placeholder="Search plugins by name, ID, or tags..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             allowClear
           />
-        </Col>
-        <Col xs={24} sm={12} md={8}>
-          <Select
+        </UICol>
+        <UICol xs={24} sm={12} md={8}>
+          <UISelect
             style={{ width: '100%' }}
             value={filterType}
             onChange={setFilterType}
@@ -129,25 +134,22 @@ export function PluginsPage() {
               { label: 'Has Scheduled Jobs', value: 'jobs' },
             ]}
           />
-        </Col>
-        <Col xs={24} sm={24} md={8} style={{ textAlign: 'right' }}>
-          <Select
+        </UICol>
+        <UICol xs={24} sm={24} md={8} style={{ textAlign: 'right' }}>
+          <UISelect
             style={{ width: 140 }}
             value={viewMode}
             onChange={setViewMode}
-          >
-            <Select.Option value="grid">
-              <AppstoreOutlined /> Grid View
-            </Select.Option>
-            <Select.Option value="table">
-              <UnorderedListOutlined /> Table View
-            </Select.Option>
-          </Select>
-        </Col>
-      </Row>
+            options={[
+              { value: 'grid', label: 'Grid View' },
+              { value: 'table', label: 'Table View' },
+            ]}
+          />
+        </UICol>
+      </UIRow>
 
       {filteredPlugins.length === 0 ? (
-        <Empty
+        <UIEmptyState
           description={
             searchQuery || filterType !== 'all'
               ? 'No plugins match your filters'

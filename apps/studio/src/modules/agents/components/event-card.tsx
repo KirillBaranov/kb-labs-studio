@@ -4,31 +4,19 @@
  */
 
 import React from 'react';
-import { Card, Tag, Typography, Space, Collapse, Progress, theme } from 'antd';
-import { MarkdownViewer } from '@/components/markdown';
 import {
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  LoadingOutlined,
-  ToolOutlined,
-  CodeOutlined,
-  ThunderboltOutlined,
-  BulbOutlined,
-  RocketOutlined,
-  StopOutlined,
-  SyncOutlined,
-  FileTextOutlined,
-  SearchOutlined,
-  EditOutlined,
-  DatabaseOutlined,
-  PlayCircleOutlined,
-  PauseCircleOutlined,
-  ClockCircleOutlined,
-} from '@ant-design/icons';
+  UICard,
+  UITag,
+  UITypographyText,
+  UITypographyParagraph,
+  UISpace,
+  UIAccordion,
+  UIProgress,
+  UIIcon,
+  useUITheme,
+} from '@kb-labs/studio-ui-kit';
+import { MarkdownViewer } from '@/components/markdown';
 import type { AgentEvent } from '@kb-labs/agent-contracts';
-
-const { Text, Paragraph } = Typography;
-const { useToken } = theme;
 
 interface EventCardProps {
   event: AgentEvent;
@@ -65,21 +53,21 @@ function truncate(text: string, maxLength: number): string {
  */
 function getToolIcon(toolName: string): React.ReactNode {
   if (toolName.startsWith('fs:') || toolName.includes('file') || toolName.includes('read') || toolName.includes('write')) {
-    return <FileTextOutlined />;
+    return <UIIcon name="FileTextOutlined" />;
   }
   if (toolName.includes('edit')) {
-    return <EditOutlined />;
+    return <UIIcon name="EditOutlined" />;
   }
   if (toolName.includes('search') || toolName.includes('grep') || toolName.includes('glob') || toolName.includes('rag')) {
-    return <SearchOutlined />;
+    return <UIIcon name="SearchOutlined" />;
   }
   if (toolName.includes('bash') || toolName.includes('shell') || toolName.includes('exec')) {
-    return <CodeOutlined />;
+    return <UIIcon name="CodeOutlined" />;
   }
   if (toolName.includes('memory')) {
-    return <DatabaseOutlined />;
+    return <UIIcon name="DatabaseOutlined" />;
   }
-  return <ToolOutlined />;
+  return <UIIcon name="ToolOutlined" />;
 }
 
 /**
@@ -94,69 +82,59 @@ interface EventStyle {
 
 function getEventStyle(event: AgentEvent): EventStyle {
   switch (event.type) {
-    // ═══════════════════════════════════════════════════════════════════════
     // Lifecycle Events
-    // ═══════════════════════════════════════════════════════════════════════
     case 'agent:start':
-      return { icon: <RocketOutlined />, color: 'blue', title: 'Agent Started', showInCompact: true };
+      return { icon: <UIIcon name="RocketOutlined" />, color: 'blue', title: 'Agent Started', showInCompact: true };
     case 'agent:end':
       return {
-        icon: event.data.success ? <CheckCircleOutlined /> : <CloseCircleOutlined />,
+        icon: event.data.success ? <UIIcon name="CheckCircleOutlined" /> : <UIIcon name="CloseCircleOutlined" />,
         color: event.data.success ? 'green' : 'red',
         title: event.data.success ? 'Completed' : 'Failed',
         showInCompact: true,
       };
     case 'agent:error':
-      return { icon: <CloseCircleOutlined />, color: 'red', title: 'Error', showInCompact: true };
+      return { icon: <UIIcon name="CloseCircleOutlined" />, color: 'red', title: 'Error', showInCompact: true };
 
-    // ═══════════════════════════════════════════════════════════════════════
     // Orchestrator Events
-    // ═══════════════════════════════════════════════════════════════════════
     case 'orchestrator:start':
-      return { icon: <PlayCircleOutlined />, color: 'purple', title: 'Planning', showInCompact: true };
+      return { icon: <UIIcon name="PlayCircleOutlined" />, color: 'purple', title: 'Planning', showInCompact: true };
     case 'orchestrator:end':
       return {
-        icon: event.data.success ? <CheckCircleOutlined /> : <CloseCircleOutlined />,
+        icon: event.data.success ? <UIIcon name="CheckCircleOutlined" /> : <UIIcon name="CloseCircleOutlined" />,
         color: event.data.success ? 'green' : 'red',
         title: 'Plan Complete',
         showInCompact: true,
       };
     case 'subtask:start':
-      return { icon: <PlayCircleOutlined />, color: 'cyan', title: `Subtask ${event.data.index + 1}/${event.data.total}`, showInCompact: true };
+      return { icon: <UIIcon name="PlayCircleOutlined" />, color: 'cyan', title: `Subtask ${event.data.index + 1}/${event.data.total}`, showInCompact: true };
     case 'subtask:end':
       return {
-        icon: event.data.success ? <CheckCircleOutlined /> : <CloseCircleOutlined />,
+        icon: event.data.success ? <UIIcon name="CheckCircleOutlined" /> : <UIIcon name="CloseCircleOutlined" />,
         color: event.data.success ? 'success' : 'error',
         title: 'Subtask Done',
         showInCompact: false,
       };
 
-    // ═══════════════════════════════════════════════════════════════════════
     // Iteration Events
-    // ═══════════════════════════════════════════════════════════════════════
     case 'iteration:start':
-      return { icon: <SyncOutlined spin />, color: 'processing', title: `Step ${event.data.iteration}`, showInCompact: false };
+      return { icon: <UIIcon name="SyncOutlined" spin />, color: 'processing', title: `Step ${event.data.iteration}`, showInCompact: false };
     case 'iteration:end':
       return {
-        icon: <CheckCircleOutlined />,
+        icon: <UIIcon name="CheckCircleOutlined" />,
         color: 'default',
         title: `Step ${event.data.iteration} Done`,
         showInCompact: false,
       };
 
-    // ═══════════════════════════════════════════════════════════════════════
     // LLM Events
-    // ═══════════════════════════════════════════════════════════════════════
     case 'llm:start':
-      return { icon: <BulbOutlined />, color: 'purple', title: 'Thinking', showInCompact: true };
+      return { icon: <UIIcon name="BulbOutlined" />, color: 'purple', title: 'Thinking', showInCompact: true };
     case 'llm:chunk':
-      return { icon: <LoadingOutlined spin />, color: 'processing', title: 'Streaming', showInCompact: false };
+      return { icon: <UIIcon name="LoadingOutlined" spin />, color: 'processing', title: 'Streaming', showInCompact: false };
     case 'llm:end':
-      return { icon: <BulbOutlined />, color: 'purple', title: 'Response', showInCompact: true };
+      return { icon: <UIIcon name="BulbOutlined" />, color: 'purple', title: 'Response', showInCompact: true };
 
-    // ═══════════════════════════════════════════════════════════════════════
     // Tool Events
-    // ═══════════════════════════════════════════════════════════════════════
     case 'tool:start':
       return {
         icon: getToolIcon(event.data.toolName),
@@ -173,55 +151,51 @@ function getEventStyle(event: AgentEvent): EventStyle {
       };
     case 'tool:error':
       return {
-        icon: <CloseCircleOutlined />,
+        icon: <UIIcon name="CloseCircleOutlined" />,
         color: 'error',
         title: `${event.data.toolName} Error`,
         showInCompact: true,
       };
 
-    // ═══════════════════════════════════════════════════════════════════════
     // Memory Events
-    // ═══════════════════════════════════════════════════════════════════════
     case 'memory:read':
-      return { icon: <DatabaseOutlined />, color: 'cyan', title: 'Memory Read', showInCompact: false };
+      return { icon: <UIIcon name="DatabaseOutlined" />, color: 'cyan', title: 'Memory Read', showInCompact: false };
     case 'memory:write':
-      return { icon: <DatabaseOutlined />, color: 'cyan', title: 'Memory Write', showInCompact: false };
+      return { icon: <UIIcon name="DatabaseOutlined" />, color: 'cyan', title: 'Memory Write', showInCompact: false };
 
-    // ═══════════════════════════════════════════════════════════════════════
     // Progress Events
-    // ═══════════════════════════════════════════════════════════════════════
     case 'progress:update':
-      return { icon: <LoadingOutlined spin />, color: 'processing', title: event.data.phase, showInCompact: true };
+      return { icon: <UIIcon name="LoadingOutlined" spin />, color: 'processing', title: event.data.phase, showInCompact: true };
     case 'status:change':
       return getStatusStyle(event.data.status);
 
     default:
-      return { icon: <ToolOutlined />, color: 'default', title: 'Event', showInCompact: false };
+      return { icon: <UIIcon name="ToolOutlined" />, color: 'default', title: 'Event', showInCompact: false };
   }
 }
 
 function getStatusStyle(status: string): EventStyle {
   switch (status) {
     case 'thinking':
-      return { icon: <BulbOutlined />, color: 'purple', title: 'Thinking', showInCompact: false };
+      return { icon: <UIIcon name="BulbOutlined" />, color: 'purple', title: 'Thinking', showInCompact: false };
     case 'analyzing':
-      return { icon: <SearchOutlined />, color: 'cyan', title: 'Analyzing', showInCompact: true };
+      return { icon: <UIIcon name="SearchOutlined" />, color: 'cyan', title: 'Analyzing', showInCompact: true };
     case 'planning':
-      return { icon: <FileTextOutlined />, color: 'blue', title: 'Planning', showInCompact: true };
+      return { icon: <UIIcon name="FileTextOutlined" />, color: 'blue', title: 'Planning', showInCompact: true };
     case 'researching':
-      return { icon: <DatabaseOutlined />, color: 'purple', title: 'Researching', showInCompact: true };
+      return { icon: <UIIcon name="DatabaseOutlined" />, color: 'purple', title: 'Researching', showInCompact: true };
     case 'executing':
-      return { icon: <ThunderboltOutlined />, color: 'blue', title: 'Executing', showInCompact: false };
+      return { icon: <UIIcon name="ThunderboltOutlined" />, color: 'blue', title: 'Executing', showInCompact: false };
     case 'finalizing':
-      return { icon: <EditOutlined />, color: 'green', title: 'Finalizing', showInCompact: true };
+      return { icon: <UIIcon name="EditOutlined" />, color: 'green', title: 'Finalizing', showInCompact: true };
     case 'waiting':
-      return { icon: <PauseCircleOutlined />, color: 'orange', title: 'Waiting', showInCompact: false };
+      return { icon: <UIIcon name="PauseCircleOutlined" />, color: 'orange', title: 'Waiting', showInCompact: false };
     case 'done':
-      return { icon: <CheckCircleOutlined />, color: 'green', title: 'Done', showInCompact: true };
+      return { icon: <UIIcon name="CheckCircleOutlined" />, color: 'green', title: 'Done', showInCompact: true };
     case 'error':
-      return { icon: <CloseCircleOutlined />, color: 'red', title: 'Error', showInCompact: true };
+      return { icon: <UIIcon name="CloseCircleOutlined" />, color: 'red', title: 'Error', showInCompact: true };
     default:
-      return { icon: <ClockCircleOutlined />, color: 'default', title: status, showInCompact: false };
+      return { icon: <UIIcon name="ClockCircleOutlined" />, color: 'default', title: status, showInCompact: false };
   }
 }
 
@@ -229,115 +203,109 @@ function getStatusStyle(status: string): EventStyle {
  * Render event content based on type
  */
 function EventContent({ event }: { event: AgentEvent }) {
-  const { token } = useToken();
+  const { token } = useUITheme();
 
   switch (event.type) {
-    // ═══════════════════════════════════════════════════════════════════════
     // Agent Lifecycle
-    // ═══════════════════════════════════════════════════════════════════════
     case 'agent:start':
       return (
-        <Space direction="vertical" size={4} style={{ width: '100%' }}>
-          <Text style={{ fontSize: 13 }}>{event.data.task}</Text>
-          <Space size={4} wrap>
-            <Tag color="blue" style={{ margin: 0 }}>{event.data.tier}</Tag>
-            <Tag style={{ margin: 0 }}>{event.data.toolCount} tools</Tag>
-            <Tag style={{ margin: 0 }}>max {event.data.maxIterations} steps</Tag>
-          </Space>
-        </Space>
+        <UISpace direction="vertical" size={4} style={{ width: '100%' }}>
+          <UITypographyText style={{ fontSize: 13 }}>{event.data.task}</UITypographyText>
+          <UISpace size={4} wrap>
+            <UITag color="blue" style={{ margin: 0 }}>{event.data.tier}</UITag>
+            <UITag style={{ margin: 0 }}>{event.data.toolCount} tools</UITag>
+            <UITag style={{ margin: 0 }}>max {event.data.maxIterations} steps</UITag>
+          </UISpace>
+        </UISpace>
       );
 
     case 'agent:end':
       return (
-        <Space direction="vertical" size={4} style={{ width: '100%' }}>
-          <Text style={{ fontSize: 13 }}>{event.data.summary}</Text>
-          <Space size={8} wrap>
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              <ClockCircleOutlined /> {formatDuration(event.data.durationMs)}
-            </Text>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+        <UISpace direction="vertical" size={4} style={{ width: '100%' }}>
+          <UITypographyText style={{ fontSize: 13 }}>{event.data.summary}</UITypographyText>
+          <UISpace size={8} wrap>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
+              <UIIcon name="ClockCircleOutlined" /> {formatDuration(event.data.durationMs)}
+            </UITypographyText>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               {formatTokens(event.data.tokensUsed)} tokens
-            </Text>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            </UITypographyText>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               {event.data.iterations} steps
-            </Text>
-          </Space>
+            </UITypographyText>
+          </UISpace>
           {(event.data.filesCreated.length > 0 || event.data.filesModified.length > 0) && (
-            <Space size={4} wrap>
+            <UISpace size={4} wrap>
               {event.data.filesCreated.length > 0 && (
-                <Tag color="green" style={{ margin: 0 }}>+{event.data.filesCreated.length} files</Tag>
+                <UITag color="green" style={{ margin: 0 }}>+{event.data.filesCreated.length} files</UITag>
               )}
               {event.data.filesModified.length > 0 && (
-                <Tag color="blue" style={{ margin: 0 }}>~{event.data.filesModified.length} files</Tag>
+                <UITag color="blue" style={{ margin: 0 }}>~{event.data.filesModified.length} files</UITag>
               )}
-            </Space>
+            </UISpace>
           )}
-        </Space>
+        </UISpace>
       );
 
     case 'agent:error':
       return (
-        <Text type="danger" style={{ fontSize: 13 }}>
+        <UITypographyText type="danger" style={{ fontSize: 13 }}>
           {event.data.error}
-          {event.data.recoverable && <Tag color="orange" style={{ marginLeft: 8 }}>Recoverable</Tag>}
-        </Text>
+          {event.data.recoverable && <UITag color="orange" style={{ marginLeft: 8 }}>Recoverable</UITag>}
+        </UITypographyText>
       );
 
-    // ═══════════════════════════════════════════════════════════════════════
     // Orchestrator
-    // ═══════════════════════════════════════════════════════════════════════
     case 'orchestrator:start':
       return (
-        <Space size={8}>
-          <Text style={{ fontSize: 13 }}>{truncate(event.data.task, 100)}</Text>
-          <Tag color={event.data.complexity === 'complex' ? 'orange' : 'green'} style={{ margin: 0 }}>
+        <UISpace size={8}>
+          <UITypographyText style={{ fontSize: 13 }}>{truncate(event.data.task, 100)}</UITypographyText>
+          <UITag color={event.data.complexity === 'complex' ? 'orange' : 'green'} style={{ margin: 0 }}>
             {event.data.complexity}
-          </Tag>
-        </Space>
+          </UITag>
+        </UISpace>
       );
 
     case 'orchestrator:end':
       return (
-        <Space direction="vertical" size={4} style={{ width: '100%' }}>
-          {event.data.summary && <Text style={{ fontSize: 13 }}>{event.data.summary}</Text>}
-          <Space size={8}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+        <UISpace direction="vertical" size={4} style={{ width: '100%' }}>
+          {event.data.summary && <UITypographyText style={{ fontSize: 13 }}>{event.data.summary}</UITypographyText>}
+          <UISpace size={8}>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               {event.data.completedCount}/{event.data.subtaskCount} subtasks
-            </Text>
+            </UITypographyText>
             {event.data.durationMs && (
-              <Text type="secondary" style={{ fontSize: 12 }}>
-                <ClockCircleOutlined /> {formatDuration(event.data.durationMs)}
-              </Text>
+              <UITypographyText type="secondary" style={{ fontSize: 12 }}>
+                <UIIcon name="ClockCircleOutlined" /> {formatDuration(event.data.durationMs)}
+              </UITypographyText>
             )}
-          </Space>
-        </Space>
+          </UISpace>
+        </UISpace>
       );
 
     case 'subtask:start':
       return (
-        <Text style={{ fontSize: 13 }}>{event.data.description}</Text>
+        <UITypographyText style={{ fontSize: 13 }}>{event.data.description}</UITypographyText>
       );
 
     case 'subtask:end':
       return event.data.summary ? (
-        <Text style={{ fontSize: 13 }} type={event.data.success ? undefined : 'danger'}>
+        <UITypographyText style={{ fontSize: 13 }} type={event.data.success ? undefined : 'danger'}>
           {event.data.summary}
-        </Text>
+        </UITypographyText>
       ) : null;
 
-    // ═══════════════════════════════════════════════════════════════════════
     // LLM Events
-    // ═══════════════════════════════════════════════════════════════════════
     case 'llm:start':
       return (
-        <Text type="secondary" style={{ fontSize: 12 }}>
-          {event.data.tier} tier • {event.data.messageCount} messages
-        </Text>
+        <UITypographyText type="secondary" style={{ fontSize: 12 }}>
+          {event.data.tier} tier - {event.data.messageCount} messages
+        </UITypographyText>
       );
 
     case 'llm:end':
       return (
-        <Space direction="vertical" size={4} style={{ width: '100%' }}>
+        <UISpace direction="vertical" size={4} style={{ width: '100%' }}>
           {event.data.content && (
             <div
               style={{
@@ -352,28 +320,26 @@ function EventContent({ event }: { event: AgentEvent }) {
               <MarkdownViewer>{event.data.content}</MarkdownViewer>
             </div>
           )}
-          <Space size={8}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+          <UISpace size={8}>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               {formatTokens(event.data.tokensUsed)} tokens
-            </Text>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            </UITypographyText>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               {formatDuration(event.data.durationMs)}
-            </Text>
+            </UITypographyText>
             {event.data.hasToolCalls && (
-              <Tag color="blue" style={{ margin: 0 }}>has tool calls</Tag>
+              <UITag color="blue" style={{ margin: 0 }}>has tool calls</UITag>
             )}
-          </Space>
-        </Space>
+          </UISpace>
+        </UISpace>
       );
 
     case 'llm:chunk':
       return (
-        <Text style={{ fontSize: 13, fontFamily: 'monospace' }}>{event.data.chunk}</Text>
+        <UITypographyText style={{ fontSize: 13, fontFamily: 'monospace' }}>{event.data.chunk}</UITypographyText>
       );
 
-    // ═══════════════════════════════════════════════════════════════════════
     // Tool Events
-    // ═══════════════════════════════════════════════════════════════════════
     case 'tool:start':
       return (
         <ToolInputDisplay input={event.data.input} metadata={event.data.metadata} />
@@ -381,13 +347,13 @@ function EventContent({ event }: { event: AgentEvent }) {
 
     case 'tool:end':
       return (
-        <Space direction="vertical" size={4} style={{ width: '100%' }}>
-          <Space size={8}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+        <UISpace direction="vertical" size={4} style={{ width: '100%' }}>
+          <UISpace size={8}>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               {formatDuration(event.data.durationMs)}
-            </Text>
-            {!event.data.success && <Tag color="error" style={{ margin: 0 }}>failed</Tag>}
-          </Space>
+            </UITypographyText>
+            {!event.data.success && <UITag color="error" style={{ margin: 0 }}>failed</UITag>}
+          </UISpace>
           {event.data.output && (
             <ToolOutputDisplay
               output={event.data.output}
@@ -395,77 +361,71 @@ function EventContent({ event }: { event: AgentEvent }) {
               metadata={event.data.metadata}
             />
           )}
-        </Space>
+        </UISpace>
       );
 
     case 'tool:error':
       return (
-        <Text type="danger" style={{ fontSize: 13 }}>{event.data.error}</Text>
+        <UITypographyText type="danger" style={{ fontSize: 13 }}>{event.data.error}</UITypographyText>
       );
 
-    // ═══════════════════════════════════════════════════════════════════════
     // Iteration Events
-    // ═══════════════════════════════════════════════════════════════════════
     case 'iteration:start':
       return (
-        <Text type="secondary" style={{ fontSize: 12 }}>
+        <UITypographyText type="secondary" style={{ fontSize: 12 }}>
           Step {event.data.iteration} of {event.data.maxIterations}
-        </Text>
+        </UITypographyText>
       );
 
     case 'iteration:end':
       return (
-        <Space size={8}>
+        <UISpace size={8}>
           {event.data.hadToolCalls ? (
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               {event.data.toolCallCount} tool call{event.data.toolCallCount !== 1 ? 's' : ''}
-            </Text>
+            </UITypographyText>
           ) : (
-            <Text type="secondary" style={{ fontSize: 12 }}>No tool calls</Text>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>No tool calls</UITypographyText>
           )}
-        </Space>
+        </UISpace>
       );
 
-    // ═══════════════════════════════════════════════════════════════════════
     // Memory Events
-    // ═══════════════════════════════════════════════════════════════════════
     case 'memory:read':
       return (
-        <Text type="secondary" style={{ fontSize: 12 }}>
+        <UITypographyText type="secondary" style={{ fontSize: 12 }}>
           Read {event.data.entryCount} entries from {event.data.source} memory
-        </Text>
+        </UITypographyText>
       );
 
     case 'memory:write':
       return (
-        <Space direction="vertical" size={4} style={{ width: '100%' }}>
-          <Space size={8}>
-            <Tag color="cyan" style={{ margin: 0 }}>{event.data.entryType}</Tag>
-            <Tag style={{ margin: 0 }}>{event.data.target}</Tag>
-          </Space>
-          <Text style={{ fontSize: 13 }}>{truncate(event.data.content, 200)}</Text>
-        </Space>
+        <UISpace direction="vertical" size={4} style={{ width: '100%' }}>
+          <UISpace size={8}>
+            <UITag color="cyan" style={{ margin: 0 }}>{event.data.entryType}</UITag>
+            <UITag style={{ margin: 0 }}>{event.data.target}</UITag>
+          </UISpace>
+          <UITypographyText style={{ fontSize: 13 }}>{truncate(event.data.content, 200)}</UITypographyText>
+        </UISpace>
       );
 
-    // ═══════════════════════════════════════════════════════════════════════
     // Progress Events
-    // ═══════════════════════════════════════════════════════════════════════
     case 'progress:update':
       return (
-        <Space direction="vertical" size={4} style={{ width: '100%' }}>
-          {event.data.message && <Text style={{ fontSize: 13 }}>{event.data.message}</Text>}
-          <Progress
+        <UISpace direction="vertical" size={4} style={{ width: '100%' }}>
+          {event.data.message && <UITypographyText style={{ fontSize: 13 }}>{event.data.message}</UITypographyText>}
+          <UIProgress
             percent={event.data.progress}
             size="small"
             status="active"
             style={{ margin: 0 }}
           />
-        </Space>
+        </UISpace>
       );
 
     case 'status:change':
       return event.data.message ? (
-        <Text type="secondary" style={{ fontSize: 13 }}>{event.data.message}</Text>
+        <UITypographyText type="secondary" style={{ fontSize: 13 }}>{event.data.message}</UITypographyText>
       ) : null;
 
     default:
@@ -481,33 +441,33 @@ function EventContent({ event }: { event: AgentEvent }) {
  * Display tool input in a readable format
  */
 function ToolInputDisplay({ input, metadata }: { input: Record<string, unknown>; metadata?: any }) {
-  const { token } = useToken();
+  const { token } = useUITheme();
 
   // Special handling for common input patterns
   if (input.file_path || input.filePath || input.path) {
     const path = (input.file_path || input.filePath || input.path) as string;
     return (
-      <Text code style={{ fontSize: 12 }}>{path}</Text>
+      <UITypographyText code style={{ fontSize: 12 }}>{path}</UITypographyText>
     );
   }
 
   if (input.pattern) {
     return (
-      <Text code style={{ fontSize: 12 }}>{input.pattern as string}</Text>
+      <UITypographyText code style={{ fontSize: 12 }}>{input.pattern as string}</UITypographyText>
     );
   }
 
   if (input.command) {
     return (
-      <Text code style={{ fontSize: 12 }}>{truncate(input.command as string, 100)}</Text>
+      <UITypographyText code style={{ fontSize: 12 }}>{truncate(input.command as string, 100)}</UITypographyText>
     );
   }
 
   if (input.query || input.text) {
     return (
-      <Text style={{ fontSize: 12, fontStyle: 'italic' }}>
+      <UITypographyText style={{ fontSize: 12, fontStyle: 'italic' }}>
         "{truncate((input.query || input.text) as string, 100)}"
-      </Text>
+      </UITypographyText>
     );
   }
 
@@ -517,19 +477,19 @@ function ToolInputDisplay({ input, metadata }: { input: Record<string, unknown>;
 
   if (keys.length <= 2) {
     return (
-      <Text type="secondary" style={{ fontSize: 12 }}>
+      <UITypographyText type="secondary" style={{ fontSize: 12 }}>
         {keys.map(k => `${k}: ${truncate(String(input[k]), 30)}`).join(', ')}
-      </Text>
+      </UITypographyText>
     );
   }
 
   return (
-    <Collapse
+    <UIAccordion
       size="small"
       ghost
       items={[{
         key: 'input',
-        label: <Text type="secondary" style={{ fontSize: 11 }}>Show input</Text>,
+        label: <UITypographyText type="secondary" style={{ fontSize: 11 }}>Show input</UITypographyText>,
         children: (
           <pre style={{ margin: 0, fontSize: 11, overflow: 'auto', maxHeight: 150 }}>
             {JSON.stringify(input, null, 2)}
@@ -544,7 +504,7 @@ function ToolInputDisplay({ input, metadata }: { input: Record<string, unknown>;
  * Display tool output in a readable format
  */
 function ToolOutputDisplay({ output, success, metadata }: { output: string; success: boolean; metadata?: any }) {
-  const { token } = useToken();
+  const { token } = useUITheme();
 
   // If output is short, show inline
   if (output.length < 200) {
@@ -569,15 +529,15 @@ function ToolOutputDisplay({ output, success, metadata }: { output: string; succ
 
   // Longer output in collapsible
   return (
-    <Collapse
+    <UIAccordion
       size="small"
       ghost
       items={[{
         key: 'output',
         label: (
-          <Text type={success ? 'success' : 'danger'} style={{ fontSize: 11 }}>
+          <UITypographyText type={success ? 'success' : 'danger'} style={{ fontSize: 11 }}>
             {success ? 'Show output' : 'Show error'} ({output.length} chars)
-          </Text>
+          </UITypographyText>
         ),
         children: (
           <pre
@@ -600,7 +560,7 @@ function ToolOutputDisplay({ output, success, metadata }: { output: string; succ
 }
 
 export function EventCard({ event, compact = false }: EventCardProps) {
-  const { token } = useToken();
+  const { token } = useUITheme();
   const { icon, color, title, showInCompact } = getEventStyle(event);
   const timestamp = new Date(event.timestamp).toLocaleTimeString([], {
     hour: '2-digit',
@@ -616,7 +576,7 @@ export function EventCard({ event, compact = false }: EventCardProps) {
   const isMinimal = ['status:change', 'iteration:start', 'iteration:end', 'llm:start', 'memory:read'].includes(event.type);
 
   return (
-    <Card
+    <UICard
       size="small"
       style={{
         marginBottom: 6,
@@ -626,22 +586,22 @@ export function EventCard({ event, compact = false }: EventCardProps) {
         body: { padding: isMinimal ? '8px 12px' : '10px 14px' },
       }}
     >
-      <Space direction="vertical" size={4} style={{ width: '100%' }}>
+      <UISpace direction="vertical" size={4} style={{ width: '100%' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Space size={6}>
-            <Tag icon={icon} color={color} style={{ margin: 0 }}>
+          <UISpace size={6}>
+            <UITag icon={icon} color={color} style={{ margin: 0 }}>
               {title}
-            </Tag>
+            </UITag>
             {event.sessionId && event.type !== 'agent:start' && (
-              <Text type="secondary" style={{ fontSize: 11 }}>{event.sessionId.slice(-8)}</Text>
+              <UITypographyText type="secondary" style={{ fontSize: 11 }}>{event.sessionId.slice(-8)}</UITypographyText>
             )}
-          </Space>
-          <Text type="secondary" style={{ fontSize: 11 }}>
+          </UISpace>
+          <UITypographyText type="secondary" style={{ fontSize: 11 }}>
             {timestamp}
-          </Text>
+          </UITypographyText>
         </div>
         <EventContent event={event} />
-      </Space>
-    </Card>
+      </UISpace>
+    </UICard>
   );
 }

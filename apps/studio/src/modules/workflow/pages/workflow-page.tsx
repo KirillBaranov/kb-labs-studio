@@ -5,15 +5,14 @@
 
 import * as React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Tabs, Row, Col, Space, Typography } from 'antd';
 import {
-  ThunderboltOutlined,
-  AppstoreOutlined,
-  UnorderedListOutlined,
-  ClockCircleOutlined,
-  HistoryOutlined,
-} from '@ant-design/icons';
-import { KBPageContainer, KBPageHeader, KBCard } from '@kb-labs/studio-ui-react';
+  UITabs,
+  UIRow,
+  UICol,
+  UISpace,
+  UITypographyText,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useQuery } from '@tanstack/react-query';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { RunningNowPanel } from '../components/running-now-panel';
@@ -22,8 +21,8 @@ import { JobsTab } from '../components/jobs-tab';
 import { CronsTab } from '../components/crons-tab';
 import { HistoryTab } from '../components/history-tab';
 import type { DashboardStatsResponse } from '@kb-labs/workflow-contracts';
-
-const { Text } = Typography;
+import { UICard } from '@kb-labs/studio-ui-kit';
+import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
 export function WorkflowPage() {
   const params = useParams<{ tab?: string }>();
@@ -46,40 +45,40 @@ export function WorkflowPage() {
     {
       key: 'workflows',
       label: (
-        <Space className="gap-tight">
-          <AppstoreOutlined />
+        <UISpace className="gap-tight">
+          <UIIcon name="AppstoreOutlined" />
           <span>Workflows</span>
-        </Space>
+        </UISpace>
       ),
       children: <WorkflowsTab />,
     },
     {
       key: 'jobs',
       label: (
-        <Space className="gap-tight">
-          <UnorderedListOutlined />
+        <UISpace className="gap-tight">
+          <UIIcon name="UnorderedListOutlined" />
           <span>Background Jobs</span>
-        </Space>
+        </UISpace>
       ),
       children: <JobsTab />,
     },
     {
       key: 'crons',
       label: (
-        <Space className="gap-tight">
-          <ClockCircleOutlined />
+        <UISpace className="gap-tight">
+          <UIIcon name="ClockCircleOutlined" />
           <span>Cron Jobs</span>
-        </Space>
+        </UISpace>
       ),
       children: <CronsTab />,
     },
     {
       key: 'history',
       label: (
-        <Space className="gap-tight">
-          <HistoryOutlined />
+        <UISpace className="gap-tight">
+          <UIIcon name="HistoryOutlined" />
           <span>History</span>
-        </Space>
+        </UISpace>
       ),
       children: <HistoryTab />,
     },
@@ -90,74 +89,74 @@ export function WorkflowPage() {
       <KBPageHeader
         title="Workflow Dashboard"
         description="Monitor workflows, jobs, and scheduled tasks"
-        icon={<ThunderboltOutlined />}
+        icon={<UIIcon name="ThunderboltOutlined" />}
       />
 
       {/* Overview Stats */}
-      <KBCard style={{ marginBottom: 'var(--spacing-section)' }}>
-        <Row gutter={16}>
-          <Col span={6}>
-            <Space direction="vertical" className="gap-tight">
-              <Text className="typo-label text-secondary">Total Workflows</Text>
-              <Text className="typo-section-title">{stats?.workflows.total || 0}</Text>
-              <Space className="gap-tight">
-                <Text className="typo-caption text-success">
+      <UICard style={{ marginBottom: 'var(--spacing-section)' }}>
+        <UIRow gutter={16}>
+          <UICol span={6}>
+            <UISpace direction="vertical" className="gap-tight">
+              <UITypographyText className="typo-label text-secondary">Total Workflows</UITypographyText>
+              <UITypographyText className="typo-section-title">{stats?.workflows.total || 0}</UITypographyText>
+              <UISpace className="gap-tight">
+                <UITypographyText className="typo-caption text-success">
                   {stats?.workflows.active || 0} active
-                </Text>
-                <Text className="typo-caption text-secondary">
+                </UITypographyText>
+                <UITypographyText className="typo-caption text-secondary">
                   {stats?.workflows.inactive || 0} inactive
-                </Text>
-              </Space>
-            </Space>
-          </Col>
-          <Col span={6}>
-            <Space direction="vertical" className="gap-tight">
-              <Text className="typo-label text-secondary">Jobs Running</Text>
-              <Text className="typo-section-title text-info">
+                </UITypographyText>
+              </UISpace>
+            </UISpace>
+          </UICol>
+          <UICol span={6}>
+            <UISpace direction="vertical" className="gap-tight">
+              <UITypographyText className="typo-label text-secondary">Jobs Running</UITypographyText>
+              <UITypographyText className="typo-section-title text-info">
                 {stats?.jobs.running || 0}
-              </Text>
-              <Space className="gap-tight">
-                <Text className="typo-caption text-secondary">
+              </UITypographyText>
+              <UISpace className="gap-tight">
+                <UITypographyText className="typo-caption text-secondary">
                   {stats?.jobs.pending || 0} pending
-                </Text>
-              </Space>
-            </Space>
-          </Col>
-          <Col span={6}>
-            <Space direction="vertical" className="gap-tight">
-              <Text className="typo-label text-secondary">Jobs Completed</Text>
-              <Text className="typo-section-title text-success">
+                </UITypographyText>
+              </UISpace>
+            </UISpace>
+          </UICol>
+          <UICol span={6}>
+            <UISpace direction="vertical" className="gap-tight">
+              <UITypographyText className="typo-label text-secondary">Jobs Completed</UITypographyText>
+              <UITypographyText className="typo-section-title text-success">
                 {stats?.jobs.completed || 0}
-              </Text>
-              <Space className="gap-tight">
-                <Text className="typo-caption text-error">
+              </UITypographyText>
+              <UISpace className="gap-tight">
+                <UITypographyText className="typo-caption text-error">
                   {stats?.jobs.failed || 0} failed
-                </Text>
-              </Space>
-            </Space>
-          </Col>
-          <Col span={6}>
-            <Space direction="vertical" className="gap-tight">
-              <Text className="typo-label text-secondary">Cron Jobs</Text>
-              <Text className="typo-section-title">{stats?.crons.total || 0}</Text>
-              <Space className="gap-tight">
-                <Text className="typo-caption text-success">
+                </UITypographyText>
+              </UISpace>
+            </UISpace>
+          </UICol>
+          <UICol span={6}>
+            <UISpace direction="vertical" className="gap-tight">
+              <UITypographyText className="typo-label text-secondary">Cron Jobs</UITypographyText>
+              <UITypographyText className="typo-section-title">{stats?.crons.total || 0}</UITypographyText>
+              <UISpace className="gap-tight">
+                <UITypographyText className="typo-caption text-success">
                   {stats?.crons.enabled || 0} enabled
-                </Text>
-                <Text className="typo-caption text-secondary">
+                </UITypographyText>
+                <UITypographyText className="typo-caption text-secondary">
                   {stats?.crons.disabled || 0} disabled
-                </Text>
-              </Space>
-            </Space>
-          </Col>
-        </Row>
-      </KBCard>
+                </UITypographyText>
+              </UISpace>
+            </UISpace>
+          </UICol>
+        </UIRow>
+      </UICard>
 
       {/* Running Now Panel */}
       <RunningNowPanel />
 
       {/* Main Tabs */}
-      <Tabs
+      <UITabs
         activeKey={activeTab}
         onChange={handleTabChange}
         items={tabItems}

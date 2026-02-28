@@ -1,7 +1,4 @@
-import { theme } from 'antd';
-import { UICard, UIText } from '@kb-labs/studio-ui-kit';
-
-const { useToken } = theme;
+import { UICard, UIText, useUITheme } from '@kb-labs/studio-ui-kit';
 
 interface ResourceQuotasProps {
   quotas: {
@@ -12,7 +9,7 @@ interface ResourceQuotasProps {
 }
 
 export function ResourceQuotas({ quotas }: ResourceQuotasProps) {
-  const { token } = useToken();
+  const { token } = useUITheme();
 
   return (
     <UICard title="Resource Quotas">

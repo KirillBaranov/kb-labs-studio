@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Card, Row, Col, Table, Tag, Typography } from 'antd';
+import { UICard, UIRow, UICol, UITable, UITag, UITypographyText, UITitle } from '@kb-labs/studio-ui-kit';
 import { HolderOutlined, DollarOutlined, RiseOutlined, FallOutlined } from '@ant-design/icons';
 import { UIPieChart } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '../../../providers/data-sources-provider';
@@ -9,7 +9,7 @@ import {
   useAdaptersVectorStoreUsage,
 } from '@kb-labs/studio-data-client';
 
-const { Text, Title } = Typography;
+
 
 interface CostBreakdown {
   adapter: string;
@@ -154,7 +154,7 @@ export function CostAttributionWidget() {
       render: (text: string, record: ModelSpender) => (
         <div>
           <div>{text}</div>
-          <Tag color="blue" style={{ marginTop: 4 }}>{record.adapter}</Tag>
+          <UITag color="blue" style={{ marginTop: 4 }}>{record.adapter}</UITag>
         </div>
       ),
     },
@@ -167,11 +167,11 @@ export function CostAttributionWidget() {
         const isAnomaly = anomalies.some(a => a.model === record.model);
         return (
           <div>
-            <Text strong>${cost.toFixed(4)}</Text>
+            <UITypographyText strong>${cost.toFixed(4)}</UITypographyText>
             {isAnomaly && (
-              <Tag color="red" style={{ marginLeft: 8 }}>
+              <UITag color="red" style={{ marginLeft: 8 }}>
                 Spike!
-              </Tag>
+              </UITag>
             )}
           </div>
         );
@@ -192,7 +192,7 @@ export function CostAttributionWidget() {
   ];
 
   return (
-    <Card
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
@@ -203,9 +203,9 @@ export function CostAttributionWidget() {
       style={{ height: '100%' }}
       bodyStyle={{ padding: '16px' }}
     >
-      <Row gutter={[16, 16]}>
+      <UIRow gutter={[16, 16]}>
         {/* Total Cost Summary */}
-        <Col span={24}>
+        <UICol span={24}>
           <div style={{
             padding: '12px 16px',
             background: 'var(--accent-subtle)',
@@ -215,23 +215,23 @@ export function CostAttributionWidget() {
             alignItems: 'center',
           }}>
             <div>
-              <Text type="secondary">Total Cost (Today)</Text>
-              <Title level={3} style={{ margin: '4px 0 0 0' }}>
+              <UITypographyText type="secondary">Total Cost (Today)</UITypographyText>
+              <UITitle level={3} style={{ margin: '4px 0 0 0' }}>
                 ${costData.totalCost.toFixed(2)}
-              </Title>
+              </UITitle>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <Text type="secondary">vs Yesterday</Text>
+              <UITypographyText type="secondary">vs Yesterday</UITypographyText>
               <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
                 <RiseOutlined style={{ color: 'var(--error)', fontSize: 16 }} />
-                <Text strong style={{ color: 'var(--error)' }}>+12.3%</Text>
+                <UITypographyText strong style={{ color: 'var(--error)' }}>+12.3%</UITypographyText>
               </div>
             </div>
           </div>
-        </Col>
+        </UICol>
 
         {/* Pie Chart */}
-        <Col xs={24} md={12}>
+        <UICol xs={24} md={12}>
           {pieChartData.length > 0 ? (
             <UIPieChart {...pieConfig} />
           ) : (
@@ -245,12 +245,12 @@ export function CostAttributionWidget() {
               No cost data available
             </div>
           )}
-        </Col>
+        </UICol>
 
         {/* Breakdown Table */}
-        <Col xs={24} md={12}>
+        <UICol xs={24} md={12}>
           <div style={{ height: 250, overflowY: 'auto' }}>
-            <Table
+            <UITable
               dataSource={costData.breakdown}
               columns={[
                 {
@@ -276,12 +276,12 @@ export function CostAttributionWidget() {
               rowKey="adapter"
             />
           </div>
-        </Col>
+        </UICol>
 
         {/* Top Spenders */}
-        <Col span={24}>
-          <Title level={5}>Top Spenders by Model</Title>
-          <Table
+        <UICol span={24}>
+          <UITitle level={5}>Top Spenders by Model</UITitle>
+          <UITable
             dataSource={topSpenders}
             columns={columns}
             pagination={false}
@@ -289,8 +289,8 @@ export function CostAttributionWidget() {
             rowKey="model"
             scroll={{ y: 200 }}
           />
-        </Col>
-      </Row>
-    </Card>
+        </UICol>
+      </UIRow>
+    </UICard>
   );
 }

@@ -5,35 +5,21 @@
 
 import * as React from 'react';
 import {
-  Card,
-  Button,
-  Space,
-  Typography,
-  Tag,
-  Collapse,
-  Input,
-  Divider,
-  Spin,
-  Result,
-  message,
-  Popconfirm,
-} from 'antd';
-import {
-  FileTextOutlined,
-  EditOutlined,
-  BuildOutlined,
-  FolderOutlined,
-  RocketOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  WarningOutlined,
-  CloseCircleOutlined,
-  LoadingOutlined,
-  ReloadOutlined,
-  LockOutlined,
-  ExclamationCircleOutlined,
-  RollbackOutlined,
-} from '@ant-design/icons';
+  UICard,
+  UIButton,
+  UISpace,
+  UITypographyText,
+  UITitle,
+  UITag,
+  UIAccordion,
+  UIInput,
+  UIDivider,
+  UISpin,
+  UIResult,
+  UIMessage,
+  UIPopconfirm,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import {
   useReleaseChecklist,
@@ -49,8 +35,6 @@ import {
 } from '@kb-labs/studio-data-client';
 import type { ChecklistItemStatus } from '@kb-labs/release-manager-contracts';
 import { useQueryClient } from '@tanstack/react-query';
-
-const { Text, Title } = Typography;
 
 interface ReleaseChecklistProps {
   selectedScope: string;
@@ -73,17 +57,17 @@ function formatBytes(bytes: number): string {
 function getStatusIcon(status: ChecklistItemStatus) {
   switch (status) {
     case 'ready':
-      return <CheckCircleOutlined style={{ color: '#52c41a', fontSize: 18 }} />;
+      return <UIIcon name="CheckCircleOutlined" style={{ color: '#52c41a', fontSize: 18 }} />;
     case 'pending':
-      return <ClockCircleOutlined style={{ color: '#8c8c8c', fontSize: 18 }} />;
+      return <UIIcon name="ClockCircleOutlined" style={{ color: '#8c8c8c', fontSize: 18 }} />;
     case 'warning':
-      return <WarningOutlined style={{ color: '#faad14', fontSize: 18 }} />;
+      return <UIIcon name="WarningOutlined" style={{ color: '#faad14', fontSize: 18 }} />;
     case 'error':
-      return <CloseCircleOutlined style={{ color: '#ff4d4f', fontSize: 18 }} />;
+      return <UIIcon name="CloseCircleOutlined" style={{ color: '#ff4d4f', fontSize: 18 }} />;
     case 'running':
-      return <LoadingOutlined style={{ color: '#1890ff', fontSize: 18 }} />;
+      return <UIIcon name="LoadingOutlined" style={{ color: '#1890ff', fontSize: 18 }} />;
     default:
-      return <ClockCircleOutlined style={{ color: '#8c8c8c', fontSize: 18 }} />;
+      return <UIIcon name="ClockCircleOutlined" style={{ color: '#8c8c8c', fontSize: 18 }} />;
   }
 }
 
@@ -143,20 +127,20 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
   const handleGeneratePlan = async () => {
     try {
       await generatePlanMutation.mutateAsync({ scope: selectedScope });
-      message.success('Release plan generated');
+      UIMessage.success('Release plan generated');
       setExpandedKeys(['plan']);
     } catch (error) {
-      message.error(`Failed to generate plan: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      UIMessage.error(`Failed to generate plan: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
   const handleGenerateChangelog = async () => {
     try {
       await generateChangelogMutation.mutateAsync({ scope: selectedScope });
-      message.success('Changelog generated');
+      UIMessage.success('Changelog generated');
       setExpandedKeys(['changelog']);
     } catch (error) {
-      message.error(`Failed to generate changelog: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      UIMessage.error(`Failed to generate changelog: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -164,13 +148,13 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
     try {
       const result = await triggerBuildMutation.mutateAsync({ scope: selectedScope });
       if (result.success) {
-        message.success('Build completed successfully');
+        UIMessage.success('Build completed successfully');
         setExpandedKeys(['preview']);
       } else {
-        message.error('Build failed');
+        UIMessage.error('Build failed');
       }
     } catch (error) {
-      message.error(`Build failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      UIMessage.error(`Build failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -188,20 +172,20 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
         otp,
       });
       setReleaseComplete(true);
-      message.success('Release published successfully!');
+      UIMessage.success('Release published successfully!');
     } catch (error) {
-      message.error(`Release failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      UIMessage.error(`Release failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
   const handleRollback = async () => {
     try {
       await rollbackMutation.mutateAsync({ scope: selectedScope });
-      message.success('Rollback completed');
+      UIMessage.success('Rollback completed');
       setReleaseComplete(false);
       setOtp('');
     } catch (error) {
-      message.error(`Rollback failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      UIMessage.error(`Rollback failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -214,61 +198,61 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
 
   if (!selectedScope) {
     return (
-      <Card>
-        <Result
+      <UICard>
+        <UIResult
           status="info"
           title="Select a scope"
           subTitle="Please select a package or monorepo scope to start the release process."
         />
-      </Card>
+      </UICard>
     );
   }
 
   if (checklistLoading) {
     return (
-      <Card>
+      <UICard>
         <div style={{ textAlign: 'center', padding: 48 }}>
-          <Spin size="large" />
+          <UISpin size="large" />
           <div style={{ marginTop: 16 }}>
-            <Text type="secondary">Loading release checklist...</Text>
+            <UITypographyText type="secondary">Loading release checklist...</UITypographyText>
           </div>
         </div>
-      </Card>
+      </UICard>
     );
   }
 
   if (releaseComplete) {
     return (
-      <Card>
-        <Result
+      <UICard>
+        <UIResult
           status="success"
           title="Release Published!"
           subTitle={`${planData?.plan?.packages.length ?? 0} package(s) published to npm`}
           extra={[
-            <Popconfirm
+            <UIPopconfirm
               key="rollback"
               title="Rollback Release"
               description="This will unpublish the packages. Are you sure?"
-              icon={<ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />}
+              icon={<UIIcon name="ExclamationCircleOutlined" style={{ color: '#ff4d4f' }} />}
               onConfirm={handleRollback}
               okText="Yes, Rollback"
               okButtonProps={{ danger: true }}
               cancelText="Cancel"
             >
-              <Button icon={<RollbackOutlined />} loading={rollbackMutation.isPending} danger>
+              <UIButton icon={<UIIcon name="RollbackOutlined" />} loading={rollbackMutation.isPending} danger>
                 Rollback
-              </Button>
-            </Popconfirm>,
-            <Button key="new" type="primary" onClick={() => {
+              </UIButton>
+            </UIPopconfirm>,
+            <UIButton key="new" type="primary" onClick={() => {
               setReleaseComplete(false);
               setOtp('');
               handleRefresh();
             }}>
               Start New Release
-            </Button>,
+            </UIButton>,
           ]}
         />
-      </Card>
+      </UICard>
     );
   }
 
@@ -278,15 +262,15 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
       key: 'plan',
       label: (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-          <Space>
+          <UISpace>
             {getStatusIcon(checklist?.plan.status ?? 'pending')}
-            <Text strong>1. Plan</Text>
+            <UITypographyText strong>1. Plan</UITypographyText>
             {checklist?.plan.packagesCount && (
-              <Tag color="blue">{checklist.plan.packagesCount} package(s)</Tag>
+              <UITag color="blue">{checklist.plan.packagesCount} package(s)</UITag>
             )}
-            {checklist?.plan.bump && <Tag>{checklist.plan.bump}</Tag>}
-          </Space>
-          <Text type="secondary" style={{ fontSize: 12 }}>{checklist?.plan.message}</Text>
+            {checklist?.plan.bump && <UITag>{checklist.plan.bump}</UITag>}
+          </UISpace>
+          <UITypographyText type="secondary" style={{ fontSize: 12 }}>{checklist?.plan.message}</UITypographyText>
         </div>
       ),
       children: (
@@ -295,35 +279,35 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
             <div>
               {planData.plan.packages.map((pkg) => (
                 <div key={pkg.name} style={{ marginBottom: 8 }}>
-                  <Text code>{pkg.name}</Text>
-                  <Text type="secondary"> {pkg.currentVersion} → </Text>
-                  <Text strong style={{ color: '#52c41a' }}>{pkg.nextVersion}</Text>
-                  <Tag style={{ marginLeft: 8 }}>{pkg.bump}</Tag>
+                  <UITypographyText code>{pkg.name}</UITypographyText>
+                  <UITypographyText type="secondary"> {pkg.currentVersion} → </UITypographyText>
+                  <UITypographyText strong style={{ color: '#52c41a' }}>{pkg.nextVersion}</UITypographyText>
+                  <UITag style={{ marginLeft: 8 }}>{pkg.bump}</UITag>
                 </div>
               ))}
             </div>
           ) : (
             <div style={{ textAlign: 'center', padding: 16 }}>
-              <Text type="secondary">No plan generated yet</Text>
+              <UITypographyText type="secondary">No plan generated yet</UITypographyText>
               <div style={{ marginTop: 16 }}>
-                <Button
+                <UIButton
                   type="primary"
-                  icon={<FileTextOutlined />}
+                  icon={<UIIcon name="FileTextOutlined" />}
                   onClick={handleGeneratePlan}
                   loading={generatePlanMutation.isPending}
                 >
                   Generate Plan
-                </Button>
+                </UIButton>
               </div>
             </div>
           )}
         </div>
       ),
       extra: checklist?.plan.status !== 'ready' && (
-        <Button
+        <UIButton
           size="small"
           type="primary"
-          icon={<FileTextOutlined />}
+          icon={<UIIcon name="FileTextOutlined" />}
           onClick={(e) => {
             e.stopPropagation();
             handleGeneratePlan();
@@ -331,7 +315,7 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
           loading={generatePlanMutation.isPending}
         >
           Generate
-        </Button>
+        </UIButton>
       ),
     },
 
@@ -340,14 +324,14 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
       key: 'changelog',
       label: (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-          <Space>
+          <UISpace>
             {getStatusIcon(checklist?.changelog.status ?? 'pending')}
-            <Text strong>2. Changelog</Text>
+            <UITypographyText strong>2. Changelog</UITypographyText>
             {checklist?.changelog.commitsCount && (
-              <Tag color="blue">{checklist.changelog.commitsCount} changes</Tag>
+              <UITag color="blue">{checklist.changelog.commitsCount} changes</UITag>
             )}
-          </Space>
-          <Text type="secondary" style={{ fontSize: 12 }}>{checklist?.changelog.message}</Text>
+          </UISpace>
+          <UITypographyText type="secondary" style={{ fontSize: 12 }}>{checklist?.changelog.message}</UITypographyText>
         </div>
       ),
       children: (
@@ -367,27 +351,27 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
             </div>
           ) : (
             <div style={{ textAlign: 'center', padding: 16 }}>
-              <Text type="secondary">No changelog generated yet</Text>
+              <UITypographyText type="secondary">No changelog generated yet</UITypographyText>
               <div style={{ marginTop: 16 }}>
-                <Button
+                <UIButton
                   type="primary"
-                  icon={<EditOutlined />}
+                  icon={<UIIcon name="EditOutlined" />}
                   onClick={handleGenerateChangelog}
                   loading={generateChangelogMutation.isPending}
                   disabled={checklist?.plan.status !== 'ready'}
                 >
                   Generate Changelog
-                </Button>
+                </UIButton>
               </div>
             </div>
           )}
         </div>
       ),
       extra: checklist?.changelog.status !== 'ready' && checklist?.plan.status === 'ready' && (
-        <Button
+        <UIButton
           size="small"
           type="primary"
-          icon={<EditOutlined />}
+          icon={<UIIcon name="EditOutlined" />}
           onClick={(e) => {
             e.stopPropagation();
             handleGenerateChangelog();
@@ -395,7 +379,7 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
           loading={generateChangelogMutation.isPending}
         >
           Generate
-        </Button>
+        </UIButton>
       ),
     },
 
@@ -404,52 +388,52 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
       key: 'build',
       label: (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-          <Space>
+          <UISpace>
             {triggerBuildMutation.isPending
-              ? <LoadingOutlined style={{ color: '#1890ff', fontSize: 18 }} />
+              ? <UIIcon name="LoadingOutlined" style={{ color: '#1890ff', fontSize: 18 }} />
               : getStatusIcon(checklist?.build.status ?? 'pending')
             }
-            <Text strong>3. Build</Text>
+            <UITypographyText strong>3. Build</UITypographyText>
             {checklist?.build.builtCount !== undefined && checklist?.build.totalCount !== undefined && (
-              <Tag color={checklist.build.builtCount === checklist.build.totalCount ? 'success' : 'warning'}>
+              <UITag color={checklist.build.builtCount === checklist.build.totalCount ? 'success' : 'warning'}>
                 {checklist.build.builtCount}/{checklist.build.totalCount} built
-              </Tag>
+              </UITag>
             )}
-          </Space>
-          <Text type="secondary" style={{ fontSize: 12 }}>{checklist?.build.message}</Text>
+          </UISpace>
+          <UITypographyText type="secondary" style={{ fontSize: 12 }}>{checklist?.build.message}</UITypographyText>
         </div>
       ),
       children: (
         <div style={{ textAlign: 'center', padding: 16 }}>
           {checklist?.build.status === 'ready' ? (
-            <Result
+            <UIResult
               status="success"
               title="All packages built"
               subTitle="Ready for preview and publish"
             />
           ) : (
             <>
-              <Text type="secondary">Run build to compile packages before publishing</Text>
+              <UITypographyText type="secondary">Run build to compile packages before publishing</UITypographyText>
               <div style={{ marginTop: 16 }}>
-                <Button
+                <UIButton
                   type="primary"
-                  icon={<BuildOutlined />}
+                  icon={<UIIcon name="BuildOutlined" />}
                   onClick={handleBuild}
                   loading={triggerBuildMutation.isPending}
                   disabled={checklist?.changelog.status !== 'ready'}
                 >
                   {triggerBuildMutation.isPending ? 'Building...' : 'Run Build'}
-                </Button>
+                </UIButton>
               </div>
             </>
           )}
         </div>
       ),
       extra: checklist?.build.status !== 'ready' && checklist?.changelog.status === 'ready' && (
-        <Button
+        <UIButton
           size="small"
           type="primary"
-          icon={<BuildOutlined />}
+          icon={<UIIcon name="BuildOutlined" />}
           onClick={(e) => {
             e.stopPropagation();
             handleBuild();
@@ -457,7 +441,7 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
           loading={triggerBuildMutation.isPending}
         >
           Build
-        </Button>
+        </UIButton>
       ),
     },
 
@@ -466,17 +450,17 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
       key: 'preview',
       label: (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-          <Space>
+          <UISpace>
             {getStatusIcon(checklist?.preview.status ?? 'pending')}
-            <Text strong>4. Preview</Text>
+            <UITypographyText strong>4. Preview</UITypographyText>
             {checklist?.preview.filesCount && (
-              <Tag color="blue">{checklist.preview.filesCount} files</Tag>
+              <UITag color="blue">{checklist.preview.filesCount} files</UITag>
             )}
             {checklist?.preview.totalSize && (
-              <Tag color="green">{formatBytes(checklist.preview.totalSize)}</Tag>
+              <UITag color="green">{formatBytes(checklist.preview.totalSize)}</UITag>
             )}
-          </Space>
-          <Text type="secondary" style={{ fontSize: 12 }}>{checklist?.preview.message}</Text>
+          </UISpace>
+          <UITypographyText type="secondary" style={{ fontSize: 12 }}>{checklist?.preview.message}</UITypographyText>
         </div>
       ),
       children: (
@@ -484,17 +468,17 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
           {previewData?.packages && previewData.packages.length > 0 ? (
             <div>
               {previewData.packages.map((pkg) => (
-                <Card key={pkg.name} size="small" style={{ marginBottom: 8 }}>
+                <UICard key={pkg.name} size="small" style={{ marginBottom: 8 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <Space>
-                      <FolderOutlined />
-                      <Text strong>{pkg.name}</Text>
-                      <Tag color="blue">v{pkg.version}</Tag>
-                    </Space>
-                    <Space>
-                      <Tag>{pkg.fileCount} files</Tag>
-                      <Tag color="green">{formatBytes(pkg.totalSize)}</Tag>
-                    </Space>
+                    <UISpace>
+                      <UIIcon name="FolderOutlined" />
+                      <UITypographyText strong>{pkg.name}</UITypographyText>
+                      <UITag color="blue">v{pkg.version}</UITag>
+                    </UISpace>
+                    <UISpace>
+                      <UITag>{pkg.fileCount} files</UITag>
+                      <UITag color="green">{formatBytes(pkg.totalSize)}</UITag>
+                    </UISpace>
                   </div>
                   <div style={{
                     maxHeight: 150,
@@ -506,32 +490,32 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
                   }}>
                     {pkg.files.map((file) => (
                       <div key={file.path} style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Text code style={{ fontSize: 11 }}>{file.path}</Text>
-                        <Text type="secondary" style={{ fontSize: 11 }}>{formatBytes(file.size)}</Text>
+                        <UITypographyText code style={{ fontSize: 11 }}>{file.path}</UITypographyText>
+                        <UITypographyText type="secondary" style={{ fontSize: 11 }}>{formatBytes(file.size)}</UITypographyText>
                       </div>
                     ))}
                     {pkg.files.length === 0 && pkg.expectedFiles && (
                       <div>
-                        <Text type="warning">Expected files (build required):</Text>
+                        <UITypographyText type="warning">Expected files (build required):</UITypographyText>
                         {pkg.expectedFiles.map((f) => (
                           <div key={f}>
-                            <Text type="secondary" style={{ fontSize: 11 }}>{f}</Text>
+                            <UITypographyText type="secondary" style={{ fontSize: 11 }}>{f}</UITypographyText>
                           </div>
                         ))}
                       </div>
                     )}
                   </div>
-                </Card>
+                </UICard>
               ))}
             </div>
           ) : (
             <div style={{ textAlign: 'center', padding: 16 }}>
-              <Text type="secondary">
+              <UITypographyText type="secondary">
                 {checklist?.build.status === 'ready'
                   ? 'Loading preview...'
                   : 'Complete build step to see file preview'
                 }
-              </Text>
+              </UITypographyText>
             </div>
           )}
         </div>
@@ -542,28 +526,28 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
   return (
     <div>
       {/* Header Card */}
-      <Card size="small" style={{ marginBottom: 16 }}>
+      <UICard size="small" style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Space>
-            <Title level={4} style={{ margin: 0 }}>Release: {selectedScope}</Title>
+          <UISpace>
+            <UITitle level={4} style={{ margin: 0 }}>Release: {selectedScope}</UITitle>
             {planData?.plan && (
-              <Tag color="blue">
+              <UITag color="blue">
                 v{planData.plan.packages[0]?.currentVersion} → v{planData.plan.packages[0]?.nextVersion}
-              </Tag>
+              </UITag>
             )}
-          </Space>
-          <Button
-            icon={<ReloadOutlined />}
+          </UISpace>
+          <UIButton
+            icon={<UIIcon name="ReloadOutlined" />}
             onClick={handleRefresh}
             size="small"
           >
             Refresh
-          </Button>
+          </UIButton>
         </div>
-      </Card>
+      </UICard>
 
       {/* Checklist */}
-      <Collapse
+      <UIAccordion
         activeKey={expandedKeys}
         onChange={(keys) => setExpandedKeys(keys as string[])}
         items={items}
@@ -571,39 +555,39 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
       />
 
       {/* Publish Section */}
-      <Card
+      <UICard
         title={
-          <Space>
-            <RocketOutlined />
+          <UISpace>
+            <UIIcon name="RocketOutlined" />
             <span>5. Publish to npm</span>
-            {checklist?.canPublish && <Tag color="success">Ready</Tag>}
-          </Space>
+            {checklist?.canPublish && <UITag color="success">Ready</UITag>}
+          </UISpace>
         }
       >
         {!checklist?.canPublish ? (
           <div style={{ textAlign: 'center', padding: 16 }}>
-            <Text type="secondary">Complete all steps above to enable publishing</Text>
+            <UITypographyText type="secondary">Complete all steps above to enable publishing</UITypographyText>
             <div style={{ marginTop: 16 }}>
-              <Space>
-                {checklist?.plan.status !== 'ready' && <Tag color={getStatusColor(checklist?.plan.status ?? 'pending')}>Plan</Tag>}
-                {checklist?.changelog.status !== 'ready' && <Tag color={getStatusColor(checklist?.changelog.status ?? 'pending')}>Changelog</Tag>}
-                {checklist?.build.status !== 'ready' && <Tag color={getStatusColor(checklist?.build.status ?? 'pending')}>Build</Tag>}
-                {checklist?.preview.status !== 'ready' && <Tag color={getStatusColor(checklist?.preview.status ?? 'pending')}>Preview</Tag>}
-              </Space>
+              <UISpace>
+                {checklist?.plan.status !== 'ready' && <UITag color={getStatusColor(checklist?.plan.status ?? 'pending')}>Plan</UITag>}
+                {checklist?.changelog.status !== 'ready' && <UITag color={getStatusColor(checklist?.changelog.status ?? 'pending')}>Changelog</UITag>}
+                {checklist?.build.status !== 'ready' && <UITag color={getStatusColor(checklist?.build.status ?? 'pending')}>Build</UITag>}
+                {checklist?.preview.status !== 'ready' && <UITag color={getStatusColor(checklist?.preview.status ?? 'pending')}>Preview</UITag>}
+              </UISpace>
             </div>
           </div>
         ) : (
-          <Space direction="vertical" style={{ width: '100%' }} size="middle">
+          <UISpace direction="vertical" style={{ width: '100%' }} size="middle">
             {/* OTP Input */}
             <div>
-              <Text strong style={{ display: 'block', marginBottom: 8 }}>
+              <UITypographyText strong style={{ display: 'block', marginBottom: 8 }}>
                 npm One-Time Password (OTP)
-              </Text>
-              <Text type="secondary" style={{ display: 'block', marginBottom: 8, fontSize: 12 }}>
+              </UITypographyText>
+              <UITypographyText type="secondary" style={{ display: 'block', marginBottom: 8, fontSize: 12 }}>
                 Enter the 6-digit code from your authenticator app
-              </Text>
-              <Input
-                prefix={<LockOutlined />}
+              </UITypographyText>
+              <UIInput
+                prefix={<UIIcon name="LockOutlined" />}
                 placeholder="123456"
                 value={otp}
                 onChange={(e) => {
@@ -615,33 +599,33 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
                 status={otpError ? 'error' : undefined}
               />
               {otpError && (
-                <Text type="danger" style={{ display: 'block', marginTop: 4, fontSize: 12 }}>
+                <UITypographyText type="danger" style={{ display: 'block', marginTop: 4, fontSize: 12 }}>
                   {otpError}
-                </Text>
+                </UITypographyText>
               )}
             </div>
 
-            <Divider style={{ margin: '8px 0' }} />
+            <UIDivider style={{ margin: '8px 0' }} />
 
             {/* Publish Button */}
-            <Button
+            <UIButton
               type="primary"
               size="large"
-              icon={<RocketOutlined />}
+              icon={<UIIcon name="RocketOutlined" />}
               onClick={handlePublish}
               loading={runReleaseMutation.isPending}
               disabled={!otp}
               block
             >
               Publish to npm
-            </Button>
+            </UIButton>
 
-            <Text type="secondary" style={{ textAlign: 'center', display: 'block', fontSize: 12 }}>
+            <UITypographyText type="secondary" style={{ textAlign: 'center', display: 'block', fontSize: 12 }}>
               This action will publish {planData?.plan?.packages.length ?? 0} package(s) to the npm registry
-            </Text>
-          </Space>
+            </UITypographyText>
+          </UISpace>
         )}
-      </Card>
+      </UICard>
     </div>
   );
 }

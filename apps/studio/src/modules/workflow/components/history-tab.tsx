@@ -4,24 +4,23 @@
  */
 
 import * as React from 'react';
-import { Table, Tag, Space, Typography, Timeline } from 'antd';
 import {
-  ClockCircleOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  StopOutlined,
-} from '@ant-design/icons';
+  UITable,
+  UITag,
+  UISpace,
+  UITypographyText,
+  UITimeline,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useQuery } from '@tanstack/react-query';
 import { useDataSources } from '@/providers/data-sources-provider';
-import { KBCard } from '@kb-labs/studio-ui-react';
 import type { DashboardStatsResponse } from '@kb-labs/workflow-contracts';
-
-const { Text } = Typography;
+import { UICard } from '@kb-labs/studio-ui-kit';
 
 const STATUS_ICONS = {
-  completed: <CheckCircleOutlined className="text-success" />,
-  failed: <CloseCircleOutlined className="text-error" />,
-  cancelled: <StopOutlined className="text-warning" />,
+  completed: <UIIcon name="CheckCircleOutlined" className="text-success" />,
+  failed: <UIIcon name="CloseCircleOutlined" className="text-error" />,
+  cancelled: <UIIcon name="StopOutlined" className="text-warning" />,
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -70,10 +69,10 @@ export function HistoryTab() {
       dataIndex: 'finishedAt',
       key: 'finishedAt',
       render: (date: string) => (
-        <Space className="gap-tight">
-          <ClockCircleOutlined className="text-secondary" />
-          <Text className="typo-caption">{formatDate(date)}</Text>
-        </Space>
+        <UISpace className="gap-tight">
+          <UIIcon name="ClockCircleOutlined" className="text-secondary" />
+          <UITypographyText className="typo-caption">{formatDate(date)}</UITypographyText>
+        </UISpace>
       ),
     },
     {
@@ -81,12 +80,12 @@ export function HistoryTab() {
       dataIndex: 'workflowName',
       key: 'workflowName',
       render: (name: string | undefined, record: typeof recentActivity[0]) => (
-        <Space direction="vertical" className="gap-tight">
-          <Text className="typo-body">{name || record.type}</Text>
-          <Text className="typo-caption text-tertiary" code>
+        <UISpace direction="vertical" className="gap-tight">
+          <UITypographyText className="typo-body">{name || record.type}</UITypographyText>
+          <UITypographyText className="typo-caption text-tertiary" code>
             {record.id.slice(0, 12)}...
-          </Text>
-        </Space>
+          </UITypographyText>
+        </UISpace>
       ),
     },
     {
@@ -94,12 +93,12 @@ export function HistoryTab() {
       dataIndex: 'status',
       key: 'status',
       render: (status: 'completed' | 'failed' | 'cancelled') => (
-        <Tag
+        <UITag
           icon={STATUS_ICONS[status]}
           color={STATUS_COLORS[status]}
         >
           {status.toUpperCase()}
-        </Tag>
+        </UITag>
       ),
     },
     {
@@ -107,7 +106,7 @@ export function HistoryTab() {
       dataIndex: 'durationMs',
       key: 'durationMs',
       render: (ms?: number) => (
-        <Text className="typo-caption">{formatDuration(ms)}</Text>
+        <UITypographyText className="typo-caption">{formatDuration(ms)}</UITypographyText>
       ),
     },
     {
@@ -116,46 +115,46 @@ export function HistoryTab() {
       key: 'error',
       render: (error?: string) => (
         error ? (
-          <Text className="typo-caption text-error" ellipsis={{ tooltip: error }}>
+          <UITypographyText className="typo-caption text-error" ellipsis={{ tooltip: error }}>
             {error}
-          </Text>
+          </UITypographyText>
         ) : (
-          <Text className="typo-caption text-tertiary">—</Text>
+          <UITypographyText className="typo-caption text-tertiary">—</UITypographyText>
         )
       ),
     },
   ];
 
   return (
-    <Space direction="vertical" className="gap-section" style={{ width: '100%' }}>
-      <KBCard title={<Text className="typo-card-title">Recent Activity Timeline</Text>}>
-        <Timeline
+    <UISpace direction="vertical" className="gap-section" style={{ width: '100%' }}>
+      <UICard title={<UITypographyText className="typo-card-title">Recent Activity Timeline</UITypographyText>}>
+        <UITimeline
           items={recentActivity.slice(0, 10).map((activity) => ({
             dot: STATUS_ICONS[activity.status],
             children: (
-              <Space direction="vertical" className="gap-tight">
-                <Space className="gap-item">
-                  <Text className="typo-body" strong>
+              <UISpace direction="vertical" className="gap-tight">
+                <UISpace className="gap-item">
+                  <UITypographyText className="typo-body" strong>
                     {activity.workflowName || activity.type}
-                  </Text>
-                  <Tag color={STATUS_COLORS[activity.status]}>
+                  </UITypographyText>
+                  <UITag color={STATUS_COLORS[activity.status]}>
                     {activity.status.toUpperCase()}
-                  </Tag>
-                </Space>
-                <Text className="typo-description text-secondary">
+                  </UITag>
+                </UISpace>
+                <UITypographyText className="typo-description text-secondary">
                   {formatDate(activity.finishedAt)} • {formatDuration(activity.durationMs)}
-                </Text>
+                </UITypographyText>
                 {activity.error && (
-                  <Text className="typo-caption text-error">{activity.error}</Text>
+                  <UITypographyText className="typo-caption text-error">{activity.error}</UITypographyText>
                 )}
-              </Space>
+              </UISpace>
             ),
           }))}
         />
-      </KBCard>
+      </UICard>
 
-      <KBCard title={<Text className="typo-card-title">All Recent Activity</Text>}>
-        <Table
+      <UICard title={<UITypographyText className="typo-card-title">All Recent Activity</UITypographyText>}>
+        <UITable
           dataSource={recentActivity}
           columns={columns}
           loading={isLoading}
@@ -163,11 +162,11 @@ export function HistoryTab() {
           pagination={{
             pageSize: 20,
             showTotal: (total) => (
-              <Text className="typo-caption">Total {total} activities</Text>
+              <UITypographyText className="typo-caption">Total {total} activities</UITypographyText>
             ),
           }}
         />
-      </KBCard>
-    </Space>
+      </UICard>
+    </UISpace>
   );
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { UICard } from '@kb-labs/studio-ui-kit';
-import { Table } from 'antd';
+import { UITable } from '@kb-labs/studio-ui-kit';
 import { HolderOutlined } from '@ant-design/icons';
 import { type MetricsSnapshot } from '../../../api/metrics';
 import { useDataSources } from '../../../providers/data-sources-provider';
@@ -72,13 +72,14 @@ export function DashboardPluginsWidget() {
       style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
       bodyStyle={{ flex: 1, padding: '16px', overflow: 'auto' }}
     >
-      <Table
+      <UITable
         columns={columns}
         dataSource={dataSource}
         pagination={false}
         size="small"
         scroll={{ y: 240 }}
       />
+
     </UICard>
   );
 }

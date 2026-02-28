@@ -1,49 +1,31 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Spin,
-  Descriptions,
-  Tag,
-  Space,
-  Typography,
-  Card,
-  Table,
-  Collapse,
-  Button,
-  Alert,
-  Tabs,
-  Empty,
-} from 'antd';
-import {
-  ArrowLeftOutlined,
-  CodeOutlined,
-  ApiOutlined,
-  NodeIndexOutlined,
-  ClockCircleOutlined,
-  WarningOutlined,
-  CheckCircleOutlined,
-  LockOutlined,
-  LinkOutlined,
-  UserOutlined,
-  GlobalOutlined,
-  DatabaseOutlined,
-  SearchOutlined,
-  QuestionCircleOutlined,
-  ConsoleSqlOutlined,
-  CloseCircleOutlined,
-} from '@ant-design/icons';
-import { KBPageContainer, KBPageHeader } from '@kb-labs/studio-ui-react';
+  UISpin,
+  UIDescriptions,
+  UITag,
+  UISpace,
+  UITypographyText,
+  UITypographyParagraph,
+  UITitle,
+  UICard,
+  UITable,
+  UIAccordion,
+  UIButton,
+  UIAlert,
+  UITabs,
+  UIEmptyState,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import type { PluginManifestEntry } from '@kb-labs/studio-data-client';
 import type { ColumnsType } from 'antd/es/table';
 import { PluginAIAssistantModal } from '../components/plugin-ai-assistant-modal';
-
-const { Title, Text, Paragraph } = Typography;
-const { Panel } = Collapse;
+import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
 // Helper to safely render schema objects
 function renderSchema(schema: any): string {
-  if (!schema) {return '—';}
+  if (!schema) {return '--';}
   if (typeof schema === 'string') {return schema;}
   if (typeof schema === 'object') {
     if ('$ref' in schema) {return schema.$ref;}
@@ -87,7 +69,7 @@ export function PluginDetailPage() {
     return (
       <KBPageContainer>
         <div style={{ textAlign: 'center', padding: '80px 0' }}>
-          <Spin size="large" />
+          <UISpin size="large" />
         </div>
       </KBPageContainer>
     );
@@ -97,11 +79,11 @@ export function PluginDetailPage() {
     return (
       <KBPageContainer>
         <KBPageHeader title="Plugin Not Found" />
-        <Empty description="Plugin not found in registry" />
+        <UIEmptyState description="Plugin not found in registry" />
         <div style={{ textAlign: 'center', marginTop: 24 }}>
-          <Button type="primary" onClick={() => navigate('/plugins')}>
+          <UIButton type="primary" onClick={() => navigate('/plugins')}>
             Back to Plugins
-          </Button>
+          </UIButton>
         </div>
       </KBPageContainer>
     );
@@ -122,19 +104,19 @@ export function PluginDetailPage() {
       key: 'overview',
       label: 'Overview',
       children: (
-        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <UISpace direction="vertical" size="large" style={{ width: '100%' }}>
           {/* Validation Errors Alert */}
           {plugin.validation && !plugin.validation.valid && (
-            <Alert
+            <UIAlert
               type="error"
-              icon={<CloseCircleOutlined />}
+              icon={<UIIcon name="CloseCircleOutlined" />}
               message={`Manifest Validation Failed (${plugin.validation.errors.length} error${plugin.validation.errors.length > 1 ? 's' : ''})`}
               description={
                 <div style={{ marginTop: 8 }}>
                   <ul style={{ margin: 0, paddingLeft: 20 }}>
                     {plugin.validation.errors.map((error, idx) => (
                       <li key={idx} style={{ marginBottom: 4 }}>
-                        <Text code style={{ fontSize: 12 }}>{error}</Text>
+                        <UITypographyText code style={{ fontSize: 12 }}>{error}</UITypographyText>
                       </li>
                     ))}
                   </ul>
@@ -145,45 +127,45 @@ export function PluginDetailPage() {
           )}
 
           {/* Plugin Header Card */}
-          <Card>
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <UICard>
+            <UISpace direction="vertical" size="middle" style={{ width: '100%' }}>
               {/* Icon + Name + Version */}
-              <Space align="start" size="large">
-                <div style={{ fontSize: 64, lineHeight: 1 }}>{display?.icon || '📦'}</div>
+              <UISpace align="start" size="large">
+                <div style={{ fontSize: 64, lineHeight: 1 }}>{display?.icon || ''}</div>
                 <div style={{ flex: 1 }}>
-                  <Title level={2} style={{ marginBottom: 4 }}>
+                  <UITitle level={2} style={{ marginBottom: 4 }}>
                     {display?.name || manifest.id}
-                  </Title>
-                  <Space size="middle">
-                    <Text type="secondary" style={{ fontSize: 16 }}>
+                  </UITitle>
+                  <UISpace size="middle">
+                    <UITypographyText type="secondary" style={{ fontSize: 16 }}>
                       v{manifest.version}
-                    </Text>
-                    <Tag color="blue">
+                    </UITypographyText>
+                    <UITag color="blue">
                       {typeof plugin.source === 'string'
                         ? plugin.source
                         : plugin.source?.kind || 'unknown'}
-                    </Tag>
-                    <Tag>{manifest.schema}</Tag>
-                  </Space>
+                    </UITag>
+                    <UITag>{manifest.schema}</UITag>
+                  </UISpace>
                 </div>
-              </Space>
+              </UISpace>
 
               {/* Description */}
               {display?.description && (
-                <Paragraph style={{ fontSize: 15, marginBottom: 0, color: 'rgba(0,0,0,0.65)' }}>
+                <UITypographyParagraph style={{ fontSize: 15, marginBottom: 0, color: 'rgba(0,0,0,0.65)' }}>
                   {display.description}
-                </Paragraph>
+                </UITypographyParagraph>
               )}
 
               {/* Tags */}
               {display?.tags && display.tags.length > 0 && (
-                <Space wrap>
+                <UISpace wrap>
                   {display.tags.map((tag, idx) => (
-                    <Tag key={typeof tag === 'string' ? tag : `tag-${idx}`} color="default">
+                    <UITag key={typeof tag === 'string' ? tag : `tag-${idx}`} color="default">
                       {typeof tag === 'string' ? tag : JSON.stringify(tag)}
-                    </Tag>
+                    </UITag>
                   ))}
-                </Space>
+                </UISpace>
               )}
 
               {/* Metadata Row */}
@@ -197,45 +179,45 @@ export function PluginDetailPage() {
               >
                 {display?.author && (
                   <div>
-                    <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
+                    <UITypographyText type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
                       Author
-                    </Text>
-                    <Space>
-                      <UserOutlined />
-                      <Text>{display.author}</Text>
-                    </Space>
+                    </UITypographyText>
+                    <UISpace>
+                      <UIIcon name="UserOutlined" />
+                      <UITypographyText>{display.author}</UITypographyText>
+                    </UISpace>
                   </div>
                 )}
                 <div>
-                  <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
+                  <UITypographyText type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
                     Plugin ID
-                  </Text>
-                  <Text code copyable>
+                  </UITypographyText>
+                  <UITypographyText code copyable>
                     {manifest.id}
-                  </Text>
+                  </UITypographyText>
                 </div>
               </div>
 
               {/* Links */}
               {(display?.homepage || display?.repository) && (
-                <Space size="large">
+                <UISpace size="large">
                   {display?.homepage && (
                     <a href={display.homepage} target="_blank" rel="noopener noreferrer">
-                      <Space>
-                        <GlobalOutlined />
+                      <UISpace>
+                        <UIIcon name="GlobalOutlined" />
                         Homepage
-                      </Space>
+                      </UISpace>
                     </a>
                   )}
                   {display?.repository && (
                     <a href={display.repository} target="_blank" rel="noopener noreferrer">
-                      <Space>
-                        <LinkOutlined />
+                      <UISpace>
+                        <UIIcon name="LinkOutlined" />
                         Repository
-                      </Space>
+                      </UISpace>
                     </a>
                   )}
-                </Space>
+                </UISpace>
               )}
 
               {/* Timestamps */}
@@ -249,84 +231,84 @@ export function PluginDetailPage() {
                 >
                   {plugin.discoveredAt && (
                     <div>
-                      <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
+                      <UITypographyText type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
                         Discovered At
-                      </Text>
-                      <Space>
-                        <SearchOutlined />
-                        <Text>{new Date(plugin.discoveredAt).toLocaleString()}</Text>
-                      </Space>
+                      </UITypographyText>
+                      <UISpace>
+                        <UIIcon name="SearchOutlined" />
+                        <UITypographyText>{new Date(plugin.discoveredAt).toLocaleString()}</UITypographyText>
+                      </UISpace>
                     </div>
                   )}
                   {plugin.buildTimestamp && (
                     <div>
-                      <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
+                      <UITypographyText type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
                         Last Built
-                      </Text>
-                      <Space>
-                        <ClockCircleOutlined />
-                        <Text>{new Date(plugin.buildTimestamp).toLocaleString()}</Text>
-                      </Space>
+                      </UITypographyText>
+                      <UISpace>
+                        <UIIcon name="ClockCircleOutlined" />
+                        <UITypographyText>{new Date(plugin.buildTimestamp).toLocaleString()}</UITypographyText>
+                      </UISpace>
                     </div>
                   )}
                 </div>
               )}
 
               {/* Plugin Root (collapsible) */}
-              <Collapse
+              <UIAccordion
                 ghost
                 items={[
                   {
                     key: 'root',
-                    label: <Text type="secondary">Plugin Root Path</Text>,
+                    label: <UITypographyText type="secondary">Plugin Root Path</UITypographyText>,
                     children: (
-                      <Text code copyable style={{ fontSize: 12 }}>
+                      <UITypographyText code copyable style={{ fontSize: 12 }}>
                         {plugin.pluginRoot}
-                      </Text>
+                      </UITypographyText>
                     ),
                   },
                 ]}
               />
-            </Space>
-          </Card>
+            </UISpace>
+          </UICard>
 
           {/* Capabilities Summary */}
-          <Card title="Capabilities">
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-              <Space wrap size="large">
+          <UICard title="Capabilities">
+            <UISpace direction="vertical" size="middle" style={{ width: '100%' }}>
+              <UISpace wrap size="large">
                 {cliCommands.length > 0 && (
                   <div>
-                    <Tag icon={<CodeOutlined />} color="blue" style={{ fontSize: 14, padding: '4px 12px' }}>
+                    <UITag icon={<UIIcon name="CodeOutlined" />} color="blue" style={{ fontSize: 14, padding: '4px 12px' }}>
                       {cliCommands.length} CLI Command{cliCommands.length > 1 ? 's' : ''}
-                    </Tag>
+                    </UITag>
                   </div>
                 )}
                 {restRoutes.length > 0 && (
                   <div>
-                    <Tag icon={<ApiOutlined />} color="green" style={{ fontSize: 14, padding: '4px 12px' }}>
+                    <UITag icon={<UIIcon name="ApiOutlined" />} color="green" style={{ fontSize: 14, padding: '4px 12px' }}>
                       {restRoutes.length} REST Route{restRoutes.length > 1 ? 's' : ''}
-                    </Tag>
+                    </UITag>
                   </div>
                 )}
                 {workflowHandlers.length > 0 && (
                   <div>
-                    <Tag icon={<NodeIndexOutlined />} color="purple" style={{ fontSize: 14, padding: '4px 12px' }}>
+                    <UITag icon={<UIIcon name="NodeIndexOutlined" />} color="purple" style={{ fontSize: 14, padding: '4px 12px' }}>
                       {workflowHandlers.length} Workflow{workflowHandlers.length > 1 ? 's' : ''}
-                    </Tag>
+                    </UITag>
                   </div>
                 )}
                 {jobs.length > 0 && (
                   <div>
-                    <Tag icon={<ClockCircleOutlined />} color="orange" style={{ fontSize: 14, padding: '4px 12px' }}>
+                    <UITag icon={<UIIcon name="ClockCircleOutlined" />} color="orange" style={{ fontSize: 14, padding: '4px 12px' }}>
                       {jobs.length} Scheduled Job{jobs.length > 1 ? 's' : ''}
-                    </Tag>
+                    </UITag>
                   </div>
                 )}
-              </Space>
+              </UISpace>
 
               {permissions && (
-                <Alert
-                  icon={<LockOutlined />}
+                <UIAlert
+                  icon={<UIIcon name="LockOutlined" />}
                   type="warning"
                   message="This plugin requires permissions"
                   description="See Permissions tab for details"
@@ -334,32 +316,32 @@ export function PluginDetailPage() {
                 />
               )}
               {platformReqs?.requires && platformReqs.requires.length > 0 && (
-                <Alert
-                  icon={<DatabaseOutlined />}
+                <UIAlert
+                  icon={<UIIcon name="DatabaseOutlined" />}
                   type="info"
                   message="Platform Requirements"
                   description={
-                    <Space wrap>
+                    <UISpace wrap>
                       {platformReqs.requires.map((req) => (
-                        <Tag key={req} color="cyan">
+                        <UITag key={req} color="cyan">
                           {req}
-                        </Tag>
+                        </UITag>
                       ))}
-                    </Space>
+                    </UISpace>
                   }
                   showIcon
                 />
               )}
-            </Space>
-          </Card>
-        </Space>
+            </UISpace>
+          </UICard>
+        </UISpace>
       ),
     },
     cliCommands.length > 0 && {
       key: 'cli',
       label: (
         <span>
-          <CodeOutlined /> CLI Commands ({cliCommands.length})
+          <UIIcon name="CodeOutlined" /> CLI Commands ({cliCommands.length})
         </span>
       ),
       children: <CLICommandsTable commands={cliCommands} />,
@@ -368,7 +350,7 @@ export function PluginDetailPage() {
       key: 'rest',
       label: (
         <span>
-          <ApiOutlined /> REST API ({restRoutes.length})
+          <UIIcon name="ApiOutlined" /> REST API ({restRoutes.length})
         </span>
       ),
       children: <RestRoutesTable routes={restRoutes} basePath={manifest.rest?.basePath} apiBasePath={apiBasePath} />,
@@ -377,7 +359,7 @@ export function PluginDetailPage() {
       key: 'workflows',
       label: (
         <span>
-          <NodeIndexOutlined /> Workflows ({workflowHandlers.length})
+          <UIIcon name="NodeIndexOutlined" /> Workflows ({workflowHandlers.length})
         </span>
       ),
       children: <WorkflowsTable handlers={workflowHandlers} />,
@@ -386,7 +368,7 @@ export function PluginDetailPage() {
       key: 'jobs',
       label: (
         <span>
-          <ClockCircleOutlined /> Jobs ({jobs.length})
+          <UIIcon name="ClockCircleOutlined" /> Jobs ({jobs.length})
         </span>
       ),
       children: <JobsTable jobs={jobs} />,
@@ -395,7 +377,7 @@ export function PluginDetailPage() {
       key: 'permissions',
       label: (
         <span>
-          <LockOutlined /> Permissions
+          <UIIcon name="LockOutlined" /> Permissions
         </span>
       ),
       children: <PermissionsView permissions={permissions} />,
@@ -404,11 +386,11 @@ export function PluginDetailPage() {
       key: 'manifest',
       label: 'Raw Manifest (JSON)',
       children: (
-        <Card>
+        <UICard>
           <pre style={{ overflow: 'auto', maxHeight: 600 }}>
             {JSON.stringify(manifest, null, 2)}
           </pre>
-        </Card>
+        </UICard>
       ),
     },
   ].filter(Boolean);
@@ -422,24 +404,24 @@ export function PluginDetailPage() {
 
   return (
     <KBPageContainer>
-      <Space style={{ marginBottom: 24, width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Button
-          icon={<ArrowLeftOutlined />}
+      <UISpace style={{ marginBottom: 24, width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
+        <UIButton
+          icon={<UIIcon name="ArrowLeftOutlined" />}
           onClick={() => navigate('/plugins')}
           type="text"
         >
           Back to Plugins
-        </Button>
-        <Button
-          icon={<QuestionCircleOutlined />}
+        </UIButton>
+        <UIButton
+          icon={<UIIcon name="QuestionCircleOutlined" />}
           onClick={() => setAiModalOpen(true)}
           type="primary"
         >
           AI Assistant
-        </Button>
-      </Space>
+        </UIButton>
+      </UISpace>
 
-      <Tabs items={tabItems as any} defaultActiveKey="overview" />
+      <UITabs items={tabItems as any} defaultActiveKey="overview" />
 
       <PluginAIAssistantModal
         open={aiModalOpen}
@@ -462,9 +444,9 @@ function CLICommandsTable({ commands }: { commands: any[] }) {
       key: 'id',
       render: (id, record) => (
         <div>
-          <Text code strong>
+          <UITypographyText code strong>
             {record.group ? `${record.group}:${id}` : id}
-          </Text>
+          </UITypographyText>
         </div>
       ),
     },
@@ -472,7 +454,7 @@ function CLICommandsTable({ commands }: { commands: any[] }) {
       title: 'Description',
       dataIndex: 'describe',
       key: 'describe',
-      render: (desc) => (typeof desc === 'string' ? desc : desc ? JSON.stringify(desc) : '—'),
+      render: (desc) => (typeof desc === 'string' ? desc : desc ? JSON.stringify(desc) : '--'),
     },
     {
       title: 'Flags',
@@ -480,16 +462,16 @@ function CLICommandsTable({ commands }: { commands: any[] }) {
       key: 'flags',
       render: (flags) =>
         flags?.length > 0 ? (
-          <Space wrap>
+          <UISpace wrap>
             {flags.map((flag: any) => (
-              <Tag key={flag.name}>
+              <UITag key={flag.name}>
                 --{flag.name}
-                {flag.required && <Text type="danger">*</Text>}
-              </Tag>
+                {flag.required && <UITypographyText type="danger">*</UITypographyText>}
+              </UITag>
             ))}
-          </Space>
+          </UISpace>
         ) : (
-          <Text type="secondary">None</Text>
+          <UITypographyText type="secondary">None</UITypographyText>
         ),
     },
     {
@@ -497,16 +479,16 @@ function CLICommandsTable({ commands }: { commands: any[] }) {
       dataIndex: 'handler',
       key: 'handler',
       render: (handler) => (
-        <Text code style={{ fontSize: 11 }}>
+        <UITypographyText code style={{ fontSize: 11 }}>
           {handler}
-        </Text>
+        </UITypographyText>
       ),
     },
   ];
 
   return (
-    <Card>
-      <Table
+    <UICard>
+      <UITable
         columns={columns}
         dataSource={commands}
         rowKey="id"
@@ -515,25 +497,25 @@ function CLICommandsTable({ commands }: { commands: any[] }) {
           expandedRowRender: (record) =>
             record.flags && record.flags.length > 0 ? (
               <div style={{ margin: 0, paddingLeft: 48 }}>
-                <Title level={5}>Flags</Title>
+                <UITitle level={5}>Flags</UITitle>
                 {record.flags.map((flag: any) => (
                   <div key={flag.name} style={{ marginBottom: 8 }}>
-                    <Text code>--{flag.name}</Text>
-                    {flag.alias && <Text type="secondary"> (-{flag.alias})</Text>}
-                    {flag.required && <Tag color="red">Required</Tag>}
-                    <Tag>{flag.type}</Tag>
+                    <UITypographyText code>--{flag.name}</UITypographyText>
+                    {flag.alias && <UITypographyText type="secondary"> (-{flag.alias})</UITypographyText>}
+                    {flag.required && <UITag color="red">Required</UITag>}
+                    <UITag>{flag.type}</UITag>
                     {flag.default !== undefined && (
-                      <Tag color="blue">
+                      <UITag color="blue">
                         Default: {typeof flag.default === 'object' ? JSON.stringify(flag.default) : String(flag.default)}
-                      </Tag>
+                      </UITag>
                     )}
                     {flag.choices && flag.choices.length > 0 && (
-                      <Tag color="cyan">
+                      <UITag color="cyan">
                         Choices: {flag.choices.join(', ')}
-                      </Tag>
+                      </UITag>
                     )}
                     <div>
-                      <Text type="secondary">{flag.description || '—'}</Text>
+                      <UITypographyText type="secondary">{flag.description || '--'}</UITypographyText>
                     </div>
                   </div>
                 ))}
@@ -541,7 +523,7 @@ function CLICommandsTable({ commands }: { commands: any[] }) {
             ) : null,
         }}
       />
-    </Card>
+    </UICard>
   );
 }
 
@@ -566,7 +548,7 @@ function RestRoutesTable({ routes, basePath, apiBasePath }: { routes: any[]; bas
           PATCH: 'purple',
           DELETE: 'red',
         };
-        return <Tag color={colors[method] || 'default'}>{method}</Tag>;
+        return <UITag color={colors[method] || 'default'}>{method}</UITag>;
       },
     },
     {
@@ -574,37 +556,37 @@ function RestRoutesTable({ routes, basePath, apiBasePath }: { routes: any[]; bas
       dataIndex: 'path',
       key: 'path',
       render: (path) => (
-        <Text code>
+        <UITypographyText code>
           {fullBasePath}{path}
-        </Text>
+        </UITypographyText>
       ),
     },
     {
       title: 'Description',
       dataIndex: 'description',
       key: 'description',
-      render: (desc) => (typeof desc === 'string' ? desc : desc ? JSON.stringify(desc) : '—'),
+      render: (desc) => (typeof desc === 'string' ? desc : desc ? JSON.stringify(desc) : '--'),
     },
     {
       title: 'Timeout',
       dataIndex: 'timeoutMs',
       key: 'timeoutMs',
-      render: (timeout) => (timeout ? `${timeout}ms` : '—'),
+      render: (timeout) => (timeout ? `${timeout}ms` : '--'),
     },
     {
       title: 'Handler',
       dataIndex: 'handler',
       key: 'handler',
       render: (handler) => (
-        <Text code style={{ fontSize: 11 }}>
+        <UITypographyText code style={{ fontSize: 11 }}>
           {handler}
-        </Text>
+        </UITypographyText>
       ),
     },
   ];
 
   const formatSchemaRef = (schema: any): string => {
-    if (!schema) {return '—';}
+    if (!schema) {return '--';}
     if (typeof schema === 'string') {return schema;}
     if ('$ref' in schema) {return schema.$ref;}
     if ('zod' in schema) {return schema.zod;}
@@ -612,19 +594,19 @@ function RestRoutesTable({ routes, basePath, apiBasePath }: { routes: any[]; bas
   };
 
   return (
-    <Card>
+    <UICard>
       {fullBasePath && (
-        <Alert
+        <UIAlert
           message={
             <span>
-              Base Path: <Text code>{fullBasePath}</Text>
+              Base Path: <UITypographyText code>{fullBasePath}</UITypographyText>
             </span>
           }
           type="info"
           style={{ marginBottom: 16 }}
         />
       )}
-      <Table
+      <UITable
         columns={columns}
         dataSource={routes}
         rowKey={(record) => `${record.method} ${record.path}`}
@@ -641,25 +623,25 @@ function RestRoutesTable({ routes, basePath, apiBasePath }: { routes: any[]; bas
               <div style={{ margin: 0, paddingLeft: 48 }}>
                 {hasInput && (
                   <div style={{ marginBottom: 16 }}>
-                    <Title level={5}>
+                    <UITitle level={5}>
                       {record.method === 'GET' ? 'Query Parameters' : 'Request Body'}
-                    </Title>
-                    <Text code>{formatSchemaRef(record.input)}</Text>
+                    </UITitle>
+                    <UITypographyText code>{formatSchemaRef(record.input)}</UITypographyText>
                   </div>
                 )}
                 {hasOutput && (
                   <div style={{ marginBottom: 16 }}>
-                    <Title level={5}>Response</Title>
-                    <Text code>{formatSchemaRef(record.output)}</Text>
+                    <UITitle level={5}>Response</UITitle>
+                    <UITypographyText code>{formatSchemaRef(record.output)}</UITypographyText>
                   </div>
                 )}
                 {hasErrors && (
                   <div>
-                    <Title level={5}>Error Responses</Title>
+                    <UITitle level={5}>Error Responses</UITitle>
                     {record.errors.map((error: any, idx: number) => (
                       <div key={idx} style={{ marginBottom: 8 }}>
-                        <Tag color="red">{error.code}</Tag>
-                        <Text>{error.message || '—'}</Text>
+                        <UITag color="red">{error.code}</UITag>
+                        <UITypographyText>{error.message || '--'}</UITypographyText>
                       </div>
                     ))}
                   </div>
@@ -670,7 +652,7 @@ function RestRoutesTable({ routes, basePath, apiBasePath }: { routes: any[]; bas
           rowExpandable: (record) => !!(record.input || record.output || (record.errors && record.errors.length > 0)),
         }}
       />
-    </Card>
+    </UICard>
   );
 }
 
@@ -680,30 +662,30 @@ function WorkflowsTable({ handlers }: { handlers: any[] }) {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
-      render: (id) => <Text code>{id}</Text>,
+      render: (id) => <UITypographyText code>{id}</UITypographyText>,
     },
     {
       title: 'Description',
       dataIndex: 'describe',
       key: 'describe',
-      render: (desc) => (typeof desc === 'string' ? desc : desc ? JSON.stringify(desc) : '—'),
+      render: (desc) => (typeof desc === 'string' ? desc : desc ? JSON.stringify(desc) : '--'),
     },
     {
       title: 'Handler',
       dataIndex: 'handler',
       key: 'handler',
       render: (handler) => (
-        <Text code style={{ fontSize: 11 }}>
+        <UITypographyText code style={{ fontSize: 11 }}>
           {handler}
-        </Text>
+        </UITypographyText>
       ),
     },
   ];
 
   return (
-    <Card>
-      <Table columns={columns} dataSource={handlers} rowKey="id" pagination={false} />
-    </Card>
+    <UICard>
+      <UITable columns={columns} dataSource={handlers} rowKey="id" pagination={false} />
+    </UICard>
   );
 }
 
@@ -713,26 +695,26 @@ function JobsTable({ jobs }: { jobs: any[] }) {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
-      render: (id) => <Text code>{id}</Text>,
+      render: (id) => <UITypographyText code>{id}</UITypographyText>,
     },
     {
       title: 'Description',
       dataIndex: 'describe',
       key: 'describe',
-      render: (desc) => (typeof desc === 'string' ? desc : desc ? JSON.stringify(desc) : '—'),
+      render: (desc) => (typeof desc === 'string' ? desc : desc ? JSON.stringify(desc) : '--'),
     },
     {
       title: 'Schedule',
       dataIndex: 'schedule',
       key: 'schedule',
-      render: (schedule) => (schedule ? <Tag color="orange">{schedule}</Tag> : <Text type="secondary">Manual</Text>),
+      render: (schedule) => (schedule ? <UITag color="orange">{schedule}</UITag> : <UITypographyText type="secondary">Manual</UITypographyText>),
     },
     {
       title: 'Enabled',
       dataIndex: 'enabled',
       key: 'enabled',
       render: (enabled) =>
-        enabled !== false ? <Tag color="green">Yes</Tag> : <Tag color="red">No</Tag>,
+        enabled !== false ? <UITag color="green">Yes</UITag> : <UITag color="red">No</UITag>,
     },
     {
       title: 'Priority',
@@ -745,54 +727,54 @@ function JobsTable({ jobs }: { jobs: any[] }) {
       dataIndex: 'handler',
       key: 'handler',
       render: (handler) => (
-        <Text code style={{ fontSize: 11 }}>
+        <UITypographyText code style={{ fontSize: 11 }}>
           {handler}
-        </Text>
+        </UITypographyText>
       ),
     },
   ];
 
   return (
-    <Card>
-      <Table columns={columns} dataSource={jobs} rowKey="id" pagination={false} />
-    </Card>
+    <UICard>
+      <UITable columns={columns} dataSource={jobs} rowKey="id" pagination={false} />
+    </UICard>
   );
 }
 
 function PermissionsView({ permissions }: { permissions: any }) {
   if (!permissions) {
     return (
-      <Card>
-        <Empty description="No permissions specified for this plugin" />
-      </Card>
+      <UICard>
+        <UIEmptyState description="No permissions specified for this plugin" />
+      </UICard>
     );
   }
 
   return (
-    <Space direction="vertical" size="large" style={{ width: '100%' }}>
+    <UISpace direction="vertical" size="large" style={{ width: '100%' }}>
       {/* Filesystem Permissions */}
       {permissions.fs && (
-        <Card
+        <UICard
           title={
-            <Space>
-              <LockOutlined />
+            <UISpace>
+              <UIIcon name="LockOutlined" />
               <span>Filesystem Permissions</span>
-            </Space>
+            </UISpace>
           }
         >
-          <Paragraph type="secondary" style={{ marginBottom: 16 }}>
+          <UITypographyParagraph type="secondary" style={{ marginBottom: 16 }}>
             File and directory access patterns that this plugin is allowed to use. Read access allows viewing files, write access allows creating or modifying files.
-          </Paragraph>
-          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          </UITypographyParagraph>
+          <UISpace direction="vertical" size="middle" style={{ width: '100%' }}>
             {permissions.fs.read && permissions.fs.read.length > 0 && (
               <div>
-                <Text strong>Read Access:</Text>
+                <UITypographyText strong>Read Access:</UITypographyText>
                 <div style={{ marginTop: 8 }}>
                   {permissions.fs.read.map((path: string, idx: number) => (
                     <div key={idx} style={{ marginBottom: 4 }}>
-                      <Text code style={{ fontSize: 12 }}>
+                      <UITypographyText code style={{ fontSize: 12 }}>
                         {path}
-                      </Text>
+                      </UITypographyText>
                     </div>
                   ))}
                 </div>
@@ -800,124 +782,124 @@ function PermissionsView({ permissions }: { permissions: any }) {
             )}
             {permissions.fs.write && permissions.fs.write.length > 0 && (
               <div>
-                <Text strong>Write Access:</Text>
+                <UITypographyText strong>Write Access:</UITypographyText>
                 <div style={{ marginTop: 8 }}>
                   {permissions.fs.write.map((path: string, idx: number) => (
                     <div key={idx} style={{ marginBottom: 4 }}>
-                      <Text code style={{ fontSize: 12 }}>
+                      <UITypographyText code style={{ fontSize: 12 }}>
                         {path}
-                      </Text>
+                      </UITypographyText>
                     </div>
                   ))}
                 </div>
               </div>
             )}
-          </Space>
-        </Card>
+          </UISpace>
+        </UICard>
       )}
 
       {/* Network Permissions */}
       {permissions.network?.fetch && permissions.network.fetch.length > 0 && (
-        <Card
+        <UICard
           title={
-            <Space>
-              <GlobalOutlined />
+            <UISpace>
+              <UIIcon name="GlobalOutlined" />
               <span>Network Permissions</span>
-            </Space>
+            </UISpace>
           }
         >
-          <Paragraph type="secondary" style={{ marginBottom: 16 }}>
+          <UITypographyParagraph type="secondary" style={{ marginBottom: 16 }}>
             External hosts and APIs that this plugin can communicate with over the network.
-          </Paragraph>
+          </UITypographyParagraph>
           <div>
-            <Text strong>Allowed Hosts:</Text>
+            <UITypographyText strong>Allowed Hosts:</UITypographyText>
             <div style={{ marginTop: 8 }}>
               {permissions.network.fetch.map((host: string, idx: number) => (
                 <div key={idx} style={{ marginBottom: 4 }}>
-                  <Text code style={{ fontSize: 12 }}>
+                  <UITypographyText code style={{ fontSize: 12 }}>
                     {host}
-                  </Text>
+                  </UITypographyText>
                 </div>
               ))}
             </div>
           </div>
-        </Card>
+        </UICard>
       )}
 
       {/* Environment Variables */}
       {permissions.env?.read && permissions.env.read.length > 0 && (
-        <Card title="Environment Variables">
-          <Paragraph type="secondary" style={{ marginBottom: 16 }}>
+        <UICard title="Environment Variables">
+          <UITypographyParagraph type="secondary" style={{ marginBottom: 16 }}>
             System environment variables that this plugin can access. Used for configuration and secrets management.
-          </Paragraph>
+          </UITypographyParagraph>
           <div>
-            <Text strong>Read Access:</Text>
+            <UITypographyText strong>Read Access:</UITypographyText>
             <div style={{ marginTop: 8 }}>
-              <Space wrap>
+              <UISpace wrap>
                 {permissions.env.read.map((env: string, idx: number) => (
-                  <Tag key={idx} color="cyan">
+                  <UITag key={idx} color="cyan">
                     {env}
-                  </Tag>
+                  </UITag>
                 ))}
-              </Space>
+              </UISpace>
             </div>
           </div>
-        </Card>
+        </UICard>
       )}
 
       {/* Shell Permissions */}
       {permissions.shell && (
-        <Card
+        <UICard
           title={
-            <Space>
-              <ConsoleSqlOutlined />
+            <UISpace>
+              <UIIcon name="ConsoleSqlOutlined" />
               <span>Shell Permissions</span>
-            </Space>
+            </UISpace>
           }
         >
-          <Paragraph type="secondary" style={{ marginBottom: 16 }}>
+          <UITypographyParagraph type="secondary" style={{ marginBottom: 16 }}>
             Shell commands that this plugin is allowed to execute. Shell access is restricted by default for security.
-          </Paragraph>
+          </UITypographyParagraph>
           {permissions.shell.allow && permissions.shell.allow.length > 0 ? (
             <div>
-              <Text strong>Allowed Commands:</Text>
+              <UITypographyText strong>Allowed Commands:</UITypographyText>
               <div style={{ marginTop: 8 }}>
-                <Space direction="vertical" style={{ width: '100%' }}>
+                <UISpace direction="vertical" style={{ width: '100%' }}>
                   {permissions.shell.allow.map((cmd: string, idx: number) => (
                     <div key={idx} style={{ marginBottom: 4 }}>
-                      <Text code style={{ fontSize: 12 }}>
+                      <UITypographyText code style={{ fontSize: 12 }}>
                         {cmd}
-                      </Text>
+                      </UITypographyText>
                     </div>
                   ))}
-                </Space>
+                </UISpace>
               </div>
             </div>
           ) : (
-            <Alert
+            <UIAlert
               type="warning"
               message="Shell access disabled"
               description="This plugin has no shell execution permissions."
               showIcon
             />
           )}
-        </Card>
+        </UICard>
       )}
 
       {/* Platform Services */}
       {permissions.platform && (
-        <Card
+        <UICard
           title={
-            <Space>
-              <DatabaseOutlined />
+            <UISpace>
+              <UIIcon name="DatabaseOutlined" />
               <span>Platform Services</span>
-            </Space>
+            </UISpace>
           }
         >
-          <Paragraph type="secondary" style={{ marginBottom: 16 }}>
+          <UITypographyParagraph type="secondary" style={{ marginBottom: 16 }}>
             Access to KB Labs platform services like LLM, vector store, cache, and analytics.
-          </Paragraph>
-          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          </UITypographyParagraph>
+          <UISpace direction="vertical" size="middle" style={{ width: '100%' }}>
             <div
               style={{
                 display: 'grid',
@@ -927,210 +909,210 @@ function PermissionsView({ permissions }: { permissions: any }) {
             >
               {/* LLM Service */}
               {permissions.platform.llm !== undefined && (
-                <Card size="small">
-                  <Space direction="vertical" size="small">
-                    <Space>
+                <UICard size="small">
+                  <UISpace direction="vertical" size="small">
+                    <UISpace>
                       {permissions.platform.llm ? (
-                        <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                        <UIIcon name="CheckCircleOutlined" style={{ color: '#52c41a' }} />
                       ) : (
-                        <WarningOutlined style={{ color: '#d9d9d9' }} />
+                        <UIIcon name="WarningOutlined" style={{ color: '#d9d9d9' }} />
                       )}
-                      <Text strong>LLM Service</Text>
-                    </Space>
+                      <UITypographyText strong>LLM Service</UITypographyText>
+                    </UISpace>
                     {typeof permissions.platform.llm === 'object' && permissions.platform.llm.models && (
                       <div>
-                        <Text type="secondary" style={{ fontSize: 12 }}>Models:</Text>
+                        <UITypographyText type="secondary" style={{ fontSize: 12 }}>Models:</UITypographyText>
                         <div style={{ marginTop: 4 }}>
-                          <Space wrap size="small">
+                          <UISpace wrap size="small">
                             {permissions.platform.llm.models.map((model: string, idx: number) => (
-                              <Tag key={idx} color="blue" style={{ fontSize: 11 }}>
+                              <UITag key={idx} color="blue" style={{ fontSize: 11 }}>
                                 {model}
-                              </Tag>
+                              </UITag>
                             ))}
-                          </Space>
+                          </UISpace>
                         </div>
                       </div>
                     )}
-                  </Space>
-                </Card>
+                  </UISpace>
+                </UICard>
               )}
 
               {/* Vector Store */}
               {permissions.platform.vectorStore !== undefined && (
-                <Card size="small">
-                  <Space direction="vertical" size="small">
-                    <Space>
+                <UICard size="small">
+                  <UISpace direction="vertical" size="small">
+                    <UISpace>
                       {permissions.platform.vectorStore ? (
-                        <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                        <UIIcon name="CheckCircleOutlined" style={{ color: '#52c41a' }} />
                       ) : (
-                        <WarningOutlined style={{ color: '#d9d9d9' }} />
+                        <UIIcon name="WarningOutlined" style={{ color: '#d9d9d9' }} />
                       )}
-                      <Text strong>Vector Store</Text>
-                    </Space>
+                      <UITypographyText strong>Vector Store</UITypographyText>
+                    </UISpace>
                     {typeof permissions.platform.vectorStore === 'object' && permissions.platform.vectorStore.collections && (
                       <div>
-                        <Text type="secondary" style={{ fontSize: 12 }}>Collections:</Text>
+                        <UITypographyText type="secondary" style={{ fontSize: 12 }}>Collections:</UITypographyText>
                         <div style={{ marginTop: 4 }}>
-                          <Space wrap size="small">
+                          <UISpace wrap size="small">
                             {permissions.platform.vectorStore.collections.map((col: string, idx: number) => (
-                              <Tag key={idx} color="purple" style={{ fontSize: 11 }}>
+                              <UITag key={idx} color="purple" style={{ fontSize: 11 }}>
                                 {col}
-                              </Tag>
+                              </UITag>
                             ))}
-                          </Space>
+                          </UISpace>
                         </div>
                       </div>
                     )}
-                  </Space>
-                </Card>
+                  </UISpace>
+                </UICard>
               )}
 
               {/* Cache */}
               {permissions.platform.cache !== undefined && (
-                <Card size="small">
-                  <Space direction="vertical" size="small">
-                    <Space>
+                <UICard size="small">
+                  <UISpace direction="vertical" size="small">
+                    <UISpace>
                       {permissions.platform.cache ? (
-                        <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                        <UIIcon name="CheckCircleOutlined" style={{ color: '#52c41a' }} />
                       ) : (
-                        <WarningOutlined style={{ color: '#d9d9d9' }} />
+                        <UIIcon name="WarningOutlined" style={{ color: '#d9d9d9' }} />
                       )}
-                      <Text strong>Cache</Text>
-                    </Space>
+                      <UITypographyText strong>Cache</UITypographyText>
+                    </UISpace>
                     {typeof permissions.platform.cache === 'object' && permissions.platform.cache.namespaces && (
                       <div>
-                        <Text type="secondary" style={{ fontSize: 12 }}>Namespaces:</Text>
+                        <UITypographyText type="secondary" style={{ fontSize: 12 }}>Namespaces:</UITypographyText>
                         <div style={{ marginTop: 4 }}>
-                          <Space wrap size="small">
+                          <UISpace wrap size="small">
                             {permissions.platform.cache.namespaces.map((ns: string, idx: number) => (
-                              <Tag key={idx} color="cyan" style={{ fontSize: 11 }}>
+                              <UITag key={idx} color="cyan" style={{ fontSize: 11 }}>
                                 {ns}
-                              </Tag>
+                              </UITag>
                             ))}
-                          </Space>
+                          </UISpace>
                         </div>
                       </div>
                     )}
-                  </Space>
-                </Card>
+                  </UISpace>
+                </UICard>
               )}
 
               {/* Storage */}
               {permissions.platform.storage !== undefined && (
-                <Card size="small">
-                  <Space direction="vertical" size="small">
-                    <Space>
+                <UICard size="small">
+                  <UISpace direction="vertical" size="small">
+                    <UISpace>
                       {permissions.platform.storage ? (
-                        <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                        <UIIcon name="CheckCircleOutlined" style={{ color: '#52c41a' }} />
                       ) : (
-                        <WarningOutlined style={{ color: '#d9d9d9' }} />
+                        <UIIcon name="WarningOutlined" style={{ color: '#d9d9d9' }} />
                       )}
-                      <Text strong>Storage</Text>
-                    </Space>
+                      <UITypographyText strong>Storage</UITypographyText>
+                    </UISpace>
                     {typeof permissions.platform.storage === 'object' && permissions.platform.storage.paths && (
                       <div>
-                        <Text type="secondary" style={{ fontSize: 12 }}>Paths:</Text>
+                        <UITypographyText type="secondary" style={{ fontSize: 12 }}>Paths:</UITypographyText>
                         <div style={{ marginTop: 4 }}>
-                          <Space wrap size="small">
+                          <UISpace wrap size="small">
                             {permissions.platform.storage.paths.map((path: string, idx: number) => (
-                              <Tag key={idx} color="orange" style={{ fontSize: 11 }}>
+                              <UITag key={idx} color="orange" style={{ fontSize: 11 }}>
                                 {path}
-                              </Tag>
+                              </UITag>
                             ))}
-                          </Space>
+                          </UISpace>
                         </div>
                       </div>
                     )}
-                  </Space>
-                </Card>
+                  </UISpace>
+                </UICard>
               )}
 
               {/* Analytics */}
               {permissions.platform.analytics !== undefined && (
-                <Card size="small">
-                  <Space>
+                <UICard size="small">
+                  <UISpace>
                     {permissions.platform.analytics ? (
-                      <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                      <UIIcon name="CheckCircleOutlined" style={{ color: '#52c41a' }} />
                     ) : (
-                      <WarningOutlined style={{ color: '#d9d9d9' }} />
+                      <UIIcon name="WarningOutlined" style={{ color: '#d9d9d9' }} />
                     )}
-                    <Text strong>Analytics</Text>
-                  </Space>
-                </Card>
+                    <UITypographyText strong>Analytics</UITypographyText>
+                  </UISpace>
+                </UICard>
               )}
 
               {/* Embeddings */}
               {permissions.platform.embeddings !== undefined && (
-                <Card size="small">
-                  <Space>
+                <UICard size="small">
+                  <UISpace>
                     {permissions.platform.embeddings ? (
-                      <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                      <UIIcon name="CheckCircleOutlined" style={{ color: '#52c41a' }} />
                     ) : (
-                      <WarningOutlined style={{ color: '#d9d9d9' }} />
+                      <UIIcon name="WarningOutlined" style={{ color: '#d9d9d9' }} />
                     )}
-                    <Text strong>Embeddings</Text>
-                  </Space>
-                </Card>
+                    <UITypographyText strong>Embeddings</UITypographyText>
+                  </UISpace>
+                </UICard>
               )}
 
               {/* Events */}
               {permissions.platform.events !== undefined && (
-                <Card size="small">
-                  <Space direction="vertical" size="small">
-                    <Space>
+                <UICard size="small">
+                  <UISpace direction="vertical" size="small">
+                    <UISpace>
                       {permissions.platform.events ? (
-                        <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                        <UIIcon name="CheckCircleOutlined" style={{ color: '#52c41a' }} />
                       ) : (
-                        <WarningOutlined style={{ color: '#d9d9d9' }} />
+                        <UIIcon name="WarningOutlined" style={{ color: '#d9d9d9' }} />
                       )}
-                      <Text strong>Event Bus</Text>
-                    </Space>
+                      <UITypographyText strong>Event Bus</UITypographyText>
+                    </UISpace>
                     {typeof permissions.platform.events === 'object' && (
                       <div>
                         {permissions.platform.events.publish && permissions.platform.events.publish.length > 0 && (
                           <div style={{ marginBottom: 8 }}>
-                            <Text type="secondary" style={{ fontSize: 12 }}>Publish:</Text>
+                            <UITypographyText type="secondary" style={{ fontSize: 12 }}>Publish:</UITypographyText>
                             <div style={{ marginTop: 4 }}>
-                              <Space wrap size="small">
+                              <UISpace wrap size="small">
                                 {permissions.platform.events.publish.map((evt: string, idx: number) => (
-                                  <Tag key={idx} color="green" style={{ fontSize: 11 }}>
+                                  <UITag key={idx} color="green" style={{ fontSize: 11 }}>
                                     {evt}
-                                  </Tag>
+                                  </UITag>
                                 ))}
-                              </Space>
+                              </UISpace>
                             </div>
                           </div>
                         )}
                         {permissions.platform.events.subscribe && permissions.platform.events.subscribe.length > 0 && (
                           <div>
-                            <Text type="secondary" style={{ fontSize: 12 }}>Subscribe:</Text>
+                            <UITypographyText type="secondary" style={{ fontSize: 12 }}>Subscribe:</UITypographyText>
                             <div style={{ marginTop: 4 }}>
-                              <Space wrap size="small">
+                              <UISpace wrap size="small">
                                 {permissions.platform.events.subscribe.map((evt: string, idx: number) => (
-                                  <Tag key={idx} color="blue" style={{ fontSize: 11 }}>
+                                  <UITag key={idx} color="blue" style={{ fontSize: 11 }}>
                                     {evt}
-                                  </Tag>
+                                  </UITag>
                                 ))}
-                              </Space>
+                              </UISpace>
                             </div>
                           </div>
                         )}
                       </div>
                     )}
-                  </Space>
-                </Card>
+                  </UISpace>
+                </UICard>
               )}
             </div>
-          </Space>
-        </Card>
+          </UISpace>
+        </UICard>
       )}
 
       {/* Quotas */}
       {permissions.quotas && (
-        <Card title="Resource Quotas">
-          <Paragraph type="secondary" style={{ marginBottom: 16 }}>
+        <UICard title="Resource Quotas">
+          <UITypographyParagraph type="secondary" style={{ marginBottom: 16 }}>
             Maximum resource limits for this plugin to prevent runaway processes and ensure system stability.
-          </Paragraph>
+          </UITypographyParagraph>
           <div
             style={{
               display: 'grid',
@@ -1139,53 +1121,53 @@ function PermissionsView({ permissions }: { permissions: any }) {
             }}
           >
             {permissions.quotas.timeoutMs && (
-              <Card size="small">
+              <UICard size="small">
                 <div style={{ textAlign: 'center' }}>
-                  <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 8 }}>
+                  <UITypographyText type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 8 }}>
                     Timeout
-                  </Text>
-                  <Text strong style={{ fontSize: 20 }}>
+                  </UITypographyText>
+                  <UITypographyText strong style={{ fontSize: 20 }}>
                     {permissions.quotas.timeoutMs}
-                  </Text>
-                  <Text type="secondary" style={{ fontSize: 12 }}>
+                  </UITypographyText>
+                  <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                     ms
-                  </Text>
+                  </UITypographyText>
                 </div>
-              </Card>
+              </UICard>
             )}
             {permissions.quotas.memoryMb && (
-              <Card size="small">
+              <UICard size="small">
                 <div style={{ textAlign: 'center' }}>
-                  <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 8 }}>
+                  <UITypographyText type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 8 }}>
                     Memory
-                  </Text>
-                  <Text strong style={{ fontSize: 20 }}>
+                  </UITypographyText>
+                  <UITypographyText strong style={{ fontSize: 20 }}>
                     {permissions.quotas.memoryMb}
-                  </Text>
-                  <Text type="secondary" style={{ fontSize: 12 }}>
+                  </UITypographyText>
+                  <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                     MB
-                  </Text>
+                  </UITypographyText>
                 </div>
-              </Card>
+              </UICard>
             )}
             {permissions.quotas.cpuMs && (
-              <Card size="small">
+              <UICard size="small">
                 <div style={{ textAlign: 'center' }}>
-                  <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 8 }}>
+                  <UITypographyText type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 8 }}>
                     CPU Time
-                  </Text>
-                  <Text strong style={{ fontSize: 20 }}>
+                  </UITypographyText>
+                  <UITypographyText strong style={{ fontSize: 20 }}>
                     {permissions.quotas.cpuMs}
-                  </Text>
-                  <Text type="secondary" style={{ fontSize: 12 }}>
+                  </UITypographyText>
+                  <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                     ms
-                  </Text>
+                  </UITypographyText>
                 </div>
-              </Card>
+              </UICard>
             )}
           </div>
-        </Card>
+        </UICard>
       )}
-    </Space>
+    </UISpace>
   );
 }

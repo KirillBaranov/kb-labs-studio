@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import { Card, Drawer, Descriptions, Badge, Tag, Statistic, Row, Col } from 'antd';
+import { UICard, UIDrawer, UIDescriptions, UIBadge, UITag, UIStatistic, UIRow, UICol } from '@kb-labs/studio-ui-kit';
 import { HolderOutlined, ApartmentOutlined, CloseOutlined } from '@ant-design/icons';
 import type {
   Node,
@@ -179,7 +179,7 @@ export function SystemTopologyWidget() {
   };
 
   return (
-    <Card
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <ApartmentOutlined />
@@ -216,12 +216,12 @@ export function SystemTopologyWidget() {
       </div>
 
       {/* Node Details Drawer */}
-      <Drawer
+      <UIDrawer
         title={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <ApartmentOutlined />
             <span>{selectedNode?.data.label}</span>
-            <Badge
+            <UIBadge
               status={
                 selectedNode?.data.status === 'error' ? 'error' :
                 selectedNode?.data.status === 'warning' ? 'warning' :
@@ -238,16 +238,16 @@ export function SystemTopologyWidget() {
       >
         {selectedNode && (
           <div>
-            <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-              <Col span={12}>
-                <Statistic
+            <UIRow gutter={[16, 16]} style={{ marginBottom: 24 }}>
+              <UICol span={12}>
+                <UIStatistic
                   title="Requests"
                   value={selectedNode.data.requests ?? 0}
                   valueStyle={{ fontSize: 24 }}
                 />
-              </Col>
-              <Col span={12}>
-                <Statistic
+              </UICol>
+              <UICol span={12}>
+                <UIStatistic
                   title="Errors"
                   value={selectedNode.data.errors ?? 0}
                   valueStyle={{
@@ -255,27 +255,27 @@ export function SystemTopologyWidget() {
                     color: (selectedNode.data.errors ?? 0) > 0 ? 'var(--error)' : 'var(--success)',
                   }}
                 />
-              </Col>
+              </UICol>
               {selectedNode.data.latency !== undefined && (
-                <Col span={12}>
-                  <Statistic
+                <UICol span={12}>
+                  <UIStatistic
                     title="Avg Latency"
                     value={selectedNode.data.latency.toFixed(0)}
                     suffix="ms"
                     valueStyle={{ fontSize: 24 }}
                   />
-                </Col>
+                </UICol>
               )}
-            </Row>
+            </UIRow>
 
-            <Descriptions title="Details" bordered size="small" column={1}>
-              <Descriptions.Item label="Node ID">
+            <UIDescriptions title="Details" bordered size="small" column={1}>
+              <UIDescriptions.Item label="Node ID">
                 <code>{selectedNode.id}</code>
-              </Descriptions.Item>
-              <Descriptions.Item label="Type">
+              </UIDescriptions.Item>
+              <UIDescriptions.Item label="Type">
                 <Tag color="blue">{selectedNode.data.type}</Tag>
-              </Descriptions.Item>
-              <Descriptions.Item label="Status">
+              </UIDescriptions.Item>
+              <UIDescriptions.Item label="Status">
                 <Tag
                   color={
                     selectedNode.data.status === 'error' ? 'red' :
@@ -285,18 +285,18 @@ export function SystemTopologyWidget() {
                 >
                   {selectedNode.data.status.toUpperCase()}
                 </Tag>
-              </Descriptions.Item>
+              </UIDescriptions.Item>
               {selectedNode.data.requests && (
-                <Descriptions.Item label="Error Rate">
+                <UIDescriptions.Item label="Error Rate">
                   {selectedNode.data.requests > 0
                     ? `${((selectedNode.data.errors ?? 0) / selectedNode.data.requests * 100).toFixed(2)}%`
                     : 'N/A'}
-                </Descriptions.Item>
+                </UIDescriptions.Item>
               )}
-            </Descriptions>
+            </UIDescriptions>
           </div>
         )}
-      </Drawer>
-    </Card>
+      </UIDrawer>
+    </UICard>
   );
 }

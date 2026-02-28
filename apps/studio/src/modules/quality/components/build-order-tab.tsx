@@ -4,7 +4,7 @@
  */
 
 import * as React from 'react';
-import { Card, Table, Tag, Spin, Alert, Select, Space } from 'antd';
+import { UICard, UITable, UITag, UISpin, UIAlert, UISelect, UISpace } from '@kb-labs/studio-ui-kit';
 import type { ColumnsType } from 'antd/es/table';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useQualityBuildOrder, useQualityCycles } from '@kb-labs/studio-data-client';
@@ -19,13 +19,13 @@ export function BuildOrderTab() {
   if (isLoading) {
     return (
       <div style={{ textAlign: 'center', padding: '40px' }}>
-        <Spin size="large" />
+        <UISpin size="large" />
       </div>
     );
   }
 
   if (error) {
-    return <Alert message="Failed to load build order" type="error" showIcon />;
+    return <UIAlert message="Failed to load build order" type="error" showIcon />;
   }
 
   const layersColumns: ColumnsType<{ layer: number; packages: string[] }> = [
@@ -34,18 +34,18 @@ export function BuildOrderTab() {
       dataIndex: 'layer',
       key: 'layer',
       width: 100,
-      render: (layer: number) => <Tag color="blue">Layer {layer}</Tag>,
+      render: (layer: number) => <UITag color="blue">Layer {layer}</UITag>,
     },
     {
       title: 'Packages (can build in parallel)',
       dataIndex: 'packages',
       key: 'packages',
       render: (packages: string[]) => (
-        <Space wrap>
+        <UISpace wrap>
           {packages.map((pkg) => (
-            <Tag key={pkg}>{pkg}</Tag>
+            <UITag key={pkg}>{pkg}</UITag>
           ))}
-        </Space>
+        </UISpace>
       ),
     },
   ];
@@ -60,7 +60,7 @@ export function BuildOrderTab() {
     <div>
       {/* Circular Dependencies Warning */}
       {data?.hasCircular && (
-        <Alert
+        <UIAlert
           message="Circular Dependencies Detected!"
           description={`Found ${data.circular.length} circular dependency cycles. Build order may not be correct.`}
           type="error"
@@ -70,8 +70,8 @@ export function BuildOrderTab() {
       )}
 
       {/* Package Filter */}
-      <Card title="Filter" style={{ marginBottom: 24 }}>
-        <Select
+      <UICard title="Filter" style={{ marginBottom: 24 }}>
+        <UISelect
           style={{ width: 400 }}
           placeholder="Select package to see its build dependencies"
           value={selectedPackage}
@@ -83,14 +83,14 @@ export function BuildOrderTab() {
             value: pkg,
           })) ?? []}
         />
-      </Card>
+      </UICard>
 
       {/* Build Layers */}
-      <Card
+      <UICard
         title={`Build Layers (${data?.layerCount ?? 0} layers, ${data?.packageCount ?? 0} packages)`}
         style={{ marginBottom: 24 }}
       >
-        <Table
+        <UITable
           dataSource={layersData}
           columns={layersColumns}
           pagination={false}
@@ -100,22 +100,22 @@ export function BuildOrderTab() {
                 <strong>Packages in this layer:</strong>
                 <div style={{ marginTop: 8 }}>
                   {record.packages.map((pkg) => (
-                    <Tag key={pkg} style={{ marginBottom: 4 }}>
+                    <UITag key={pkg} style={{ marginBottom: 4 }}>
                       {pkg}
-                    </Tag>
+                    </UITag>
                   ))}
                 </div>
               </div>
             ),
           }}
         />
-      </Card>
+      </UICard>
 
       {/* Circular Dependencies */}
       {data?.hasCircular && (
-        <Card title={`Circular Dependencies (${data.circular.length})`}>
+        <UICard title={`Circular Dependencies (${data.circular.length})`}>
           {data.circular.map((cycle, idx) => (
-            <Alert
+            <UIAlert
               key={idx}
               message={`Cycle ${idx + 1}`}
               description={cycle.join(' → ')}
@@ -124,7 +124,7 @@ export function BuildOrderTab() {
               style={{ marginBottom: 12 }}
             />
           ))}
-        </Card>
+        </UICard>
       )}
     </div>
   );

@@ -4,12 +4,12 @@
  */
 
 import type { RouteObject } from 'react-router-dom';
-import type { NavigationItem } from '@kb-labs/studio-ui-react';
 import { DashboardPage } from '../pages/dashboard-page';
 import { AIInsightsPage } from '../pages/ai-insights-page';
 import { DashboardLayout } from '../layouts/dashboard-layout';
 import { ErrorBoundary } from '../../../components/error-boundary';
 import { renderIcon } from '../../../routes/helpers';
+import { NavigationItem } from '@/components/ui';
 
 // Route paths
 const PATHS = {

@@ -1,36 +1,26 @@
-import { Space, Collapse, theme } from 'antd';
-import {
-  UserOutlined,
-  GlobalOutlined,
-  LinkOutlined,
-  SearchOutlined,
-  ClockCircleOutlined,
-} from '@ant-design/icons';
-import { UICard, UIText, UITitle, UITag } from '@kb-labs/studio-ui-kit';
+import { UISpace, UIAccordion, UICard, UIText, UITitle, UITag, UIIcon, useUITheme } from '@kb-labs/studio-ui-kit';
 import type { PluginManifestEntry } from '@kb-labs/studio-data-client';
-
-const { useToken } = theme;
 
 interface PluginHeaderProps {
   plugin: PluginManifestEntry;
 }
 
 export function PluginHeader({ plugin }: PluginHeaderProps) {
-  const { token } = useToken();
+  const { token } = useUITheme();
   const { manifest } = plugin;
   const display = manifest.display;
 
   return (
     <UICard>
-      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+      <UISpace direction="vertical" size="middle" style={{ width: '100%' }}>
         {/* Icon + Name + Version */}
-        <Space align="start" size="large">
-          <div style={{ fontSize: 64, lineHeight: 1 }}>{display?.icon || '📦'}</div>
+        <UISpace align="start" size="large">
+          <div style={{ fontSize: 64, lineHeight: 1 }}>{display?.icon || ''}</div>
           <div style={{ flex: 1 }}>
             <UITitle level={2} style={{ marginBottom: 4 }}>
               {display?.name || manifest.id}
             </UITitle>
-            <Space size="middle">
+            <UISpace size="middle">
               <UIText color="secondary" style={{ fontSize: 16 }}>
                 v{manifest.version}
               </UIText>
@@ -40,9 +30,9 @@ export function PluginHeader({ plugin }: PluginHeaderProps) {
                   : plugin.source?.kind || 'unknown'}
               </UITag>
               <UITag>{manifest.schema}</UITag>
-            </Space>
+            </UISpace>
           </div>
-        </Space>
+        </UISpace>
 
         {/* Description */}
         {display?.description && (
@@ -53,13 +43,13 @@ export function PluginHeader({ plugin }: PluginHeaderProps) {
 
         {/* Tags */}
         {display?.tags && display.tags.length > 0 && (
-          <Space wrap>
+          <UISpace wrap>
             {display.tags.map((tag, idx) => (
               <UITag key={typeof tag === 'string' ? tag : `tag-${idx}`} color="default">
                 {typeof tag === 'string' ? tag : JSON.stringify(tag)}
               </UITag>
             ))}
-          </Space>
+          </UISpace>
         )}
 
         {/* Metadata Row */}
@@ -79,10 +69,10 @@ export function PluginHeader({ plugin }: PluginHeaderProps) {
               >
                 Author
               </UIText>
-              <Space>
-                <UserOutlined />
+              <UISpace>
+                <UIIcon name="UserOutlined" />
                 <UIText>{display.author}</UIText>
-              </Space>
+              </UISpace>
             </div>
           )}
           <div>
@@ -98,24 +88,24 @@ export function PluginHeader({ plugin }: PluginHeaderProps) {
 
         {/* Links */}
         {(display?.homepage || display?.repository) && (
-          <Space size="large">
+          <UISpace size="large">
             {display?.homepage && (
               <a href={display.homepage} target="_blank" rel="noopener noreferrer">
-                <Space>
-                  <GlobalOutlined />
+                <UISpace>
+                  <UIIcon name="GlobalOutlined" />
                   Homepage
-                </Space>
+                </UISpace>
               </a>
             )}
             {display?.repository && (
               <a href={display.repository} target="_blank" rel="noopener noreferrer">
-                <Space>
-                  <LinkOutlined />
+                <UISpace>
+                  <UIIcon name="LinkOutlined" />
                   Repository
-                </Space>
+                </UISpace>
               </a>
             )}
-          </Space>
+          </UISpace>
         )}
 
         {/* Timestamps */}
@@ -135,10 +125,10 @@ export function PluginHeader({ plugin }: PluginHeaderProps) {
                 >
                   Discovered At
                 </UIText>
-                <Space>
-                  <SearchOutlined />
+                <UISpace>
+                  <UIIcon name="SearchOutlined" />
                   <UIText>{new Date(plugin.discoveredAt).toLocaleString()}</UIText>
-                </Space>
+                </UISpace>
               </div>
             )}
             {plugin.buildTimestamp && (
@@ -149,17 +139,17 @@ export function PluginHeader({ plugin }: PluginHeaderProps) {
                 >
                   Last Built
                 </UIText>
-                <Space>
-                  <ClockCircleOutlined />
+                <UISpace>
+                  <UIIcon name="ClockCircleOutlined" />
                   <UIText>{new Date(plugin.buildTimestamp).toLocaleString()}</UIText>
-                </Space>
+                </UISpace>
               </div>
             )}
           </div>
         )}
 
         {/* Plugin Root (collapsible) */}
-        <Collapse
+        <UIAccordion
           ghost
           items={[
             {
@@ -173,7 +163,7 @@ export function PluginHeader({ plugin }: PluginHeaderProps) {
             },
           ]}
         />
-      </Space>
+      </UISpace>
     </UICard>
   );
 }

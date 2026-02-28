@@ -1,6 +1,4 @@
-import { Table, Alert, theme } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import { UICard, UIText, UITag, UITitle } from '@kb-labs/studio-ui-kit';
+import { UITable, UIAlert, UICard, UIText, UITag, UITitle, useUITheme, type UITableColumn } from '@kb-labs/studio-ui-kit';
 
 interface RestRoutesTableProps {
   routes: any[];
@@ -9,6 +7,8 @@ interface RestRoutesTableProps {
 }
 
 export function RestRoutesTable({ routes, basePath, apiBasePath }: RestRoutesTableProps) {
+  const { token } = useUITheme();
+
   // Combine API base path with plugin base path, avoiding duplicate /v1
   const fullBasePath =
     apiBasePath && basePath
@@ -17,7 +17,7 @@ export function RestRoutesTable({ routes, basePath, apiBasePath }: RestRoutesTab
         : apiBasePath + basePath
       : basePath || '';
 
-  const columns: ColumnsType<any> = [
+  const columns: UITableColumn<any>[] = [
     {
       title: 'Method',
       dataIndex: 'method',
@@ -38,46 +38,40 @@ export function RestRoutesTable({ routes, basePath, apiBasePath }: RestRoutesTab
       title: 'Path',
       dataIndex: 'path',
       key: 'path',
-      render: (path) => {
-        const { token } = theme.useToken();
-        return (
-          <UIText style={{ fontFamily: token.fontFamilyCode }}>
-            {fullBasePath}
-            {path}
-          </UIText>
-        );
-      },
+      render: (path) => (
+        <UIText style={{ fontFamily: token.fontFamilyCode }}>
+          {fullBasePath}
+          {path}
+        </UIText>
+      ),
     },
     {
       title: 'Description',
       dataIndex: 'description',
       key: 'description',
-      render: (desc) => (typeof desc === 'string' ? desc : desc ? JSON.stringify(desc) : '—'),
+      render: (desc) => (typeof desc === 'string' ? desc : desc ? JSON.stringify(desc) : '--'),
     },
     {
       title: 'Timeout',
       dataIndex: 'timeoutMs',
       key: 'timeoutMs',
-      render: (timeout) => (timeout ? `${timeout}ms` : '—'),
+      render: (timeout) => (timeout ? `${timeout}ms` : '--'),
     },
     {
       title: 'Handler',
       dataIndex: 'handler',
       key: 'handler',
-      render: (handler) => {
-        const { token } = theme.useToken();
-        return (
-          <UIText style={{ fontSize: 11, fontFamily: token.fontFamilyCode }}>
-            {handler}
-          </UIText>
-        );
-      },
+      render: (handler) => (
+        <UIText style={{ fontSize: 11, fontFamily: token.fontFamilyCode }}>
+          {handler}
+        </UIText>
+      ),
     },
   ];
 
   const formatSchemaRef = (schema: any): string => {
     if (!schema) {
-      return '—';
+      return '--';
     }
     if (typeof schema === 'string') {
       return schema;
@@ -94,11 +88,11 @@ export function RestRoutesTable({ routes, basePath, apiBasePath }: RestRoutesTab
   return (
     <UICard>
       {fullBasePath && (
-        <Alert
+        <UIAlert
           message={
             <span>
               Base Path:{' '}
-              <UIText style={{ fontFamily: theme.useToken().token.fontFamilyCode }}>
+              <UIText style={{ fontFamily: token.fontFamilyCode }}>
                 {fullBasePath}
               </UIText>
             </span>
@@ -107,7 +101,7 @@ export function RestRoutesTable({ routes, basePath, apiBasePath }: RestRoutesTab
           style={{ marginBottom: 16 }}
         />
       )}
-      <Table
+      <UITable
         columns={columns}
         dataSource={routes}
         rowKey={(record) => `${record.method} ${record.path}`}
@@ -129,7 +123,7 @@ export function RestRoutesTable({ routes, basePath, apiBasePath }: RestRoutesTab
                     <UITitle level={5}>
                       {record.method === 'GET' ? 'Query Parameters' : 'Request Body'}
                     </UITitle>
-                    <UIText style={{ fontFamily: theme.useToken().token.fontFamilyCode }}>
+                    <UIText style={{ fontFamily: token.fontFamilyCode }}>
                       {formatSchemaRef(record.input)}
                     </UIText>
                   </div>
@@ -137,7 +131,7 @@ export function RestRoutesTable({ routes, basePath, apiBasePath }: RestRoutesTab
                 {hasOutput && (
                   <div style={{ marginBottom: 16 }}>
                     <UITitle level={5}>Response</UITitle>
-                    <UIText style={{ fontFamily: theme.useToken().token.fontFamilyCode }}>
+                    <UIText style={{ fontFamily: token.fontFamilyCode }}>
                       {formatSchemaRef(record.output)}
                     </UIText>
                   </div>
@@ -148,7 +142,7 @@ export function RestRoutesTable({ routes, basePath, apiBasePath }: RestRoutesTab
                     {record.errors.map((error: any, idx: number) => (
                       <div key={idx} style={{ marginBottom: 8 }}>
                         <UITag color="red">{error.code}</UITag>
-                        <UIText>{error.message || '—'}</UIText>
+                        <UIText>{error.message || '--'}</UIText>
                       </div>
                     ))}
                   </div>

@@ -4,11 +4,9 @@
  */
 
 import React, { useState } from 'react';
-import { Typography, theme } from 'antd';
+import { UITypographyText, useUITheme } from '@kb-labs/studio-ui-kit';
 import { MarkdownViewer } from '@/components/markdown';
 import { ToolItem, type ToolCall } from './tool-item';
-
-const { Text } = Typography;
 
 export interface ResearchStep {
   id: string;
@@ -27,28 +25,28 @@ interface StepItemProps {
 }
 
 function formatDuration(ms?: number): string {
-  if (!ms) return '';
-  if (ms < 1000) return `${ms}ms`;
+  if (!ms) {return '';}
+  if (ms < 1000) {return `${ms}ms`;}
   return `${(ms / 1000).toFixed(1)}s`;
 }
 
 function getStatusIcon(status: string, token: any): { emoji: string; color: string } {
   switch (status) {
     case 'done':
-      return { emoji: '✓', color: token.colorSuccess };
+      return { emoji: 'done', color: token.colorSuccess };
     case 'error':
-      return { emoji: '✗', color: token.colorError };
+      return { emoji: 'error', color: token.colorError };
     case 'running':
-      return { emoji: '⚡', color: token.colorPrimary };
+      return { emoji: 'running', color: token.colorPrimary };
     case 'pending':
-      return { emoji: '○', color: token.colorTextDisabled };
+      return { emoji: 'pending', color: token.colorTextDisabled };
     default:
-      return { emoji: '○', color: token.colorTextSecondary };
+      return { emoji: 'pending', color: token.colorTextSecondary };
   }
 }
 
 export function StepItem({ step, isLast, level }: StepItemProps) {
-  const { token } = theme.useToken();
+  const { token } = useUITheme();
   const [isExpanded, setIsExpanded] = useState(true);
 
   const { emoji, color } = getStatusIcon(step.status, token);
@@ -111,7 +109,7 @@ export function StepItem({ step, isLast, level }: StepItemProps) {
         </div>
 
         {/* Task name */}
-        <Text
+        <UITypographyText
           style={{
             flex: 1,
             fontSize: 13,
@@ -120,10 +118,10 @@ export function StepItem({ step, isLast, level }: StepItemProps) {
           }}
         >
           {step.task}
-        </Text>
+        </UITypographyText>
 
         {/* Duration/status */}
-        <Text type="secondary" style={{ fontSize: 12 }}>
+        <UITypographyText type="secondary" style={{ fontSize: 12 }}>
           {step.status === 'running' ? (
             <span style={{ color: token.colorPrimary }}>running...</span>
           ) : step.status === 'error' ? (
@@ -133,7 +131,7 @@ export function StepItem({ step, isLast, level }: StepItemProps) {
           ) : (
             formatDuration(step.duration)
           )}
-        </Text>
+        </UITypographyText>
       </div>
 
       {/* Expanded content */}
@@ -150,9 +148,9 @@ export function StepItem({ step, isLast, level }: StepItemProps) {
                 borderRadius: 6,
               }}
             >
-              <Text style={{ color: token.colorError, fontSize: 12 }}>
-                ⚠️ {step.error}
-              </Text>
+              <UITypographyText style={{ color: token.colorError, fontSize: 12 }}>
+                {step.error}
+              </UITypographyText>
             </div>
           )}
 

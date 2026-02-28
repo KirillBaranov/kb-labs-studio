@@ -4,9 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { Typography, theme } from 'antd';
-
-const { Text } = Typography;
+import { UITypographyText, useUITheme } from '@kb-labs/studio-ui-kit';
 
 export interface ToolCall {
   id: string;
@@ -27,21 +25,21 @@ function getToolIcon(toolName: string): string {
   const baseName = toolName.split(':').pop() || toolName;
   switch (baseName) {
     case 'read':
-      return '📄';
+      return 'file';
     case 'write':
     case 'edit':
-      return '✏️';
+      return 'edit';
     case 'glob':
     case 'list':
-      return '📁';
+      return 'folder';
     case 'grep':
-      return '🔎';
+      return 'search';
     case 'rag-query':
-      return '🔍';
+      return 'search';
     case 'bash':
-      return '⚡';
+      return 'terminal';
     default:
-      return '🔧';
+      return 'tool';
   }
 }
 
@@ -73,7 +71,7 @@ function formatToolName(toolName: string, input?: Record<string, unknown>): stri
 }
 
 export function ToolItem({ tool, isLast }: ToolItemProps) {
-  const { token } = theme.useToken();
+  const { token } = useUITheme();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const icon = getToolIcon(tool.name);
@@ -138,10 +136,10 @@ export function ToolItem({ tool, isLast }: ToolItemProps) {
           }}
         />
 
-        <Text style={{ fontSize: 14 }}>
+        <UITypographyText style={{ fontSize: 14 }}>
           {icon}
-        </Text>
-        <Text
+        </UITypographyText>
+        <UITypographyText
           style={{
             flex: 1,
             fontSize: 12,
@@ -149,10 +147,10 @@ export function ToolItem({ tool, isLast }: ToolItemProps) {
           }}
         >
           {displayName}
-        </Text>
-        <Text style={{ color: statusColor, fontSize: 11 }}>
+        </UITypographyText>
+        <UITypographyText style={{ color: statusColor, fontSize: 11 }}>
           {statusText}
-        </Text>
+        </UITypographyText>
       </div>
 
       {/* Error */}
@@ -167,9 +165,9 @@ export function ToolItem({ tool, isLast }: ToolItemProps) {
             borderRadius: 4,
           }}
         >
-          <Text style={{ color: token.colorError, fontSize: 11 }}>
-            ⚠️ {tool.error}
-          </Text>
+          <UITypographyText style={{ color: token.colorError, fontSize: 11 }}>
+            {tool.error}
+          </UITypographyText>
         </div>
       )}
 

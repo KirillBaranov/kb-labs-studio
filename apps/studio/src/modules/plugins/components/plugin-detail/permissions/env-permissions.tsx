@@ -1,5 +1,4 @@
-import { Space } from 'antd';
-import { UICard, UIText, UITag } from '@kb-labs/studio-ui-kit';
+import { UISpace, UICard, UIText, UITag } from '@kb-labs/studio-ui-kit';
 
 interface EnvPermissionsProps {
   permissions: {
@@ -17,13 +16,13 @@ export function EnvPermissions({ permissions }: EnvPermissionsProps) {
       <div>
         <UIText strong>Read Access:</UIText>
         <div style={{ marginTop: 8 }}>
-          <Space wrap>
+          <UISpace wrap>
             {permissions.read.map((env: string, idx: number) => (
               <UITag key={idx} color="cyan">
                 {env}
               </UITag>
             ))}
-          </Space>
+          </UISpace>
         </div>
       </div>
     </UICard>

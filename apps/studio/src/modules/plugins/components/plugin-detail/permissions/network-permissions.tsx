@@ -1,8 +1,4 @@
-import { Space, theme } from 'antd';
-import { GlobalOutlined } from '@ant-design/icons';
-import { UICard, UIText } from '@kb-labs/studio-ui-kit';
-
-const { useToken } = theme;
+import { UISpace, UICard, UIText, UIIcon, useUITheme } from '@kb-labs/studio-ui-kit';
 
 interface NetworkPermissionsProps {
   permissions: {
@@ -11,15 +7,15 @@ interface NetworkPermissionsProps {
 }
 
 export function NetworkPermissions({ permissions }: NetworkPermissionsProps) {
-  const { token } = useToken();
+  const { token } = useUITheme();
 
   return (
     <UICard
       title={
-        <Space>
-          <GlobalOutlined />
+        <UISpace>
+          <UIIcon name="GlobalOutlined" />
           <span>Network Permissions</span>
-        </Space>
+        </UISpace>
       }
     >
       <UIText color="secondary" style={{ marginBottom: 16, display: 'block' }}>
