@@ -28,6 +28,8 @@ export * from './sources/agent-source';
 // TODO: TEMPORARY - Remove after commit plugin UI is polished
 export * from './sources/commit-source';
 export * from './sources/quality-source';
+export * from './sources/qa-source';
+export * from './sources/http-qa-source';
 export * from './sources/http-audit-source';
 export * from './sources/http-release-source';
 export * from './sources/http-system-source';
@@ -58,6 +60,7 @@ export * from './mocks/mock-agent-source';
 // TODO: TEMPORARY - Remove after commit plugin UI is polished
 export * from './mocks/mock-commit-source';
 export * from './mocks/mock-quality-source';
+export * from './mocks/mock-qa-source';
 export * from './factory';
 export * from './query-keys';
 export * from './hooks/use-audit';
@@ -74,6 +77,7 @@ export * from './hooks/use-session-turns';
 export * from './hooks/use-file-changes';
 export * from './hooks/use-commit';
 export * from './hooks/use-quality';
+export * from './hooks/use-qa';
 export * from './hooks/types';
 export * from './hooks/use-job-events';
 export * from './hooks/use-notifications';

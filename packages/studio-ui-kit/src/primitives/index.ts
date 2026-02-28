@@ -8,3 +8,4 @@
 export * from './UIText';
 export * from './UIBox';
 export * from './UIFlex';
+export * from './UITypography';

@@ -6,3 +6,6 @@
 
 export * from './UIModal';
 export * from './UITooltip';
+export * from './UIDrawer';
+export * from './UIPopconfirm';
+export * from './UIPopover';

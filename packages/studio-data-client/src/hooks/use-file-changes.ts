@@ -31,7 +31,7 @@ export function useFileChanges(
   return useQuery({
     queryKey: sessionId ? fileChangesKeys.byRun(sessionId, runId) : ['agents', 'sessions', null, 'changes'],
     queryFn: async (): Promise<{ changes: FileChangeSummary[]; total: number; sessionId: string; runId?: string }> => {
-      if (!sessionId) return { changes: [], total: 0, sessionId: '' };
+      if (!sessionId) {return { changes: [], total: 0, sessionId: '' };}
       return source.listFileChanges(sessionId, runId);
     },
     enabled: (options?.enabled !== false) && !!sessionId,

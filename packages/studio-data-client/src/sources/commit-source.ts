@@ -25,7 +25,6 @@ import type {
   FileDiffResponse,
   SummarizeRequest,
   SummarizeResponse,
-  // @ts-ignore - commit-contracts doesn't generate .d.ts files yet
 } from '@kb-labs/commit-contracts';
 
 /**

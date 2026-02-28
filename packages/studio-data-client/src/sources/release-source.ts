@@ -31,7 +31,6 @@ import type {
   BuildRequest,
   BuildResponse,
   ReleaseChecklist,
-  // @ts-ignore - release-manager-contracts doesn't generate .d.ts files yet
 } from '@kb-labs/release-manager-contracts';
 
 /**

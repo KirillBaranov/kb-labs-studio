@@ -46,19 +46,19 @@ function MyComponent() {
 
 ## 📊 Component Stats
 
-- **Total Components:** 29
-- **With Tests:** 4/29 (14%)
+- **Total Components:** 47
+- **With Tests:** 4/47 (9%)
 
 **By Category:**
 
-- Primitives: 3
-- Core: 6
-- Layout: 1
-- Form: 6
-- Navigation: 3
+- Primitives: 4
+- Core: 7
+- Layout: 4
+- Form: 10
+- Navigation: 7
 - Composite: 2
-- Feedback: 4
-- Overlay: 2
+- Feedback: 6
+- Overlay: 5
 - Content: 2
 
 ## 📚 Component Reference
@@ -72,6 +72,7 @@ Foundation components for layout and typography
 | **UIBox** | Box component - Layout primitive with spacing tokens | ❌ |
 | **UIFlex** | Flex component - Flexbox layout primitive | ❌ |
 | **UIText** | Text component - Typography primitive with design tokens | ✅ |
+| **UITypography** | UITypography components - Rich text display | ❌ |
 
 ### Core
 
@@ -79,6 +80,7 @@ Essential UI components
 
 | Component | Description | Tests |
 |-----------|-------------|-------|
+| **UIAvatar** | UIAvatar component - User avatar | ❌ |
 | **UIBadge** | Badge component - Status indicator with semantic colors | ❌ |
 | **UIButton** | UIButton component - Action button with semantic variants | ✅ |
 | **UICard** | UICard component - Card container with header/footer | ❌ |
@@ -92,6 +94,9 @@ Layout and container components
 
 | Component | Description | Tests |
 |-----------|-------------|-------|
+| **UIDivider** | UIDivider component - Visual separator | ❌ |
+| **UIGrid** | UIRow / UICol components - Grid layout | ❌ |
+| **UISpace** | UISpace component - Spacing container | ❌ |
 | **UIStack** | UIStack component - Vertical/horizontal spacing layout | ❌ |
 
 ### Form
@@ -104,8 +109,12 @@ Form controls and inputs
 | **UIDatePicker** | UIDatePicker component - Date/time picker | ❌ |
 | **UIForm** | UIForm component - Form wrapper with validation | ❌ |
 | **UIInput** | UIInput component - Text input with variants | ✅ |
+| **UIInputNumber** | UIInputNumber component - Numeric input | ❌ |
+| **UIRadio** | UIRadio component - Radio button | ❌ |
 | **UISelect** | UISelect component - Dropdown select with icon support | ❌ |
+| **UISlider** | UISlider component - Slider input | ❌ |
 | **UISwitch** | UISwitch component - Toggle switch | ❌ |
+| **UIUpload** | UIUpload component - File upload | ❌ |
 
 ### Navigation
 
@@ -115,6 +124,10 @@ Navigation and menu components
 |-----------|-------------|-------|
 | **UIAccordion** | UIAccordion component - Collapsible panels | ❌ |
 | **UIBreadcrumb** | UIBreadcrumb component - Navigation breadcrumb trail | ❌ |
+| **UIDropdown** | UIDropdown component - Dropdown menu | ❌ |
+| **UIMenu** | UIMenu component - Navigation menu | ❌ |
+| **UISegmented** | UISegmented component - Segmented control | ❌ |
+| **UISteps** | UISteps component - Step indicator | ❌ |
 | **UITabs** | UITabs component - Tabbed navigation | ❌ |
 
 ### Composite
@@ -135,7 +148,9 @@ Feedback and notification components
 | **UIAlert** | UIAlert component - Alert messages and notifications | ❌ |
 | **UIEmptyState** | UIEmptyState component - Empty state placeholder | ❌ |
 | **UIErrorState** | UIErrorState component - Error state display | ❌ |
+| **UIResult** | UIResult component - Result page | ❌ |
 | **UISkeleton** | UISkeleton component - Loading skeleton | ❌ |
+| **UISpin** | UISpin component - Loading spinner | ❌ |
 
 ### Overlay
 
@@ -143,7 +158,10 @@ Modal and overlay components
 
 | Component | Description | Tests |
 |-----------|-------------|-------|
+| **UIDrawer** | UIDrawer component - Side panel overlay | ❌ |
 | **UIModal** | UIModal component - Modal dialog | ❌ |
+| **UIPopconfirm** | UIPopconfirm component - Confirmation popover | ❌ |
+| **UIPopover** | UIPopover component - Popover overlay | ❌ |
 | **UITooltip** | UITooltip component - Tooltip overlay | ❌ |
 
 ### Content

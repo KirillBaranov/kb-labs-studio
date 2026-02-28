@@ -1,0 +1,16 @@
+/**
+ * UIUpload component - File upload
+ *
+ * Wraps Ant Design Upload.
+ */
+
+import * as React from 'react';
+import { Upload as AntUpload, type UploadProps as AntUploadProps } from 'antd';
+
+export interface UIUploadProps extends AntUploadProps {}
+
+export function UIUpload(props: UIUploadProps) {
+  return <AntUpload {...props} />;
+}
+
+UIUpload.Dragger = AntUpload.Dragger;

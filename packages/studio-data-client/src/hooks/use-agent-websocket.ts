@@ -145,10 +145,10 @@ export function useAgentWebSocket(options: UseAgentWebSocketOptions): UseAgentWe
             setIsCompleted(false);
             setCompletionResult(null);
             setTurns((prev) => {
-              if (prev.length === 0) return incoming;
+              if (prev.length === 0) {return incoming;}
               // Keep any locally-streamed turn that has more steps than the snapshot
               const merged = new Map<string, Turn>();
-              for (const t of incoming) merged.set(t.id, t);
+              for (const t of incoming) {merged.set(t.id, t);}
               for (const t of prev) {
                 const snap = merged.get(t.id);
                 if (snap && t.status === 'streaming' && snap.status === 'streaming' && t.steps.length > snap.steps.length) {
@@ -177,8 +177,8 @@ export function useAgentWebSocket(options: UseAgentWebSocketOptions): UseAgentWe
                 updated[idx] = turn;
               } else {
                 const insertAt = updated.findIndex((t) => t.sequence > turn.sequence);
-                if (insertAt >= 0) updated.splice(insertAt, 0, turn);
-                else updated.push(turn);
+                if (insertAt >= 0) {updated.splice(insertAt, 0, turn);}
+                else {updated.push(turn);}
               }
               return updated;
             });
@@ -254,7 +254,7 @@ export function useAgentWebSocket(options: UseAgentWebSocketOptions): UseAgentWe
 
   // Public reconnect — re-enables reconnection and opens socket
   const reconnect = useCallback(() => {
-    if (!url) return;
+    if (!url) {return;}
     shouldReconnectRef.current = true;
     reconnectAttemptsRef.current = 0;
     openSocket(url);
@@ -301,7 +301,7 @@ export function useAgentWebSocket(options: UseAgentWebSocketOptions): UseAgentWe
       shouldReconnectRef.current = false;
       closeSocket();
     };
-  }, [url]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [url]);
 
   return {
     status,

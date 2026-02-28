@@ -27,6 +27,12 @@
       "@kb-labs/plugin-contracts/*": [
         "../kb-labs-plugin/packages/plugin-contracts/src/*"
       ],
+      "@kb-labs/qa-contracts": [
+        "../kb-labs-qa-plugin/packages/qa-contracts/src/index.ts"
+      ],
+      "@kb-labs/qa-contracts/*": [
+        "../kb-labs-qa-plugin/packages/qa-contracts/src/*"
+      ],
       "@kb-labs/quality-contracts": [
         "../kb-labs-quality-plugin/packages/quality-contracts/src/index.ts"
       ],
@@ -62,12 +68,6 @@
       ],
       "@kb-labs/studio-ui-kit/*": [
         "packages/studio-ui-kit/src/*"
-      ],
-      "@kb-labs/studio-ui-react": [
-        "packages/studio-ui-react/src/index.ts"
-      ],
-      "@kb-labs/studio-ui-react/*": [
-        "packages/studio-ui-react/src/*"
       ]
     }
   }

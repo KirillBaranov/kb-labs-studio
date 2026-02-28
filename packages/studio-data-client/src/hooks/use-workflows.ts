@@ -12,8 +12,7 @@ export function useWorkflowRuns(
   return useQuery({
     queryKey,
     queryFn: async () => {
-      const response = await source.listRuns(filters)
-      return response
+      return source.listRuns(filters)
     },
   })
 }

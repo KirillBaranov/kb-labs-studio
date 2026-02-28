@@ -1,14 +1,5 @@
 import * as React from 'react';
 import { createBrowserRouter, Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import {
-  KBPageLayout,
-  type NavigationItem,
-  AVAILABLE_ICONS,
-  getAvailableIconNames,
-  KBStatusBar,
-  StatusBarItem,
-  StatusBarPresets,
-} from '@kb-labs/studio-ui-react';
 import type { StudioRegistry } from '@kb-labs/rest-api-contracts';
 import { useAuth } from './providers/auth-provider';
 import { useRegistry } from './providers/registry-provider';
@@ -46,6 +37,7 @@ import { AgentsPage } from './modules/agents/pages/agents-page';
 import { CommitPage } from './modules/commit/pages/commit-page';
 import { ReleasePage } from './modules/release/pages/release-page';
 import { QualityPage } from './modules/quality/pages/quality-page';
+import { QADashboardPage } from './modules/qa/pages/qa-page';
 import { PluginsPage } from './modules/plugins/pages/plugins-page';
 import { PluginDetailPage } from './modules/plugins/pages/plugin-detail-page';
 import { WorkflowPage } from './modules/workflow/pages/workflow-page';
@@ -53,6 +45,10 @@ import { WidgetModalManager } from './components/widget-modal';
 import { PageTransition } from './components/page-transition';
 import { createStudioLogger } from './utils/logger';
 import { ErrorBoundary } from './components/error-boundary';
+import { useSettings } from './providers/settings-provider';
+import { NavigationItemsProvider } from './providers/navigation-items-provider';
+import { applyNavigationCategories } from './utils/apply-navigation-categories';
+import { AVAILABLE_ICONS, KBPageLayout, KBStatusBar, type NavigationItem, StatusBarItem, StatusBarPresets, getAvailableIconNames } from '@/components/ui';
 
 type PluginNavRoute = {
   key: string;
@@ -92,6 +88,7 @@ function LayoutContent() {
   const { registry, loading, error, retrying, hasData, refresh, registryMeta, health } = useRegistry();
   const commandPalette = useCommandPalette();
   const sources = useDataSources();
+  const { settings } = useSettings();
 
   // Notifications hook
   const {
@@ -131,7 +128,8 @@ function LayoutContent() {
     (health?.pluginsFailed ?? 0) > 0
   );
 
-  const allNavigationItems = React.useMemo<NavigationItem[]>(() => {
+  // Build flat navigation items (before category grouping)
+  const flatNavigationItems = React.useMemo<NavigationItem[]>(() => {
     const items: NavigationItem[] = [
       {
         key: 'dashboard',
@@ -182,6 +180,12 @@ function LayoutContent() {
         label: 'Quality',
         icon: renderPluginIcon('CheckCircleOutlined'),
         path: '/quality',
+      },
+      {
+        key: 'qa',
+        label: 'QA',
+        icon: renderPluginIcon('SafetyOutlined'),
+        path: '/qa',
       },
       {
         key: 'release',
@@ -308,7 +312,7 @@ function LayoutContent() {
       items.push({
         key: `plugin-${model.pluginId}`,
         label: model.displayName,
-        icon: renderPluginIcon(model.icon), // Use parent menu's icon
+        icon: renderPluginIcon(model.icon),
         children: model.routes.map(route => ({
           key: route.key,
           label: route.label,
@@ -329,6 +333,21 @@ function LayoutContent() {
     return items;
   }, [pluginNavModel]);
 
+  // Available items for NavigationSettings UI (top-level items except settings)
+  const availableNavItems = React.useMemo(
+    () =>
+      flatNavigationItems
+        .filter(item => item.key !== 'settings')
+        .map(item => ({ key: item.key, label: item.label })),
+    [flatNavigationItems],
+  );
+
+  // Apply user's category configuration
+  const allNavigationItems = React.useMemo<NavigationItem[]>(
+    () => applyNavigationCategories(flatNavigationItems, settings.navigation.categories),
+    [flatNavigationItems, settings.navigation.categories],
+  );
+
   React.useEffect(() => {
     if (error) {
       logger.error('Registry load failure in router', error);
@@ -336,7 +355,7 @@ function LayoutContent() {
   }, [error, logger]);
 
   return (
-    <>
+    <NavigationItemsProvider items={availableNavItems}>
       <KBPageLayout
         headerProps={{
           LinkComponent: Link as any,
@@ -406,7 +425,7 @@ function LayoutContent() {
         </PageTransition>
         <WidgetModalManager />
       </KBPageLayout>
-    </>
+    </NavigationItemsProvider>
   );
 }
 
@@ -593,6 +612,16 @@ export const router = createBrowserRouter([
       {
         path: '/quality/:tab',
         element: <QualityPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/qa',
+        element: <QADashboardPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/qa/:tab',
+        element: <QADashboardPage />,
         errorElement: <ErrorBoundary />,
       },
       {

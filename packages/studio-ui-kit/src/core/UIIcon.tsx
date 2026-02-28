@@ -34,6 +34,17 @@ export interface UIIconProps {
 }
 
 /**
+ * Icon resolver registry — call registerIconRenderer() once at app startup
+ * to wire up the icon lookup (e.g. from @/components/ui/icons renderIcon).
+ */
+type IconRenderer = (name: string) => React.ReactNode | null;
+let _iconRenderer: IconRenderer | null = null;
+
+export function registerIconRenderer(renderer: IconRenderer): void {
+  _iconRenderer = renderer;
+}
+
+/**
  * UIIcon - Icon wrapper with CSS-based theming
  *
  * @example
@@ -71,8 +82,11 @@ export function UIIcon({
   style: customStyle,
 }: UIIconProps) {
   // Build CSS classes
+  // 'anticon' class is required so Ant Design components (e.g. Tag icon prop)
+  // apply correct margin/spacing — it's the standard Ant Design icon marker class
   const classes = [
     styles.uiIcon,
+    'anticon',
     styles[`size-${size}`],
     styles[`color-${color}`],
     spin && styles.spin,
@@ -87,14 +101,10 @@ export function UIIcon({
 
   const iconName = name || (typeof icon === 'string' ? icon : null);
   if (iconName) {
-    // Try to load icon from AVAILABLE_ICONS (lazy import to avoid circular deps)
-    try {
-      // This will be resolved at runtime when studio-ui-react is available
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { renderIcon } = require('@kb-labs/studio-ui-react/lib/icons');
-      iconElement = renderIcon(iconName);
-    } catch (_error) {
-      console.warn(`Icon "${iconName}" could not be loaded. Make sure @kb-labs/studio-ui-react is installed.`);
+    if (_iconRenderer) {
+      iconElement = _iconRenderer(iconName);
+    } else {
+      console.warn(`Icon "${iconName}" could not be loaded. Call registerIconRenderer() at app startup.`);
       iconElement = null;
     }
   } else if (React.isValidElement(icon)) {

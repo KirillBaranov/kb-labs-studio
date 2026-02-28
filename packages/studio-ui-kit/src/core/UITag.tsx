@@ -16,6 +16,8 @@ export type UITagVariant = 'success' | 'warning' | 'error' | 'info' | 'default' 
 export interface UITagProps extends Omit<AntTagProps, 'color'> {
   /** Semantic variant */
   variant?: UITagVariant;
+  /** Direct color override (Ant Design color name or hex) */
+  color?: string;
   /** Tag content */
   children: React.ReactNode;
   /** Closable tag */
@@ -39,6 +41,7 @@ export interface UITagProps extends Omit<AntTagProps, 'color'> {
  */
 export function UITag({
   variant = 'default',
+  color,
   children,
   closable,
   onClose,
@@ -58,7 +61,7 @@ export function UITag({
 
   return (
     <AntTag
-      color={colorMap[variant]}
+      color={color ?? colorMap[variant]}
       closable={closable}
       onClose={onClose}
       icon={icon}

@@ -6,7 +6,6 @@
 import { useQuery, useMutation, useQueryClient, type UseMutationOptions } from '@tanstack/react-query';
 import type { AgentDataSource } from '../sources/agent-source';
 import type {
-  ListAgentsResponse,
   RunRequest,
   RunResponse,
   RunStatusResponse,

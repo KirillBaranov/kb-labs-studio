@@ -26,19 +26,19 @@ export class HttpAdaptersSource implements AdaptersDataSource {
   private buildQueryString(options?: DateRangeOptions): string {
     const params = new URLSearchParams();
 
-    if (options?.from) params.append('from', options.from);
-    if (options?.to) params.append('to', options.to);
+    if (options?.from) {params.append('from', options.from);}
+    if (options?.to) {params.append('to', options.to);}
 
     // Legacy model filter
     if (options?.models) {
       const modelsArray = Array.isArray(options.models) ? options.models : [options.models];
-      if (modelsArray.length > 0) params.append('models', modelsArray.join(','));
+      if (modelsArray.length > 0) {params.append('models', modelsArray.join(','));}
     }
 
     // StatsQuery fields
-    if (options?.groupBy) params.append('groupBy', options.groupBy);
-    if (options?.breakdownBy) params.append('breakdownBy', options.breakdownBy);
-    if (options?.metrics && options.metrics.length > 0) params.append('metrics', options.metrics.join(','));
+    if (options?.groupBy) {params.append('groupBy', options.groupBy);}
+    if (options?.breakdownBy) {params.append('breakdownBy', options.breakdownBy);}
+    if (options?.metrics && options.metrics.length > 0) {params.append('metrics', options.metrics.join(','));}
 
     const qs = params.toString();
     return qs ? `?${qs}` : '';

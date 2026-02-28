@@ -10,3 +10,7 @@ export * from './UIForm';
 export * from './UICheckbox';
 export * from './UISwitch';
 export * from './UIDatePicker';
+export * from './UIInputNumber';
+export * from './UIRadio';
+export * from './UIUpload';
+export * from './UISlider';
