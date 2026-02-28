@@ -4,12 +4,11 @@
  */
 
 import * as React from 'react';
-import { Button, Dropdown, Space, Tooltip } from 'antd';
-import type { MenuProps } from 'antd';
-import * as Icons from '@ant-design/icons';
+import { UIButton, UIDropdown, UISpace, UITooltip, UIModalConfirm } from '@kb-labs/studio-ui-kit';
+import type { UIMenuProps } from '@kb-labs/studio-ui-kit';
 import type { WidgetAction } from '@kb-labs/studio-contracts';
 import { useWidgetActions } from '../hooks/useWidgetActions';
-import { Modal } from 'antd';
+import { renderIcon } from '@/components/ui';
 
 export interface ActionToolbarProps {
   /** Actions to display */
@@ -43,7 +42,7 @@ export function ActionToolbar({
   basePath,
   callbacks,
   size = 'middle',
-  responsive = true,
+  _responsive = true,
   className,
 }: ActionToolbarProps): React.ReactElement {
   const { handleAction } = useWidgetActions({
@@ -97,7 +96,7 @@ export function ActionToolbar({
 
       // Show confirmation if needed
       if (action.confirm) {
-        Modal.confirm({
+        UIModalConfirm({
           title: action.confirm.title,
           content: action.confirm.description,
           okText: action.confirm.okText || 'OK',
@@ -134,23 +133,15 @@ export function ActionToolbar({
     [handleAction, widgetData]
   );
 
-  // Render icon
-  const renderIcon = (iconName?: string) => {
-    if (!iconName) return null;
-    const IconComponent = (Icons as Record<string, React.ComponentType<any>>)[iconName];
-    if (!IconComponent) return null;
-    return <IconComponent />;
-  };
-
   // Render button action
   const renderButton = (action: WidgetAction) => {
     const isLoading = loadingActions.has(action.id);
     const isDisabled = action.disabled === true || isLoading;
 
     const button = (
-      <Button
+      <UIButton
         key={action.id}
-        type={action.variant === 'primary' ? 'primary' : action.variant === 'danger' ? 'primary' : 'default'}
+        variant={action.variant === 'primary' ? 'primary' : action.variant === 'danger' ? 'primary' : 'default'}
         danger={action.variant === 'danger'}
         icon={renderIcon(action.icon)}
         loading={isLoading}
@@ -159,14 +150,14 @@ export function ActionToolbar({
         size={size}
       >
         {action.label}
-      </Button>
+      </UIButton>
     );
 
     if (action.tooltip) {
       return (
-        <Tooltip key={action.id} title={action.tooltip}>
+        <UITooltip key={action.id} title={action.tooltip}>
           {button}
-        </Tooltip>
+        </UITooltip>
       );
     }
 
@@ -179,7 +170,7 @@ export function ActionToolbar({
       return renderButton(action);
     }
 
-    const menuItems: MenuProps['items'] = action.children.map((child) => ({
+    const menuItems: UIMenuProps['items'] = action.children.map((child) => ({
       key: child.id,
       label: child.label,
       icon: renderIcon(child.icon),
@@ -189,14 +180,14 @@ export function ActionToolbar({
     }));
 
     return (
-      <Dropdown key={action.id} menu={{ items: menuItems }} trigger={['click']}>
-        <Button
+      <UIDropdown key={action.id} menu={{ items: menuItems }} trigger={['click']}>
+        <UIButton
           icon={renderIcon(action.icon)}
           size={size}
         >
           {action.label}
-        </Button>
-      </Dropdown>
+        </UIButton>
+      </UIDropdown>
     );
   };
 
@@ -213,9 +204,9 @@ export function ActionToolbar({
   }
 
   return (
-    <Space className={className} size="small" wrap>
+    <UISpace className={className} size="small" wrap>
       {renderedActions}
-    </Space>
+    </UISpace>
   );
 }
 

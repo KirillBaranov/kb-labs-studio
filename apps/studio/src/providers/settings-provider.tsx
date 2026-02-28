@@ -1,6 +1,13 @@
 import * as React from 'react';
 import type { FeatureId } from '@/config/feature-flags';
 
+export interface NavigationCategory {
+  id: string;
+  label: string;
+  order: number;
+  itemKeys: string[];
+}
+
 export interface UserSettings {
   appearance: {
     theme: 'light' | 'dark' | 'auto';
@@ -11,6 +18,9 @@ export interface UserSettings {
   experimental: {
     /** User-enabled feature flags */
     enabledFeatures: FeatureId[];
+  };
+  navigation: {
+    categories: NavigationCategory[];
   };
 }
 
@@ -23,6 +33,9 @@ const DEFAULT_SETTINGS: UserSettings = {
   },
   experimental: {
     enabledFeatures: [],
+  },
+  navigation: {
+    categories: [],
   },
 };
 
@@ -44,10 +57,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
-        // Deep merge to ensure new fields (like experimental) are properly initialized
+        // Deep merge to ensure new fields are properly initialized
         return {
           appearance: { ...DEFAULT_SETTINGS.appearance, ...(parsed.appearance || {}) },
           experimental: { ...DEFAULT_SETTINGS.experimental, ...(parsed.experimental || {}) },
+          navigation: { ...DEFAULT_SETTINGS.navigation, ...(parsed.navigation || {}) },
         };
       }
     } catch (error) {
@@ -92,6 +106,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       experimental: {
         ...prev.experimental,
         ...(updates.experimental || {}),
+      },
+      navigation: {
+        ...prev.navigation,
+        ...(updates.navigation || {}),
       },
     }));
   }, []);

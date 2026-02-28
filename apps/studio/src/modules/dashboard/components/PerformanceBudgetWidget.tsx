@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Card, Row, Col, Table, Progress, Tag, Typography, Statistic } from 'antd';
+import { UICard, UIRow, UICol, UITable, UIProgress, UITag, UITypographyText, UITitle, UIStatistic } from '@kb-labs/studio-ui-kit';
 import {
   HolderOutlined,
   DashboardOutlined,
@@ -10,7 +10,7 @@ import {
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { usePrometheusMetrics } from '@kb-labs/studio-data-client';
 
-const { Text, Title } = Typography;
+
 
 const SLO_TARGET = 99.9; // 99.9% uptime target
 
@@ -29,7 +29,7 @@ export function PerformanceBudgetWidget() {
 
   // Calculate overall uptime
   const overallUptime = useMemo(() => {
-    if (!metrics.data?.requests) return 100;
+    if (!metrics.data?.requests) {return 100;}
 
     const total = metrics.data.requests.total ?? 0;
     const success = metrics.data.requests.success ?? 0;
@@ -64,7 +64,7 @@ export function PerformanceBudgetWidget() {
 
   // Per-plugin SLO tracking
   const serviceSLOs = useMemo(() => {
-    if (!metrics.data?.perPlugin) return [];
+    if (!metrics.data?.perPlugin) {return [];}
 
     return metrics.data.perPlugin.map((plugin): ServiceSLO => {
       const total = plugin.requests;
@@ -77,8 +77,8 @@ export function PerformanceBudgetWidget() {
       const budgetUsed = (currentDowntime / allowedDowntime) * 100;
 
       let status: 'healthy' | 'warning' | 'critical' = 'healthy';
-      if (budgetUsed > 90) status = 'critical';
-      else if (budgetUsed > 70) status = 'warning';
+      if (budgetUsed > 90) {status = 'critical';}
+      else if (budgetUsed > 70) {status = 'warning';}
 
       const serviceBurnRate = currentDowntime / allowedDowntime;
 
@@ -95,8 +95,8 @@ export function PerformanceBudgetWidget() {
 
   // Error budget gauge status
   const getGaugeStatus = (usedPercent: number) => {
-    if (usedPercent < 70) return 'success';
-    if (usedPercent < 90) return 'warning';
+    if (usedPercent < 70) {return 'success';}
+    if (usedPercent < 90) {return 'warning';}
     return 'exception';
   };
 
@@ -105,15 +105,15 @@ export function PerformanceBudgetWidget() {
       title: 'Service',
       dataIndex: 'service',
       key: 'service',
-      render: (text: string) => <Text strong>{text}</Text>,
+      render: (text: string) => <UITypographyText strong>{text}</UITypographyText>,
     },
     {
       title: 'Uptime',
       dataIndex: 'uptime',
       key: 'uptime',
       render: (uptime: number) => {
-        const color = uptime >= 99.9 ? '#52c41a' : uptime >= 99 ? '#faad14' : '#ff4d4f';
-        return <Text style={{ color }}>{uptime.toFixed(3)}%</Text>;
+        const color = uptime >= 99.9 ? 'var(--success)' : uptime >= 99 ? 'var(--warning)' : 'var(--error)';
+        return <UITypographyText style={{ color }}>{uptime.toFixed(3)}%</UITypographyText>;
       },
       sorter: (a: ServiceSLO, b: ServiceSLO) => a.uptime - b.uptime,
     },
@@ -123,7 +123,7 @@ export function PerformanceBudgetWidget() {
       key: 'budgetUsed',
       render: (budgetUsed: number, record: ServiceSLO) => (
         <div style={{ width: 150 }}>
-          <Progress
+          <UIProgress
             percent={budgetUsed}
             size="small"
             status={record.status === 'critical' ? 'exception' : record.status === 'warning' ? 'normal' : 'success'}
@@ -144,7 +144,7 @@ export function PerformanceBudgetWidget() {
           critical: { color: 'red', icon: <CloseCircleOutlined />, text: 'Critical' },
         };
         const { color, icon, text } = config[status];
-        return <Tag color={color} icon={icon}>{text}</Tag>;
+        return <UITag color={color} icon={icon}>{text}</UITag>;
       },
       filters: [
         { text: 'Healthy', value: 'healthy' },
@@ -158,18 +158,18 @@ export function PerformanceBudgetWidget() {
       dataIndex: 'burnRate',
       key: 'burnRate',
       render: (rate: number) => {
-        const color = rate <= 1 ? '#52c41a' : rate <= 2 ? '#faad14' : '#ff4d4f';
-        return <Text style={{ color }}>{rate.toFixed(2)}x</Text>;
+        const color = rate <= 1 ? 'var(--success)' : rate <= 2 ? 'var(--warning)' : 'var(--error)';
+        return <UITypographyText style={{ color }}>{rate.toFixed(2)}x</UITypographyText>;
       },
       sorter: (a: ServiceSLO, b: ServiceSLO) => a.burnRate - b.burnRate,
     },
   ];
 
   return (
-    <Card
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: '#999' }} />
+          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
           <DashboardOutlined />
           <span>Performance Budget (SLO)</span>
         </div>
@@ -177,80 +177,80 @@ export function PerformanceBudgetWidget() {
       style={{ height: '100%' }}
       bodyStyle={{ padding: '16px' }}
     >
-      <Row gutter={[16, 16]}>
+      <UIRow gutter={[16, 16]}>
         {/* SLO Summary */}
-        <Col xs={24} md={8}>
+        <UICol xs={24} md={8}>
           <div style={{
             padding: '16px',
-            background: '#f0f5ff',
+            background: 'var(--accent-subtle)',
             borderRadius: 8,
             textAlign: 'center',
           }}>
-            <Text type="secondary">SLO Target</Text>
-            <Title level={2} style={{ margin: '8px 0' }}>
+            <UITypographyText type="secondary">SLO Target</UITypographyText>
+            <UITitle level={2} style={{ margin: '8px 0' }}>
               {SLO_TARGET}%
-            </Title>
-            <Text type="secondary">Monthly Uptime</Text>
+            </UITitle>
+            <UITypographyText type="secondary">Monthly Uptime</UITypographyText>
           </div>
-        </Col>
+        </UICol>
 
-        <Col xs={24} md={8}>
+        <UICol xs={24} md={8}>
           <div style={{
             padding: '16px',
-            background: overallUptime >= 99.9 ? '#f6ffed' : '#fff1f0',
+            background: overallUptime >= 99.9 ? 'var(--bg-tertiary)' : 'var(--bg-tertiary)',
             borderRadius: 8,
             textAlign: 'center',
           }}>
-            <Text type="secondary">Current Uptime</Text>
-            <Title
+            <UITypographyText type="secondary">Current Uptime</UITypographyText>
+            <UITitle
               level={2}
               style={{
                 margin: '8px 0',
-                color: overallUptime >= 99.9 ? '#52c41a' : '#ff4d4f',
+                color: overallUptime >= 99.9 ? 'var(--success)' : 'var(--error)',
               }}
             >
               {overallUptime.toFixed(3)}%
-            </Title>
-            <Text type="secondary">
+            </UITitle>
+            <UITypographyText type="secondary">
               {overallUptime >= SLO_TARGET ? 'Within SLO' : 'Below SLO'}
-            </Text>
+            </UITypographyText>
           </div>
-        </Col>
+        </UICol>
 
-        <Col xs={24} md={8}>
+        <UICol xs={24} md={8}>
           <div style={{
             padding: '16px',
-            background: '#fffbe6',
+            background: 'var(--bg-tertiary)',
             borderRadius: 8,
             textAlign: 'center',
           }}>
-            <Text type="secondary">Burn Rate</Text>
-            <Title
+            <UITypographyText type="secondary">Burn Rate</UITypographyText>
+            <UITitle
               level={2}
               style={{
                 margin: '8px 0',
-                color: burnRate <= 1 ? '#52c41a' : burnRate <= 2 ? '#faad14' : '#ff4d4f',
+                color: burnRate <= 1 ? 'var(--success)' : burnRate <= 2 ? 'var(--warning)' : 'var(--error)',
               }}
             >
               {burnRate.toFixed(2)}x
-            </Title>
-            <Text type="secondary">
+            </UITitle>
+            <UITypographyText type="secondary">
               {burnRate <= 1 ? 'On Track' : 'Burning Fast'}
-            </Text>
+            </UITypographyText>
           </div>
-        </Col>
+        </UICol>
 
         {/* Error Budget Gauge */}
-        <Col span={24}>
-          <Card
+        <UICol span={24}>
+          <UICard
             size="small"
             title="Error Budget Consumption"
-            style={{ background: '#fafafa' }}
+            style={{ background: 'var(--bg-tertiary)' }}
           >
-            <Row gutter={16} align="middle">
-              <Col xs={24} md={12}>
+            <UIRow gutter={16} align="middle">
+              <UICol xs={24} md={12}>
                 <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                  <Progress
+                  <UIProgress
                     type="dashboard"
                     percent={errorBudget.usedPercent}
                     status={getGaugeStatus(errorBudget.usedPercent)}
@@ -259,55 +259,55 @@ export function PerformanceBudgetWidget() {
                         <div style={{ fontSize: 24, fontWeight: 'bold' }}>
                           {(100 - (percent ?? 0)).toFixed(1)}%
                         </div>
-                        <div style={{ fontSize: 12, color: '#999' }}>
+                        <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
                           Remaining
                         </div>
                       </div>
                     )}
                   />
                 </div>
-              </Col>
-              <Col xs={24} md={12}>
-                <Row gutter={[8, 8]}>
-                  <Col span={12}>
-                    <Statistic
+              </UICol>
+              <UICol xs={24} md={12}>
+                <UIRow gutter={[8, 8]}>
+                  <UICol span={12}>
+                    <UIStatistic
                       title="Budget Allowed"
                       value={errorBudget.totalMinutes}
                       suffix="min/month"
                       precision={1}
                       valueStyle={{ fontSize: 18 }}
                     />
-                  </Col>
-                  <Col span={12}>
-                    <Statistic
+                  </UICol>
+                  <UICol span={12}>
+                    <UIStatistic
                       title="Budget Remaining"
                       value={errorBudget.remainingMinutes}
                       suffix="min"
                       precision={1}
                       valueStyle={{
                         fontSize: 18,
-                        color: errorBudget.usedPercent > 90 ? '#ff4d4f' : '#52c41a',
+                        color: errorBudget.usedPercent > 90 ? 'var(--error)' : 'var(--success)',
                       }}
                     />
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-          </Card>
-        </Col>
+                  </UICol>
+                </UIRow>
+              </UICol>
+            </UIRow>
+          </UICard>
+        </UICol>
 
         {/* Per-Service SLO Table */}
-        <Col span={24}>
-          <Title level={5}>Service-Level SLOs</Title>
-          <Table
+        <UICol span={24}>
+          <UITitle level={5}>Service-Level SLOs</UITitle>
+          <UITable
             dataSource={serviceSLOs}
             columns={columns}
             pagination={{ pageSize: 5 }}
             size="small"
             rowKey="service"
           />
-        </Col>
-      </Row>
-    </Card>
+        </UICol>
+      </UIRow>
+    </UICard>
   );
 }

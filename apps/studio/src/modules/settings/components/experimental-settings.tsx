@@ -4,16 +4,18 @@
  */
 
 import * as React from 'react';
-import { Switch, Space, Typography, Alert, Tag, Tooltip, Collapse } from 'antd';
 import {
-  BgColorsOutlined,
-  ThunderboltOutlined,
-  RobotOutlined,
-  DatabaseOutlined,
-  ExperimentOutlined,
-  WarningOutlined,
-  InfoCircleOutlined,
-} from '@ant-design/icons';
+  UISwitch,
+  UISpace,
+  UITypographyText,
+  UITypographyParagraph,
+  UITitle,
+  UIAlert,
+  UITag,
+  UITooltip,
+  UIAccordion,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useFeatureFlags } from '@/hooks/use-feature-flags';
 import {
   FEATURE_FLAGS,
@@ -24,14 +26,11 @@ import {
   type FeatureRisk,
 } from '@/config/feature-flags';
 
-const { Text, Paragraph, Title } = Typography;
-const { Panel } = Collapse;
-
 const GROUP_ICONS: Record<FeatureGroup, React.ReactNode> = {
-  'ui-ux': <BgColorsOutlined />,
-  performance: <ThunderboltOutlined />,
-  ai: <RobotOutlined />,
-  data: <DatabaseOutlined />,
+  'ui-ux': <UIIcon name="BgColorsOutlined" />,
+  performance: <UIIcon name="ThunderboltOutlined" />,
+  ai: <UIIcon name="RobotOutlined" />,
+  data: <UIIcon name="DatabaseOutlined" />,
 };
 
 const STATUS_COLORS: Record<FeatureStatus, string> = {
@@ -48,13 +47,13 @@ const RISK_COLORS: Record<FeatureRisk, string> = {
 };
 
 const RISK_ICONS: Record<FeatureRisk, React.ReactNode> = {
-  low: <InfoCircleOutlined />,
-  medium: <WarningOutlined />,
-  high: <WarningOutlined />,
+  low: <UIIcon name="InfoCircleOutlined" />,
+  medium: <UIIcon name="WarningOutlined" />,
+  high: <UIIcon name="WarningOutlined" />,
 };
 
 function isNewFeature(addedAt?: string): boolean {
-  if (!addedAt) return false;
+  if (!addedAt) {return false;}
   const added = new Date(addedAt);
   const now = new Date();
   const daysDiff = (now.getTime() - added.getTime()) / (1000 * 60 * 60 * 24);
@@ -69,62 +68,60 @@ export function ExperimentalSettings() {
   const totalCount = Object.keys(FEATURE_FLAGS).length;
 
   return (
-    <Space direction="vertical" size="large" style={{ width: '100%' }}>
+    <UISpace direction="vertical" size="large" style={{ width: '100%' }}>
       {/* Header */}
       <div>
-        <Title level={4} style={{ marginBottom: 8 }}>
-          <ExperimentOutlined style={{ marginRight: 8 }} />
+        <UITitle level={4} style={{ marginBottom: 8 }}>
+          <UIIcon name="ExperimentOutlined" style={{ marginRight: 8 }} />
           Experimental Features
-        </Title>
-        <Paragraph type="secondary">
+        </UITitle>
+        <UITypographyParagraph type="secondary">
           Enable experimental features to test new functionality before it's generally available.
           These features are still in development and may have bugs or incomplete functionality.
-        </Paragraph>
-        <Paragraph type="secondary" style={{ marginTop: 0 }}>
+        </UITypographyParagraph>
+        <UITypographyParagraph type="secondary" style={{ marginTop: 0 }}>
           <strong>{enabledCount}</strong> of <strong>{totalCount}</strong> features enabled
-        </Paragraph>
+        </UITypographyParagraph>
       </div>
 
       {/* Warning Alert */}
-      <Alert
+      <UIAlert
         message="Experimental Features Notice"
         description="Features marked as Alpha or Beta are actively being developed and may change or be removed without notice. High-risk features may affect application stability."
         type="warning"
         showIcon
-        icon={<WarningOutlined />}
+        icon={<UIIcon name="WarningOutlined" />}
       />
 
       {/* Feature Groups */}
-      <Collapse
+      <UIAccordion
         defaultActiveKey={['ui-ux', 'performance', 'ai', 'data']}
         expandIconPosition="end"
         style={{ backgroundColor: 'transparent' }}
-      >
-        {(Object.keys(groupedFeatures) as FeatureGroup[]).map((groupId) => {
+        items={(Object.keys(groupedFeatures) as FeatureGroup[]).map((groupId) => {
           const group = FEATURE_GROUPS[groupId];
           const features = groupedFeatures[groupId];
           const enabledInGroup = features.filter((f) => isEnabled(f.id)).length;
 
-          return (
-            <Panel
-              key={groupId}
-              header={
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <span style={{ fontSize: 18 }}>{GROUP_ICONS[groupId]}</span>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 15, fontWeight: 500 }}>{group.name}</div>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      {group.description}
-                    </Text>
-                  </div>
-                  <Tag color="blue">
-                    {enabledInGroup} / {features.length}
-                  </Tag>
+          return {
+            key: groupId,
+            label: (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: 18 }}>{GROUP_ICONS[groupId]}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 15, fontWeight: 500 }}>{group.name}</div>
+                  <UITypographyText type="secondary" style={{ fontSize: 12 }}>
+                    {group.description}
+                  </UITypographyText>
                 </div>
-              }
-              style={{ marginBottom: 8 }}
-            >
-              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                <UITag color="blue">
+                  {enabledInGroup} / {features.length}
+                </UITag>
+              </div>
+            ),
+            style: { marginBottom: 8 },
+            children: (
+              <UISpace direction="vertical" size="middle" style={{ width: '100%' }}>
                 {features.map((feature) => {
                   const enabled = isEnabled(feature.id);
                   const depsNotMet = !areDependenciesMet(feature.id);
@@ -144,7 +141,7 @@ export function ExperimentalSettings() {
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                         {/* Left: Switch */}
                         <div style={{ paddingTop: 2 }}>
-                          <Switch
+                          <UISwitch
                             checked={enabled}
                             onChange={() => toggleFeature(feature.id)}
                             disabled={depsNotMet && !enabled}
@@ -154,24 +151,24 @@ export function ExperimentalSettings() {
                         {/* Middle: Content */}
                         <div style={{ flex: 1 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                            <Text strong style={{ fontSize: 14 }}>
+                            <UITypographyText strong style={{ fontSize: 14 }}>
                               {feature.name}
-                            </Text>
-                            {isNew && <Tag color="cyan">New</Tag>}
-                            <Tag color={STATUS_COLORS[feature.status]}>{feature.status.toUpperCase()}</Tag>
+                            </UITypographyText>
+                            {isNew && <UITag color="cyan">New</UITag>}
+                            <UITag color={STATUS_COLORS[feature.status]}>{feature.status.toUpperCase()}</UITag>
                           </div>
 
-                          <Paragraph
+                          <UITypographyParagraph
                             type="secondary"
                             style={{ fontSize: 13, marginBottom: 8, marginTop: 0 }}
                           >
                             {feature.description}
-                          </Paragraph>
+                          </UITypographyParagraph>
 
                           {/* Details Tooltip */}
                           {feature.details && (
-                            <Tooltip title={feature.details} placement="bottomLeft">
-                              <Text
+                            <UITooltip title={feature.details} placement="bottomLeft">
+                              <UITypographyText
                                 type="secondary"
                                 style={{
                                   fontSize: 12,
@@ -181,18 +178,18 @@ export function ExperimentalSettings() {
                                 }}
                               >
                                 Learn more
-                              </Text>
-                            </Tooltip>
+                              </UITypographyText>
+                            </UITooltip>
                           )}
 
                           {/* Dependencies warning */}
                           {depsNotMet && !enabled && feature.dependencies && (
                             <div style={{ marginTop: 8 }}>
-                              <Alert
+                              <UIAlert
                                 message={`Requires: ${feature.dependencies.map((d) => FEATURE_FLAGS[d].name).join(', ')}`}
                                 type="info"
                                 showIcon
-                                icon={<InfoCircleOutlined />}
+                                icon={<UIIcon name="InfoCircleOutlined" />}
                                 style={{ fontSize: 12, padding: '4px 8px' }}
                               />
                             </div>
@@ -201,7 +198,7 @@ export function ExperimentalSettings() {
                           {/* Deprecated warning */}
                           {feature.status === 'deprecated' && (
                             <div style={{ marginTop: 8 }}>
-                              <Alert
+                              <UIAlert
                                 message="This feature is deprecated and will be removed soon"
                                 type="warning"
                                 showIcon
@@ -213,48 +210,48 @@ export function ExperimentalSettings() {
 
                         {/* Right: Risk Badge */}
                         <div style={{ paddingTop: 2 }}>
-                          <Tooltip title={`Risk: ${feature.risk}`}>
-                            <Tag
+                          <UITooltip title={`Risk: ${feature.risk}`}>
+                            <UITag
                               color={RISK_COLORS[feature.risk]}
                               icon={RISK_ICONS[feature.risk]}
                               style={{ margin: 0 }}
                             >
                               {feature.risk.toUpperCase()}
-                            </Tag>
-                          </Tooltip>
+                            </UITag>
+                          </UITooltip>
                         </div>
                       </div>
                     </div>
                   );
                 })}
-              </Space>
-            </Panel>
-          );
+              </UISpace>
+            ),
+          };
         })}
-      </Collapse>
+      />
 
       {/* Footer Info */}
-      <Alert
+      <UIAlert
         message="Feature Stability Levels"
         description={
           <div>
             <div style={{ marginBottom: 4 }}>
-              <Tag color="red">ALPHA</Tag> - Early development, expect breaking changes
+              <UITag color="red">ALPHA</UITag> - Early development, expect breaking changes
             </div>
             <div style={{ marginBottom: 4 }}>
-              <Tag color="orange">BETA</Tag> - Feature-complete but needs testing
+              <UITag color="orange">BETA</UITag> - Feature-complete but needs testing
             </div>
             <div style={{ marginBottom: 4 }}>
-              <Tag color="green">STABLE</Tag> - Production-ready, safe to use
+              <UITag color="green">STABLE</UITag> - Production-ready, safe to use
             </div>
             <div>
-              <Tag color="default">DEPRECATED</Tag> - Will be removed soon
+              <UITag color="default">DEPRECATED</UITag> - Will be removed soon
             </div>
           </div>
         }
         type="info"
         showIcon
       />
-    </Space>
+    </UISpace>
   );
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Card, Table } from 'antd';
+import { UICard } from '@kb-labs/studio-ui-kit';
+import { UITable } from '@kb-labs/studio-ui-kit';
 import { HolderOutlined } from '@ant-design/icons';
 import { type MetricsSnapshot } from '../../../api/metrics';
 import { useDataSources } from '../../../providers/data-sources-provider';
@@ -61,23 +62,24 @@ export function DashboardPluginsWidget() {
   })) ?? [];
 
   return (
-    <Card
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: '#999' }} />
+          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
           <span>Plugin Performance</span>
         </div>
       }
       style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
       bodyStyle={{ flex: 1, padding: '16px', overflow: 'auto' }}
     >
-      <Table
+      <UITable
         columns={columns}
         dataSource={dataSource}
         pagination={false}
         size="small"
         scroll={{ y: 240 }}
       />
-    </Card>
+
+    </UICard>
   );
 }

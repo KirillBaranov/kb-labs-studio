@@ -4,7 +4,7 @@
  */
 
 import * as React from 'react';
-import { Button, Card } from 'antd';
+import { UIButton, UICard } from '@kb-labs/studio-ui-kit';
 import { trackWidgetEvent } from '../utils/analytics';
 
 export interface WidgetErrorBoundaryProps {
@@ -74,7 +74,7 @@ export class WidgetErrorBoundary extends React.Component<
       }
 
       return (
-        <Card
+        <UICard
           style={{
             borderColor: 'var(--error)',
             backgroundColor: 'var(--bg-secondary)',
@@ -103,8 +103,8 @@ export class WidgetErrorBoundary extends React.Component<
                 Widget: {this.props.widgetId}
               </p>
             )}
-            <Button
-              type="primary"
+            <UIButton
+              variant="primary"
               onClick={this.resetError}
               style={{
                 backgroundColor: 'var(--error)',
@@ -112,9 +112,9 @@ export class WidgetErrorBoundary extends React.Component<
               }}
             >
               Retry Widget
-            </Button>
+            </UIButton>
           </div>
-        </Card>
+        </UICard>
       );
     }
 

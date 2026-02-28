@@ -16,7 +16,7 @@ import type {
  * Mock adapters data source for testing
  */
 export class MockAdaptersSource implements AdaptersDataSource {
-  async getLLMUsage(options?: DateRangeOptions): Promise<LLMUsageStats> {
+  async getLLMUsage(_options?: DateRangeOptions): Promise<LLMUsageStats> {
     return {
       totalRequests: 1247,
       totalTokens: 3_456_789,
@@ -64,7 +64,7 @@ export class MockAdaptersSource implements AdaptersDataSource {
     };
   }
 
-  async getEmbeddingsUsage(options?: DateRangeOptions): Promise<EmbeddingsUsageStats> {
+  async getEmbeddingsUsage(_options?: DateRangeOptions): Promise<EmbeddingsUsageStats> {
     return {
       totalRequests: 3456,
       totalTextLength: 1_234_567,
@@ -77,7 +77,7 @@ export class MockAdaptersSource implements AdaptersDataSource {
     };
   }
 
-  async getVectorStoreUsage(options?: DateRangeOptions): Promise<VectorStoreUsageStats> {
+  async getVectorStoreUsage(_options?: DateRangeOptions): Promise<VectorStoreUsageStats> {
     return {
       searchQueries: 2345,
       upsertOperations: 567,
@@ -90,7 +90,7 @@ export class MockAdaptersSource implements AdaptersDataSource {
     };
   }
 
-  async getCacheUsage(options?: DateRangeOptions): Promise<CacheUsageStats> {
+  async getCacheUsage(_options?: DateRangeOptions): Promise<CacheUsageStats> {
     return {
       totalGets: 15_678,
       hits: 13_456,
@@ -102,7 +102,7 @@ export class MockAdaptersSource implements AdaptersDataSource {
     };
   }
 
-  async getStorageUsage(options?: DateRangeOptions): Promise<StorageUsageStats> {
+  async getStorageUsage(_options?: DateRangeOptions): Promise<StorageUsageStats> {
     return {
       readOperations: 8765,
       writeOperations: 2345,
@@ -114,7 +114,7 @@ export class MockAdaptersSource implements AdaptersDataSource {
     };
   }
 
-  async getLLMDailyStats(options?: DateRangeOptions): Promise<DailyStats[]> {
+  async getLLMDailyStats(_options?: DateRangeOptions): Promise<DailyStats[]> {
     return this.generateMockDailyStats({
       totalTokens: [10000, 60000],
       totalCost: [1, 6],
@@ -122,7 +122,7 @@ export class MockAdaptersSource implements AdaptersDataSource {
     });
   }
 
-  async getEmbeddingsDailyStats(options?: DateRangeOptions): Promise<DailyStats[]> {
+  async getEmbeddingsDailyStats(_options?: DateRangeOptions): Promise<DailyStats[]> {
     return this.generateMockDailyStats({
       totalTokens: [5000, 30000],
       totalCost: [0.1, 0.5],
@@ -130,7 +130,7 @@ export class MockAdaptersSource implements AdaptersDataSource {
     });
   }
 
-  async getVectorStoreDailyStats(options?: DateRangeOptions): Promise<DailyStats[]> {
+  async getVectorStoreDailyStats(_options?: DateRangeOptions): Promise<DailyStats[]> {
     return this.generateMockDailyStats({
       totalSearches: [100, 500],
       totalUpserts: [50, 200],
@@ -139,7 +139,7 @@ export class MockAdaptersSource implements AdaptersDataSource {
     });
   }
 
-  async getCacheDailyStats(options?: DateRangeOptions): Promise<DailyStats[]> {
+  async getCacheDailyStats(_options?: DateRangeOptions): Promise<DailyStats[]> {
     return this.generateMockDailyStats({
       totalHits: [500, 2000],
       totalMisses: [100, 500],
@@ -148,7 +148,7 @@ export class MockAdaptersSource implements AdaptersDataSource {
     });
   }
 
-  async getStorageDailyStats(options?: DateRangeOptions): Promise<DailyStats[]> {
+  async getStorageDailyStats(_options?: DateRangeOptions): Promise<DailyStats[]> {
     return this.generateMockDailyStats({
       totalBytesRead: [1000000, 10000000],
       totalBytesWritten: [500000, 5000000],

@@ -4,14 +4,18 @@
  */
 
 import * as React from 'react';
-import { Table, Tag, Space, Typography, Badge } from 'antd';
-import { ClockCircleOutlined, CalendarOutlined } from '@ant-design/icons';
+import {
+  UITable,
+  UITag,
+  UISpace,
+  UITypographyText,
+  UIBadge,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useQuery } from '@tanstack/react-query';
 import { useDataSources } from '@/providers/data-sources-provider';
-import { KBCard } from '@kb-labs/studio-ui-react';
 import type { CronInfo } from '@kb-labs/workflow-contracts';
-
-const { Text } = Typography;
+import { UICard } from '@kb-labs/studio-ui-kit';
 
 export function CronsTab() {
   const sources = useDataSources();
@@ -22,7 +26,7 @@ export function CronsTab() {
   });
 
   const formatDate = (date?: Date | string) => {
-    if (!date) return '—';
+    if (!date) {return '—';}
     return new Date(date).toLocaleString();
   };
 
@@ -32,7 +36,7 @@ export function CronsTab() {
       dataIndex: 'id',
       key: 'id',
       render: (id: string) => (
-        <Text className="typo-body" strong>{id}</Text>
+        <UITypographyText className="typo-body" strong>{id}</UITypographyText>
       ),
     },
     {
@@ -40,10 +44,10 @@ export function CronsTab() {
       dataIndex: 'schedule',
       key: 'schedule',
       render: (schedule: string) => (
-        <Space className="gap-tight">
-          <ClockCircleOutlined className="text-secondary" />
-          <Text className="typo-caption" code>{schedule}</Text>
-        </Space>
+        <UISpace className="gap-tight">
+          <UIIcon name="ClockCircleOutlined" className="text-secondary" />
+          <UITypographyText className="typo-caption" code>{schedule}</UITypographyText>
+        </UISpace>
       ),
     },
     {
@@ -51,7 +55,7 @@ export function CronsTab() {
       dataIndex: 'jobType',
       key: 'jobType',
       render: (jobType: string) => (
-        <Text className="typo-body">{jobType}</Text>
+        <UITypographyText className="typo-body">{jobType}</UITypographyText>
       ),
     },
     {
@@ -59,7 +63,7 @@ export function CronsTab() {
       dataIndex: 'timezone',
       key: 'timezone',
       render: (timezone?: string) => (
-        <Text className="typo-caption">{timezone || 'UTC'}</Text>
+        <UITypographyText className="typo-caption">{timezone || 'UTC'}</UITypographyText>
       ),
     },
     {
@@ -67,12 +71,12 @@ export function CronsTab() {
       dataIndex: 'enabled',
       key: 'enabled',
       render: (enabled: boolean) => (
-        <Badge
+        <UIBadge
           status={enabled ? 'success' : 'default'}
           text={
-            <Text className="typo-caption">
+            <UITypographyText className="typo-caption">
               {enabled ? 'Enabled' : 'Disabled'}
-            </Text>
+            </UITypographyText>
           }
         />
       ),
@@ -82,10 +86,10 @@ export function CronsTab() {
       dataIndex: 'lastRun',
       key: 'lastRun',
       render: (date?: Date | string) => (
-        <Space className="gap-tight">
-          <CalendarOutlined className="text-secondary" />
-          <Text className="typo-caption">{formatDate(date)}</Text>
-        </Space>
+        <UISpace className="gap-tight">
+          <UIIcon name="CalendarOutlined" className="text-secondary" />
+          <UITypographyText className="typo-caption">{formatDate(date)}</UITypographyText>
+        </UISpace>
       ),
     },
     {
@@ -94,12 +98,12 @@ export function CronsTab() {
       key: 'nextRun',
       render: (date?: Date | string) => (
         date ? (
-          <Space className="gap-tight">
-            <CalendarOutlined className="text-info" />
-            <Text className="typo-caption">{formatDate(date)}</Text>
-          </Space>
+          <UISpace className="gap-tight">
+            <UIIcon name="CalendarOutlined" className="text-info" />
+            <UITypographyText className="typo-caption">{formatDate(date)}</UITypographyText>
+          </UISpace>
         ) : (
-          <Text className="typo-caption text-tertiary">—</Text>
+          <UITypographyText className="typo-caption text-tertiary">—</UITypographyText>
         )
       ),
     },
@@ -109,9 +113,9 @@ export function CronsTab() {
       key: 'pluginId',
       render: (pluginId?: string) => (
         pluginId ? (
-          <Tag color="blue">{pluginId}</Tag>
+          <UITag color="blue">{pluginId}</UITag>
         ) : (
-          <Text className="typo-caption text-tertiary">—</Text>
+          <UITypographyText className="typo-caption text-tertiary">—</UITypographyText>
         )
       ),
     },
@@ -121,32 +125,32 @@ export function CronsTab() {
   const disabledCount = cronsData?.crons?.filter((c) => !c.enabled).length || 0;
 
   return (
-    <Space direction="vertical" className="gap-section" style={{ width: '100%' }}>
-      <KBCard>
-        <Space className="gap-section">
+    <UISpace direction="vertical" className="gap-section" style={{ width: '100%' }}>
+      <UICard>
+        <UISpace className="gap-section">
           <div>
-            <Text className="typo-label text-secondary">Total Cron Jobs</Text>
+            <UITypographyText className="typo-label text-secondary">Total Cron Jobs</UITypographyText>
             <div>
-              <Text className="typo-section-title">{cronsData?.crons?.length || 0}</Text>
+              <UITypographyText className="typo-section-title">{cronsData?.crons?.length || 0}</UITypographyText>
             </div>
           </div>
           <div>
-            <Text className="typo-label text-secondary">Enabled</Text>
+            <UITypographyText className="typo-label text-secondary">Enabled</UITypographyText>
             <div>
-              <Text className="typo-section-title text-success">{enabledCount}</Text>
+              <UITypographyText className="typo-section-title text-success">{enabledCount}</UITypographyText>
             </div>
           </div>
           <div>
-            <Text className="typo-label text-secondary">Disabled</Text>
+            <UITypographyText className="typo-label text-secondary">Disabled</UITypographyText>
             <div>
-              <Text className="typo-section-title">{disabledCount}</Text>
+              <UITypographyText className="typo-section-title">{disabledCount}</UITypographyText>
             </div>
           </div>
-        </Space>
-      </KBCard>
+        </UISpace>
+      </UICard>
 
-      <KBCard>
-        <Table
+      <UICard>
+        <UITable
           dataSource={cronsData?.crons || []}
           columns={columns}
           loading={isLoading}
@@ -154,11 +158,11 @@ export function CronsTab() {
           pagination={{
             pageSize: 20,
             showTotal: (total) => (
-              <Text className="typo-caption">Total {total} cron jobs</Text>
+              <UITypographyText className="typo-caption">Total {total} cron jobs</UITypographyText>
             ),
           }}
         />
-      </KBCard>
-    </Space>
+      </UICard>
+    </UISpace>
   );
 }

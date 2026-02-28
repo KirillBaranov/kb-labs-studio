@@ -1,4 +1,4 @@
-import { Row, Col } from 'antd';
+import { UIRow, UICol } from '@kb-labs/studio-ui-kit';
 import type { PluginManifestEntry } from '@kb-labs/studio-data-client';
 import { PluginCard } from './plugin-card';
 
@@ -9,12 +9,12 @@ interface PluginGridProps {
 
 export function PluginGrid({ plugins, onPluginClick }: PluginGridProps) {
   return (
-    <Row gutter={[16, 16]}>
+    <UIRow gutter={[16, 16]}>
       {plugins.map((plugin) => (
-        <Col key={plugin.pluginId} xs={24} sm={12} lg={8} xl={6}>
+        <UICol key={plugin.pluginId} xs={24} sm={12} lg={8} xl={6}>
           <PluginCard plugin={plugin} onClick={() => onPluginClick(plugin)} />
-        </Col>
+        </UICol>
       ))}
-    </Row>
+    </UIRow>
   );
 }

@@ -222,3 +222,56 @@ export type {
   WidgetDataMap,
   DataForKind,
 } from './data/index.js';
+
+// =============================================================================
+// Runtime Validation (Zod Schemas)
+// =============================================================================
+
+export {
+  // Base
+  BaseWidgetPropsSchema,
+  // Display widgets
+  MetricWidgetPropsSchema,
+  MetricGroupWidgetPropsSchema,
+  TableWidgetPropsSchema,
+  CardWidgetPropsSchema,
+  CardListWidgetPropsSchema,
+  ChartLineWidgetPropsSchema,
+  ChartBarWidgetPropsSchema,
+  ChartPieWidgetPropsSchema,
+  ChartAreaWidgetPropsSchema,
+  TimelineWidgetPropsSchema,
+  TreeWidgetPropsSchema,
+  JsonWidgetPropsSchema,
+  DiffWidgetPropsSchema,
+  LogsWidgetPropsSchema,
+  // Form widgets
+  FormWidgetPropsSchema,
+  InputWidgetPropsSchema,
+  SelectWidgetPropsSchema,
+  CheckboxGroupWidgetPropsSchema,
+  SwitchWidgetPropsSchema,
+  DatePickerWidgetPropsSchema,
+  // Layout widgets
+  SectionWidgetPropsSchema,
+  GridWidgetPropsSchema,
+  StackWidgetPropsSchema,
+  TabsWidgetPropsSchema,
+  ModalWidgetPropsSchema,
+  // Navigation widgets
+  BreadcrumbWidgetPropsSchema,
+  StepperWidgetPropsSchema,
+  MenuWidgetPropsSchema,
+  // Feedback widgets
+  AlertWidgetPropsSchema,
+  ConfirmWidgetPropsSchema,
+  // Discriminated union
+  WidgetPropsSchema,
+  // Validation helper
+  validateWidgetProps,
+  // Types
+  type WidgetProps,
+  type MetricWidgetProps,
+  type TableWidgetProps,
+  type ChartPieWidgetProps,
+} from './schemas/widget-props.js';

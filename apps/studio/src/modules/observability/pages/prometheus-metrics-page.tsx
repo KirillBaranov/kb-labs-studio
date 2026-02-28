@@ -1,17 +1,20 @@
-import { Row, Col, Table, Card, Statistic, Alert, Tag, Progress, Timeline, Badge } from 'antd';
 import {
-  ClockCircleOutlined,
-  ApiOutlined,
-  ThunderboltOutlined,
-  WarningOutlined,
-  CheckCircleOutlined,
-  DatabaseOutlined,
-  ExclamationCircleOutlined,
-} from '@ant-design/icons';
-import { KBPageContainer, KBPageHeader } from '@kb-labs/studio-ui-react';
+  UIRow,
+  UICol,
+  UITable,
+  UICard,
+  UIStatistic,
+  UIAlert,
+  UITag,
+  UIProgress,
+  UITimeline,
+  UIBadge,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { usePrometheusMetrics } from '@kb-labs/studio-data-client';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import type { PluginMetrics, TenantMetrics } from '@kb-labs/studio-data-client';
+import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
 /**
  * Format uptime duration to human-readable string
@@ -56,9 +59,9 @@ function formatRelativeTime(timestamp: number): string {
  * Get status code color
  */
 function getStatusCodeColor(code: number): string {
-  if (code >= 500) return '#ff4d4f'; // red
-  if (code >= 400) return '#faad14'; // orange
-  if (code >= 300) return '#1890ff'; // blue
+  if (code >= 500) {return '#ff4d4f';} // red
+  if (code >= 400) {return '#faad14';} // orange
+  if (code >= 300) {return '#1890ff';} // blue
   return '#52c41a'; // green
 }
 
@@ -83,7 +86,7 @@ export function PrometheusMetricsPage() {
           title="Prometheus Metrics"
           description="REST API performance and health metrics"
         />
-        <Alert
+        <UIAlert
           message="Failed to load Prometheus metrics"
           description={error instanceof Error ? error.message : 'Unknown error. Make sure REST API is running on localhost:5050'}
           type="error"
@@ -124,123 +127,123 @@ export function PrometheusMetricsPage() {
       />
 
       {/* Overview Cards */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <Statistic
+      <UIRow gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <UICol xs={24} sm={12} lg={6}>
+          <UICard>
+            <UIStatistic
               title="Total Requests"
               value={data.requests?.total ?? 0}
-              prefix={<ApiOutlined />}
+              prefix={<UIIcon name="ApiOutlined" />}
             />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <Statistic
+          </UICard>
+        </UICol>
+        <UICol xs={24} sm={12} lg={6}>
+          <UICard>
+            <UIStatistic
               title="Avg Latency (p50)"
               value={formatNumber(data.latency?.p50 ?? 0, 1)}
               suffix="ms"
-              prefix={<ThunderboltOutlined />}
+              prefix={<UIIcon name="ThunderboltOutlined" />}
             />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <Statistic
+          </UICard>
+        </UICol>
+        <UICol xs={24} sm={12} lg={6}>
+          <UICard>
+            <UIStatistic
               title="Error Rate"
               value={formatNumber(errorRate, 1)}
               suffix="%"
-              prefix={<WarningOutlined />}
+              prefix={<UIIcon name="WarningOutlined" />}
               valueStyle={{ color: errorRate > 5 ? '#ff4d4f' : '#52c41a' }}
             />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <Statistic
+          </UICard>
+        </UICol>
+        <UICol xs={24} sm={12} lg={6}>
+          <UICard>
+            <UIStatistic
               title="Uptime"
               value={formatUptime(data.uptime?.seconds ?? 0)}
-              prefix={<ClockCircleOutlined />}
+              prefix={<UIIcon name="ClockCircleOutlined" />}
             />
-          </Card>
-        </Col>
-      </Row>
+          </UICard>
+        </UICol>
+      </UIRow>
 
       {/* Latency Percentiles */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col xs={24} lg={12}>
-          <Card title="Latency Percentiles" extra={<ThunderboltOutlined style={{ color: '#1890ff' }} />}>
-            <Row gutter={16}>
-              <Col span={8}>
-                <Statistic
+      <UIRow gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <UICol xs={24} lg={12}>
+          <UICard title="Latency Percentiles" extra={<UIIcon name="ThunderboltOutlined" style={{ color: '#1890ff' }} />}>
+            <UIRow gutter={16}>
+              <UICol span={8}>
+                <UIStatistic
                   title="p50 (Median)"
                   value={formatNumber(data.latency?.p50 ?? 0, 1)}
                   suffix="ms"
                   valueStyle={{ fontSize: 20 }}
                 />
-              </Col>
-              <Col span={8}>
-                <Statistic
+              </UICol>
+              <UICol span={8}>
+                <UIStatistic
                   title="p95"
                   value={formatNumber(data.latency?.p95 ?? 0, 1)}
                   suffix="ms"
                   valueStyle={{ fontSize: 20, color: (data.latency?.p95 ?? 0) > 200 ? '#faad14' : '#52c41a' }}
                 />
-              </Col>
-              <Col span={8}>
-                <Statistic
+              </UICol>
+              <UICol span={8}>
+                <UIStatistic
                   title="p99"
                   value={formatNumber(data.latency?.p99 ?? 0, 1)}
                   suffix="ms"
                   valueStyle={{ fontSize: 20, color: (data.latency?.p99 ?? 0) > 500 ? '#ff4d4f' : '#faad14' }}
                 />
-              </Col>
-            </Row>
+              </UICol>
+            </UIRow>
             <div style={{ marginTop: 16, fontSize: 12, color: '#8c8c8c' }}>
               Min: {formatNumber(data.latency?.min ?? 0, 1)}ms | Max: {formatNumber(data.latency?.max ?? 0, 1)}ms | Avg: {formatNumber(data.latency?.average ?? 0, 1)}ms
             </div>
-          </Card>
-        </Col>
+          </UICard>
+        </UICol>
 
-        <Col xs={24} lg={12}>
-          <Card title="Success Rate" extra={<CheckCircleOutlined style={{ color: successRate >= 95 ? '#52c41a' : '#faad14' }} />}>
-            <Progress
+        <UICol xs={24} lg={12}>
+          <UICard title="Success Rate" extra={<UIIcon name="CheckCircleOutlined" style={{ color: successRate >= 95 ? '#52c41a' : '#faad14' }} />}>
+            <UIProgress
               percent={Math.round(successRate)}
               status={successRate >= 95 ? 'success' : successRate >= 90 ? 'normal' : 'exception'}
               strokeColor={successRate >= 95 ? '#52c41a' : successRate >= 90 ? '#1890ff' : '#ff4d4f'}
             />
             <div style={{ marginTop: 16 }}>
-              <Row gutter={16}>
-                <Col span={8}>
-                  <Statistic
+              <UIRow gutter={16}>
+                <UICol span={8}>
+                  <UIStatistic
                     title="Success"
                     value={data.requests?.success ?? 0}
                     valueStyle={{ fontSize: 18, color: '#52c41a' }}
                   />
-                </Col>
-                <Col span={8}>
-                  <Statistic
+                </UICol>
+                <UICol span={8}>
+                  <UIStatistic
                     title="4xx Errors"
                     value={data.requests?.clientErrors ?? 0}
                     valueStyle={{ fontSize: 18, color: '#faad14' }}
                   />
-                </Col>
-                <Col span={8}>
-                  <Statistic
+                </UICol>
+                <UICol span={8}>
+                  <UIStatistic
                     title="5xx Errors"
                     value={data.requests?.serverErrors ?? 0}
                     valueStyle={{ fontSize: 18, color: '#ff4d4f' }}
                   />
-                </Col>
-              </Row>
+                </UICol>
+              </UIRow>
             </div>
-          </Card>
-        </Col>
-      </Row>
+          </UICard>
+        </UICol>
+      </UIRow>
 
       {/* Per-Plugin Metrics */}
-      <Card title="Per-Plugin Metrics" style={{ marginBottom: 24 }}>
-        <Table<{ key: string; plugin: string } & PluginMetrics>
+      <UICard title="Per-Plugin Metrics" style={{ marginBottom: 24 }}>
+        <UITable<{ key: string; plugin: string } & PluginMetrics>
           dataSource={(data.perPlugin ?? []).map((item) => ({
             key: item.pluginId,
             plugin: item.pluginId,
@@ -251,7 +254,7 @@ export function PrometheusMetricsPage() {
               title: 'Plugin',
               dataIndex: 'plugin',
               key: 'plugin',
-              render: (plugin: string) => <Tag color="blue">{plugin}</Tag>,
+              render: (plugin: string) => <UITag color="blue">{plugin}</UITag>,
             },
             {
               title: 'Requests',
@@ -294,11 +297,11 @@ export function PrometheusMetricsPage() {
           pagination={false}
           size="small"
         />
-      </Card>
+      </UICard>
 
       {/* Per-Tenant Metrics */}
-      <Card title="Per-Tenant Metrics" style={{ marginBottom: 24 }}>
-        <Table<{ key: string; tenant: string } & TenantMetrics>
+      <UICard title="Per-Tenant Metrics" style={{ marginBottom: 24 }}>
+        <UITable<{ key: string; tenant: string } & TenantMetrics>
           dataSource={(data.perTenant ?? []).map((item) => ({
             key: item.tenantId,
             tenant: item.tenantId,
@@ -309,7 +312,7 @@ export function PrometheusMetricsPage() {
               title: 'Tenant',
               dataIndex: 'tenant',
               key: 'tenant',
-              render: (tenant: string) => <Tag color="green">{tenant}</Tag>,
+              render: (tenant: string) => <UITag color="green">{tenant}</UITag>,
             },
             {
               title: 'Requests',
@@ -352,42 +355,42 @@ export function PrometheusMetricsPage() {
           pagination={false}
           size="small"
         />
-      </Card>
+      </UICard>
 
       {/* Error Analytics */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col xs={24} lg={12}>
-          <Card title="Error Breakdown" extra={<ExclamationCircleOutlined style={{ color: '#faad14' }} />}>
-            <Row gutter={16}>
+      <UIRow gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <UICol xs={24} lg={12}>
+          <UICard title="Error Breakdown" extra={<UIIcon name="ExclamationCircleOutlined" style={{ color: '#faad14' }} />}>
+            <UIRow gutter={16}>
               {Object.entries(data.errors?.byStatusCode ?? {})
                 .sort(([a], [b]) => Number(b) - Number(a))
                 .map(([code, count]) => (
-                  <Col span={8} key={code}>
-                    <Statistic
+                  <UICol span={8} key={code}>
+                    <UIStatistic
                       title={`${code} Errors`}
                       value={count}
                       valueStyle={{ fontSize: 18, color: getStatusCodeColor(Number(code)) }}
                     />
-                  </Col>
+                  </UICol>
                 ))}
-            </Row>
+            </UIRow>
             {Object.keys(data.errors?.byStatusCode ?? {}).length === 0 && (
-              <Alert message="No errors recorded" type="success" showIcon />
+              <UIAlert message="No errors recorded" type="success" showIcon />
             )}
-          </Card>
-        </Col>
+          </UICard>
+        </UICol>
 
-        <Col xs={24} lg={12}>
-          <Card title="Recent Errors" extra={<Badge count={data.errors?.recent?.length ?? 0} />}>
+        <UICol xs={24} lg={12}>
+          <UICard title="Recent Errors" extra={<UIBadge count={data.errors?.recent?.length ?? 0} />}>
             {data.errors?.recent && data.errors.recent.length > 0 ? (
-              <Timeline
+              <UITimeline
                 items={data.errors.recent.map((error) => ({
                   color: getStatusCodeColor(error.statusCode),
                   children: (
                     <div>
                       <div style={{ marginBottom: 4 }}>
-                        <Tag color={getStatusCodeColor(error.statusCode)}>{error.statusCode}</Tag>
-                        {error.errorCode && <Tag>{error.errorCode}</Tag>}
+                        <UITag color={getStatusCodeColor(error.statusCode)}>{error.statusCode}</UITag>
+                        {error.errorCode && <UITag>{error.errorCode}</UITag>}
                         <span style={{ fontSize: 12, color: '#8c8c8c', marginLeft: 8 }}>
                           {formatRelativeTime(error.timestamp)}
                         </span>
@@ -398,34 +401,34 @@ export function PrometheusMetricsPage() {
                 }))}
               />
             ) : (
-              <Alert message="No recent errors" type="success" showIcon />
+              <UIAlert message="No recent errors" type="success" showIcon />
             )}
-          </Card>
-        </Col>
-      </Row>
+          </UICard>
+        </UICol>
+      </UIRow>
 
       {/* Redis Status & Plugin Mounts */}
-      <Row gutter={[16, 16]}>
-        <Col xs={24} lg={12}>
-          <Card title="Redis Status" extra={<DatabaseOutlined style={{ color: data.redis.lastStatus?.healthy ? '#52c41a' : '#ff4d4f' }} />}>
+      <UIRow gutter={[16, 16]}>
+        <UICol xs={24} lg={12}>
+          <UICard title="Redis Status" extra={<UIIcon name="DatabaseOutlined" style={{ color: data.redis.lastStatus?.healthy ? '#52c41a' : '#ff4d4f' }} />}>
             {data.redis.lastStatus ? (
               <>
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Statistic
+                <UIRow gutter={16}>
+                  <UICol span={12}>
+                    <UIStatistic
                       title="Health"
                       value={data.redis.lastStatus.healthy ? 'Healthy' : 'Unhealthy'}
                       valueStyle={{ color: data.redis.lastStatus.healthy ? '#52c41a' : '#ff4d4f' }}
                     />
-                  </Col>
-                  <Col span={12}>
-                    <Statistic
+                  </UICol>
+                  <UICol span={12}>
+                    <UIStatistic
                       title="Role"
                       value={data.redis.lastStatus.role}
                       valueStyle={{ fontSize: 20 }}
                     />
-                  </Col>
-                </Row>
+                  </UICol>
+                </UIRow>
                 <div style={{ marginTop: 16 }}>
                   <p style={{ margin: 0, fontSize: 12, color: '#8c8c8c' }}>
                     State: <strong>{data.redis.lastStatus.state}</strong>
@@ -436,48 +439,48 @@ export function PrometheusMetricsPage() {
                 </div>
               </>
             ) : (
-              <Alert message="No Redis status data available" type="info" showIcon />
+              <UIAlert message="No Redis status data available" type="info" showIcon />
             )}
-          </Card>
-        </Col>
+          </UICard>
+        </UICol>
 
-        <Col xs={24} lg={12}>
-          <Card title="Plugin Mounts">
+        <UICol xs={24} lg={12}>
+          <UICard title="Plugin Mounts">
             {data.pluginMounts ? (
               <>
-                <Row gutter={16}>
-                  <Col span={8}>
-                    <Statistic
+                <UIRow gutter={16}>
+                  <UICol span={8}>
+                    <UIStatistic
                       title="Total"
                       value={data.pluginMounts.total}
                       valueStyle={{ fontSize: 20 }}
                     />
-                  </Col>
-                  <Col span={8}>
-                    <Statistic
+                  </UICol>
+                  <UICol span={8}>
+                    <UIStatistic
                       title="Succeeded"
                       value={data.pluginMounts.succeeded}
                       valueStyle={{ fontSize: 20, color: '#52c41a' }}
                     />
-                  </Col>
-                  <Col span={8}>
-                    <Statistic
+                  </UICol>
+                  <UICol span={8}>
+                    <UIStatistic
                       title="Failed"
                       value={data.pluginMounts.failed}
                       valueStyle={{ fontSize: 20, color: data.pluginMounts.failed > 0 ? '#ff4d4f' : '#52c41a' }}
                     />
-                  </Col>
-                </Row>
+                  </UICol>
+                </UIRow>
                 <div style={{ marginTop: 16, fontSize: 12, color: '#8c8c8c' }}>
                   Elapsed time: {formatNumber(data.pluginMounts.elapsedMs, 0)}ms
                 </div>
               </>
             ) : (
-              <Alert message="No plugin mount data available" type="info" showIcon />
+              <UIAlert message="No plugin mount data available" type="info" showIcon />
             )}
-          </Card>
-        </Col>
-      </Row>
+          </UICard>
+        </UICol>
+      </UIRow>
     </KBPageContainer>
   );
 }

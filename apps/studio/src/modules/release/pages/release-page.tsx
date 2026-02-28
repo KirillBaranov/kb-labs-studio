@@ -4,12 +4,12 @@
  */
 
 import * as React from 'react';
-import { Select, Collapse, Descriptions, Tag } from 'antd';
-import { KBPageContainer, KBPageHeader } from '@kb-labs/studio-ui-react';
+import { UISelect, UIAccordion, UIDescriptions, UIDescriptionsItem, UITag } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useReleaseScopes } from '@kb-labs/studio-data-client';
 import { ReleaseStepper } from '../components/release-stepper';
 import { HistoryTab } from '../components/history-tab';
+import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
 interface ReleasePageProps {
   view?: 'overview' | 'history';
@@ -72,7 +72,7 @@ export function ReleasePage({ view = 'overview' }: ReleasePageProps) {
         title={pageTitle}
         description={pageDescription}
         extra={
-          <Select
+          <UISelect
             style={{ width: 400 }}
             placeholder="Select scope (package or monorepo)"
             value={selectedScope}
@@ -91,7 +91,7 @@ export function ReleasePage({ view = 'overview' }: ReleasePageProps) {
 
       {/* Scope Info Accordion */}
       {currentScope && (
-        <Collapse
+        <UIAccordion
           size="small"
           style={{ marginTop: 16 }}
           items={[
@@ -105,31 +105,31 @@ export function ReleasePage({ view = 'overview' }: ReleasePageProps) {
                       v{currentScope.currentVersion}
                     </span>
                   )}
-                  <Tag color={getTypeColor(currentScope.type)} style={{ marginLeft: 8 }}>
+                  <UITag color={getTypeColor(currentScope.type)} style={{ marginLeft: 8 }}>
                     {currentScope.type}
-                  </Tag>
+                  </UITag>
                 </span>
               ),
               children: (
-                <Descriptions size="small" column={1} bordered>
-                  <Descriptions.Item label="Package Name">{currentScope.id}</Descriptions.Item>
+                <UIDescriptions size="small" column={1} bordered>
+                  <UIDescriptionsItem label="Package Name">{currentScope.id}</UIDescriptionsItem>
                   {currentScope.currentVersion && (
-                    <Descriptions.Item label="Current Version">
+                    <UIDescriptionsItem label="Current Version">
                       {currentScope.currentVersion}
-                    </Descriptions.Item>
+                    </UIDescriptionsItem>
                   )}
                   {currentScope.description && (
-                    <Descriptions.Item label="Description">
+                    <UIDescriptionsItem label="Description">
                       {currentScope.description}
-                    </Descriptions.Item>
+                    </UIDescriptionsItem>
                   )}
-                  <Descriptions.Item label="Path">
+                  <UIDescriptionsItem label="Path">
                     <code style={{ fontSize: 12 }}>{currentScope.path}</code>
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Type">
-                    <Tag color={getTypeColor(currentScope.type)}>{currentScope.type}</Tag>
-                  </Descriptions.Item>
-                </Descriptions>
+                  </UIDescriptionsItem>
+                  <UIDescriptionsItem label="Type">
+                    <UITag color={getTypeColor(currentScope.type)}>{currentScope.type}</UITag>
+                  </UIDescriptionsItem>
+                </UIDescriptions>
               ),
             },
           ]}

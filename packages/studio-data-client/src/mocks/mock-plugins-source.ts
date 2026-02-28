@@ -157,7 +157,9 @@ const mockManifests: PluginsRegistryResponse = {
 export class MockPluginsSource implements PluginsDataSource {
   async getPlugins(): Promise<PluginsRegistryResponse> {
     // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await new Promise<void>((resolve) => {
+      setTimeout(() => resolve(), 300);
+    });
     return {
       ...mockManifests,
       apiBasePath: '/api/v1',
@@ -166,7 +168,9 @@ export class MockPluginsSource implements PluginsDataSource {
 
   async askAboutPlugin(pluginId: string, request: { question: string }) {
     // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise<void>((resolve) => {
+      setTimeout(() => resolve(), 1000);
+    });
 
     // Mock AI responses based on question keywords
     const question = request.question.toLowerCase();

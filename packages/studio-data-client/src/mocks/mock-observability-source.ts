@@ -28,7 +28,9 @@ import type {
 } from '../contracts/observability';
 
 function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise<void>((resolve) => {
+    setTimeout(() => resolve(), ms);
+  });
 }
 
 /**
@@ -360,20 +362,20 @@ export class MockObservabilitySource implements ObservabilityDataSource {
     };
   }
 
-  async getLog(id: string, includeRelated?: boolean): Promise<{ log: LogRecord; related?: LogRecord[] }> {
+  async getLog(_id: string, includeRelated?: boolean): Promise<{ log: LogRecord; related?: LogRecord[] }> {
     await delay(200);
 
     const now = Date.now();
     const mockLog: LogRecord = {
-      id,
+      id: _id,
       time: new Date(now - 120_000).toISOString(), // 2 minutes ago
       level: 'error',
-      msg: `Mock log entry with id ${id}`,
+      msg: `Mock log entry with id ${_id}`,
       plugin: 'rest-api',
-      executionId: `exec-${id}`,
+      executionId: `exec-${_id}`,
       tenantId: 'default',
-      requestId: `req-${id}`,
-      traceId: `trace-${id}`,
+      requestId: `req-${_id}`,
+      traceId: `trace-${_id}`,
       err: {
         name: 'MockError',
         message: 'This is a mock error for demonstration',
@@ -386,7 +388,7 @@ export class MockObservabilitySource implements ObservabilityDataSource {
     if (includeRelated) {
       // Generate mock related logs
       related = Array.from({ length: 3 }, (_, i) => ({
-        id: `${id}-related-${i}`,
+        id: `${_id}-related-${i}`,
         time: new Date(now - (120_000 + i * 1000)).toISOString(),
         level: ['info', 'debug', 'error'][i % 3] as 'info' | 'debug' | 'error',
         msg: `Mock related log ${i + 1}`,
@@ -401,19 +403,19 @@ export class MockObservabilitySource implements ObservabilityDataSource {
     return { log: mockLog, related };
   }
 
-  async getRelatedLogs(id: string): Promise<{ total: number; logs: LogRecord[]; correlationKeys: any }> {
+  async getRelatedLogs(_id: string): Promise<{ total: number; logs: LogRecord[]; correlationKeys: any }> {
     await delay(150);
 
     const now = Date.now();
     const mockLogs: LogRecord[] = Array.from({ length: 5 }, (_, i) => ({
-      id: `${id}-related-${i}`,
+      id: `${_id}-related-${i}`,
       time: new Date(now - (120_000 + i * 1000)).toISOString(),
       level: ['info', 'debug', 'warn', 'error'][i % 4] as 'info' | 'debug' | 'warn' | 'error',
       msg: `Mock related log ${i + 1}`,
       plugin: 'rest-api',
-      executionId: `exec-${id}`,
-      requestId: `req-${id}`,
-      traceId: `trace-${id}`,
+      executionId: `exec-${_id}`,
+      requestId: `req-${_id}`,
+      traceId: `trace-${_id}`,
       meta: { mockData: true, relatedIndex: i },
     }));
 
@@ -421,9 +423,9 @@ export class MockObservabilitySource implements ObservabilityDataSource {
       total: mockLogs.length,
       logs: mockLogs,
       correlationKeys: {
-        requestId: `req-${id}`,
-        traceId: `trace-${id}`,
-        executionId: `exec-${id}`,
+        requestId: `req-${_id}`,
+        traceId: `trace-${_id}`,
+        executionId: `exec-${_id}`,
       },
     };
   }
@@ -651,12 +653,12 @@ The system has been mostly stable with info-level logs. Two connection timeout e
     return incident;
   }
 
-  async resolveIncident(id: string, resolutionNotes?: string): Promise<Incident> {
+  async resolveIncident(_id: string, resolutionNotes?: string): Promise<Incident> {
     await delay(150);
 
     // Mock resolving an incident
     const incident: Incident = {
-      id,
+      id: _id,
       type: 'error_rate',
       severity: 'critical',
       title: 'Mock Incident',
@@ -693,11 +695,11 @@ The system has been mostly stable with info-level logs. Two connection timeout e
     };
   }
 
-  async getIncident(id: string): Promise<IncidentDetailResponse> {
+  async getIncident(_id: string): Promise<IncidentDetailResponse> {
     await delay(150);
 
     const incident: Incident = {
-      id,
+      id: _id,
       type: 'error_rate',
       severity: 'critical',
       title: 'High Error Rate Detected',
@@ -758,7 +760,7 @@ The system has been mostly stable with info-level logs. Two connection timeout e
     };
   }
 
-  async analyzeIncident(id: string): Promise<IncidentAnalysisResponse> {
+  async analyzeIncident(_id: string): Promise<IncidentAnalysisResponse> {
     await delay(800); // Simulate LLM processing time
 
     return {

@@ -5,11 +5,10 @@
 
 import * as React from 'react';
 import { useRouteError, isRouteErrorResponse, Link } from 'react-router-dom';
-import { Result, Button, Card, Typography, Space, Collapse, Tag, message } from 'antd';
-import { HomeOutlined, ReloadOutlined, BugOutlined, CodeOutlined, CopyOutlined, CheckOutlined } from '@ant-design/icons';
-
-const { Paragraph, Text } = Typography;
-const { Panel } = Collapse;
+import {
+  UIResult, UIButton, UICard, UITypographyText, UITypographyParagraph,
+  UISpace, UIAccordion, UITag, UIMessage, UIIcon,
+} from '@kb-labs/studio-ui-kit';
 
 export function ErrorBoundary() {
   const error = useRouteError();
@@ -71,7 +70,7 @@ export function ErrorBoundary() {
       padding: '2rem',
       backgroundColor: 'var(--bg-tertiary)',
     }}>
-      <Card
+      <UICard
         style={{
           maxWidth: '800px',
           width: '100%',
@@ -81,65 +80,65 @@ export function ErrorBoundary() {
         }}
         bodyStyle={{ padding: '3rem' }}
       >
-        <Result
+        <UIResult
           status={status}
           title={<span style={{ fontSize: '1.5rem', fontWeight: 600 }}>{title}</span>}
           subTitle={
-            <Space direction="vertical" size="middle" style={{ width: '100%', marginTop: '1rem' }}>
-              <Paragraph style={{ fontSize: '1rem', color: 'var(--text-secondary)', margin: 0 }}>
+            <UISpace direction="vertical" size="middle" style={{ width: '100%', marginTop: '1rem' }}>
+              <UITypographyParagraph style={{ fontSize: '1rem', color: 'var(--text-secondary)', margin: 0 }}>
                 {description}
-              </Paragraph>
-              <Text type="secondary" style={{ fontSize: '0.875rem' }}>
+              </UITypographyParagraph>
+              <UITypographyText type="secondary" style={{ fontSize: '0.875rem' }}>
                 💡 {suggestion}
-              </Text>
-            </Space>
+              </UITypographyText>
+            </UISpace>
           }
           extra={
-            <Space direction="vertical" size="large" style={{ width: '100%', marginTop: '1.5rem' }}>
-              <Space size="middle">
+            <UISpace direction="vertical" size="large" style={{ width: '100%', marginTop: '1.5rem' }}>
+              <UISpace size="middle">
                 <Link to="/">
-                  <Button type="primary" size="large" icon={<HomeOutlined />}>
+                  <UIButton variant="primary" size="large" icon={<UIIcon name="HomeOutlined" />}>
                     На главную
-                  </Button>
+                  </UIButton>
                 </Link>
-                <Button
+                <UIButton
                   size="large"
-                  icon={<ReloadOutlined />}
+                  icon={<UIIcon name="ReloadOutlined" />}
                   onClick={() => window.location.reload()}
                 >
                   Перезагрузить
-                </Button>
-              </Space>
+                </UIButton>
+              </UISpace>
 
-              {/* Error Details Collapse */}
+              {/* Error Details Accordion */}
               {errorDetails && (
-                <Collapse
+                <UIAccordion
                   ghost
                   style={{ width: '100%', textAlign: 'left' }}
                   items={[
                     {
                       key: 'details',
                       label: (
-                        <Space>
-                          <BugOutlined />
-                          <Text strong>Детали ошибки (для разработчиков)</Text>
-                        </Space>
+                        <UISpace>
+                          <UIIcon name="BugOutlined" />
+                          <UITypographyText strong>Детали ошибки (для разработчиков)</UITypographyText>
+                        </UISpace>
                       ),
                       children: (
-                        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                        <UISpace direction="vertical" size="middle" style={{ width: '100%' }}>
                           {/* Error Type */}
                           <div>
-                            <Text type="secondary" style={{ fontSize: '0.75rem' }}>Тип ошибки:</Text>
+                            <UITypographyText type="secondary" style={{ fontSize: '0.75rem' }}>Тип ошибки:</UITypographyText>
                             <div style={{ marginTop: 4 }}>
-                              <Tag color="red" icon={<CodeOutlined />}>
+                              <UITag variant="error" icon={<UIIcon name="CodeOutlined" />}>
                                 {errorDetails.name}
-                              </Tag>
+                              </UITag>
                             </div>
                           </div>
 
                           {/* Error Message */}
                           <div>
-                            <Text type="secondary" style={{ fontSize: '0.75rem' }}>Сообщение:</Text>
+                            <UITypographyText type="secondary" style={{ fontSize: '0.75rem' }}>Сообщение:</UITypographyText>
                             <div
                               style={{
                                 marginTop: 4,
@@ -151,14 +150,14 @@ export function ErrorBoundary() {
                                 wordBreak: 'break-word',
                               }}
                             >
-                              <Text code>{errorDetails.message}</Text>
+                              <UITypographyText code>{errorDetails.message}</UITypographyText>
                             </div>
                           </div>
 
                           {/* Stack Trace */}
                           {errorDetails.stack && (
                             <div>
-                              <Text type="secondary" style={{ fontSize: '0.75rem' }}>Stack Trace:</Text>
+                              <UITypographyText type="secondary" style={{ fontSize: '0.75rem' }}>Stack Trace:</UITypographyText>
                               <div
                                 style={{
                                   marginTop: 4,
@@ -187,30 +186,30 @@ export function ErrorBoundary() {
                           )}
 
                           {/* Copy to Clipboard */}
-                          <Button
+                          <UIButton
                             size="small"
-                            type={copied ? 'primary' : 'default'}
-                            icon={copied ? <CheckOutlined /> : <CopyOutlined />}
+                            variant={copied ? 'primary' : 'default'}
+                            icon={copied ? <UIIcon name="CheckOutlined" /> : <UIIcon name="CopyOutlined" />}
                             onClick={() => {
                               const text = `${errorDetails.name}: ${errorDetails.message}\n\n${errorDetails.stack || 'No stack trace'}`;
                               navigator.clipboard.writeText(text);
                               setCopied(true);
-                              message.success('Ошибка скопирована в буфер обмена');
+                              UIMessage.success('Ошибка скопирована в буфер обмена');
                               setTimeout(() => setCopied(false), 2000);
                             }}
                           >
                             {copied ? 'Скопировано!' : 'Скопировать в буфер обмена'}
-                          </Button>
-                        </Space>
+                          </UIButton>
+                        </UISpace>
                       ),
                     },
                   ]}
                 />
               )}
-            </Space>
+            </UISpace>
           }
         />
-      </Card>
+      </UICard>
     </div>
   );
 }

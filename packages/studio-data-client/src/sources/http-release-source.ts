@@ -45,23 +45,23 @@ export class HttpReleaseSource implements ReleaseDataSource {
 
   // === Scopes ===
   async getScopes(): Promise<ScopesResponse> {
-    return await this.client.fetch<ScopesResponse>(`${this.basePath}/scopes`);
+    return this.client.fetch<ScopesResponse>(`${this.basePath}/scopes`);
   }
 
   // === Status ===
   async getStatus(scope: string): Promise<StatusResponse> {
     const params = new URLSearchParams({ scope });
-    return await this.client.fetch<StatusResponse>(`${this.basePath}/status?${params}`);
+    return this.client.fetch<StatusResponse>(`${this.basePath}/status?${params}`);
   }
 
   // === Plan ===
   async getPlan(scope: string): Promise<PlanResponse> {
     const params = new URLSearchParams({ scope });
-    return await this.client.fetch<PlanResponse>(`${this.basePath}/plan?${params}`);
+    return this.client.fetch<PlanResponse>(`${this.basePath}/plan?${params}`);
   }
 
   async generatePlan(request: GeneratePlanRequest): Promise<GeneratePlanResponse> {
-    return await this.client.fetch<GeneratePlanResponse>(`${this.basePath}/generate`, {
+    return this.client.fetch<GeneratePlanResponse>(`${this.basePath}/generate`, {
       method: 'POST',
       data: request,
     });
@@ -69,7 +69,7 @@ export class HttpReleaseSource implements ReleaseDataSource {
 
   async resetPlan(scope: string): Promise<{ success: boolean }> {
     const params = new URLSearchParams({ scope });
-    return await this.client.fetch<{ success: boolean }>(
+    return this.client.fetch<{ success: boolean }>(
       `${this.basePath}/plan?${params}`,
       {
         method: 'DELETE',
@@ -80,13 +80,13 @@ export class HttpReleaseSource implements ReleaseDataSource {
   // === Preview ===
   async getPreview(scope: string): Promise<PreviewResponse> {
     const params = new URLSearchParams({ scope });
-    return await this.client.fetch<PreviewResponse>(`${this.basePath}/preview?${params}`);
+    return this.client.fetch<PreviewResponse>(`${this.basePath}/preview?${params}`);
   }
 
   // === Verify ===
   async getVerify(scope: string): Promise<VerifyResponse> {
     const params = new URLSearchParams({ scope });
-    return await this.client.fetch<VerifyResponse>(`${this.basePath}/verify?${params}`);
+    return this.client.fetch<VerifyResponse>(`${this.basePath}/verify?${params}`);
   }
 
   // === Changelog ===
@@ -97,13 +97,13 @@ export class HttpReleaseSource implements ReleaseDataSource {
     const params = new URLSearchParams({ scope });
     if (options?.from) {params.set('from', options.from);}
     if (options?.to) {params.set('to', options.to);}
-    return await this.client.fetch<ChangelogResponse>(`${this.basePath}/changelog?${params}`);
+    return this.client.fetch<ChangelogResponse>(`${this.basePath}/changelog?${params}`);
   }
 
   async generateChangelog(
     request: GenerateChangelogRequest
   ): Promise<GenerateChangelogResponse> {
-    return await this.client.fetch<GenerateChangelogResponse>(
+    return this.client.fetch<GenerateChangelogResponse>(
       `${this.basePath}/changelog/generate`,
       {
         method: 'POST',
@@ -113,7 +113,7 @@ export class HttpReleaseSource implements ReleaseDataSource {
   }
 
   async saveChangelog(request: SaveChangelogRequest): Promise<SaveChangelogResponse> {
-    return await this.client.fetch<SaveChangelogResponse>(`${this.basePath}/changelog/save`, {
+    return this.client.fetch<SaveChangelogResponse>(`${this.basePath}/changelog/save`, {
       method: 'POST',
       data: request,
     });
@@ -121,21 +121,21 @@ export class HttpReleaseSource implements ReleaseDataSource {
 
   // === Release ===
   async runRelease(request: RunReleaseRequest): Promise<RunReleaseResponse> {
-    return await this.client.fetch<RunReleaseResponse>(`${this.basePath}/run`, {
+    return this.client.fetch<RunReleaseResponse>(`${this.basePath}/run`, {
       method: 'POST',
       data: request,
     });
   }
 
   async publish(request: PublishRequest): Promise<PublishResponse> {
-    return await this.client.fetch<PublishResponse>(`${this.basePath}/publish`, {
+    return this.client.fetch<PublishResponse>(`${this.basePath}/publish`, {
       method: 'POST',
       data: request,
     });
   }
 
   async rollback(request: RollbackRequest): Promise<RollbackResponse> {
-    return await this.client.fetch<RollbackResponse>(`${this.basePath}/rollback`, {
+    return this.client.fetch<RollbackResponse>(`${this.basePath}/rollback`, {
       method: 'POST',
       data: request,
     });
@@ -143,28 +143,28 @@ export class HttpReleaseSource implements ReleaseDataSource {
 
   // === Report ===
   async getReport(): Promise<ReportResponse> {
-    return await this.client.fetch<ReportResponse>(`${this.basePath}/report`);
+    return this.client.fetch<ReportResponse>(`${this.basePath}/report`);
   }
 
   // === History ===
   async getHistory(): Promise<HistoryResponse> {
-    return await this.client.fetch<HistoryResponse>(`${this.basePath}/history`);
+    return this.client.fetch<HistoryResponse>(`${this.basePath}/history`);
   }
 
   async getHistoryReport(scope: string, id: string): Promise<HistoryReportResponse> {
-    return await this.client.fetch<HistoryReportResponse>(
+    return this.client.fetch<HistoryReportResponse>(
       `${this.basePath}/history/${scope}/${id}/report`
     );
   }
 
   async getHistoryPlan(scope: string, id: string): Promise<HistoryPlanResponse> {
-    return await this.client.fetch<HistoryPlanResponse>(
+    return this.client.fetch<HistoryPlanResponse>(
       `${this.basePath}/history/${scope}/${id}/plan`
     );
   }
 
   async getHistoryChangelog(scope: string, id: string): Promise<HistoryChangelogResponse> {
-    return await this.client.fetch<HistoryChangelogResponse>(
+    return this.client.fetch<HistoryChangelogResponse>(
       `${this.basePath}/history/${scope}/${id}/changelog`
     );
   }
@@ -172,12 +172,12 @@ export class HttpReleaseSource implements ReleaseDataSource {
   // === Git Timeline ===
   async getGitTimeline(scope: string): Promise<GitTimelineResponse> {
     const params = new URLSearchParams({ scope });
-    return await this.client.fetch<GitTimelineResponse>(`${this.basePath}/git-timeline?${params}`);
+    return this.client.fetch<GitTimelineResponse>(`${this.basePath}/git-timeline?${params}`);
   }
 
   // === Build ===
   async triggerBuild(request: BuildRequest): Promise<BuildResponse> {
-    return await this.client.fetch<BuildResponse>(`${this.basePath}/build`, {
+    return this.client.fetch<BuildResponse>(`${this.basePath}/build`, {
       method: 'POST',
       data: request,
     });
@@ -186,7 +186,7 @@ export class HttpReleaseSource implements ReleaseDataSource {
   // === Checklist ===
   async getChecklist(scope: string): Promise<ReleaseChecklist> {
     const params = new URLSearchParams({ scope });
-    return await this.client.fetch<ReleaseChecklist>(`${this.basePath}/checklist?${params}`);
+    return this.client.fetch<ReleaseChecklist>(`${this.basePath}/checklist?${params}`);
   }
 }
 

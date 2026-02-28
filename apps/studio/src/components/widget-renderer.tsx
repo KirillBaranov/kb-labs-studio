@@ -8,14 +8,20 @@ import { useRegistry } from '../providers/registry-provider';
 import { useWidgetData } from '../hooks/useWidgetData';
 import type { StudioRegistryEntry } from '@kb-labs/rest-api-contracts';
 import { isCompositeWidget } from '@kb-labs/rest-api-contracts';
-import * as Widgets from './widgets/index';
-import { Skeleton, ErrorState } from './widgets/shared/index';
+import type { WidgetProps } from '@kb-labs/studio-contracts';
+// TODO: widget library removed, pending new widget system
 import { trackWidgetEvent } from '../utils/analytics';
 import { studioConfig } from '../config/studio.config';
-import { HeaderPolicyCallout } from './header-policy-callout';
 import { WidgetErrorBoundary } from './widget-error-boundary';
-// eslint-disable-next-line import/extensions
+ 
 import { useWidgetEvents } from '../hooks/useWidgetEvents';
+import { useWidgetEventSubscription } from '../hooks/useWidgetEventSubscription';
+import { useCircularDependencyDetection } from '../hooks/useCircularDependencyDetection';
+import { useWidgetDataMerger } from '../hooks/useWidgetDataMerger';
+import { useWidgetComponentLoader } from '../hooks/useWidgetComponentLoader';
+import { useWidgetChangeHandler } from '../hooks/useWidgetChangeHandler';
+import { useHeaderNotice } from '../hooks/useHeaderNotice';
+import { WithWidgetState } from '../hocs/WithWidgetState';
 
 /**
  * Widget kind to component mapping (29 widgets across 5 categories)
@@ -25,48 +31,11 @@ import { useWidgetEvents } from '../hooks/useWidgetEvents';
  * Layout (5): section, grid, stack, tabs, modal
  * Navigation (3): breadcrumb, stepper, menu
  * Feedback (2): alert, confirm
+ *
+ * 🎯 TYPE SAFETY: Now uses WidgetProps discriminated union instead of `any`
  */
-const WIDGET_COMPONENTS: Record<string, React.ComponentType<any>> = {
-  // Display widgets (14)
-  'metric': Widgets.Metric,
-  'metric-group': Widgets.MetricGroup,
-  'table': Widgets.Table,
-  'card': Widgets.Card,
-  'cardlist': Widgets.CardList,
-  'chart-line': Widgets.ChartLine,
-  'chart-bar': Widgets.ChartBar,
-  'chart-pie': Widgets.ChartPie,
-  'chart-area': Widgets.ChartArea,
-  'timeline': Widgets.Timeline,
-  'tree': Widgets.Tree,
-  'json': Widgets.Json,
-  'diff': Widgets.Diff,
-  'logs': Widgets.Logs,
-
-  // Form widgets (6)
-  'form': Widgets.Form,
-  'input': Widgets.Input,
-  'select': Widgets.Select,
-  'checkbox-group': Widgets.CheckboxGroup,
-  'switch': Widgets.Switch,
-  'date-picker': Widgets.DatePicker,
-
-  // Layout widgets (5) - composite with children
-  'section': Widgets.Section,
-  'grid': Widgets.Grid,
-  'stack': Widgets.Stack,
-  'tabs': Widgets.Tabs,
-  'modal': Widgets.Modal,
-
-  // Navigation widgets (3)
-  'breadcrumb': Widgets.Breadcrumb,
-  'stepper': Widgets.Stepper,
-  'menu': Widgets.Menu,
-
-  // Feedback widgets (2)
-  'alert': Widgets.Alert,
-  'confirm': Widgets.Confirm,
-};
+// TODO: widget library removed, pending new widget system
+const WIDGET_COMPONENTS: Record<string, React.ComponentType<WidgetProps>> = {};
 
 /**
  * Widget renderer props
@@ -94,9 +63,6 @@ export function WidgetRenderer({
   layoutHint,
 }: WidgetRendererProps): React.ReactElement | null {
   const { registry } = useRegistry();
-  const [component, setComponent] = React.useState<React.ComponentType<any> | null>(null);
-  const [componentError, setComponentError] = React.useState<Error | null>(null);
-  const [loadingComponent, setLoadingComponent] = React.useState(false);
 
   // Find widget in registry using O(1) Map lookup (from flattened registry)
   const widget = React.useMemo(() => {
@@ -117,83 +83,14 @@ export function WidgetRenderer({
     return undefined;
   }, [registry, widgetId, pluginId]);
 
+  // 🎯 REFACTOR: Use hook for dynamic component loading
+  const { component, loading: loadingComponent, error: componentError } = useWidgetComponentLoader(widget);
+
   // Event bus for widget communication
   const { subscribe, emit } = useWidgetEvents();
 
-  // State for dynamic query parameters from events
-  const [eventParams, setEventParams] = React.useState<Record<string, string | number | boolean>>({});
-
-  // State for complex data from events (like plan objects)
-  const [eventData, setEventData] = React.useState<unknown | null>(null);
-
-  // Auto-subscribe to events from manifest
-  React.useEffect(() => {
-    if (!widget?.events?.subscribe) {
-      return;
-    }
-
-    const unsubscribes: Array<() => void> = [];
-
-    for (const eventConfig of widget.events.subscribe) {
-      const eventName = typeof eventConfig === 'string' ? eventConfig : eventConfig.name;
-      const paramsMap = typeof eventConfig === 'object' ? eventConfig.paramsMap : undefined;
-
-      const unsubscribe = subscribe(eventName, (payload) => {
-        if (!payload || typeof payload !== 'object') {
-          return;
-        }
-
-        // Map event payload to query params and/or direct data
-        const newParams: Record<string, string | number | boolean> = {};
-        const mappedData: Record<string, unknown> = {};
-
-        if (paramsMap) {
-          // Use explicit mapping: paramsMap = { workspace: 'workspace', cards: 'cards' }
-          for (const [paramKey, payloadKey] of Object.entries(paramsMap)) {
-            const value = (payload as Record<string, unknown>)[payloadKey];
-            if (value !== undefined && value !== null) {
-              // If it's a primitive, add to params
-              if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-                newParams[paramKey] = value;
-              } else {
-                // If it's a complex object, store as direct data
-                mappedData[paramKey] = value;
-              }
-            }
-          }
-        } else {
-          // No mapping - copy all payload fields directly
-          for (const [key, value] of Object.entries(payload)) {
-            if (value !== undefined && value !== null) {
-              if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-                newParams[key] = value;
-              } else {
-                mappedData[key] = value;
-              }
-            }
-          }
-        }
-
-        // Update params if any
-        if (Object.keys(newParams).length > 0) {
-          setEventParams(prev => ({
-            ...prev,
-            ...newParams,
-          }));
-        }
-
-        // Update data if we received complex objects
-        if (Object.keys(mappedData).length > 0) {
-          setEventData(mappedData);
-        }
-      });
-      unsubscribes.push(unsubscribe);
-    }
-
-    return () => {
-      unsubscribes.forEach((unsub) => unsub());
-    };
-  }, [widget?.events?.subscribe, subscribe, widgetId]);
+  // 🎯 REFACTOR: Use extracted hook for event subscription
+  const { eventParams, eventData } = useWidgetEventSubscription(widget, widgetId);
 
   // Track widget mount
   React.useEffect(() => {
@@ -236,7 +133,7 @@ export function WidgetRenderer({
     }
 
     return source;
-  }, [widget?.data?.source, eventParams, widgetId]);
+  }, [widget?.data?.source, eventParams]);
 
   const widgetData = useWidgetData({
     widgetId,
@@ -254,192 +151,20 @@ export function WidgetRenderer({
     }
   }, [widgetData.error, widgetId, pluginId]);
 
-  // Load custom component if needed
-  React.useEffect(() => {
-    if (!widget) {
-      setLoadingComponent(false);
-      return;
-    }
+  // 🎯 REFACTOR: Call all hooks BEFORE any conditional returns
+  // These hooks must be called unconditionally to satisfy React Rules of Hooks
 
-    // If standard widget, use kind mapping
-    if (!widget.component) {
-      setLoadingComponent(false);
-      return;
-    }
+  // 🎯 REFACTOR: Use hook for header notice
+  const headerNotice = useHeaderNotice(widget, widgetData, headerHints);
 
-    // Load custom component dynamically
-    setLoadingComponent(true);
-    setComponentError(null);
+  // 🎯 REFACTOR: Use hook for change handler
+  const handleChange = useWidgetChangeHandler(widget, widgetData.data, emit, widgetId);
 
-    try {
-      // Use component path from registry (set by server or manifest)
-      const componentPath = widget.component;
-      if (!componentPath) {
-        throw new Error(`Widget ${widget.id} has no component path`);
-      }
+  // 🎯 REFACTOR: Use extracted hook for circular dependency detection
+  const { isCircular, markVisited, clearVisited } = useCircularDependencyDetection();
 
-      // Dynamic import - path comes from server registry, not user input
-      import(/* @vite-ignore */ componentPath)
-        .then((module) => {
-          const imported = module as Record<string, unknown>;
-          const keys = Object.keys(imported);
-          const fallbackKey = keys.length > 0 ? keys[0] : undefined;
-          const Component =
-            (imported.default as React.ComponentType<any> | undefined) ||
-            (fallbackKey ? (imported[fallbackKey] as React.ComponentType<any> | undefined) : undefined);
-          if (!Component) {
-            throw new Error(`Component not found in ${componentPath}`);
-          }
-          setComponent(Component);
-          setComponentError(null);
-        })
-        .catch((e) => {
-          setComponentError(e instanceof Error ? e : new Error(String(e)));
-        })
-        .finally(() => {
-          setLoadingComponent(false);
-        });
-    } catch (e) {
-      setComponentError(e instanceof Error ? e : new Error(String(e)));
-      setLoadingComponent(false);
-    }
-  }, [widget]);
-
-  // Widget not found
-  if (!widget) {
-    return (
-      <ErrorState
-        error="Widget not found"
-        hint={`Widget ${widgetId} not found in registry`}
-      />
-    );
-  }
-
-  // Widget data configuration missing
-  if (!widget.data || !widget.data.source) {
-    return (
-      <ErrorState
-        error="Invalid widget configuration"
-        hint={`Widget ${widgetId} is missing data configuration`}
-      />
-    );
-  }
-
-  // Determine component to use
-  let WidgetComponent: React.ComponentType<any> | null = null;
-
-  if (widget.component && component) {
-    // Custom component loaded
-    WidgetComponent = component;
-  } else if (!widget.component) {
-    // Standard widget by kind (29 widgets + legacy aliases)
-    WidgetComponent = WIDGET_COMPONENTS[widget.kind] || null;
-  }
-
-  // Component not found
-  if (!WidgetComponent) {
-    return (
-      <ErrorState
-        error="Component not found"
-        hint={`No component found for widget kind: ${widget.kind}`}
-      />
-    );
-  }
-
-  // Custom component loading error
-  if (componentError) {
-    return (
-      <ErrorState
-        error={componentError.message}
-        hint="Failed to load widget component"
-      />
-    );
-  }
-
-  // Loading custom component
-  if (loadingComponent) {
-    return <Skeleton variant="default" />;
-  }
-
-  const rawHeaderOptions = (widget.options as any)?.headers as
-    | {
-        enabled?: boolean;
-        title?: string;
-        description?: string;
-        collapsible?: boolean;
-        expanded?: boolean;
-        showProvided?: boolean;
-      }
-    | undefined;
-
-  const missingHeadersCount = widgetData.headers?.missingRequired?.length ?? 0;
-  const headerNoticeEnabled =
-    !!headerHints &&
-    ((rawHeaderOptions?.enabled ?? studioConfig.headerNotices.enabled) || missingHeadersCount > 0);
-
-  const headerNotice = headerNoticeEnabled && headerHints ? (
-    <HeaderPolicyCallout
-      hints={headerHints}
-      status={widgetData.headers}
-      title={rawHeaderOptions?.title || 'Header policy'}
-      description={
-        rawHeaderOptions?.description ||
-        'Studio forwards headers that match this manifest-defined policy.'
-      }
-      collapsible={rawHeaderOptions?.collapsible ?? studioConfig.headerNotices.collapsible}
-      defaultExpanded={
-        rawHeaderOptions?.expanded ??
-        (missingHeadersCount > 0 || studioConfig.headerNotices.defaultExpanded)
-      }
-      showProvided={rawHeaderOptions?.showProvided ?? studioConfig.headerNotices.showProvided}
-    />
-  ) : null;
-
-  // Extract showTitle and showDescription from options
-  // Default: showTitle=true for charts, false for others
-  const widgetOptions = widget.options as Record<string, unknown> | undefined;
-  const showTitle = widgetOptions?.showTitle as boolean | undefined;
-  const showDescription = widgetOptions?.showDescription as boolean | undefined;
-
-  // Create onChange handler for form widgets that auto-emits events
-  const handleChange = React.useCallback(
-    (value: unknown) => {
-
-      // Auto-emit events declared in manifest
-      if (!widget?.events?.emit || widget.events.emit.length === 0) {
-        return;
-      }
-
-      const eventConfig = widget.events.emit[0]; // Use first event config
-      const eventName = typeof eventConfig === 'string' ? eventConfig : eventConfig.name;
-      const payloadMap = typeof eventConfig === 'object' ? eventConfig.payloadMap : undefined;
-
-
-      // Build payload using payloadMap or default { value }
-      const payload: Record<string, unknown> = {};
-
-      if (payloadMap) {
-        // Use explicit mapping: payloadMap = { workspace: 'value' }
-        for (const [payloadKey, dataKey] of Object.entries(payloadMap)) {
-          if (dataKey === 'value') {
-            payload[payloadKey] = value;
-          } else if (widgetData.data && typeof widgetData.data === 'object') {
-            payload[payloadKey] = (widgetData.data as Record<string, unknown>)[dataKey];
-          }
-        }
-      } else {
-        // Default: emit { value }
-        payload.value = value;
-      }
-
-      emit(eventName, payload);
-    },
-    [widget?.events?.emit, widgetData.data, emit, widgetId]
-  );
-
-  // Render children for composite widgets (section, grid, stack, tabs, modal)
-  // Tracks visited widget IDs to prevent circular dependencies
-  const visitedWidgets = React.useRef<Set<string>>(new Set());
+  // 🎯 REFACTOR: Use extracted hook for data merging
+  const finalData = useWidgetDataMerger(eventData, widgetData.data);
 
   const renderChildren = React.useCallback((childrenIds: string[] | undefined): React.ReactNode => {
     if (!childrenIds || !Array.isArray(childrenIds) || childrenIds.length === 0) {
@@ -447,11 +172,11 @@ export function WidgetRenderer({
     }
 
     // Clear visited set before rendering children (prevents false circular dependency warnings on re-renders)
-    visitedWidgets.current.clear();
+    clearVisited();
 
     return childrenIds.map((childId) => {
       // Circular dependency protection
-      if (visitedWidgets.current.has(childId)) {
+      if (isCircular(childId)) {
         console.warn(`[WidgetRenderer] Circular dependency detected: ${childId} already in render tree`);
         return null;
       }
@@ -467,7 +192,7 @@ export function WidgetRenderer({
       const childPluginId = childWidget.plugin?.id || pluginId;
 
       // Mark as visited before recursing
-      visitedWidgets.current.add(childId);
+      markVisited(childId);
 
       return (
         <WidgetRenderer
@@ -477,20 +202,42 @@ export function WidgetRenderer({
         />
       );
     });
-  }, [registry.widgetMap, pluginId]);
+  }, [registry.widgetMap, pluginId, isCircular, markVisited, clearVisited]);
+
+  // 🎯 REFACTOR: Determine component to use
+  const resolvedComponent: React.ComponentType<WidgetProps> | null =
+    (widget?.component && component) ? component :
+    (!widget?.component && widget) ? WIDGET_COMPONENTS[widget.kind] || null :
+    null;
+
+  // 🎯 REFACTOR: Use HOC for all validation/loading/error states
+  const EnhancedWidgetComponent = React.useMemo(
+    () => WithWidgetState({
+      component: resolvedComponent,
+      widgetId,
+      widget,
+      loadingComponent,
+      componentError,
+    }),
+    [resolvedComponent, widgetId, widget, loadingComponent, componentError]
+  );
+
+  // Early return if widget validation fails (HOC will render error state)
+  if (!widget || !widget.data || !widget.data.source || !resolvedComponent || componentError || loadingComponent) {
+    return <EnhancedWidgetComponent />;
+  }
+
+  // Widget is valid - get the actual component for rendering
+  const WidgetComponent = resolvedComponent;
+
+  // Extract showTitle and showDescription from options
+  const widgetOptions = widget.options as Record<string, unknown> | undefined;
+  const showTitle = widgetOptions?.showTitle as boolean | undefined;
+  const showDescription = widgetOptions?.showDescription as boolean | undefined;
 
   // Check if widget is composite and render children
   const isComposite = widget && isCompositeWidget(widget);
   const childrenNodes = isComposite ? renderChildren(widget.children) : null;
-
-  // Merge eventData with widgetData - eventData takes precedence
-  const finalData = React.useMemo(() => {
-    if (eventData) {
-      // If we have event data, use it (overrides fetched data)
-      return eventData;
-    }
-    return widgetData.data;
-  }, [eventData, widgetData.data]);
 
   // Render widget with data, wrapped in error boundary
   return (

@@ -127,9 +127,9 @@ export function useJobEvents(
               setIsConnected(false);
               onComplete?.();
             }
-          } catch (err) {
-            setError(err instanceof Error ? err : new Error('Failed to parse event'));
-            onError?.(err instanceof Error ? err : new Error('Failed to parse event'));
+          } catch (_err) {
+            setError(_err instanceof Error ? _err : new Error('Failed to parse event'));
+            onError?.(_err instanceof Error ? _err : new Error('Failed to parse event'));
           }
         };
 
@@ -178,8 +178,8 @@ export function useJobEvents(
                   onComplete?.();
                 }
               }
-            } catch (err) {
-              const errorInstance = err instanceof Error ? err : new Error('Polling failed');
+            } catch (_err) {
+              const errorInstance = _err instanceof Error ? _err : new Error('Polling failed');
               setError(errorInstance);
               onError?.(errorInstance);
             }
@@ -201,7 +201,7 @@ export function useJobEvents(
             pollingRef.current = null;
           }
         };
-      } catch (err) {
+      } catch (_err) {
         // SSE not supported, fallback to polling
         useSSERef.current = false;
       }
@@ -259,8 +259,8 @@ export function useJobEvents(
           
           setIsConnected(true);
           setError(null);
-        } catch (err) {
-          const errorInstance = err instanceof Error ? err : new Error('Polling failed');
+        } catch (_err) {
+          const errorInstance = _err instanceof Error ? _err : new Error('Polling failed');
           setError(errorInstance);
           onError?.(errorInstance);
           setIsConnected(false);

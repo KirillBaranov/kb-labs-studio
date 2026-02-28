@@ -1,5 +1,5 @@
 import { defineConfig } from 'tsup';
-import reactLibPreset from '@kb-labs/devkit/tsup/react-lib.js';
+import reactLibPreset from '@kb-labs/devkit/tsup/react-lib';
 
 export default defineConfig({
   ...reactLibPreset,

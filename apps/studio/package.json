@@ -17,11 +17,15 @@
   "dependencies": {
     "@ant-design/icons": "^5.4.0",
     "@ant-design/plots": "^2.6.6",
+    "@kb-labs/agent-contracts": "link:../../../kb-labs-agents/packages/agent-contracts",
+    "@kb-labs/qa-contracts": "link:../../../kb-labs-qa-plugin/packages/qa-contracts",
     "@kb-labs/quality-contracts": "link:../../../kb-labs-quality-plugin/packages/quality-contracts",
-    "@kb-labs/rest-api-contracts": "link:../../../kb-labs-rest-api/packages/rest-api-contracts",
+    "@kb-labs/rest-api-contracts": "^1.0.0",
     "@kb-labs/studio-data-client": "link:../../packages/studio-data-client",
     "@kb-labs/studio-ui-core": "link:../../packages/studio-ui-core",
-    "@kb-labs/studio-ui-react": "link:../../packages/studio-ui-react",
+    "@kb-labs/studio-ui-kit": "link:../../packages/studio-ui-kit",
+    "@ant-design/charts": "^2.6.6",
+    "clsx": "^2.1.1",
     "@tanstack/react-query": "^5.62.23",
     "@tanstack/react-query-devtools": "^5.62.23",
     "@types/react-grid-layout": "^1.3.6",
@@ -36,6 +40,7 @@
     "react-resizable": "^3.0.5",
     "react-router-dom": "^7.1.4",
     "reactflow": "^11.11.4",
+    "zod": "^3.23.8",
     "zustand": "^5.0.2"
   },
   "devDependencies": {

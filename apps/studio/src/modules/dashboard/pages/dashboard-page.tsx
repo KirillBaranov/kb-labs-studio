@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Tabs } from 'antd';
+import { UITabs } from '@kb-labs/studio-ui-kit';
 import {
   DashboardOutlined,
   ThunderboltOutlined,
@@ -170,7 +170,7 @@ export function DashboardPage() {
 
   return (
     <>
-      <Tabs
+      <UITabs
         activeKey={activeTab}
         onChange={setActiveTab}
         items={items}

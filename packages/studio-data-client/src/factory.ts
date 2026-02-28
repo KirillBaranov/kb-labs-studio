@@ -13,6 +13,7 @@ import type { AgentDataSource } from './sources/agent-source';
 // TODO: TEMPORARY - Remove after commit plugin UI is polished
 import type { CommitDataSource } from './sources/commit-source';
 import type { QualityDataSource } from './sources/quality-source';
+import type { QADataSource } from './sources/qa-source';
 import { MockAuditSource } from './mocks/mock-audit-source';
 import { MockReleaseSource } from './mocks/mock-release-source';
 import { MockSystemSource } from './mocks/mock-system-source';
@@ -28,6 +29,7 @@ import { MockAgentSource } from './mocks/mock-agent-source';
 // TODO: TEMPORARY - Remove after commit plugin UI is polished
 import { MockCommitSource } from './mocks/mock-commit-source';
 import { MockQualitySource } from './mocks/mock-quality-source';
+import { MockQASource } from './mocks/mock-qa-source';
 import { HttpAuditSource } from './sources/http-audit-source';
 import { HttpReleaseSource } from './sources/http-release-source';
 import { HttpSystemSource } from './sources/http-system-source';
@@ -43,6 +45,7 @@ import { HttpAgentSource } from './sources/http-agent-source';
 // TODO: TEMPORARY - Remove after commit plugin UI is polished
 import { HttpCommitSource } from './sources/http-commit-source';
 import { HttpQualitySource } from './sources/http-quality-source';
+import { HttpQASource } from './sources/http-qa-source';
 import { HttpClient } from './client/http-client';
 
 export interface DataSourcesConfig {
@@ -66,6 +69,7 @@ export interface DataSources {
   // TODO: TEMPORARY - Remove after commit plugin UI is polished
   commit: CommitDataSource;
   quality: QualityDataSource;
+  qa: QADataSource;
 }
 
 export function createDataSources(config: DataSourcesConfig): DataSources {
@@ -86,6 +90,7 @@ export function createDataSources(config: DataSourcesConfig): DataSources {
       // TODO: TEMPORARY - Remove after commit plugin UI is polished
       commit: new MockCommitSource(),
       quality: new MockQualitySource(),
+      qa: new MockQASource(),
     };
   }
 
@@ -108,6 +113,7 @@ export function createDataSources(config: DataSourcesConfig): DataSources {
     // TODO: TEMPORARY - Remove after commit plugin UI is polished
     commit: new HttpCommitSource(client),
     quality: new HttpQualitySource(client),
+    qa: new HttpQASource(client),
   };
 }
 

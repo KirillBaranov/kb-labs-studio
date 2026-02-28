@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Card, Input, Button, Space, Typography, Avatar, Spin, Tag } from 'antd';
+import { UICard, UIInput, UIButton, UISpace, UITypographyText, UITypographyParagraph, UITitle, UIAvatar, UISpin, UITag } from '@kb-labs/studio-ui-kit';
 import {
   RobotOutlined,
   SendOutlined,
@@ -11,8 +11,7 @@ import {
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { usePrometheusMetrics, useAdaptersLLMUsage } from '@kb-labs/studio-data-client';
 
-const { Text, Paragraph, Title } = Typography;
-const { TextArea } = Input;
+const { TextArea } = UIInput;
 
 interface Message {
   id: string;
@@ -175,7 +174,7 @@ export function AIInsightsWidget() {
   });
 
   const sendMessage = async (text: string) => {
-    if (!text.trim()) return;
+    if (!text.trim()) {return;}
 
     const userMessage: Message = {
       id: `user-${Date.now()}`,
@@ -223,12 +222,12 @@ export function AIInsightsWidget() {
   };
 
   return (
-    <Card
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <RobotOutlined />
           <span>AI Insights</span>
-          <Tag color="blue" style={{ marginLeft: 8 }}>Beta</Tag>
+          <UITag color="blue" style={{ marginLeft: 8 }}>Beta</UITag>
         </div>
       }
       style={{ height: '100%' }}
@@ -245,21 +244,21 @@ export function AIInsightsWidget() {
       }}>
         {messages.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-            <BulbOutlined style={{ fontSize: 48, color: '#d9d9d9', marginBottom: 16 }} />
-            <Title level={5} type="secondary">Ask me anything about your system</Title>
-            <Paragraph type="secondary" style={{ fontSize: 13 }}>
+            <BulbOutlined style={{ fontSize: 48, color: 'var(--border-primary)', marginBottom: 16 }} />
+            <UITitle level={5} type="secondary">Ask me anything about your system</UITitle>
+            <UITypographyParagraph type="secondary" style={{ fontSize: 13 }}>
               I can analyze costs, performance, health metrics, and suggest optimizations.
-            </Paragraph>
+            </UITypographyParagraph>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginTop: 16 }}>
               {SUGGESTED_QUESTIONS.slice(0, 4).map((q, i) => (
-                <Tag
+                <UITag
                   key={i}
                   color={getCategoryColor(q.category)}
                   style={{ cursor: 'pointer', padding: '4px 12px' }}
                   onClick={() => sendMessage(q.text)}
                 >
                   {q.text}
-                </Tag>
+                </UITag>
               ))}
             </div>
           </div>
@@ -273,11 +272,11 @@ export function AIInsightsWidget() {
                 flexDirection: msg.role === 'user' ? 'row-reverse' : 'row',
               }}
             >
-              <Avatar
+              <UIAvatar
                 size={32}
                 icon={msg.role === 'user' ? <UserOutlined /> : <RobotOutlined />}
                 style={{
-                  backgroundColor: msg.role === 'user' ? '#1890ff' : '#722ed1',
+                  backgroundColor: msg.role === 'user' ? 'var(--info)' : 'var(--link)',
                   flexShrink: 0,
                 }}
               />
@@ -285,8 +284,8 @@ export function AIInsightsWidget() {
                 maxWidth: '80%',
                 padding: '10px 14px',
                 borderRadius: 12,
-                backgroundColor: msg.role === 'user' ? '#1890ff' : '#f5f5f5',
-                color: msg.role === 'user' ? '#fff' : '#000',
+                backgroundColor: msg.role === 'user' ? 'var(--info)' : 'var(--bg-tertiary)',
+                color: msg.role === 'user' ? 'var(--text-inverse)' : 'var(--text-primary)',
               }}>
                 <div style={{ whiteSpace: 'pre-wrap', fontSize: 13, lineHeight: 1.6 }}>
                   {msg.content.split('**').map((part, i) =>
@@ -296,12 +295,12 @@ export function AIInsightsWidget() {
                 {msg.context && msg.context.length > 0 && (
                   <div style={{ marginTop: 8, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                     {msg.context.map((ctx, i) => (
-                      <Tag key={i} style={{ fontSize: 10, margin: 0 }}>{ctx}</Tag>
+                      <UITag key={i} style={{ fontSize: 10, margin: 0 }}>{ctx}</UITag>
                     ))}
                   </div>
                 )}
                 {msg.role === 'assistant' && (
-                  <Button
+                  <UIButton
                     type="text"
                     size="small"
                     icon={copiedId === msg.id ? <CheckOutlined /> : <CopyOutlined />}
@@ -316,13 +315,13 @@ export function AIInsightsWidget() {
 
         {isTyping && (
           <div style={{ display: 'flex', gap: 12 }}>
-            <Avatar size={32} icon={<RobotOutlined />} style={{ backgroundColor: '#722ed1' }} />
+            <UIAvatar size={32} icon={<RobotOutlined />} style={{ backgroundColor: 'var(--link)' }} />
             <div style={{
               padding: '10px 14px',
               borderRadius: 12,
-              backgroundColor: '#f5f5f5',
+              backgroundColor: 'var(--bg-tertiary)',
             }}>
-              <Spin size="small" /> <Text type="secondary" style={{ marginLeft: 8 }}>Analyzing...</Text>
+              <UISpin size="small" /> <UITypographyText type="secondary" style={{ marginLeft: 8 }}>Analyzing...</UITypographyText>
             </div>
           </div>
         )}
@@ -332,11 +331,11 @@ export function AIInsightsWidget() {
       {/* Input Area */}
       <div style={{
         padding: 12,
-        borderTop: '1px solid #f0f0f0',
+        borderTop: '1px solid var(--border-primary)',
         display: 'flex',
         gap: 8,
       }}>
-        <TextArea
+        <UITypographyTextArea
           value={input}
           onChange={e => setInput(e.target.value)}
           placeholder="Ask about costs, performance, health..."
@@ -349,13 +348,13 @@ export function AIInsightsWidget() {
           }}
           style={{ flex: 1 }}
         />
-        <Button
+        <UIButton
           type="primary"
           icon={<SendOutlined />}
           onClick={() => sendMessage(input)}
           disabled={!input.trim() || isTyping}
         />
       </div>
-    </Card>
+    </UICard>
   );
 }

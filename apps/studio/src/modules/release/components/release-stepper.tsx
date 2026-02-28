@@ -5,19 +5,12 @@
 
 import * as React from 'react';
 import {
-  Steps,
-  Button,
-  Card,
-  Result,
-} from 'antd';
-import {
-  FileTextOutlined,
-  EditOutlined,
-  FolderOutlined,
-  RocketOutlined,
-  ArrowLeftOutlined,
-  ArrowRightOutlined,
-} from '@ant-design/icons';
+  UISteps,
+  UIButton,
+  UICard,
+  UIResult,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { PlanStep } from './steps/plan-step';
 import { ChangelogStep } from './steps/changelog-step';
 import { PreviewStep } from './steps/preview-step';
@@ -39,26 +32,26 @@ export function ReleaseStepper({ selectedScope }: ReleaseStepperProps) {
   const steps = [
     {
       title: 'Plan',
-      icon: <FileTextOutlined />,
+      icon: <UIIcon name="FileTextOutlined" />,
     },
     {
       title: 'Changelog',
-      icon: <EditOutlined />,
+      icon: <UIIcon name="EditOutlined" />,
     },
     {
       title: 'Preview',
-      icon: <FolderOutlined />,
+      icon: <UIIcon name="FolderOutlined" />,
     },
     {
       title: 'Release',
-      icon: <RocketOutlined />,
+      icon: <UIIcon name="RocketOutlined" />,
     },
   ];
 
   const canGoNext = () => {
-    if (currentStep === 0) return planReady;
-    if (currentStep === 1) return changelogReady;
-    if (currentStep === 2) return previewReady;
+    if (currentStep === 0) {return planReady;}
+    if (currentStep === 1) {return changelogReady;}
+    if (currentStep === 2) {return previewReady;}
     return false;
   };
 
@@ -88,33 +81,33 @@ export function ReleaseStepper({ selectedScope }: ReleaseStepperProps) {
 
   if (!selectedScope) {
     return (
-      <Card>
-        <Result
+      <UICard>
+        <UIResult
           status="info"
           title="Select a scope"
           subTitle="Please select a package or monorepo scope to start the release process."
         />
-      </Card>
+      </UICard>
     );
   }
 
   if (releaseComplete) {
     return (
-      <Card>
-        <Result
+      <UICard>
+        <UIResult
           status="success"
           title="Release Complete!"
           subTitle="Your packages have been published successfully."
           extra={[
-            <Button key="history" onClick={() => window.location.href = '/release/history'}>
+            <UIButton key="history" onClick={() => window.location.href = '/release/history'}>
               View History
-            </Button>,
-            <Button key="new" type="primary" onClick={handleStartOver}>
+            </UIButton>,
+            <UIButton key="new" type="primary" onClick={handleStartOver}>
               Start New Release
-            </Button>,
+            </UIButton>,
           ]}
         />
-      </Card>
+      </UICard>
     );
   }
 
@@ -156,9 +149,9 @@ export function ReleaseStepper({ selectedScope }: ReleaseStepperProps) {
   return (
     <div>
       {/* Navigation stepper */}
-      <Card size="small" style={{ marginBottom: 16 }}>
+      <UICard size="small" style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Steps
+          <UISteps
             current={currentStep}
             items={steps}
             type="navigation"
@@ -175,26 +168,26 @@ export function ReleaseStepper({ selectedScope }: ReleaseStepperProps) {
           {/* Navigation buttons */}
           {currentStep < 3 && (
             <div style={{ display: 'flex', gap: 8, marginLeft: 32, flexShrink: 0 }}>
-              <Button
-                icon={<ArrowLeftOutlined />}
+              <UIButton
+                icon={<UIIcon name="ArrowLeftOutlined" />}
                 onClick={handlePrev}
                 disabled={currentStep === 0}
                 size="small"
               >
                 Back
-              </Button>
-              <Button
+              </UIButton>
+              <UIButton
                 type="primary"
                 onClick={handleNext}
                 disabled={!canGoNext()}
                 size="small"
               >
-                Next <ArrowRightOutlined />
-              </Button>
+                Next <UIIcon name="ArrowRightOutlined" />
+              </UIButton>
             </div>
           )}
         </div>
-      </Card>
+      </UICard>
 
       {/* Step content */}
       {renderStepContent()}

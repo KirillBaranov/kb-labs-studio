@@ -48,7 +48,7 @@ export function useNotifications(
   const [notifications, setNotifications] = useState<LogNotification[]>([]);
 
   useEffect(() => {
-    const cleanup = source.subscribeToLogs(
+    return source.subscribeToLogs(
       (log: LogRecord) => {
         // Only track warn and error logs
         if (log.level !== 'warn' && log.level !== 'error') {
@@ -83,8 +83,6 @@ export function useNotifications(
         console.error('Notifications SSE error:', err);
       }
     );
-
-    return cleanup;
   }, [source, maxNotifications]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;

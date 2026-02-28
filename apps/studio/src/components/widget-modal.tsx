@@ -4,8 +4,8 @@
  */
 
 import * as React from 'react';
-import { Modal as AntModal } from 'antd';
-import type { ModalProps } from 'antd';
+import { UIModal } from '@kb-labs/studio-ui-kit';
+import type { UIModalProps } from '@kb-labs/studio-ui-kit';
 import { WidgetRenderer } from './widget-renderer';
 import { useWidgetEvents } from '../hooks/useWidgetEvents';
 
@@ -19,7 +19,7 @@ export interface WidgetModalConfig {
   onClose?: () => void;
 }
 
-export interface WidgetModalProps extends Omit<ModalProps, 'open' | 'onCancel'> {
+export interface WidgetModalProps extends Omit<UIModalProps, 'open' | 'onCancel' | 'children'> {
   config: WidgetModalConfig;
   open: boolean;
   onClose: () => void;
@@ -35,7 +35,7 @@ export function WidgetModal({
   ...modalProps
 }: WidgetModalProps): React.ReactElement {
   return (
-    <AntModal
+    <UIModal
       {...modalProps}
       open={open}
       onCancel={onClose}
@@ -52,7 +52,7 @@ export function WidgetModal({
       ) : (
         <div>No widget configured for this modal</div>
       )}
-    </AntModal>
+    </UIModal>
   );
 }
 

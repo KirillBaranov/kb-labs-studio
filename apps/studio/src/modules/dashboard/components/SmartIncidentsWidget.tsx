@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Card, List, Tag, Badge, Collapse, Alert, Timeline, Typography, Empty, Progress, Segmented, Button } from 'antd';
+import { UICard, UIList, UITag, UIBadge, UIAccordion, UIAlert, UITimeline, UITypographyText, UITypographyParagraph, UIEmptyState, UIProgress, UISegmented, UIButton } from '@kb-labs/studio-ui-kit';
 import {
   AlertOutlined,
   CheckCircleOutlined,
@@ -16,8 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { useIncidents, type Incident, type IncidentSeverity } from '@kb-labs/studio-data-client';
 
-const { Text, Paragraph } = Typography;
-const { Panel } = Collapse;
+
 
 interface RootCause {
   factor: string;
@@ -45,7 +44,7 @@ export function SmartIncidentsWidget() {
 
   // Filter and sort incidents
   const incidents = useMemo(() => {
-    if (!incidentsQuery.data) return [];
+    if (!incidentsQuery.data) {return [];}
     return incidentsQuery.data.sort((a, b) => b.timestamp - a.timestamp);
   }, [incidentsQuery.data]);
 
@@ -133,30 +132,30 @@ export function SmartIncidentsWidget() {
       error_rate: <BugOutlined />,
       latency_spike: <LineChartOutlined />,
       plugin_failure: <ThunderboltOutlined />,
-      cache_failure: <AlertOutlined />,
+      cache_failure: <UIAlertOutlined />,
       resource_exhaustion: <WarningOutlined />,
     };
-    return icons[type] || <AlertOutlined />;
+    return icons[type] || <UIAlertOutlined />;
   };
 
   const isLoading = incidentsQuery.isLoading;
   const hasError = incidentsQuery.isError;
 
   return (
-    <Card
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <AlertOutlined />
+            <UIAlertOutlined />
             <span>Smart Incidents</span>
             {incidents.length > 0 && (
-              <Badge
+              <UIBadge
                 count={incidents.length}
-                style={{ backgroundColor: incidents.some(i => i.severity === 'critical') ? '#ff4d4f' : '#faad14' }}
+                style={{ backgroundColor: incidents.some(i => i.severity === 'critical') ? 'var(--error)' : 'var(--warning)' }}
               />
             )}
           </div>
-          <Segmented
+          <UISegmented
             options={[
               { label: 'All', value: 'all' },
               { label: 'Critical', value: 'critical' },
@@ -178,7 +177,7 @@ export function SmartIncidentsWidget() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#999',
+          color: 'var(--text-tertiary)',
         }}>
           Loading incidents...
         </div>
@@ -188,18 +187,18 @@ export function SmartIncidentsWidget() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#ff4d4f',
+          color: 'var(--error)',
         }}>
           Failed to load incidents
         </div>
       ) : incidents.length === 0 ? (
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
+        <UIEmptyState
+          image={UIEmptyState.PRESENTED_IMAGE_SIMPLE}
           description="No incidents detected"
           style={{ marginTop: 40 }}
         />
       ) : (
-        <List
+        <UIList
           dataSource={incidents}
           renderItem={(incident) => {
             const config = getSeverityConfig(incident.severity);
@@ -207,7 +206,7 @@ export function SmartIncidentsWidget() {
             const isExpanded = expandedIncidents.includes(incident.id);
 
             return (
-              <List.Item style={{ padding: '12px 0', borderBottom: '1px solid #f0f0f0' }}>
+              <UIList.Item style={{ padding: '12px 0', borderBottom: '1px solid var(--border-primary)' }}>
                 <div style={{ width: '100%' }}>
                   {/* Compact header - always visible */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -216,39 +215,39 @@ export function SmartIncidentsWidget() {
                     </span>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-                        <Text
+                        <UITypographyText
                           strong
                           style={{ fontSize: 14, cursor: 'pointer' }}
                           onClick={() => navigate(`/observability/incidents/${incident.id}`)}
                         >
                           {incident.title}
-                        </Text>
-                        <Tag color={config.color} icon={config.icon} style={{ margin: 0 }}>
+                        </UITypographyText>
+                        <UITag color={config.color} icon={config.icon} style={{ margin: 0 }}>
                           {incident.severity.toUpperCase()}
-                        </Tag>
+                        </UITag>
                         {incident.resolvedAt && (
-                          <Tag color="green" icon={<CheckCircleOutlined />} style={{ margin: 0 }}>
+                          <UITag color="green" icon={<CheckCircleOutlined />} style={{ margin: 0 }}>
                             RESOLVED
-                          </Tag>
+                          </UITag>
                         )}
                       </div>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
+                      <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                         {new Date(incident.timestamp).toLocaleString()}
                         {incident.affectedServices && incident.affectedServices.length > 0 && (
                           <> • Affected: {incident.affectedServices.slice(0, 2).join(', ')}{incident.affectedServices.length > 2 && '...'}</>
                         )}
-                      </Text>
+                      </UITypographyText>
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <Button
+                      <UIButton
                         type="text"
                         size="small"
                         icon={<EyeOutlined />}
                         onClick={() => navigate(`/observability/incidents/${incident.id}`)}
                       >
                         View
-                      </Button>
-                      <Button
+                      </UIButton>
+                      <UIButton
                         type="text"
                         size="small"
                         icon={isExpanded ? <UpOutlined /> : <DownOutlined />}
@@ -261,7 +260,7 @@ export function SmartIncidentsWidget() {
                         }}
                       >
                         {isExpanded ? 'Hide' : 'Details'}
-                      </Button>
+                      </UIButton>
                     </div>
                   </div>
 
@@ -269,55 +268,55 @@ export function SmartIncidentsWidget() {
                   {isExpanded && (
                     <div style={{ marginTop: 12, paddingLeft: 32 }}>
                       {/* Summary */}
-                      <Paragraph style={{ marginBottom: 12, color: '#666', fontSize: 13 }}>
+                      <UITypographyParagraph style={{ marginBottom: 12, color: 'var(--text-secondary)', fontSize: 13 }}>
                         {incident.details}
-                      </Paragraph>
+                      </UITypographyParagraph>
 
                       {/* Quick Stats */}
                       <div style={{ display: 'flex', gap: 16, marginBottom: 12 }}>
                         {incident.relatedData?.logs && (
-                          <Text type="secondary" style={{ fontSize: 12 }}>
+                          <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                             📋 {incident.relatedData.logs.errorCount} errors
-                          </Text>
+                          </UITypographyText>
                         )}
                         {incident.relatedData?.metrics?.before && incident.relatedData?.metrics?.during && (
-                          <Text type="secondary" style={{ fontSize: 12 }}>
+                          <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                             📈 {incident.relatedData.metrics.during.errorRate?.toFixed(1)}% error rate
                             {incident.relatedData.metrics.before.errorRate &&
                               ` (was ${incident.relatedData.metrics.before.errorRate.toFixed(1)}%)`
                             }
-                          </Text>
+                          </UITypographyText>
                         )}
                         {incident.relatedData?.metrics?.topSlowest && incident.relatedData.metrics.topSlowest.length > 0 && (
-                          <Text type="secondary" style={{ fontSize: 12 }}>
+                          <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                             🐌 {incident.relatedData.metrics.topSlowest.length} slow endpoints
-                          </Text>
+                          </UITypographyText>
                         )}
                       </div>
 
                       {/* Root Cause Summary */}
                       {rca.causalChain.length > 0 && (
                         <div style={{ marginBottom: 12 }}>
-                          <Text strong style={{ fontSize: 13 }}>🔍 Root Cause:</Text>
+                          <UITypographyText strong style={{ fontSize: 13 }}>🔍 Root Cause:</UITypographyText>
                           <div style={{ marginTop: 4 }}>
                             {rca.evidence.slice(0, 2).map((ev, index) => (
                               <div key={index} style={{ marginTop: 4, paddingLeft: 16 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                  <Progress
+                                  <UIProgress
                                     type="line"
                                     percent={ev.correlation * 100}
                                     size="small"
                                     style={{ width: 80 }}
                                     format={(percent) => `${percent?.toFixed(0)}%`}
                                   />
-                                  <Text style={{ fontSize: 12 }}>{ev.factor}</Text>
+                                  <UITypographyText style={{ fontSize: 12 }}>{ev.factor}</UITypographyText>
                                 </div>
                               </div>
                             ))}
                             {rca.evidence.length > 2 && (
-                              <Text type="secondary" style={{ fontSize: 12, marginLeft: 16 }}>
+                              <UITypographyText type="secondary" style={{ fontSize: 12, marginLeft: 16 }}>
                                 +{rca.evidence.length - 2} more...
-                              </Text>
+                              </UITypographyText>
                             )}
                           </div>
                         </div>
@@ -325,7 +324,7 @@ export function SmartIncidentsWidget() {
 
                       {/* Top Recommendation */}
                       {rca.recommendations.length > 0 && (
-                        <Alert
+                        <UIAlert
                           message="Top Recommendation"
                           description={rca.recommendations[0]}
                           type="info"
@@ -336,11 +335,11 @@ export function SmartIncidentsWidget() {
                     </div>
                   )}
                 </div>
-              </List.Item>
+              </UIList.Item>
             );
           }}
         />
       )}
-    </Card>
+    </UICard>
   );
 }

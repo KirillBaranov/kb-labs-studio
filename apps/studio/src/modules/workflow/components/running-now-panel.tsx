@@ -4,17 +4,19 @@
  */
 
 import * as React from 'react';
-import { Collapse, List, Progress, Space, Typography, Badge, Button } from 'antd';
 import {
-  ThunderboltOutlined,
-  ReloadOutlined,
-  ClockCircleOutlined,
-} from '@ant-design/icons';
+  UIAccordion,
+  UIList,
+  UIProgress,
+  UISpace,
+  UITypographyText,
+  UIBadge,
+  UIButton,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useQuery } from '@tanstack/react-query';
 import { useDataSources } from '@/providers/data-sources-provider';
 import type { DashboardStatsResponse } from '@kb-labs/workflow-contracts';
-
-const { Text } = Typography;
 
 export function RunningNowPanel() {
   const sources = useDataSources();
@@ -30,11 +32,11 @@ export function RunningNowPanel() {
   const hasRunningJobs = activeExecutions.length > 0;
 
   const formatDuration = (ms?: number) => {
-    if (!ms) return '—';
+    if (!ms) {return '—';}
     const seconds = Math.floor(ms / 1000);
-    if (seconds < 60) return `${seconds}s`;
+    if (seconds < 60) {return `${seconds}s`;}
     const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ${seconds % 60}s`;
+    if (minutes < 60) {return `${minutes}m ${seconds % 60}s`;}
     const hours = Math.floor(minutes / 60);
     return `${hours}h ${minutes % 60}m`;
   };
@@ -43,17 +45,17 @@ export function RunningNowPanel() {
     {
       key: 'running',
       label: (
-        <Space>
-          <ThunderboltOutlined className="text-info" />
-          <Text className="typo-label">Running Now</Text>
-          <Badge count={activeExecutions.length} className="bg-theme-primary" />
-        </Space>
+        <UISpace>
+          <UIIcon name="ThunderboltOutlined" className="text-info" />
+          <UITypographyText className="typo-label">Running Now</UITypographyText>
+          <UIBadge count={activeExecutions.length} className="bg-theme-primary" />
+        </UISpace>
       ),
       extra: (
-        <Button
+        <UIButton
           type="text"
           size="small"
-          icon={<ReloadOutlined spin={isLoading} />}
+          icon={<UIIcon name="ReloadOutlined" spin={isLoading} />}
           onClick={(e) => {
             e.stopPropagation();
             refetch();
@@ -61,59 +63,59 @@ export function RunningNowPanel() {
         />
       ),
       children: activeExecutions.length > 0 ? (
-        <List
+        <UIList
           dataSource={activeExecutions}
           renderItem={(execution) => (
-            <List.Item>
-              <List.Item.Meta
+            <UIList.Item>
+              <UIList.Item.Meta
                 title={
-                  <Space>
-                    <Text className="typo-body">
+                  <UISpace>
+                    <UITypographyText className="typo-body">
                       {execution.workflowName || execution.type}
-                    </Text>
+                    </UITypographyText>
                     {execution.progress !== undefined && (
-                      <Text className="typo-caption text-secondary">
+                      <UITypographyText className="typo-caption text-secondary">
                         {execution.progress}%
-                      </Text>
+                      </UITypographyText>
                     )}
-                  </Space>
+                  </UISpace>
                 }
                 description={
-                  <Space direction="vertical" className="gap-tight" style={{ width: '100%' }}>
+                  <UISpace direction="vertical" className="gap-tight" style={{ width: '100%' }}>
                     {execution.progressMessage && (
-                      <Text className="typo-description">{execution.progressMessage}</Text>
+                      <UITypographyText className="typo-description">{execution.progressMessage}</UITypographyText>
                     )}
-                    <Space className="gap-item">
-                      <ClockCircleOutlined className="text-secondary" />
-                      <Text className="typo-caption text-secondary">
+                    <UISpace className="gap-item">
+                      <UIIcon name="ClockCircleOutlined" className="text-secondary" />
+                      <UITypographyText className="typo-caption text-secondary">
                         {formatDuration(execution.durationMs)}
-                      </Text>
-                      <Text className="typo-caption text-tertiary">
+                      </UITypographyText>
+                      <UITypographyText className="typo-caption text-tertiary">
                         ID: {execution.id.slice(0, 8)}
-                      </Text>
-                    </Space>
-                  </Space>
+                      </UITypographyText>
+                    </UISpace>
+                  </UISpace>
                 }
               />
               {execution.progress !== undefined && (
-                <Progress
+                <UIProgress
                   percent={execution.progress}
                   size="small"
                   status="active"
                   style={{ width: 120 }}
                 />
               )}
-            </List.Item>
+            </UIList.Item>
           )}
         />
       ) : (
-        <Text className="typo-description text-secondary">No active executions</Text>
+        <UITypographyText className="typo-description text-secondary">No active executions</UITypographyText>
       ),
     },
   ];
 
   return (
-    <Collapse
+    <UIAccordion
       items={items}
       defaultActiveKey={hasRunningJobs ? ['running'] : []}
       style={{

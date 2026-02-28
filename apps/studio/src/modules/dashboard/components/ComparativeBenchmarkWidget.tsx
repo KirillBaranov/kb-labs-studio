@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Card, Table, Tag, Segmented, Space, Typography, Tooltip, Progress } from 'antd';
+import { UICard, UITable, UITag, UISegmented, UISpace, UITypographyText, UITitle, UITooltip, UIProgress } from '@kb-labs/studio-ui-kit';
 import {
   HolderOutlined,
   BarChartOutlined,
@@ -8,11 +8,11 @@ import {
   ClockCircleOutlined,
   FireOutlined,
 } from '@ant-design/icons';
-import { KBBarChart } from '@kb-labs/studio-ui-react';
+import { UIBarChart } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { usePrometheusMetrics, useAdaptersLLMUsage } from '@kb-labs/studio-data-client';
 
-const { Text, Title } = Typography;
+
 
 interface BenchmarkEntry {
   name: string;
@@ -40,7 +40,7 @@ export function ComparativeBenchmarkWidget() {
 
   // Calculate benchmark scores for plugins
   const pluginBenchmarks = useMemo(() => {
-    if (!metrics.data?.perPlugin) return [];
+    if (!metrics.data?.perPlugin) {return [];}
 
     const entries: BenchmarkEntry[] = metrics.data.perPlugin.map((plugin) => {
       const requests = plugin.requests ?? 0;
@@ -73,9 +73,9 @@ export function ComparativeBenchmarkWidget() {
     entries.sort((a, b) => b.score - a.score);
     entries.forEach((entry, index) => {
       entry.rank = index + 1;
-      if (index === 0) entry.badge = 'gold';
-      else if (index === 1) entry.badge = 'silver';
-      else if (index === 2) entry.badge = 'bronze';
+      if (index === 0) {entry.badge = 'gold';}
+      else if (index === 1) {entry.badge = 'silver';}
+      else if (index === 2) {entry.badge = 'bronze';}
     });
 
     return entries;
@@ -83,7 +83,7 @@ export function ComparativeBenchmarkWidget() {
 
   // Calculate benchmark scores for adapters (LLM)
   const adapterBenchmarks = useMemo(() => {
-    if (!llmUsage.data?.byModel) return [];
+    if (!llmUsage.data?.byModel) {return [];}
 
     const entries: BenchmarkEntry[] = Object.entries(llmUsage.data.byModel).map(([model, stats]) => {
       const requests = stats.requests ?? 0;
@@ -114,9 +114,9 @@ export function ComparativeBenchmarkWidget() {
     entries.sort((a, b) => b.score - a.score);
     entries.forEach((entry, index) => {
       entry.rank = index + 1;
-      if (index === 0) entry.badge = 'gold';
-      else if (index === 1) entry.badge = 'silver';
-      else if (index === 2) entry.badge = 'bronze';
+      if (index === 0) {entry.badge = 'gold';}
+      else if (index === 1) {entry.badge = 'silver';}
+      else if (index === 2) {entry.badge = 'bronze';}
     });
 
     return entries;
@@ -158,10 +158,10 @@ export function ComparativeBenchmarkWidget() {
     legend: false,
     color: (datum: any) => {
       const entry = sortedData.find(e => e.name === datum.name);
-      if (entry?.badge === 'gold') return '#FFD700';
-      if (entry?.badge === 'silver') return '#C0C0C0';
-      if (entry?.badge === 'bronze') return '#CD7F32';
-      return '#1890ff';
+      if (entry?.badge === 'gold') {return 'var(--warning)';}
+      if (entry?.badge === 'silver') {return 'var(--text-tertiary)';}
+      if (entry?.badge === 'bronze') {return 'var(--warning)';}
+      return 'var(--info)';
     },
     label: {
       position: 'right' as const,
@@ -176,16 +176,16 @@ export function ComparativeBenchmarkWidget() {
   };
 
   const getBadgeIcon = (badge?: 'gold' | 'silver' | 'bronze') => {
-    if (badge === 'gold') return <TrophyOutlined style={{ color: '#FFD700', fontSize: 18 }} />;
-    if (badge === 'silver') return <TrophyOutlined style={{ color: '#C0C0C0', fontSize: 18 }} />;
-    if (badge === 'bronze') return <TrophyOutlined style={{ color: '#CD7F32', fontSize: 18 }} />;
+    if (badge === 'gold') {return <TrophyOutlined style={{ color: 'var(--warning)', fontSize: 18 }} />;}
+    if (badge === 'silver') {return <TrophyOutlined style={{ color: 'var(--text-tertiary)', fontSize: 18 }} />;}
+    if (badge === 'bronze') {return <TrophyOutlined style={{ color: 'var(--warning)', fontSize: 18 }} />;}
     return null;
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return '#52c41a';
-    if (score >= 60) return '#faad14';
-    return '#ff4d4f';
+    if (score >= 80) {return 'var(--success)';}
+    if (score >= 60) {return 'var(--warning)';}
+    return 'var(--error)';
   };
 
   const columns = [
@@ -197,7 +197,7 @@ export function ComparativeBenchmarkWidget() {
       render: (rank: number, record: BenchmarkEntry) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {getBadgeIcon(record.badge)}
-          <Text strong>#{rank}</Text>
+          <UITypographyText strong>#{rank}</UITypographyText>
         </div>
       ),
     },
@@ -205,7 +205,7 @@ export function ComparativeBenchmarkWidget() {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      render: (name: string) => <Text strong>{name}</Text>,
+      render: (name: string) => <UITypographyText strong>{name}</UITypographyText>,
     },
     {
       title: 'Score',
@@ -214,7 +214,7 @@ export function ComparativeBenchmarkWidget() {
       width: 120,
       render: (score: number) => (
         <div>
-          <Progress
+          <UIProgress
             percent={score}
             size="small"
             strokeColor={getScoreColor(score)}
@@ -229,12 +229,12 @@ export function ComparativeBenchmarkWidget() {
       dataIndex: 'requests',
       key: 'requests',
       render: (requests: number) => (
-        <Tooltip title="Total requests">
-          <Space>
-            <ThunderboltOutlined style={{ color: '#1890ff' }} />
-            <Text>{requests.toLocaleString()}</Text>
-          </Space>
-        </Tooltip>
+        <UITooltip title="Total requests">
+          <UISpace>
+            <ThunderboltOutlined style={{ color: 'var(--info)' }} />
+            <UITypographyText>{requests.toLocaleString()}</UITypographyText>
+          </UISpace>
+        </UITooltip>
       ),
       sorter: (a: BenchmarkEntry, b: BenchmarkEntry) => a.requests - b.requests,
     },
@@ -243,14 +243,14 @@ export function ComparativeBenchmarkWidget() {
       dataIndex: 'avgLatency',
       key: 'avgLatency',
       render: (latency: number) => {
-        const color = latency < 200 ? '#52c41a' : latency < 500 ? '#faad14' : '#ff4d4f';
+        const color = latency < 200 ? 'var(--success)' : latency < 500 ? 'var(--warning)' : 'var(--error)';
         return (
-          <Tooltip title="Average response time">
-            <Space>
+          <UITooltip title="Average response time">
+            <UISpace>
               <ClockCircleOutlined style={{ color }} />
-              <Text style={{ color }}>{latency.toFixed(0)}ms</Text>
-            </Space>
-          </Tooltip>
+              <UITypographyText style={{ color }}>{latency.toFixed(0)}ms</UITypographyText>
+            </UISpace>
+          </UITooltip>
         );
       },
       sorter: (a: BenchmarkEntry, b: BenchmarkEntry) => a.avgLatency - b.avgLatency,
@@ -260,11 +260,11 @@ export function ComparativeBenchmarkWidget() {
       dataIndex: 'errorRate',
       key: 'errorRate',
       render: (errorRate: number) => {
-        const color = errorRate < 1 ? '#52c41a' : errorRate < 5 ? '#faad14' : '#ff4d4f';
+        const color = errorRate < 1 ? 'var(--success)' : errorRate < 5 ? 'var(--warning)' : 'var(--error)';
         return (
-          <Tag color={color}>
+          <UITag color={color}>
             {errorRate.toFixed(2)}%
-          </Tag>
+          </UITag>
         );
       },
       sorter: (a: BenchmarkEntry, b: BenchmarkEntry) => a.errorRate - b.errorRate,
@@ -272,17 +272,17 @@ export function ComparativeBenchmarkWidget() {
   ];
 
   return (
-    <Card
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: '#999' }} />
+          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
           <BarChartOutlined />
           <span>Comparative Benchmarks</span>
         </div>
       }
       extra={
-        <Space>
-          <Segmented
+        <UISpace>
+          <UISegmented
             value={category}
             onChange={(value) => setCategory(value as BenchmarkCategory)}
             options={[
@@ -290,7 +290,7 @@ export function ComparativeBenchmarkWidget() {
               { label: 'Adapters', value: 'adapters' },
             ]}
           />
-          <Segmented
+          <UISegmented
             value={sortBy}
             onChange={(value) => setSortBy(value as SortBy)}
             options={[
@@ -300,7 +300,7 @@ export function ComparativeBenchmarkWidget() {
               { label: 'Errors', value: 'errorRate' },
             ]}
           />
-        </Space>
+        </UISpace>
       }
       style={{ height: '100%' }}
       bodyStyle={{ padding: '16px', maxHeight: 'calc(100% - 57px)', overflowY: 'auto' }}
@@ -308,19 +308,19 @@ export function ComparativeBenchmarkWidget() {
       {/* Top Performers Chart */}
       <div style={{ marginBottom: 16 }}>
         <Title level={5}>
-          <FireOutlined style={{ color: '#ff4d4f' }} /> Top 5 Performers
+          <FireOutlined style={{ color: 'var(--error)' }} /> Top 5 Performers
         </Title>
         {chartData.length > 0 ? (
-          <KBBarChart {...chartConfig} />
+          <UIBarChart {...chartConfig} />
         ) : (
-          <div style={{ textAlign: 'center', padding: 40, color: '#999' }}>
+          <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-tertiary)' }}>
             No data available
           </div>
         )}
       </div>
 
       {/* Benchmark Table */}
-      <Table
+      <UITable
         dataSource={sortedData}
         columns={columns}
         pagination={{ pageSize: 10 }}
@@ -330,9 +330,9 @@ export function ComparativeBenchmarkWidget() {
       />
 
       {/* Scoring Methodology */}
-      <div style={{ marginTop: 16, padding: 12, background: '#f0f5ff', borderRadius: 8 }}>
-        <Text strong>Scoring Methodology:</Text>
-        <div style={{ marginTop: 8, fontSize: 12, color: '#666' }}>
+      <div style={{ marginTop: 16, padding: 12, background: 'var(--accent-subtle)', borderRadius: 8 }}>
+        <UITypographyText strong>Scoring Methodology:</UITypographyText>
+        <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text-secondary)' }}>
           {category === 'plugins' ? (
             <>
               • <b>Latency (40%)</b>: Lower is better (0ms=100pts, 1000ms=0pts)
@@ -350,6 +350,6 @@ export function ComparativeBenchmarkWidget() {
           )}
         </div>
       </div>
-    </Card>
+    </UICard>
   );
 }

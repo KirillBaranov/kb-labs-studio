@@ -94,7 +94,7 @@ export function useAdaptersStorageUsage(source: AdaptersDataSource, options?: Da
  */
 export function useAdaptersLLMDailyStats(source: AdaptersDataSource, options?: DateRangeOptions) {
   return useQuery({
-    queryKey: ['adapters', 'llm', 'daily-stats', options?.from, options?.to],
+    queryKey: ['adapters', 'llm', 'daily-stats', options?.from, options?.to, options?.models],
     queryFn: () => source.getLLMDailyStats(options),
     refetchInterval: 60000, // Daily stats change slower
     staleTime: 50000,

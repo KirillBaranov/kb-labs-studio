@@ -4,16 +4,10 @@
  */
 
 import * as React from 'react';
-import { Row, Col, Card, Statistic, Progress, Tag, Alert, Spin, Button, Space } from 'antd';
 import {
-  CheckCircleOutlined,
-  WarningOutlined,
-  FileTextOutlined,
-  CodeOutlined,
-  DatabaseOutlined,
-  ClockCircleOutlined,
-  ThunderboltOutlined,
-} from '@ant-design/icons';
+  UIRow, UICol, UICard, UIStatistic, UIProgress, UITag, UIAlert,
+  UISpin, UIButton, UISpace, UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import {
   useQualityHealth,
@@ -36,7 +30,7 @@ export function OverviewTab() {
   if (isLoading) {
     return (
       <div style={{ textAlign: 'center', padding: '40px' }}>
-        <Spin size="large" />
+        <UISpin size="large" />
       </div>
     );
   }
@@ -59,15 +53,15 @@ export function OverviewTab() {
   };
 
   const getHealthStatus = (score?: number): 'success' | 'exception' | 'normal' => {
-    if (!score) return 'normal';
-    if (score >= 80) return 'success';
-    if (score < 60) return 'exception';
+    if (!score) {return 'normal';}
+    if (score >= 80) {return 'success';}
+    if (score < 60) {return 'exception';}
     return 'normal';
   };
 
   const getSeverityType = (severity: string): 'error' | 'warning' | 'info' => {
-    if (severity === 'high') return 'error';
-    if (severity === 'medium') return 'warning';
+    if (severity === 'high') {return 'error';}
+    if (severity === 'medium') {return 'warning';}
     return 'info';
   };
 
@@ -75,10 +69,10 @@ export function OverviewTab() {
     <div>
       {/* Stale Packages Alert */}
       {!staleLoading && staleData && staleData.totalStale > 0 && (
-        <Alert
+        <UIAlert
           type="error"
           showIcon
-          icon={<ClockCircleOutlined />}
+          icon={<UIIcon name="ClockCircleOutlined" />}
           message={`${staleData.totalStale} stale package${staleData.totalStale > 1 ? 's' : ''} detected`}
           description={
             <div>
@@ -98,12 +92,12 @@ export function OverviewTab() {
                   </ul>
                 </div>
               )}
-              <Space>
-                <Button type="primary" danger icon={<ThunderboltOutlined />} size="small">
+              <UISpace>
+                <UIButton type="primary" danger icon={<UIIcon name="ThunderboltOutlined" />} size="small">
                   Rebuild All Stale
-                </Button>
-                <Button size="small">View Details</Button>
-              </Space>
+                </UIButton>
+                <UIButton size="small">View Details</UIButton>
+              </UISpace>
             </div>
           }
           style={{ marginBottom: 24 }}
@@ -111,11 +105,11 @@ export function OverviewTab() {
       )}
 
       {/* Health Score Card */}
-      <Card title="Health Score" style={{ marginBottom: 24 }}>
-        <Row gutter={24}>
-          <Col span={12}>
+      <UICard title="Health Score" style={{ marginBottom: 24 }}>
+        <UIRow gutter={24}>
+          <UICol span={12}>
             <div style={{ textAlign: 'center' }}>
-              <Progress
+              <UIProgress
                 type="circle"
                 percent={healthData?.score ?? 0}
                 size={180}
@@ -126,97 +120,97 @@ export function OverviewTab() {
                 }}
               />
               <div style={{ marginTop: 16 }}>
-                <Tag color={getGradeColor(healthData?.grade)} style={{ fontSize: 16 }}>
+                <UITag color={getGradeColor(healthData?.grade)} style={{ fontSize: 16 }}>
                   Grade {healthData?.grade}
-                </Tag>
+                </UITag>
               </div>
             </div>
-          </Col>
-          <Col span={12}>
-            <Statistic
+          </UICol>
+          <UICol span={12}>
+            <UIStatistic
               title="Packages"
               value={statsData?.packages ?? 0}
-              prefix={<DatabaseOutlined />}
+              prefix={<UIIcon name="DatabaseOutlined" />}
             />
-            <Statistic
+            <UIStatistic
               title="Lines of Code"
               value={statsData?.loc ?? 0}
-              prefix={<CodeOutlined />}
+              prefix={<UIIcon name="CodeOutlined" />}
               style={{ marginTop: 16 }}
             />
-            <Statistic
+            <UIStatistic
               title="Total Size"
               value={statsData?.size ?? 'N/A'}
-              prefix={<FileTextOutlined />}
+              prefix={<UIIcon name="FileTextOutlined" />}
               style={{ marginTop: 16 }}
             />
-          </Col>
-        </Row>
-      </Card>
+          </UICol>
+        </UIRow>
+      </UICard>
 
       {/* Issues Breakdown */}
       {healthData?.issues && healthData.issues.length > 0 && (
-        <Card title="Health Issues" style={{ marginBottom: 24 }}>
-          <Row gutter={16}>
+        <UICard title="Health Issues" style={{ marginBottom: 24 }}>
+          <UIRow gutter={16}>
             {healthData.issues.map((issue, idx) => (
-              <Col span={24} key={idx} style={{ marginBottom: 12 }}>
-                <Alert
+              <UICol span={24} key={idx} style={{ marginBottom: 12 }}>
+                <UIAlert
                   message={
-                    <Space>
+                    <UISpace>
                       <span>{issue.message}</span>
-                      <Tag color={getSeverityType(issue.severity) === 'error' ? 'red' : 'orange'}>
+                      <UITag color={getSeverityType(issue.severity) === 'error' ? 'red' : 'orange'}>
                         {issue.severity}
-                      </Tag>
-                      <Tag>{issue.count} affected</Tag>
-                      <Tag color="red">-{issue.penalty} points</Tag>
-                    </Space>
+                      </UITag>
+                      <UITag>{issue.count} affected</UITag>
+                      <UITag color="red">-{issue.penalty} points</UITag>
+                    </UISpace>
                   }
                   type={getSeverityType(issue.severity)}
                   showIcon
                   icon={
                     getSeverityType(issue.severity) === 'error' ? (
-                      <WarningOutlined />
+                      <UIIcon name="WarningOutlined" />
                     ) : (
-                      <CheckCircleOutlined />
+                      <UIIcon name="CheckCircleOutlined" />
                     )
                   }
                 />
-              </Col>
+              </UICol>
             ))}
-          </Row>
-        </Card>
+          </UIRow>
+        </UICard>
       )}
 
       {/* Quick Stats */}
-      <Row gutter={16}>
-        <Col span={8}>
-          <Card>
-            <Statistic
+      <UIRow gutter={16}>
+        <UICol span={8}>
+          <UICard>
+            <UIStatistic
               title="Packages"
               value={statsData?.packages ?? 0}
-              prefix={<DatabaseOutlined />}
+              prefix={<UIIcon name="DatabaseOutlined" />}
             />
-          </Card>
-        </Col>
-        <Col span={8}>
-          <Card>
-            <Statistic
+          </UICard>
+        </UICol>
+        <UICol span={8}>
+          <UICard>
+            <UIStatistic
               title="Lines of Code"
               value={statsData?.loc ?? 0}
-              prefix={<CodeOutlined />}
+              prefix={<UIIcon name="CodeOutlined" />}
             />
-          </Card>
-        </Col>
-        <Col span={8}>
-          <Card>
-            <Statistic
+          </UICard>
+        </UICol>
+        <UICol span={8}>
+          <UICard>
+            <UIStatistic
               title="Total Size"
               value={statsData?.size ?? 'N/A'}
-              prefix={<FileTextOutlined />}
+              prefix={<UIIcon name="FileTextOutlined" />}
             />
-          </Card>
-        </Col>
-      </Row>
+          </UICard>
+        </UICol>
+      </UIRow>
     </div>
   );
 }

@@ -1,8 +1,11 @@
+import { KBPageContainer, KBPageHeader, KBSection } from '@/components/ui';
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { Button, Descriptions, Table, Typography, Alert, List } from 'antd'
+import {
+  UIButton, UIDescriptions, UITable, UITypographyText, UITypographyParagraph,
+  UITitle, UIAlert, UIList,
+} from '@kb-labs/studio-ui-kit'
 import type { ColumnsType } from 'antd/es/table'
-import { KBPageContainer, KBPageHeader, KBSection } from '@kb-labs/studio-ui-react'
 import { useDataSources } from '@/providers/data-sources-provider'
 import {
   useWorkflowRun,
@@ -13,7 +16,9 @@ import {
 import type { WorkflowRun, JobRun, WorkflowPresenterEvent } from '@kb-labs/studio-data-client'
 import { WorkflowStatusBadge } from '@/components/workflow-status-badge'
 
-const { Paragraph, Text, Title } = Typography
+const Text = UITypographyText
+const Paragraph = UITypographyParagraph
+const Title = UITitle
 
 export function WorkflowRunPage() {
   const params = useParams<{ runId: string }>()
@@ -73,45 +78,45 @@ export function WorkflowRunPage() {
         title={`Workflow Run ${runId ?? ''}`}
         description="Detailed status of the workflow execution"
         extra={
-          <Button onClick={() => refetch()} disabled={isLoading}>
+          <UIButton onClick={() => refetch()} disabled={isLoading}>
             Refresh
-          </Button>
+          </UIButton>
         }
       />
 
-      {error && <Alert type="error" message="Failed to load workflow run" description={String(error)} closable />}
+      {error && <UIAlert type="error" message="Failed to load workflow run" description={String(error)} closable />}
 
       <KBSection>
         {isLoading && <Text>Loading workflow run...</Text>}
         {!isLoading && !run && !error && <Text>Workflow run not found.</Text>}
         {run && (
-          <Descriptions bordered column={1} title="Run Metadata" size="small">
-            <Descriptions.Item label="Run ID">
+          <UIDescriptions bordered column={1} title="Run Metadata" size="small">
+            <UIDescriptions.Item label="Run ID">
               <code>{run.id}</code>
-            </Descriptions.Item>
-            <Descriptions.Item label="Workflow">
+            </UIDescriptions.Item>
+            <UIDescriptions.Item label="Workflow">
               {run.name}@{run.version}
-            </Descriptions.Item>
-            <Descriptions.Item label="Status">
+            </UIDescriptions.Item>
+            <UIDescriptions.Item label="Status">
               <WorkflowStatusBadge status={run.status} />
-            </Descriptions.Item>
-            <Descriptions.Item label="Trigger">
+            </UIDescriptions.Item>
+            <UIDescriptions.Item label="Trigger">
               {run.trigger.type} — {run.trigger.actor ?? 'unknown'}
-            </Descriptions.Item>
-            <Descriptions.Item label="Queued At">{run.queuedAt}</Descriptions.Item>
-            <Descriptions.Item label="Started At">{run.startedAt ?? '—'}</Descriptions.Item>
-            <Descriptions.Item label="Finished At">{run.finishedAt ?? '—'}</Descriptions.Item>
+            </UIDescriptions.Item>
+            <UIDescriptions.Item label="Queued At">{run.queuedAt}</UIDescriptions.Item>
+            <UIDescriptions.Item label="Started At">{run.startedAt ?? '—'}</UIDescriptions.Item>
+            <UIDescriptions.Item label="Finished At">{run.finishedAt ?? '—'}</UIDescriptions.Item>
             {run.result?.summary && (
-              <Descriptions.Item label="Summary">{run.result.summary}</Descriptions.Item>
+              <UIDescriptions.Item label="Summary">{run.result.summary}</UIDescriptions.Item>
             )}
-          </Descriptions>
+          </UIDescriptions>
         )}
       </KBSection>
 
       {run && (
         <KBSection>
           <Title level={4}>Jobs</Title>
-          <Table
+          <UITable
             rowKey="id"
             dataSource={run.jobs}
             columns={jobColumns}
@@ -125,7 +130,7 @@ export function WorkflowRunPage() {
         <KBSection>
           <Title level={4}>Result Metrics</Title>
           {run.result.metrics ? (
-            <List
+            <UIList
               bordered
               size="small"
               dataSource={Object.entries(run.result.metrics).map(([key, value]) => ({
@@ -133,17 +138,17 @@ export function WorkflowRunPage() {
                 value,
               }))}
               renderItem={({ key, value }) => (
-                <List.Item>
+                <UIList.Item>
                   <Text strong>{key}</Text>
                   <span style={{ marginLeft: 8 }}>{String(value ?? '—')}</span>
-                </List.Item>
+                </UIList.Item>
               )}
             />
           ) : (
             <Text type="secondary">No metrics recorded.</Text>
           )}
           {run.result.error && (
-            <Alert
+            <UIAlert
               style={{ marginTop: 16 }}
               type="error"
               message={run.result.error.message}
@@ -159,14 +164,14 @@ export function WorkflowRunPage() {
       {run && (
         <KBSection>
           <Title level={4}>Logs</Title>
-          {!isConnected && <Alert type="info" message="Connecting to log stream..." showIcon />}
-          {logError && <Alert type="error" message="Log stream error" description={logError.message} />}
-          <List
+          {!isConnected && <UIAlert type="info" message="Connecting to log stream..." showIcon />}
+          {logError && <UIAlert type="error" message="Log stream error" description={logError.message} />}
+          <UIList
             bordered
             size="small"
             dataSource={events}
             renderItem={(item) => (
-              <List.Item>
+              <UIList.Item>
                 <Paragraph style={{ marginBottom: 0 }}>
                   <Text code>{item.timestamp ?? ''}</Text>{' '}
                   <Text strong>{item.type}</Text>{' '}
@@ -174,7 +179,7 @@ export function WorkflowRunPage() {
                   {item.stepId && <Text type="secondary">step:{item.stepId}</Text>}{' '}
                   {item.payload && <Text>{JSON.stringify(item.payload)}</Text>}
                 </Paragraph>
-              </List.Item>
+              </UIList.Item>
             )}
           />
         </KBSection>
@@ -184,12 +189,12 @@ export function WorkflowRunPage() {
         <KBSection>
           <Title level={4}>Presenter Events</Title>
           {!presenterConnected && (
-            <Alert type="info" message="Connecting to presenter event stream..." showIcon />
+            <UIAlert type="info" message="Connecting to presenter event stream..." showIcon />
           )}
           {presenterError && (
-            <Alert type="error" message="Presenter event stream error" description={presenterError.message} />
+            <UIAlert type="error" message="Presenter event stream error" description={presenterError.message} />
           )}
-          <List
+          <UIList
             bordered
             size="small"
             dataSource={presenterEvents}
@@ -205,7 +210,7 @@ export function WorkflowRunPage() {
                     : JSON.stringify(item.payload)
 
               return (
-                <List.Item>
+                <UIList.Item>
                   <Paragraph style={{ marginBottom: 0 }}>
                     <Text code>{item.timestamp}</Text>{' '}
                     <Text strong>{item.type}</Text>{' '}
@@ -213,7 +218,7 @@ export function WorkflowRunPage() {
                     {status !== undefined && <Text type="secondary">status:{String(status)}</Text>}{' '}
                     {payload && <Text>{payload}</Text>}
                   </Paragraph>
-                </List.Item>
+                </UIList.Item>
               )
             }}
           />
@@ -222,13 +227,13 @@ export function WorkflowRunPage() {
 
       {run && !isTerminal && (
         <KBSection>
-          <Button
+          <UIButton
             danger
             loading={cancelMutation.isPending}
             onClick={() => runId && cancelMutation.mutate(runId)}
           >
             Cancel Run
-          </Button>
+          </UIButton>
         </KBSection>
       )}
     </KBPageContainer>

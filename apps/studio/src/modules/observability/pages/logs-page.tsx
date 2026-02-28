@@ -1,51 +1,37 @@
 import {
-  Card,
-  Alert,
-  Badge,
-  Tag,
-  List,
-  Typography,
-  Space,
-  Row,
-  Col,
-  Select,
-  DatePicker,
-  Button,
-  Collapse,
-  Descriptions,
-  Tooltip,
-  message,
-  Modal,
-  Input,
-  Checkbox,
-  Divider,
-  Spin,
-} from 'antd';
-import {
-  CheckCircleOutlined,
-  SyncOutlined,
-  InfoCircleOutlined,
-  WarningOutlined,
-  CloseCircleOutlined,
-  BugOutlined,
-  CopyOutlined,
-  FilterOutlined,
-  ClockCircleOutlined,
-  GroupOutlined,
-  RobotOutlined,
-  ThunderboltOutlined,
-} from '@ant-design/icons';
+  UICard,
+  UIAlert,
+  UIBadge,
+  UITag,
+  UIList,
+  UITypographyText,
+  UITypographyParagraph,
+  UISpace,
+  UIRow,
+  UICol,
+  UISelect,
+  UIButton,
+  UIAccordion,
+  UIDescriptions,
+  UIDescriptionsItem,
+  UITooltip,
+  UIMessage,
+  UIModal,
+  UIInput,
+  UIDivider,
+  UISpin,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
+import { UIRangePicker, UICheckbox } from '@kb-labs/studio-ui-kit';
 import { useState, useMemo, useEffect } from 'react';
-import { KBPageContainer, KBPageHeader } from '@kb-labs/studio-ui-react';
 import { useLogStream } from '@kb-labs/studio-data-client';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import type { LogRecord, LogSummarizeResponse } from '@kb-labs/studio-data-client';
-import dayjs, { Dayjs } from 'dayjs';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
+import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
-const { Text, Paragraph } = Typography;
-const { RangePicker } = DatePicker;
-const { Option } = Select;
-const { TextArea } = Input;
+const { TextArea } = UIInput;
 
 /**
  * Time range presets for quick filtering
@@ -92,13 +78,13 @@ function getLevelIcon(level: LogRecord['level']) {
   switch (level) {
     case 'trace':
     case 'debug':
-      return <BugOutlined style={{ color: '#8c8c8c' }} />;
+      return <UIIcon name="BugOutlined" style={{ color: '#8c8c8c' }} />;
     case 'info':
-      return <InfoCircleOutlined style={{ color: '#1890ff' }} />;
+      return <UIIcon name="InfoCircleOutlined" style={{ color: '#1890ff' }} />;
     case 'warn':
-      return <WarningOutlined style={{ color: '#faad14' }} />;
+      return <UIIcon name="WarningOutlined" style={{ color: '#faad14' }} />;
     case 'error':
-      return <CloseCircleOutlined style={{ color: '#ff4d4f' }} />;
+      return <UIIcon name="CloseCircleOutlined" style={{ color: '#ff4d4f' }} />;
   }
 }
 
@@ -124,7 +110,7 @@ function getLevelColor(level: LogRecord['level']): string {
  */
 function copyToClipboard(text: string, label: string) {
   navigator.clipboard.writeText(text);
-  message.success(`${label} copied to clipboard`);
+  UIMessage.success(`${label} copied to clipboard`);
 }
 
 /**
@@ -170,12 +156,12 @@ function calculateLogStats(logs: LogRecord[]) {
     }
 
     // Track errors and warnings
-    if (log.level === 'error') stats.errorCount++;
-    if (log.level === 'warn') stats.warningCount++;
+    if (log.level === 'error') {stats.errorCount++;}
+    if (log.level === 'warn') {stats.warningCount++;}
 
     // Track unique traces and executions
-    if (log.trace) stats.uniqueTraces.add(log.trace);
-    if (log.executionId) stats.uniqueExecutions.add(log.executionId);
+    if (log.trace) {stats.uniqueTraces.add(log.trace);}
+    if (log.executionId) {stats.uniqueExecutions.add(log.executionId);}
   }
 
   return stats;
@@ -270,7 +256,7 @@ export function LogsPage() {
 
   // Group logs if needed
   const groupedLogs = useMemo(() => {
-    if (groupBy === 'none') return null;
+    if (groupBy === 'none') {return null;}
 
     switch (groupBy) {
       case 'trace':
@@ -312,46 +298,46 @@ export function LogsPage() {
     }
 
     return (
-      <Collapse
+      <UIAccordion
         ghost
         key={`${log.time}-${index}`}
         items={[
           {
             key: index,
             label: (
-              <Space>
-                <Text type="secondary" style={{ fontSize: 12 }}>
+              <UISpace>
+                <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                   {formatTime(log.time)}
-                </Text>
+                </UITypographyText>
                 {getLevelIcon(log.level)}
-                <Tag color={getLevelColor(log.level)}>{log.level.toUpperCase()}</Tag>
-                {log.plugin && <Tag color="purple">{log.plugin}</Tag>}
-                <Text>{log.msg || '(no message)'}</Text>
+                <UITag color={getLevelColor(log.level)}>{log.level.toUpperCase()}</UITag>
+                {log.plugin && <UITag color="purple">{log.plugin}</UITag>}
+                <UITypographyText>{log.msg || '(no message)'}</UITypographyText>
                 {log.err && (
-                  <Tag color="red" icon={<CloseCircleOutlined />}>
+                  <UITag color="red" icon={<UIIcon name="CloseCircleOutlined" />}>
                     {String(log.err.name || log.err.type || 'Error')}
-                  </Tag>
+                  </UITag>
                 )}
                 {log.traceId && (
-                  <Tooltip title="Click to copy trace ID">
-                    <Tag
+                  <UITooltip title="Click to copy trace ID">
+                    <UITag
                       color="default"
                       style={{ fontSize: 11, cursor: 'pointer', color: '#8c8c8c' }}
                       onClick={(e) => {
                         e.stopPropagation();
                         copyToClipboard(String(log.traceId), 'Trace ID');
                       }}
-                      icon={<CopyOutlined />}
+                      icon={<UIIcon name="CopyOutlined" />}
                     >
                       {String(log.traceId).slice(0, 8)}
-                    </Tag>
-                  </Tooltip>
+                    </UITag>
+                  </UITooltip>
                 )}
-              </Space>
+              </UISpace>
             ),
             children: (
               <div style={{ backgroundColor: '#fafafa', padding: 16, borderRadius: 4, marginLeft: -24, marginRight: -24 }}>
-                <Paragraph
+                <UITypographyParagraph
                   copyable={{ text: jsonString }}
                   style={{
                     marginBottom: 0,
@@ -363,7 +349,7 @@ export function LogsPage() {
                   }}
                 >
                   {jsonString}
-                </Paragraph>
+                </UITypographyParagraph>
               </div>
             ),
           },
@@ -376,26 +362,26 @@ export function LogsPage() {
    * Render grouped logs
    */
   const renderGroupedLogs = () => {
-    if (!groupedLogs) return null;
+    if (!groupedLogs) {return null;}
 
     const groups = Array.from(groupedLogs.entries());
 
     return (
-      <Collapse
+      <UIAccordion
         items={groups.map(([key, groupLogs]) => ({
           key,
           label: (
-            <Space>
-              <GroupOutlined />
-              <Text strong>{key}</Text>
-              <Badge count={groupLogs.length} style={{ backgroundColor: '#52c41a' }} />
-            </Space>
+            <UISpace>
+              <UIIcon name="GroupOutlined" />
+              <UITypographyText strong>{key}</UITypographyText>
+              <UIBadge count={groupLogs.length} style={{ backgroundColor: '#52c41a' }} />
+            </UISpace>
           ),
           children: (
-            <List
+            <UIList
               dataSource={groupLogs}
               renderItem={(log, index) => (
-                <List.Item style={{ padding: '8px 0' }}>{renderLogItem(log, index)}</List.Item>
+                <UIList.Item style={{ padding: '8px 0' }}>{renderLogItem(log, index)}</UIList.Item>
               )}
             />
           ),
@@ -444,7 +430,7 @@ export function LogsPage() {
       // Store the full result data for structured rendering
       setSummaryResult(result);
     } catch (err: any) {
-      message.error('Failed to generate summary: ' + err.message);
+      UIMessage.error('Failed to generate summary: ' + err.message);
     } finally {
       setSummarizing(false);
     }
@@ -468,17 +454,17 @@ export function LogsPage() {
 
       {/* Connection Status */}
       {!isConnected && !error && (
-        <Alert
+        <UIAlert
           message="Connecting to log stream..."
           type="info"
           showIcon
-          icon={<SyncOutlined spin />}
+          icon={<UIIcon name="SyncOutlined" spin />}
           style={{ marginBottom: 24 }}
         />
       )}
 
       {error && (
-        <Alert
+        <UIAlert
           message="Connection failed"
           description={error.message + ' - Make sure REST API is running on localhost:5050'}
           type="error"
@@ -488,221 +474,224 @@ export function LogsPage() {
       )}
 
       {isConnected && (
-        <Alert
+        <UIAlert
           message="Connected to log stream"
           type="success"
           showIcon
-          icon={<CheckCircleOutlined />}
+          icon={<UIIcon name="CheckCircleOutlined" />}
           style={{ marginBottom: 24 }}
         />
       )}
 
       {/* Filters & Stats (Collapsible) */}
-      <Card style={{ marginBottom: 16 }}>
-        <Collapse
+      <UICard style={{ marginBottom: 16 }}>
+        <UIAccordion
           defaultActiveKey={['filters']}
           ghost
           items={[
             {
               key: 'filters',
               label: (
-                <Space>
-                  <FilterOutlined />
-                  <Text strong>Filters & Statistics</Text>
-                  <Badge count={filteredLogs.length} style={{ backgroundColor: '#52c41a' }} />
-                </Space>
+                <UISpace>
+                  <UIIcon name="FilterOutlined" />
+                  <UITypographyText strong>Filters & Statistics</UITypographyText>
+                  <UIBadge count={filteredLogs.length} style={{ backgroundColor: '#52c41a' }} />
+                </UISpace>
               ),
               children: (
                 <>
-                  <Row gutter={[16, 16]}>
-                    <Col span={6}>
-                      <Space direction="vertical" style={{ width: '100%' }}>
-                        <Text type="secondary" style={{ fontSize: 12 }}>
-                          <FilterOutlined /> Level
-                        </Text>
-                        <Select
+                  <UIRow gutter={[16, 16]}>
+                    <UICol span={6}>
+                      <UISpace direction="vertical" style={{ width: '100%' }}>
+                        <UITypographyText type="secondary" style={{ fontSize: 12 }}>
+                          <UIIcon name="FilterOutlined" /> Level
+                        </UITypographyText>
+                        <UISelect
                           style={{ width: '100%' }}
                           placeholder="All levels"
                           allowClear
                           value={levelFilter}
                           onChange={setLevelFilter}
-                        >
-                          <Option value="trace">Trace</Option>
-                          <Option value="debug">Debug</Option>
-                          <Option value="info">Info</Option>
-                          <Option value="warn">Warning</Option>
-                          <Option value="error">Error</Option>
-                        </Select>
-                      </Space>
-                    </Col>
+                          options={[
+                            { label: 'Trace', value: 'trace' },
+                            { label: 'Debug', value: 'debug' },
+                            { label: 'Info', value: 'info' },
+                            { label: 'Warning', value: 'warn' },
+                            { label: 'Error', value: 'error' },
+                          ]}
+                        />
+                      </UISpace>
+                    </UICol>
 
-                    <Col span={6}>
-                      <Space direction="vertical" style={{ width: '100%' }}>
-                        <Text type="secondary" style={{ fontSize: 12 }}>
-                          <FilterOutlined /> Plugin
-                        </Text>
-                        <Select
+                    <UICol span={6}>
+                      <UISpace direction="vertical" style={{ width: '100%' }}>
+                        <UITypographyText type="secondary" style={{ fontSize: 12 }}>
+                          <UIIcon name="FilterOutlined" /> Plugin
+                        </UITypographyText>
+                        <UISelect
                           style={{ width: '100%' }}
                           placeholder="All plugins"
                           allowClear
                           value={pluginFilter}
                           onChange={setPluginFilter}
-                        >
-                          {uniquePlugins.map((plugin) => (
-                            <Option key={plugin} value={plugin}>
-                              {plugin}
-                            </Option>
-                          ))}
-                        </Select>
-                      </Space>
-                    </Col>
+                          options={uniquePlugins.map((plugin) => ({ label: plugin, value: plugin }))}
+                        />
+                      </UISpace>
+                    </UICol>
 
-                    <Col span={6}>
-                      <Space direction="vertical" style={{ width: '100%' }}>
-                        <Text type="secondary" style={{ fontSize: 12 }}>
-                          <ClockCircleOutlined /> Time Range
-                        </Text>
-                        <Select style={{ width: '100%' }} value={timeRange} onChange={setTimeRange}>
-                          {Object.entries(TIME_RANGES).map(([key, { label }]) => (
-                            <Option key={key} value={key}>
-                              {label}
-                            </Option>
-                          ))}
-                        </Select>
-                      </Space>
-                    </Col>
+                    <UICol span={6}>
+                      <UISpace direction="vertical" style={{ width: '100%' }}>
+                        <UITypographyText type="secondary" style={{ fontSize: 12 }}>
+                          <UIIcon name="ClockCircleOutlined" /> Time Range
+                        </UITypographyText>
+                        <UISelect
+                          style={{ width: '100%' }}
+                          value={timeRange}
+                          onChange={setTimeRange}
+                          options={Object.entries(TIME_RANGES).map(([key, { label }]) => ({
+                            label,
+                            value: key,
+                          }))}
+                        />
+                      </UISpace>
+                    </UICol>
 
-                    <Col span={6}>
-                      <Space direction="vertical" style={{ width: '100%' }}>
-                        <Text type="secondary" style={{ fontSize: 12 }}>
-                          <GroupOutlined /> Group By
-                        </Text>
-                        <Select style={{ width: '100%' }} value={groupBy} onChange={setGroupBy}>
-                          <Option value="none">No grouping</Option>
-                          <Option value="trace">Trace ID</Option>
-                          <Option value="execution">Execution ID</Option>
-                          <Option value="plugin">Plugin</Option>
-                        </Select>
-                      </Space>
-                    </Col>
+                    <UICol span={6}>
+                      <UISpace direction="vertical" style={{ width: '100%' }}>
+                        <UITypographyText type="secondary" style={{ fontSize: 12 }}>
+                          <UIIcon name="GroupOutlined" /> Group By
+                        </UITypographyText>
+                        <UISelect
+                          style={{ width: '100%' }}
+                          value={groupBy}
+                          onChange={setGroupBy}
+                          options={[
+                            { label: 'No grouping', value: 'none' },
+                            { label: 'Trace ID', value: 'trace' },
+                            { label: 'Execution ID', value: 'execution' },
+                            { label: 'Plugin', value: 'plugin' },
+                          ]}
+                        />
+                      </UISpace>
+                    </UICol>
 
                     {timeRange === 'custom' && (
-                      <Col span={24}>
-                        <Space direction="vertical" style={{ width: '100%' }}>
-                          <Text type="secondary" style={{ fontSize: 12 }}>
+                      <UICol span={24}>
+                        <UISpace direction="vertical" style={{ width: '100%' }}>
+                          <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                             Custom Time Range
-                          </Text>
-                          <RangePicker
+                          </UITypographyText>
+                          <UIRangePicker
                             showTime
                             style={{ width: '100%' }}
                             onChange={(dates) =>
                               setCustomTimeRange(dates as [Dayjs, Dayjs] | null)
                             }
                           />
-                        </Space>
-                      </Col>
+                        </UISpace>
+                      </UICol>
                     )}
-                  </Row>
+                  </UIRow>
 
                   {/* Statistics (for AI Summarization) */}
-                  <Row
+                  <UIRow
                     gutter={16}
                     style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #f0f0f0' }}
                   >
-                    <Col span={4}>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
+                    <UICol span={4}>
+                      <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                         Total Logs
-                      </Text>
+                      </UITypographyText>
                       <div>
-                        <Text strong style={{ fontSize: 20 }}>
+                        <UITypographyText strong style={{ fontSize: 20 }}>
                           {stats.total}
-                        </Text>
+                        </UITypographyText>
                       </div>
-                    </Col>
-                    <Col span={4}>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
+                    </UICol>
+                    <UICol span={4}>
+                      <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                         Errors
-                      </Text>
+                      </UITypographyText>
                       <div>
-                        <Text type="danger" strong style={{ fontSize: 20 }}>
+                        <UITypographyText type="danger" strong style={{ fontSize: 20 }}>
                           {stats.errorCount}
-                        </Text>
+                        </UITypographyText>
                       </div>
-                    </Col>
-                    <Col span={4}>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
+                    </UICol>
+                    <UICol span={4}>
+                      <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                         Warnings
-                      </Text>
+                      </UITypographyText>
                       <div>
-                        <Text type="warning" strong style={{ fontSize: 20 }}>
+                        <UITypographyText type="warning" strong style={{ fontSize: 20 }}>
                           {stats.warningCount}
-                        </Text>
+                        </UITypographyText>
                       </div>
-                    </Col>
-                    <Col span={4}>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
+                    </UICol>
+                    <UICol span={4}>
+                      <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                         Unique Traces
-                      </Text>
+                      </UITypographyText>
                       <div>
-                        <Text strong style={{ fontSize: 20 }}>
+                        <UITypographyText strong style={{ fontSize: 20 }}>
                           {stats.uniqueTraces.size}
-                        </Text>
+                        </UITypographyText>
                       </div>
-                    </Col>
-                    <Col span={4}>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
+                    </UICol>
+                    <UICol span={4}>
+                      <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                         Unique Executions
-                      </Text>
+                      </UITypographyText>
                       <div>
-                        <Text strong style={{ fontSize: 20 }}>
+                        <UITypographyText strong style={{ fontSize: 20 }}>
                           {stats.uniqueExecutions.size}
-                        </Text>
+                        </UITypographyText>
                       </div>
-                    </Col>
-                    <Col span={4}>
-                      <Button
+                    </UICol>
+                    <UICol span={4}>
+                      <UIButton
                         type="primary"
-                        icon={<RobotOutlined />}
+                        icon={<UIIcon name="RobotOutlined" />}
                         onClick={openSummarizeModal}
                         disabled={filteredLogs.length === 0}
                       >
                         AI Summarize
-                      </Button>
-                    </Col>
-                  </Row>
+                      </UIButton>
+                    </UICol>
+                  </UIRow>
                 </>
               ),
             },
           ]}
         />
-      </Card>
+      </UICard>
 
       {/* Logs List */}
-      <Card
+      <UICard
         title={
-          <Space>
+          <UISpace>
             <span>{groupBy === 'none' ? 'Recent Logs' : `Logs grouped by ${groupBy}`}</span>
-            <Badge count={filteredLogs.length} showZero style={{ backgroundColor: '#52c41a' }} />
-          </Space>
+            <UIBadge count={filteredLogs.length} showZero style={{ backgroundColor: '#52c41a' }} />
+          </UISpace>
         }
         extra={
-          <Space>
-            <Button
+          <UISpace>
+            <UIButton
               size="small"
-              icon={isPaused ? <SyncOutlined /> : <ClockCircleOutlined />}
+              icon={isPaused ? <UIIcon name="SyncOutlined" /> : <UIIcon name="ClockCircleOutlined" />}
               onClick={() => setIsPaused(!isPaused)}
               type={isPaused ? 'primary' : 'default'}
             >
               {isPaused ? 'Resume' : 'Pause'}
-            </Button>
-            <Button size="small" onClick={clearLogs}>
+            </UIButton>
+            <UIButton size="small" onClick={clearLogs}>
               Clear
-            </Button>
-          </Space>
+            </UIButton>
+          </UISpace>
         }
       >
         {filteredLogs.length === 0 ? (
-          <Alert
+          <UIAlert
             message="No logs match current filters"
             description="Adjust filters or wait for new logs to arrive"
             type="info"
@@ -710,10 +699,10 @@ export function LogsPage() {
           />
         ) : groupBy === 'none' ? (
           <div style={{ maxHeight: 600, overflow: 'auto' }}>
-            <List
+            <UIList
               dataSource={filteredLogs}
               renderItem={(log, index) => (
-                <List.Item style={{ padding: '8px 0' }}>{renderLogItem(log, index)}</List.Item>
+                <UIList.Item style={{ padding: '8px 0' }}>{renderLogItem(log, index)}</UIList.Item>
               )}
               pagination={
                 filteredLogs.length > 50
@@ -730,93 +719,93 @@ export function LogsPage() {
         ) : (
           renderGroupedLogs()
         )}
-      </Card>
+      </UICard>
 
       {/* AI Summarize Modal */}
-      <Modal
+      <UIModal
         title={
-          <Space>
-            <RobotOutlined />
+          <UISpace>
+            <UIIcon name="RobotOutlined" />
             <span>AI Log Summarization</span>
-          </Space>
+          </UISpace>
         }
         open={summarizeModalOpen}
         onCancel={() => setSummarizeModalOpen(false)}
         width={800}
         footer={[
-          <Button key="cancel" onClick={() => setSummarizeModalOpen(false)}>
+          <UIButton key="cancel" onClick={() => setSummarizeModalOpen(false)}>
             Cancel
-          </Button>,
-          <Button
+          </UIButton>,
+          <UIButton
             key="summarize"
             type="primary"
-            icon={<ThunderboltOutlined />}
+            icon={<UIIcon name="ThunderboltOutlined" />}
             loading={summarizing}
             onClick={handleSummarize}
             disabled={!customQuestion.trim()}
           >
             Generate Summary
-          </Button>,
+          </UIButton>,
         ]}
       >
-        <Space direction="vertical" style={{ width: '100%' }} size="large">
+        <UISpace direction="vertical" style={{ width: '100%' }} size="large">
           {/* Data Preview */}
-          <Card size="small" style={{ backgroundColor: '#fafafa' }}>
-            <Row gutter={16}>
-              <Col span={6}>
-                <Text type="secondary">Logs to analyze:</Text>
+          <UICard size="small" style={{ backgroundColor: '#fafafa' }}>
+            <UIRow gutter={16}>
+              <UICol span={6}>
+                <UITypographyText type="secondary">Logs to analyze:</UITypographyText>
                 <div>
-                  <Text strong>{filteredLogs.length}</Text>
+                  <UITypographyText strong>{filteredLogs.length}</UITypographyText>
                 </div>
-              </Col>
-              <Col span={6}>
-                <Text type="secondary">Errors:</Text>
+              </UICol>
+              <UICol span={6}>
+                <UITypographyText type="secondary">Errors:</UITypographyText>
                 <div>
-                  <Text type="danger" strong>
+                  <UITypographyText type="danger" strong>
                     {stats.errorCount}
-                  </Text>
+                  </UITypographyText>
                 </div>
-              </Col>
-              <Col span={6}>
-                <Text type="secondary">Warnings:</Text>
+              </UICol>
+              <UICol span={6}>
+                <UITypographyText type="secondary">Warnings:</UITypographyText>
                 <div>
-                  <Text type="warning" strong>
+                  <UITypographyText type="warning" strong>
                     {stats.warningCount}
-                  </Text>
+                  </UITypographyText>
                 </div>
-              </Col>
-              <Col span={6}>
-                <Text type="secondary">Time range:</Text>
+              </UICol>
+              <UICol span={6}>
+                <UITypographyText type="secondary">Time range:</UITypographyText>
                 <div>
-                  <Text strong>{TIME_RANGES[timeRange as keyof typeof TIME_RANGES]?.label}</Text>
+                  <UITypographyText strong>{TIME_RANGES[timeRange as keyof typeof TIME_RANGES]?.label}</UITypographyText>
                 </div>
-              </Col>
-            </Row>
-          </Card>
+              </UICol>
+            </UIRow>
+          </UICard>
 
           {/* Quick Templates */}
           <div>
-            <Text strong>Quick Questions:</Text>
+            <UITypographyText strong>Quick Questions:</UITypographyText>
             <div style={{ marginTop: 8 }}>
-              <Space wrap>
+              <UISpace wrap>
                 {QUESTION_TEMPLATES.map((template) => (
-                  <Button
+                  <UIButton
                     key={template.label}
                     size="small"
                     onClick={() => setCustomQuestion(template.value)}
                   >
                     {template.label}
-                  </Button>
+                  </UIButton>
                 ))}
-              </Space>
+              </UISpace>
             </div>
           </div>
 
-          <Divider style={{ margin: '8px 0' }} />
+          <UIDivider style={{ margin: '8px 0' }} />
 
           {/* Custom Question */}
           <div>
-            <Text strong>Your Question:</Text>
+            <UITypographyText strong>Your Question:</UITypographyText>
             <TextArea
               value={customQuestion}
               onChange={(e) => setCustomQuestion(e.target.value)}
@@ -828,99 +817,99 @@ export function LogsPage() {
 
           {/* Context Options */}
           <div>
-            <Text strong>Include in context:</Text>
+            <UITypographyText strong>Include in context:</UITypographyText>
             <div style={{ marginTop: 8 }}>
-              <Space direction="vertical">
-                <Checkbox
+              <UISpace direction="vertical">
+                <UICheckbox
                   checked={includeContext.errors}
-                  onChange={(e) =>
-                    setIncludeContext({ ...includeContext, errors: e.target.checked })
+                  onChange={(checked) =>
+                    setIncludeContext({ ...includeContext, errors: checked })
                   }
                 >
                   Error messages and stack traces
-                </Checkbox>
-                <Checkbox
+                </UICheckbox>
+                <UICheckbox
                   checked={includeContext.warnings}
-                  onChange={(e) =>
-                    setIncludeContext({ ...includeContext, warnings: e.target.checked })
+                  onChange={(checked) =>
+                    setIncludeContext({ ...includeContext, warnings: checked })
                   }
                 >
                   Warning messages
-                </Checkbox>
-                <Checkbox
+                </UICheckbox>
+                <UICheckbox
                   checked={includeContext.info}
-                  onChange={(e) =>
-                    setIncludeContext({ ...includeContext, info: e.target.checked })
+                  onChange={(checked) =>
+                    setIncludeContext({ ...includeContext, info: checked })
                   }
                 >
                   Info-level logs
-                </Checkbox>
-                <Checkbox
+                </UICheckbox>
+                <UICheckbox
                   checked={includeContext.metadata}
-                  onChange={(e) =>
-                    setIncludeContext({ ...includeContext, metadata: e.target.checked })
+                  onChange={(checked) =>
+                    setIncludeContext({ ...includeContext, metadata: checked })
                   }
                 >
                   Metadata (traceId, executionId, etc.)
-                </Checkbox>
-                <Checkbox
+                </UICheckbox>
+                <UICheckbox
                   checked={includeContext.stackTraces}
-                  onChange={(e) =>
-                    setIncludeContext({ ...includeContext, stackTraces: e.target.checked })
+                  onChange={(checked) =>
+                    setIncludeContext({ ...includeContext, stackTraces: checked })
                   }
                 >
                   Full stack traces
-                </Checkbox>
-              </Space>
+                </UICheckbox>
+              </UISpace>
             </div>
           </div>
 
           {/* Summary Result */}
           {summarizing && (
             <div style={{ textAlign: 'center', padding: '24px 0' }}>
-              <Spin tip="Analyzing logs with AI..." size="large" />
+              <UISpin tip="Analyzing logs with AI..." size="large" />
             </div>
           )}
 
           {summaryResult && !summarizing && (
-            <Space direction="vertical" size="middle" style={{ width: '100%', marginTop: 16 }}>
+            <UISpace direction="vertical" size="middle" style={{ width: '100%', marginTop: 16 }}>
               {/* Statistics Card */}
-              <Card
+              <UICard
                 title={
-                  <Space>
-                    <InfoCircleOutlined />
+                  <UISpace>
+                    <UIIcon name="InfoCircleOutlined" />
                     <span>Statistics</span>
-                  </Space>
+                  </UISpace>
                 }
                 size="small"
               >
-                <Descriptions column={2} size="small">
-                  <Descriptions.Item label="Total Logs">{summaryResult.summary.total}</Descriptions.Item>
-                  <Descriptions.Item label="Time Range">
+                <UIDescriptions column={2} size="small">
+                  <UIDescriptionsItem label="Total Logs">{summaryResult.summary.total}</UIDescriptionsItem>
+                  <UIDescriptionsItem label="Time Range">
                     {summaryResult.summary.timeRange.from && summaryResult.summary.timeRange.to
                       ? `${summaryResult.summary.timeRange.from} to ${summaryResult.summary.timeRange.to}`
                       : 'All time'}
-                  </Descriptions.Item>
-                </Descriptions>
+                  </UIDescriptionsItem>
+                </UIDescriptions>
 
                 {/* Level breakdown */}
                 {summaryResult.summary.stats?.byLevel && Object.keys(summaryResult.summary.stats.byLevel).length > 0 && (
                   <>
-                    <Divider style={{ margin: '12px 0' }} />
-                    <Text strong>By Level:</Text>
+                    <UIDivider style={{ margin: '12px 0' }} />
+                    <UITypographyText strong>By Level:</UITypographyText>
                     <div style={{ marginTop: 8 }}>
-                      <Space wrap>
+                      <UISpace wrap>
                         {Object.entries(summaryResult.summary.stats.byLevel).map(([level, count]) => (
-                          <Tag key={level} color={
+                          <UITag key={level} color={
                             level === 'error' ? 'red' :
                             level === 'warn' ? 'orange' :
                             level === 'info' ? 'blue' :
                             'default'
                           }>
                             {level}: {count}
-                          </Tag>
+                          </UITag>
                         ))}
-                      </Space>
+                      </UISpace>
                     </div>
                   </>
                 )}
@@ -928,80 +917,80 @@ export function LogsPage() {
                 {/* Plugin breakdown */}
                 {summaryResult.summary.stats?.byPlugin && Object.keys(summaryResult.summary.stats.byPlugin).length > 0 && (
                   <>
-                    <Divider style={{ margin: '12px 0' }} />
-                    <Text strong>By Plugin (Top 5):</Text>
+                    <UIDivider style={{ margin: '12px 0' }} />
+                    <UITypographyText strong>By Plugin (Top 5):</UITypographyText>
                     <div style={{ marginTop: 8 }}>
-                      <Space wrap>
+                      <UISpace wrap>
                         {Object.entries(summaryResult.summary.stats.byPlugin)
                           .sort((a: any, b: any) => b[1] - a[1])
                           .slice(0, 5)
                           .map(([plugin, count]) => (
-                            <Tag key={plugin}>{plugin}: {count}</Tag>
+                            <UITag key={plugin}>{plugin}: {count}</UITag>
                           ))}
-                      </Space>
+                      </UISpace>
                     </div>
                   </>
                 )}
-              </Card>
+              </UICard>
 
               {/* Top Errors Card */}
               {summaryResult.summary.stats?.topErrors && summaryResult.summary.stats.topErrors.length > 0 && (
-                <Card
+                <UICard
                   title={
-                    <Space>
-                      <BugOutlined />
+                    <UISpace>
+                      <UIIcon name="BugOutlined" />
                       <span>Top Errors</span>
-                    </Space>
+                    </UISpace>
                   }
                   size="small"
                 >
-                  <List
+                  <UIList
                     size="small"
                     dataSource={summaryResult.summary.stats.topErrors.slice(0, 5)}
                     renderItem={(err: any, idx: number) => (
-                      <List.Item>
-                        <Text>
-                          <Text type="secondary">{idx + 1}.</Text>{' '}
-                          <Text code>{err.message}</Text>{' '}
-                          <Text type="secondary">({err.count} times)</Text>
-                        </Text>
-                      </List.Item>
+                      <UIList.Item>
+                        <UITypographyText>
+                          <UITypographyText type="secondary">{idx + 1}.</UITypographyText>{' '}
+                          <UITypographyText code>{err.message}</UITypographyText>{' '}
+                          <UITypographyText type="secondary">({err.count} times)</UITypographyText>
+                        </UITypographyText>
+                      </UIList.Item>
                     )}
                   />
-                </Card>
+                </UICard>
               )}
 
               {/* AI Analysis Card */}
               {summaryResult.aiSummary && (
-                <Alert
+                <UIAlert
                   type="info"
                   showIcon
-                  icon={<RobotOutlined />}
+                  icon={<UIIcon name="RobotOutlined" />}
                   message="AI Analysis"
                   description={
-                    <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                    <UISpace direction="vertical" size="small" style={{ width: '100%' }}>
                       {summaryResult.aiSummary.split('\n\n').map((paragraph, idx) => (
-                        <Paragraph key={idx} style={{ marginBottom: 0 }}>
+                        <UITypographyParagraph key={idx} style={{ marginBottom: 0 }}>
                           {paragraph}
-                        </Paragraph>
+                        </UITypographyParagraph>
                       ))}
-                    </Space>
+                    </UISpace>
                   }
                 />
               )}
 
               {/* Info message if AI not available */}
               {!summaryResult.aiSummary && summaryResult.message && (
-                <Alert
+                <UIAlert
                   message={summaryResult.message}
                   type="info"
                   showIcon
                 />
               )}
-            </Space>
+            </UISpace>
           )}
-        </Space>
-      </Modal>
+        </UISpace>
+      </UIModal>
     </KBPageContainer>
   );
 }

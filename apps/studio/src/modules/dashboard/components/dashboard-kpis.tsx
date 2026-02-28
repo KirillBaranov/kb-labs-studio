@@ -1,4 +1,4 @@
-import { KBStatCard, KBStatGrid } from '@kb-labs/studio-ui-react';
+import { KBStatCard, KBStatGrid } from '@/components/ui';
 
 export function DashboardKpis() {
   return (

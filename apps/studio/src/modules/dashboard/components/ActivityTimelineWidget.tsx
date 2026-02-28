@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Segmented } from 'antd';
-import { KBAreaChart } from '@kb-labs/studio-ui-react';
+import { UICard, UISegmented } from '@kb-labs/studio-ui-kit';
+import { UIAreaChart, useChartColors } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { useMetricsHistory } from '@kb-labs/studio-data-client';
 
@@ -15,7 +15,13 @@ const TIME_RANGE_CONFIG = {
 
 export function ActivityTimelineWidget() {
   const sources = useDataSources();
+  const palette = useChartColors();
   const [timeRange, setTimeRange] = useState<TimeRange>('10m');
+
+  // Get colors from palette for legend
+  const colorMap = palette.mapColors([{ type: 'Requests' }, { type: 'Errors' }], 'type');
+  const requestsColor = colorMap['Requests'];
+  const errorsColor = colorMap['Errors'];
 
   // Fetch requests and errors history
   const requestsQuery = useMetricsHistory(sources.observability, {
@@ -32,7 +38,7 @@ export function ActivityTimelineWidget() {
 
   // Transform data for chart
   const chartData = React.useMemo(() => {
-    if (!requestsQuery.data || !errorsQuery.data) return [];
+    if (!requestsQuery.data || !errorsQuery.data) {return [];}
 
     // Merge requests and errors by timestamp
     const dataMap = new Map<number, { time: string; Requests: number; Errors: number }>();
@@ -67,11 +73,6 @@ export function ActivityTimelineWidget() {
     colorField: 'type',
     height: 250,
     smooth: true,
-    scale: {
-      color: {
-        range: ['#1890ff', '#ff4d4f'], // Requests: blue, Errors: red
-      },
-    },
     style: {
       fillOpacity: 0.3,
     },
@@ -85,7 +86,7 @@ export function ActivityTimelineWidget() {
         label: {
           formatter: (v: string) => {
             const num = Number(v);
-            if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+            if (num >= 1000) {return `${(num / 1000).toFixed(1)}K`;}
             return num.toLocaleString();
           },
         },
@@ -98,7 +99,7 @@ export function ActivityTimelineWidget() {
         (d: any) => ({
           name: d.type,
           value: d.value?.toLocaleString() ?? 0,
-          color: d.type === 'Requests' ? '#1890ff' : '#ff4d4f',
+          color: colorMap[d.type],
         }),
       ],
     },
@@ -114,11 +115,11 @@ export function ActivityTimelineWidget() {
   const hasError = requestsQuery.isError || errorsQuery.isError;
 
   return (
-    <Card
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span>Requests & Errors</span>
-          <Segmented
+          <UISegmented
             options={Object.entries(TIME_RANGE_CONFIG).map(([key, cfg]) => ({
               label: cfg.label,
               value: key,
@@ -137,7 +138,7 @@ export function ActivityTimelineWidget() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#999',
+          color: 'var(--text-tertiary)',
         }}>
           Loading metrics...
         </div>
@@ -147,7 +148,7 @@ export function ActivityTimelineWidget() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#ff4d4f',
+          color: 'var(--error)',
         }}>
           Failed to load metrics
         </div>
@@ -161,7 +162,7 @@ export function ActivityTimelineWidget() {
                 width: 10,
                 height: 10,
                 borderRadius: '50%',
-                backgroundColor: '#1890ff',
+                backgroundColor: requestsColor,
               }} />
               <span style={{ fontSize: 13, fontWeight: 500 }}>
                 Requests ({currentRequests.toLocaleString()})
@@ -173,14 +174,14 @@ export function ActivityTimelineWidget() {
                 width: 10,
                 height: 10,
                 borderRadius: '50%',
-                backgroundColor: '#ff4d4f',
+                backgroundColor: errorsColor,
               }} />
               <span style={{ fontSize: 13, fontWeight: 500 }}>
                 Errors ({currentErrors.toLocaleString()})
               </span>
             </div>
           </div>
-          <KBAreaChart {...config} data={multiSeriesData} />
+          <UIAreaChart {...config} data={multiSeriesData} />
         </div>
       ) : (
         <div style={{
@@ -188,11 +189,11 @@ export function ActivityTimelineWidget() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#999',
+          color: 'var(--text-tertiary)',
         }}>
           No data available
         </div>
       )}
-    </Card>
+    </UICard>
   );
 }

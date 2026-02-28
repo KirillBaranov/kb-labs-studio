@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, DatePicker, Button, Space, Slider, Typography, Tag, Tooltip, Alert } from 'antd';
+import { UICard, UIDatePicker, UIButton, UISpace, UISlider, UITypographyText, UITitle, UITag, UITooltip, UIAlert } from '@kb-labs/studio-ui-kit';
 import {
   HistoryOutlined,
   PlayCircleOutlined,
@@ -9,9 +9,10 @@ import {
   ReloadOutlined,
   ClockCircleOutlined,
 } from '@ant-design/icons';
-import dayjs, { Dayjs } from 'dayjs';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 
-const { Text, Title } = Typography;
+
 
 interface TimeTravelState {
   isActive: boolean;
@@ -101,7 +102,7 @@ export function TimeTravelWidget() {
     if (state.isPlaying && state.selectedTime && historicalData.length > 0) {
       const interval = setInterval(() => {
         setState(prev => {
-          if (!prev.selectedTime) return prev;
+          if (!prev.selectedTime) {return prev;}
 
           const currentIndex = historicalData.findIndex(
             s => s.timestamp >= prev.selectedTime!.valueOf()
@@ -128,7 +129,7 @@ export function TimeTravelWidget() {
   };
 
   const stepBackward = () => {
-    if (!state.selectedTime || historicalData.length === 0) return;
+    if (!state.selectedTime || historicalData.length === 0) {return;}
 
     const currentIndex = historicalData.findIndex(
       s => s.timestamp >= state.selectedTime!.valueOf()
@@ -142,7 +143,7 @@ export function TimeTravelWidget() {
   };
 
   const stepForward = () => {
-    if (!state.selectedTime || historicalData.length === 0) return;
+    if (!state.selectedTime || historicalData.length === 0) {return;}
 
     const currentIndex = historicalData.findIndex(
       s => s.timestamp >= state.selectedTime!.valueOf()
@@ -167,7 +168,7 @@ export function TimeTravelWidget() {
   };
 
   const handleSliderChange = (value: number) => {
-    if (historicalData.length === 0) return;
+    if (historicalData.length === 0) {return;}
     const index = Math.floor((value / 100) * (historicalData.length - 1));
     setState(prev => ({
       ...prev,
@@ -177,7 +178,7 @@ export function TimeTravelWidget() {
   };
 
   const getSliderValue = () => {
-    if (!state.selectedTime || historicalData.length === 0) return 0;
+    if (!state.selectedTime || historicalData.length === 0) {return 0;}
     const currentIndex = historicalData.findIndex(
       s => s.timestamp >= state.selectedTime!.valueOf()
     );
@@ -185,32 +186,32 @@ export function TimeTravelWidget() {
   };
 
   return (
-    <Card
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <HistoryOutlined />
           <span>Time Travel</span>
           {state.isActive ? (
-            <Tag color="orange">Historical Mode</Tag>
+            <UITag color="orange">Historical Mode</UITag>
           ) : (
-            <Tag color="green">Live</Tag>
+            <UITag color="green">Live</UITag>
           )}
         </div>
       }
       extra={
         state.isActive && (
-          <Button type="link" icon={<ReloadOutlined />} onClick={resetToLive}>
+          <UIButton type="link" icon={<ReloadOutlined />} onClick={resetToLive}>
             Back to Live
-          </Button>
+          </UIButton>
         )
       }
     >
       {/* Date Selection */}
       <div style={{ marginBottom: 16 }}>
-        <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
+        <UITypographyText type="secondary" style={{ display: 'block', marginBottom: 8 }}>
           Select a date to view historical metrics:
-        </Text>
-        <DatePicker
+        </UITypographyText>
+        <UIDatePicker
           value={state.selectedTime}
           onChange={handleDateChange}
           disabledDate={date => date.isAfter(dayjs())}
@@ -223,19 +224,19 @@ export function TimeTravelWidget() {
       {state.isActive && historicalData.length > 0 && (
         <>
           {/* Current Time Display */}
-          <Alert
+          <UIAlert
             type="info"
             message={
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Space>
+                <UISpace>
                   <ClockCircleOutlined />
-                  <Text strong>
+                  <UITypographyText strong>
                     Viewing: {state.selectedTime?.format('YYYY-MM-DD HH:mm:ss')}
-                  </Text>
-                </Space>
-                <Text type="secondary">
+                  </UITypographyText>
+                </UISpace>
+                <UITypographyText type="secondary">
                   {dayjs().diff(state.selectedTime, 'hour')}h ago
-                </Text>
+                </UITypographyText>
               </div>
             }
             style={{ marginBottom: 16 }}
@@ -249,23 +250,23 @@ export function TimeTravelWidget() {
             gap: 8,
             marginBottom: 16,
           }}>
-            <Tooltip title="Step Back (5 min)">
-              <Button icon={<StepBackwardOutlined />} onClick={stepBackward} />
-            </Tooltip>
-            <Button
+            <UITooltip title="Step Back (5 min)">
+              <UIButton icon={<StepBackwardOutlined />} onClick={stepBackward} />
+            </UITooltip>
+            <UIButton
               type="primary"
               shape="circle"
               size="large"
               icon={state.isPlaying ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
               onClick={togglePlayback}
             />
-            <Tooltip title="Step Forward (5 min)">
-              <Button icon={<StepForwardOutlined />} onClick={stepForward} />
-            </Tooltip>
+            <UITooltip title="Step Forward (5 min)">
+              <UIButton icon={<StepForwardOutlined />} onClick={stepForward} />
+            </UITooltip>
             <div style={{ marginLeft: 16 }}>
-              <Text type="secondary" style={{ marginRight: 8 }}>Speed:</Text>
+              <UITypographyText type="secondary" style={{ marginRight: 8 }}>Speed:</UITypographyText>
               {[1, 2, 5, 10].map(speed => (
-                <Button
+                <UIButton
                   key={speed}
                   size="small"
                   type={state.playbackSpeed === speed ? 'primary' : 'default'}
@@ -273,32 +274,32 @@ export function TimeTravelWidget() {
                   style={{ marginRight: 4 }}
                 >
                   {speed}x
-                </Button>
+                </UIButton>
               ))}
             </div>
           </div>
 
           {/* Timeline Slider */}
           <div style={{ padding: '0 8px', marginBottom: 16 }}>
-            <Slider
+            <UISlider
               value={getSliderValue()}
               onChange={handleSliderChange}
               tooltip={{
                 formatter: (value) => {
-                  if (!value || historicalData.length === 0) return '';
+                  if (!value || historicalData.length === 0) {return '';}
                   const index = Math.floor((value / 100) * (historicalData.length - 1));
                   return dayjs(historicalData[index].timestamp).format('HH:mm');
                 },
               }}
             />
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Text type="secondary" style={{ fontSize: 11 }}>
+              <UITypographyText type="secondary" style={{ fontSize: 11 }}>
                 {historicalData[0] && dayjs(historicalData[0].timestamp).format('HH:mm')}
-              </Text>
-              <Text type="secondary" style={{ fontSize: 11 }}>
+              </UITypographyText>
+              <UITypographyText type="secondary" style={{ fontSize: 11 }}>
                 {historicalData[historicalData.length - 1] &&
                   dayjs(historicalData[historicalData.length - 1].timestamp).format('HH:mm')}
-              </Text>
+              </UITypographyText>
             </div>
           </div>
 
@@ -309,32 +310,32 @@ export function TimeTravelWidget() {
               gridTemplateColumns: 'repeat(4, 1fr)',
               gap: 12,
               padding: 16,
-              background: '#fafafa',
+              background: 'var(--bg-tertiary)',
               borderRadius: 8,
             }}>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 20, fontWeight: 700, color: '#1890ff' }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--info)' }}>
                   {currentSnapshot.metrics.requests.toLocaleString()}
                 </div>
-                <Text type="secondary" style={{ fontSize: 11 }}>Requests</Text>
+                <UITypographyText type="secondary" style={{ fontSize: 11 }}>Requests</UITypographyText>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 20, fontWeight: 700, color: '#ff4d4f' }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--error)' }}>
                   {currentSnapshot.metrics.errors}
                 </div>
-                <Text type="secondary" style={{ fontSize: 11 }}>Errors</Text>
+                <UITypographyText type="secondary" style={{ fontSize: 11 }}>Errors</UITypographyText>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 20, fontWeight: 700, color: '#faad14' }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--warning)' }}>
                   {currentSnapshot.metrics.latency}ms
                 </div>
-                <Text type="secondary" style={{ fontSize: 11 }}>Latency</Text>
+                <UITypographyText type="secondary" style={{ fontSize: 11 }}>Latency</UITypographyText>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 20, fontWeight: 700, color: '#52c41a' }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--success)' }}>
                   ${currentSnapshot.metrics.cost.toFixed(2)}
                 </div>
-                <Text type="secondary" style={{ fontSize: 11 }}>Cost</Text>
+                <UITypographyText type="secondary" style={{ fontSize: 11 }}>Cost</UITypographyText>
               </div>
             </div>
           )}
@@ -345,7 +346,7 @@ export function TimeTravelWidget() {
         <div style={{
           textAlign: 'center',
           padding: '40px 20px',
-          color: '#999',
+          color: 'var(--text-tertiary)',
         }}>
           <HistoryOutlined style={{ fontSize: 48, marginBottom: 16, opacity: 0.3 }} />
           <div>Select a date above to view historical metrics</div>
@@ -354,6 +355,6 @@ export function TimeTravelWidget() {
           </div>
         </div>
       )}
-    </Card>
+    </UICard>
   );
 }

@@ -1,16 +1,13 @@
-import { Table, Tag, Space, Typography, Tooltip } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
 import {
-  CodeOutlined,
-  ApiOutlined,
-  NodeIndexOutlined,
-  ClockCircleOutlined,
-  WarningOutlined,
-  CheckCircleOutlined,
-} from '@ant-design/icons';
+  UITable,
+  UITag,
+  UISpace,
+  UITypographyText,
+  UITooltip,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
+import type { ColumnsType } from 'antd/es/table';
 import type { PluginManifestEntry } from '@kb-labs/studio-data-client';
-
-const { Text } = Typography;
 
 interface PluginTableProps {
   plugins: PluginManifestEntry[];
@@ -28,16 +25,16 @@ export function PluginTable({ plugins, onPluginClick }: PluginTableProps) {
       render: (id, record) => {
         const { display } = record.manifest;
         return (
-          <Space>
-            <span style={{ fontSize: 20 }}>{display?.icon || '📦'}</span>
+          <UISpace>
+            <span style={{ fontSize: 20 }}>{display?.icon || ''}</span>
             <div>
-              <Text strong>{display?.name || id}</Text>
+              <UITypographyText strong>{display?.name || id}</UITypographyText>
               <br />
-              <Text type="secondary" style={{ fontSize: 12 }}>
+              <UITypographyText type="secondary" style={{ fontSize: 12 }}>
                 {id}
-              </Text>
+              </UITypographyText>
             </div>
-          </Space>
+          </UISpace>
         );
       },
     },
@@ -46,7 +43,7 @@ export function PluginTable({ plugins, onPluginClick }: PluginTableProps) {
       dataIndex: ['manifest', 'version'],
       key: 'version',
       width: 100,
-      render: (version) => <Text code>{version}</Text>,
+      render: (version) => <UITypographyText code>{version}</UITypographyText>,
     },
     {
       title: 'Description',
@@ -54,9 +51,9 @@ export function PluginTable({ plugins, onPluginClick }: PluginTableProps) {
       key: 'description',
       ellipsis: { showTitle: false },
       render: (desc) => (
-        <Tooltip title={desc}>
-          <Text type="secondary">{desc || '—'}</Text>
-        </Tooltip>
+        <UITooltip title={desc}>
+          <UITypographyText type="secondary">{desc || '--'}</UITypographyText>
+        </UITooltip>
       ),
     },
     {
@@ -67,13 +64,13 @@ export function PluginTable({ plugins, onPluginClick }: PluginTableProps) {
       render: (_, record) => {
         const count = record.manifest.cli?.commands.length ?? 0;
         return count > 0 ? (
-          <Tooltip title={`${count} command${count > 1 ? 's' : ''}`}>
-            <Tag icon={<CodeOutlined />} color="blue">
+          <UITooltip title={`${count} command${count > 1 ? 's' : ''}`}>
+            <UITag icon={<UIIcon name="CodeOutlined" />} color="blue">
               {count}
-            </Tag>
-          </Tooltip>
+            </UITag>
+          </UITooltip>
         ) : (
-          <Text type="secondary">—</Text>
+          <UITypographyText type="secondary">--</UITypographyText>
         );
       },
     },
@@ -85,13 +82,13 @@ export function PluginTable({ plugins, onPluginClick }: PluginTableProps) {
       render: (_, record) => {
         const count = record.manifest.rest?.routes.length ?? 0;
         return count > 0 ? (
-          <Tooltip title={`${count} route${count > 1 ? 's' : ''}`}>
-            <Tag icon={<ApiOutlined />} color="green">
+          <UITooltip title={`${count} route${count > 1 ? 's' : ''}`}>
+            <UITag icon={<UIIcon name="ApiOutlined" />} color="green">
               {count}
-            </Tag>
-          </Tooltip>
+            </UITag>
+          </UITooltip>
         ) : (
-          <Text type="secondary">—</Text>
+          <UITypographyText type="secondary">--</UITypographyText>
         );
       },
     },
@@ -103,13 +100,13 @@ export function PluginTable({ plugins, onPluginClick }: PluginTableProps) {
       render: (_, record) => {
         const count = record.manifest.workflows?.handlers.length ?? 0;
         return count > 0 ? (
-          <Tooltip title={`${count} handler${count > 1 ? 's' : ''}`}>
-            <Tag icon={<NodeIndexOutlined />} color="purple">
+          <UITooltip title={`${count} handler${count > 1 ? 's' : ''}`}>
+            <UITag icon={<UIIcon name="NodeIndexOutlined" />} color="purple">
               {count}
-            </Tag>
-          </Tooltip>
+            </UITag>
+          </UITooltip>
         ) : (
-          <Text type="secondary">—</Text>
+          <UITypographyText type="secondary">--</UITypographyText>
         );
       },
     },
@@ -121,13 +118,13 @@ export function PluginTable({ plugins, onPluginClick }: PluginTableProps) {
       render: (_, record) => {
         const count = record.manifest.jobs?.length ?? 0;
         return count > 0 ? (
-          <Tooltip title={`${count} job${count > 1 ? 's' : ''}`}>
-            <Tag icon={<ClockCircleOutlined />} color="orange">
+          <UITooltip title={`${count} job${count > 1 ? 's' : ''}`}>
+            <UITag icon={<UIIcon name="ClockCircleOutlined" />} color="orange">
               {count}
-            </Tag>
-          </Tooltip>
+            </UITag>
+          </UITooltip>
         ) : (
-          <Text type="secondary">—</Text>
+          <UITypographyText type="secondary">--</UITypographyText>
         );
       },
     },
@@ -136,33 +133,33 @@ export function PluginTable({ plugins, onPluginClick }: PluginTableProps) {
       key: 'flags',
       width: 180,
       render: (_, record) => (
-        <Space wrap size={4}>
+        <UISpace wrap size={4}>
           {record.manifest.permissions && (
-            <Tooltip title="Requires permissions">
-              <Tag icon={<WarningOutlined />} color="gold" style={{ fontSize: 11 }}>
+            <UITooltip title="Requires permissions">
+              <UITag icon={<UIIcon name="WarningOutlined" />} color="gold" style={{ fontSize: 11 }}>
                 Perms
-              </Tag>
-            </Tooltip>
+              </UITag>
+            </UITooltip>
           )}
           {record.manifest.platform?.requires && record.manifest.platform.requires.length > 0 && (
-            <Tooltip title={`Requires: ${record.manifest.platform.requires.join(', ')}`}>
-              <Tag icon={<CheckCircleOutlined />} color="cyan" style={{ fontSize: 11 }}>
+            <UITooltip title={`Requires: ${record.manifest.platform.requires.join(', ')}`}>
+              <UITag icon={<UIIcon name="CheckCircleOutlined" />} color="cyan" style={{ fontSize: 11 }}>
                 Platform
-              </Tag>
-            </Tooltip>
+              </UITag>
+            </UITooltip>
           )}
           {record.manifest.display?.tags?.slice(0, 2).map((tag) => (
-            <Tag key={tag} style={{ fontSize: 11 }}>
+            <UITag key={tag} style={{ fontSize: 11 }}>
               {tag}
-            </Tag>
+            </UITag>
           ))}
-        </Space>
+        </UISpace>
       ),
     },
   ];
 
   return (
-    <Table
+    <UITable
       columns={columns}
       dataSource={plugins}
       rowKey="pluginId"

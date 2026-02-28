@@ -12,8 +12,7 @@ export function useWorkflowRuns(
   return useQuery({
     queryKey,
     queryFn: async () => {
-      const response = await source.listRuns(filters)
-      return response
+      return source.listRuns(filters)
     },
   })
 }
@@ -26,7 +25,7 @@ export function useWorkflowRun(runId: string | null, source: WorkflowDataSource)
       if (!runId) {
         return null
       }
-      return await source.getRun(runId)
+      return source.getRun(runId)
     },
   })
 }
@@ -51,7 +50,7 @@ export function useRunWorkflow(source: WorkflowDataSource) {
       if (!source.runWorkflow) {
         throw new Error('Workflow source does not support running workflows')
       }
-      return await source.runWorkflow(params)
+      return source.runWorkflow(params)
     },
     onSuccess: (run) => {
       void queryClient.invalidateQueries({ queryKey: qk.workflows.all, exact: false })

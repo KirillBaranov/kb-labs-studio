@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { Empty } from 'antd';
-import { KBButton } from '@kb-labs/studio-ui-react';
+import { UIEmptyState as UIEmptyStateBase, UIButton } from '@kb-labs/studio-ui-kit';
 
 export interface EmptyStateProps {
   icon?: React.ReactNode;
@@ -18,18 +17,12 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
     : icon;
 
   return (
-    <Empty
-      image={iconElement}
-      imageStyle={{ height: 60 }}
-      description={
-        <div>
-          <h3 style={{ marginBottom: 8, fontSize: 18, fontWeight: 600 }}>{title}</h3>
-          <p style={{ margin: 0, color: 'var(--text-secondary)' }}>{description}</p>
-        </div>
-      }
-    >
-      {action && <KBButton onClick={action.onClick}>{action.label}</KBButton>}
-    </Empty>
+    <UIEmptyStateBase
+      icon={iconElement}
+      title={title}
+      description={description}
+      action={action ? <UIButton onClick={action.onClick}>{action.label}</UIButton> : undefined}
+    />
   );
 }
 

@@ -5,24 +5,21 @@
 
 import { useState } from 'react';
 import {
-  Card,
-  Empty,
-  Spin,
-  Timeline,
-  Typography,
-  Tag,
-  Button,
-  Modal,
-  Descriptions,
-  Tabs,
-  Space,
-} from 'antd';
-import {
-  ClockCircleOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  EyeOutlined,
-} from '@ant-design/icons';
+  UICard,
+  UIEmptyState,
+  UISpin,
+  UITimeline,
+  UITypographyText,
+  UITitle,
+  UITag,
+  UIButton,
+  UIModal,
+  UIDescriptions,
+  UIDescriptionsItem,
+  UITabs,
+  UISpace,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import {
   useReleaseHistory,
@@ -32,8 +29,6 @@ import {
 } from '@kb-labs/studio-data-client';
 import { MarkdownViewer } from '@/components/markdown';
 import type { ReleaseHistoryItem } from '@kb-labs/release-manager-contracts';
-
-const { Title, Text } = Typography;
 
 interface HistoryTabProps {
   selectedScope: string;
@@ -94,17 +89,17 @@ export function HistoryTab({ selectedScope }: HistoryTabProps) {
   };
 
   if (historyLoading) {
-    return <Spin size="large" style={{ display: 'block', margin: '48px auto' }} />;
+    return <UISpin size="large" style={{ display: 'block', margin: '48px auto' }} />;
   }
 
   if (historyError) {
     return (
-      <Card>
-        <Empty
+      <UICard>
+        <UIEmptyState
           description={`Failed to load history: ${historyError instanceof Error ? historyError.message : 'Unknown error'}`}
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          image={UIEmptyState.PRESENTED_IMAGE_SIMPLE}
         />
-      </Card>
+      </UICard>
     );
   }
 
@@ -117,23 +112,23 @@ export function HistoryTab({ selectedScope }: HistoryTabProps) {
 
   if (filteredReleases.length === 0) {
     return (
-      <Card>
-        <Empty
+      <UICard>
+        <UIEmptyState
           description={selectedScope
             ? `No release history for scope "${selectedScope}" yet`
             : "No release history yet"
           }
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          image={UIEmptyState.PRESENTED_IMAGE_SIMPLE}
         />
-      </Card>
+      </UICard>
     );
   }
 
   const getStatusIcon = (success: boolean) => {
     if (success) {
-      return <CheckCircleOutlined style={{ color: '#52c41a' }} />;
+      return <UIIcon name="CheckCircleOutlined" style={{ color: '#52c41a' }} />;
     } else {
-      return <CloseCircleOutlined style={{ color: '#ff4d4f' }} />;
+      return <UIIcon name="CloseCircleOutlined" style={{ color: '#ff4d4f' }} />;
     }
   };
 
@@ -144,25 +139,25 @@ export function HistoryTab({ selectedScope }: HistoryTabProps) {
   const timelineItems = filteredReleases.map((release) => ({
     dot: getStatusIcon(release.success),
     children: (
-      <Card size="small" style={{ marginBottom: 16 }}>
-        <Space direction="vertical" style={{ width: '100%' }}>
-          <Space>
-            <Tag color="blue">{release.scope}</Tag>
-            <Tag color={getStatusColor(release.success)}>{release.success ? 'Success' : 'Failed'}</Tag>
-            <Text type="secondary">{new Date(release.timestamp).toLocaleString()}</Text>
-          </Space>
-          <Text>
+      <UICard size="small" style={{ marginBottom: 16 }}>
+        <UISpace direction="vertical" style={{ width: '100%' }}>
+          <UISpace>
+            <UITag color="blue">{release.scope}</UITag>
+            <UITag color={getStatusColor(release.success)}>{release.success ? 'Success' : 'Failed'}</UITag>
+            <UITypographyText type="secondary">{new Date(release.timestamp).toLocaleString()}</UITypographyText>
+          </UISpace>
+          <UITypographyText>
             Released {release.packages.length} package(s)
-          </Text>
-          <Button
-            icon={<EyeOutlined />}
+          </UITypographyText>
+          <UIButton
+            icon={<UIIcon name="EyeOutlined" />}
             onClick={() => handleViewDetails(release.id, release.scope)}
             size="small"
           >
             View Details
-          </Button>
-        </Space>
-      </Card>
+          </UIButton>
+        </UISpace>
+      </UICard>
     ),
   }));
 
@@ -171,31 +166,31 @@ export function HistoryTab({ selectedScope }: HistoryTabProps) {
       key: 'report',
       label: 'Report',
       children: reportData?.report ? (
-        <Descriptions bordered column={1} size="small">
-          <Descriptions.Item label="Release ID">{reportData.id}</Descriptions.Item>
-          <Descriptions.Item label="Scope">{reportData.report.scope}</Descriptions.Item>
-          <Descriptions.Item label="Stage">{reportData.report.stage}</Descriptions.Item>
-          <Descriptions.Item label="Timestamp">
+        <UIDescriptions bordered column={1} size="small">
+          <UIDescriptionsItem label="Release ID">{reportData.id}</UIDescriptionsItem>
+          <UIDescriptionsItem label="Scope">{reportData.report.scope}</UIDescriptionsItem>
+          <UIDescriptionsItem label="Stage">{reportData.report.stage}</UIDescriptionsItem>
+          <UIDescriptionsItem label="Timestamp">
             {new Date(reportData.report.ts).toLocaleString()}
-          </Descriptions.Item>
-          <Descriptions.Item label="Status">
-            <Tag color={reportData.report.result?.ok ? 'success' : 'error'}>
+          </UIDescriptionsItem>
+          <UIDescriptionsItem label="Status">
+            <UITag color={reportData.report.result?.ok ? 'success' : 'error'}>
               {reportData.report.result?.ok ? 'Success' : 'Failed'}
-            </Tag>
-          </Descriptions.Item>
+            </UITag>
+          </UIDescriptionsItem>
           {reportData.report.result?.timingMs && (
-            <Descriptions.Item label="Duration">
+            <UIDescriptionsItem label="Duration">
               {reportData.report.result.timingMs}ms
-            </Descriptions.Item>
+            </UIDescriptionsItem>
           )}
           {reportData.report.result?.published && (
-            <Descriptions.Item label="Packages Published">
+            <UIDescriptionsItem label="Packages Published">
               {reportData.report.result.published.length}
-            </Descriptions.Item>
+            </UIDescriptionsItem>
           )}
-        </Descriptions>
+        </UIDescriptions>
       ) : (
-        <Spin />
+        <UISpin />
       ),
     },
     {
@@ -203,31 +198,31 @@ export function HistoryTab({ selectedScope }: HistoryTabProps) {
       label: 'Plan',
       children: planData?.plan ? (
         <div>
-          <Descriptions bordered column={2} size="small" style={{ marginBottom: 16 }}>
-            <Descriptions.Item label="Scope">{planData.plan.scope}</Descriptions.Item>
-            <Descriptions.Item label="Strategy">{planData.plan.strategy}</Descriptions.Item>
-            <Descriptions.Item label="Packages">{planData.plan.packages.length}</Descriptions.Item>
-            <Descriptions.Item label="Rollback">
+          <UIDescriptions bordered column={2} size="small" style={{ marginBottom: 16 }}>
+            <UIDescriptionsItem label="Scope">{planData.plan.scope}</UIDescriptionsItem>
+            <UIDescriptionsItem label="Strategy">{planData.plan.strategy}</UIDescriptionsItem>
+            <UIDescriptionsItem label="Packages">{planData.plan.packages.length}</UIDescriptionsItem>
+            <UIDescriptionsItem label="Rollback">
               {planData.plan.rollbackEnabled ? 'Enabled' : 'Disabled'}
-            </Descriptions.Item>
-          </Descriptions>
+            </UIDescriptionsItem>
+          </UIDescriptions>
           {planData.plan.packages.map((pkg, idx) => (
-            <Card key={idx} size="small" style={{ marginBottom: 8 }}>
-              <Space direction="vertical" size="small">
-                <Text strong>{pkg.name}</Text>
-                <Space>
-                  <Tag color="blue">{pkg.currentVersion}</Tag>
+            <UICard key={idx} size="small" style={{ marginBottom: 8 }}>
+              <UISpace direction="vertical" size="small">
+                <UITypographyText strong>{pkg.name}</UITypographyText>
+                <UISpace>
+                  <UITag color="blue">{pkg.currentVersion}</UITag>
                   →
-                  <Tag color="green">{pkg.nextVersion}</Tag>
-                  <Tag>{pkg.bump}</Tag>
-                </Space>
-                <Text type="secondary">{pkg.reason}</Text>
-              </Space>
-            </Card>
+                  <UITag color="green">{pkg.nextVersion}</UITag>
+                  <UITag>{pkg.bump}</UITag>
+                </UISpace>
+                <UITypographyText type="secondary">{pkg.reason}</UITypographyText>
+              </UISpace>
+            </UICard>
           ))}
         </div>
       ) : (
-        <Spin />
+        <UISpin />
       ),
     },
     {
@@ -236,24 +231,24 @@ export function HistoryTab({ selectedScope }: HistoryTabProps) {
       children: changelogData?.markdown ? (
         <MarkdownViewer>{changelogData.markdown}</MarkdownViewer>
       ) : (
-        <Spin />
+        <UISpin />
       ),
     },
   ];
 
   return (
-    <Card title={<Title level={4} style={{ margin: 0 }}>Release History</Title>}>
-      <Timeline items={timelineItems} />
+    <UICard title={<UITitle level={4} style={{ margin: 0 }}>Release History</UITitle>}>
+      <UITimeline items={timelineItems} />
 
-      <Modal
+      <UIModal
         title={`Release Details - ${selectedReleaseId}`}
         open={modalVisible}
         onCancel={handleModalClose}
         footer={null}
         width={800}
       >
-        <Tabs items={modalTabItems} />
-      </Modal>
-    </Card>
+        <UITabs items={modalTabItems} />
+      </UIModal>
+    </UICard>
   );
 }

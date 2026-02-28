@@ -13,6 +13,10 @@ import type {
   GenerateRequest,
   GenerateResponse,
   PlanResponse,
+  PatchPlanRequest,
+  PatchPlanResponse,
+  RegenerateCommitRequest,
+  RegenerateCommitResponse,
   ApplyRequest,
   ApplyResponse,
   PushRequest,
@@ -93,6 +97,8 @@ export class MockCommitSource implements CommitDataSource {
 
   async generatePlan(request: GenerateRequest): Promise<GenerateResponse> {
     return {
+      success: true,
+      secretsDetected: false,
       plan: {
         schemaVersion: '1.0',
         createdAt: new Date().toISOString(),
@@ -111,6 +117,22 @@ export class MockCommitSource implements CommitDataSource {
       },
       planPath: '.kb/commit/current/plan.json',
       scope: request.scope,
+    };
+  }
+
+  async patchPlan(request: PatchPlanRequest): Promise<PatchPlanResponse> {
+    return {
+      success: true,
+      scope: request.scope ?? 'root',
+      commitId: request.commitId,
+    };
+  }
+
+  async regenerateCommit(request: RegenerateCommitRequest): Promise<RegenerateCommitResponse> {
+    return {
+      success: true,
+      scope: request.scope ?? 'root',
+      commitId: request.commitId,
     };
   }
 

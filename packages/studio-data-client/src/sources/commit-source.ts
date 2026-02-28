@@ -12,6 +12,10 @@ import type {
   GenerateRequest,
   GenerateResponse,
   PlanResponse,
+  PatchPlanRequest,
+  PatchPlanResponse,
+  RegenerateCommitRequest,
+  RegenerateCommitResponse,
   ApplyRequest,
   ApplyResponse,
   PushRequest,
@@ -63,7 +67,17 @@ export interface CommitDataSource {
   generatePlan(request: GenerateRequest): Promise<GenerateResponse>;
 
   /**
-   * POST /apply - Apply commit plan
+   * PATCH /plan - Edit a single commit in the plan
+   */
+  patchPlan(request: PatchPlanRequest): Promise<PatchPlanResponse>;
+
+  /**
+   * POST /regenerate-commit - Regenerate a single commit with LLM
+   */
+  regenerateCommit(request: RegenerateCommitRequest): Promise<RegenerateCommitResponse>;
+
+  /**
+   * POST /apply - Apply commit plan (supports selective apply via commitIds)
    */
   applyCommits(request: ApplyRequest): Promise<ApplyResponse>;
 

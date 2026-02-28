@@ -4,7 +4,7 @@
  */
 
 import * as React from 'react';
-import { Card, Select, Spin, Alert, Tree, Row, Col, Statistic } from 'antd';
+import { UICard, UISelect, UISpin, UIAlert, UITree, UIRow, UICol, UIStatistic } from '@kb-labs/studio-ui-kit';
 import type { DataNode } from 'antd/es/tree';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useQualityGraph, useQualityBuildOrder } from '@kb-labs/studio-data-client';
@@ -29,13 +29,13 @@ export function GraphTab() {
   if (isLoading) {
     return (
       <div style={{ textAlign: 'center', padding: '40px' }}>
-        <Spin size="large" />
+        <UISpin size="large" />
       </div>
     );
   }
 
   if (error) {
-    return <Alert message="Failed to load graph" type="error" showIcon />;
+    return <UIAlert message="Failed to load graph" type="error" showIcon />;
   }
 
   const convertToTreeData = (node: GraphNode, path: string = ''): DataNode => {
@@ -49,11 +49,11 @@ export function GraphTab() {
 
   const renderTreeMode = () => {
     if (!data?.tree) {
-      return <Alert message="No tree data available" type="info" />;
+      return <UIAlert message="No tree data available" type="info" />;
     }
 
     return (
-      <Tree
+      <UITree
         treeData={[convertToTreeData(data.tree)]}
         showLine
         defaultExpandedKeys={[data.tree.name]}
@@ -63,7 +63,7 @@ export function GraphTab() {
 
   const renderPackagesMode = () => {
     if (!data?.packages || data.packages.length === 0) {
-      return <Alert message="No packages found" type="info" />;
+      return <UIAlert message="No packages found" type="info" />;
     }
 
     return (
@@ -77,35 +77,35 @@ export function GraphTab() {
 
   const renderStatsMode = () => {
     if (!data?.stats) {
-      return <Alert message="No stats available" type="info" />;
+      return <UIAlert message="No stats available" type="info" />;
     }
 
     return (
       <div>
-        <Row gutter={16} style={{ marginBottom: 24 }}>
-          <Col span={8}>
-            <Card>
-              <Statistic title="Total Packages" value={data.stats.totalPackages} />
-            </Card>
-          </Col>
-          <Col span={8}>
-            <Card>
-              <Statistic title="Max Depth" value={data.stats.maxDepth} />
-            </Card>
-          </Col>
-          <Col span={8}>
-            <Card>
-              <Statistic
+        <UIRow gutter={16} style={{ marginBottom: 24 }}>
+          <UICol span={8}>
+            <UICard>
+              <UIStatistic title="Total Packages" value={data.stats.totalPackages} />
+            </UICard>
+          </UICol>
+          <UICol span={8}>
+            <UICard>
+              <UIStatistic title="Max Depth" value={data.stats.maxDepth} />
+            </UICard>
+          </UICol>
+          <UICol span={8}>
+            <UICard>
+              <UIStatistic
                 title="Avg Dependencies"
                 value={data.stats.avgDependencies}
                 precision={1}
               />
-            </Card>
-          </Col>
-        </Row>
+            </UICard>
+          </UICol>
+        </UIRow>
 
         {data.stats.mostDepended && data.stats.mostDepended.length > 0 && (
-          <Card title="Most Depended On">
+          <UICard title="Most Depended On">
             <ul>
               {data.stats.mostDepended.map((item) => (
                 <li key={item.name}>
@@ -113,7 +113,7 @@ export function GraphTab() {
                 </li>
               ))}
             </ul>
-          </Card>
+          </UICard>
         )}
       </div>
     );
@@ -122,11 +122,11 @@ export function GraphTab() {
   return (
     <div>
       {/* Controls */}
-      <Card title="Visualization Options" style={{ marginBottom: 24 }}>
-        <Row gutter={16}>
-          <Col span={12}>
+      <UICard title="Visualization Options" style={{ marginBottom: 24 }}>
+        <UIRow gutter={16}>
+          <UICol span={12}>
             <label>Mode:</label>
-            <Select
+            <UISelect
               style={{ width: '100%', marginTop: 8 }}
               value={mode}
               onChange={setMode}
@@ -137,11 +137,11 @@ export function GraphTab() {
                 { label: 'Statistics', value: 'stats' },
               ]}
             />
-          </Col>
+          </UICol>
           {mode !== 'stats' && (
-            <Col span={12}>
+            <UICol span={12}>
               <label>Package{mode === 'tree' ? ' (optional)' : ''}:</label>
-              <Select
+              <UISelect
                 style={{ width: '100%', marginTop: 8 }}
                 placeholder={mode === 'tree' ? 'All packages' : 'Select a package'}
                 value={selectedPackage}
@@ -155,17 +155,17 @@ export function GraphTab() {
                   })) ?? []
                 }
               />
-            </Col>
+            </UICol>
           )}
-        </Row>
-      </Card>
+        </UIRow>
+      </UICard>
 
       {/* Visualization */}
-      <Card title={`${mode.charAt(0).toUpperCase() + mode.slice(1)} View`}>
+      <UICard title={`${mode.charAt(0).toUpperCase() + mode.slice(1)} View`}>
         {mode === 'tree' && renderTreeMode()}
         {(mode === 'reverse' || mode === 'impact') && renderPackagesMode()}
         {mode === 'stats' && renderStatsMode()}
-      </Card>
+      </UICard>
     </div>
   );
 }

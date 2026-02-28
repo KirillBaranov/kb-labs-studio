@@ -4,19 +4,16 @@
  */
 
 import * as React from 'react';
-import { Card, Table, Tag, Spin, Alert, Space, Button, Typography } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
 import {
-  ClockCircleOutlined,
-  ThunderboltOutlined,
-  WarningOutlined,
-  FileOutlined,
-} from '@ant-design/icons';
+  UICard, UITable, UITag, UISpin, UIAlert, UISpace, UIButton,
+  UITypographyText, UIIcon,
+} from '@kb-labs/studio-ui-kit';
+import type { ColumnsType } from 'antd/es/table';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useQualityStale } from '@kb-labs/studio-data-client';
 import type { StalePackage, StaleChain } from '@kb-labs/quality-contracts';
 
-const { Text } = Typography;
+const Text = UITypographyText;
 
 export function StaleTab() {
   const sources = useDataSources();
@@ -25,13 +22,13 @@ export function StaleTab() {
   if (isLoading) {
     return (
       <div style={{ textAlign: 'center', padding: '40px' }}>
-        <Spin size="large" />
+        <UISpin size="large" />
       </div>
     );
   }
 
   if (error) {
-    return <Alert message="Failed to load stale packages" type="error" showIcon />;
+    return <UIAlert message="Failed to load stale packages" type="error" showIcon />;
   }
 
   const getSeverityColor = (severity: string): string => {
@@ -94,7 +91,7 @@ export function StaleTab() {
       ],
       onFilter: (value, record) => record.reason === value,
       render: (reason: string) => (
-        <Tag color={getReasonColor(reason)}>{getReasonText(reason)}</Tag>
+        <UITag color={getReasonColor(reason)}>{getReasonText(reason)}</UITag>
       ),
     },
     {
@@ -113,7 +110,7 @@ export function StaleTab() {
       ],
       onFilter: (value, record) => record.severity === value,
       render: (severity: string) => (
-        <Tag color={getSeverityColor(severity)}>{severity.toUpperCase()}</Tag>
+        <UITag color={getSeverityColor(severity)}>{severity.toUpperCase()}</UITag>
       ),
     },
     {
@@ -133,7 +130,7 @@ export function StaleTab() {
       render: (_, record) => {
         if (record.sourceModified) {
           return (
-            <Space direction="vertical" size={0}>
+            <UISpace direction="vertical" size={0}>
               <Text type="secondary" style={{ fontSize: 12 }}>
                 Source: {new Date(record.sourceModified).toLocaleString()}
               </Text>
@@ -142,7 +139,7 @@ export function StaleTab() {
                   Dist: {new Date(record.distModified).toLocaleString()}
                 </Text>
               )}
-            </Space>
+            </UISpace>
           );
         }
         return <Text type="secondary">-</Text>;
@@ -163,7 +160,7 @@ export function StaleTab() {
       key: 'depth',
       sorter: (a, b) => a.depth - b.depth,
       render: (depth: number) => (
-        <Tag color={depth > 5 ? 'red' : depth > 3 ? 'orange' : 'blue'}>{depth} levels</Tag>
+        <UITag color={depth > 5 ? 'red' : depth > 3 ? 'orange' : 'blue'}>{depth} levels</UITag>
       ),
     },
     {
@@ -183,12 +180,12 @@ export function StaleTab() {
     <div>
       {/* Summary Alert */}
       {data && data.totalStale > 0 ? (
-        <Alert
+        <UIAlert
           type="error"
           showIcon
-          icon={<ClockCircleOutlined />}
+          icon={<UIIcon name="ClockCircleOutlined" />}
           message={
-            <Space>
+            <UISpace>
               <strong>
                 {data.totalStale} stale package{data.totalStale > 1 ? 's' : ''} detected
               </strong>
@@ -196,20 +193,20 @@ export function StaleTab() {
                 affecting {data.totalAffected} downstream package
                 {data.totalAffected > 1 ? 's' : ''}
               </Text>
-            </Space>
+            </UISpace>
           }
           action={
-            <Space>
-              <Button type="primary" danger icon={<ThunderboltOutlined />} size="small">
+            <UISpace>
+              <UIButton type="primary" danger icon={<UIIcon name="ThunderboltOutlined" />} size="small">
                 Rebuild All
-              </Button>
-              <Button size="small">Export Report</Button>
-            </Space>
+              </UIButton>
+              <UIButton size="small">Export Report</UIButton>
+            </UISpace>
           }
           style={{ marginBottom: 24 }}
         />
       ) : (
-        <Alert
+        <UIAlert
           type="success"
           showIcon
           message="All packages are up to date"
@@ -220,41 +217,41 @@ export function StaleTab() {
 
       {/* Critical Chains */}
       {data?.criticalChains && data.criticalChains.length > 0 && (
-        <Card
+        <UICard
           title={
-            <Space>
-              <WarningOutlined style={{ color: '#ff4d4f' }} />
+            <UISpace>
+              <UIIcon name="WarningOutlined" style={{ color: '#ff4d4f' }} />
               Critical Rebuild Chains
-            </Space>
+            </UISpace>
           }
           style={{ marginBottom: 24 }}
         >
-          <Alert
+          <UIAlert
             type="warning"
             showIcon
             message="High-impact stale packages"
             description="These packages affect many downstream packages. Rebuilding them will trigger cascading rebuilds."
             style={{ marginBottom: 16 }}
           />
-          <Table
+          <UITable
             dataSource={data.criticalChains}
             columns={chainColumns}
             rowKey="root"
             pagination={{ pageSize: 5 }}
           />
-        </Card>
+        </UICard>
       )}
 
       {/* Stale Packages Table */}
-      <Card
+      <UICard
         title={
-          <Space>
-            <FileOutlined />
+          <UISpace>
+            <UIIcon name="FileOutlined" />
             Stale Packages
-          </Space>
+          </UISpace>
         }
       >
-        <Table
+        <UITable
           dataSource={data?.stalePackages ?? []}
           columns={staleColumns}
           rowKey="name"
@@ -262,7 +259,7 @@ export function StaleTab() {
           expandable={{
             expandedRowRender: (record) => (
               <div style={{ padding: '8px 16px' }}>
-                <Space direction="vertical" size={8} style={{ width: '100%' }}>
+                <UISpace direction="vertical" size={8} style={{ width: '100%' }}>
                   <div>
                     <Text strong>Path: </Text>
                     <Text type="secondary" code>
@@ -274,22 +271,22 @@ export function StaleTab() {
                       <Text strong>Affected Packages ({record.affectedPackages.length}):</Text>
                       <div style={{ marginTop: 8 }}>
                         {record.affectedPackages.slice(0, 10).map((pkg: string) => (
-                          <Tag key={pkg} style={{ marginBottom: 4 }}>
+                          <UITag key={pkg} style={{ marginBottom: 4 }}>
                             {pkg}
-                          </Tag>
+                          </UITag>
                         ))}
                         {record.affectedPackages.length > 10 && (
-                          <Tag>+{record.affectedPackages.length - 10} more</Tag>
+                          <UITag>+{record.affectedPackages.length - 10} more</UITag>
                         )}
                       </div>
                     </div>
                   )}
-                </Space>
+                </UISpace>
               </div>
             ),
           }}
         />
-      </Card>
+      </UICard>
     </div>
   );
 }

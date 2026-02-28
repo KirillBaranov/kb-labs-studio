@@ -1,18 +1,19 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  Card,
-  Input,
-  Button,
-  Typography,
-  Space,
-  Tag,
-  Spin,
-  Statistic,
-  Checkbox,
-  Select,
-  Tooltip,
-  message,
-} from 'antd';
+  UICard,
+  UIInput,
+  UIButton,
+  UITypographyText,
+  UITypographyParagraph,
+  UISpace,
+  UITag,
+  UISpin,
+  UIStatistic,
+  UICheckbox,
+  UISelect,
+  UITooltip,
+  UIMessage,
+} from '@kb-labs/studio-ui-kit';
 import {
   SendOutlined,
   RobotOutlined,
@@ -28,8 +29,7 @@ import { useDataSources } from '../../../providers/data-sources-provider';
 import { usePrometheusMetrics, useIncidents } from '@kb-labs/studio-data-client';
 import { MarkdownViewer } from '../../../components/markdown/markdown-viewer';
 
-const { Text, Paragraph } = Typography;
-const { TextArea } = Input;
+const { TextArea } = UIInput;
 
 interface Message {
   id: string;
@@ -98,7 +98,7 @@ export function AIInsightsPage() {
 
   // Build context summary for display
   const contextSummary = React.useMemo(() => {
-    if (!metrics) return null;
+    if (!metrics) {return null;}
 
     const errorRate = metrics.requests?.total
       ? (((metrics.requests.clientErrors ?? 0) + (metrics.requests.serverErrors ?? 0)) / metrics.requests.total * 100)
@@ -126,7 +126,7 @@ export function AIInsightsPage() {
 
   // Send message
   const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading) {return;}
 
     const userMessage: Message = {
       id: `user-${Date.now()}`,
@@ -179,7 +179,7 @@ export function AIInsightsPage() {
   const handleCopy = async (content: string, id: string) => {
     await navigator.clipboard.writeText(content);
     setCopiedId(id);
-    message.success('Copied to clipboard');
+    UIMessage.success('Copied to clipboard');
     setTimeout(() => setCopiedId(null), 2000);
   };
 
@@ -197,29 +197,29 @@ export function AIInsightsPage() {
   return (
     <div style={{ display: 'flex', gap: 24, height: 'calc(100vh - 280px)', minHeight: 500 }}>
       {/* Main Chat Panel */}
-      <Card
+      <UICard
         style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
         styles={{ body: { flex: 1, display: 'flex', flexDirection: 'column', padding: 0, overflow: 'hidden' } }}
         title={
-          <Space>
+          <UISpace>
             <RobotOutlined />
             <span>AI Assistant</span>
-            {metricsLoading && <Spin size="small" />}
-          </Space>
+            {metricsLoading && <UISpin size="small" />}
+          </UISpace>
         }
         extra={
-          <Space>
-            <Tooltip title="Clear conversation">
-              <Button icon={<ReloadOutlined />} onClick={handleClear} disabled={messages.length === 0} />
-            </Tooltip>
-            <Tooltip title="Configure context">
-              <Button
+          <UISpace>
+            <UITooltip title="Clear conversation">
+              <UIButton icon={<ReloadOutlined />} onClick={handleClear} disabled={messages.length === 0} />
+            </UITooltip>
+            <UITooltip title="Configure context">
+              <UIButton
                 icon={<SettingOutlined />}
                 onClick={() => setShowConfig(!showConfig)}
                 type={showConfig ? 'primary' : 'default'}
               />
-            </Tooltip>
-          </Space>
+            </UITooltip>
+          </UISpace>
         }
       >
         {/* Messages Area */}
@@ -227,27 +227,27 @@ export function AIInsightsPage() {
           {messages.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '48px 24px' }}>
               <RobotOutlined style={{ fontSize: 48, color: '#bfbfbf', marginBottom: 16 }} />
-              <Text type="secondary" style={{ display: 'block', marginBottom: 24 }}>
+              <UITypographyText type="secondary" style={{ display: 'block', marginBottom: 24 }}>
                 Ask me anything about your system's performance, errors, or health.
                 I'll analyze real-time metrics and provide actionable insights.
-              </Text>
+              </UITypographyText>
 
               <div style={{ marginTop: 24 }}>
-                <Text strong style={{ display: 'block', marginBottom: 12 }}>
+                <UITypographyText strong style={{ display: 'block', marginBottom: 12 }}>
                   <BulbOutlined /> Suggested questions:
-                </Text>
-                <Space wrap style={{ justifyContent: 'center' }}>
+                </UITypographyText>
+                <UISpace wrap style={{ justifyContent: 'center' }}>
                   {SUGGESTED_QUESTIONS.map((q, i) => (
-                    <Tag
+                    <UITag
                       key={i}
                       color="blue"
                       style={{ cursor: 'pointer', padding: '4px 12px' }}
                       onClick={() => handleSuggestion(q.text)}
                     >
                       {q.text}
-                    </Tag>
+                    </UITag>
                   ))}
-                </Space>
+                </UISpace>
               </div>
             </div>
           ) : (
@@ -275,16 +275,16 @@ export function AIInsightsPage() {
                       )}
                       <div style={{ flex: 1 }}>
                         {msg.thinking ? (
-                          <Space>
-                            <Spin size="small" />
-                            <Text type="secondary">Analyzing...</Text>
-                          </Space>
+                          <UISpace>
+                            <UISpin size="small" />
+                            <UITypographyText type="secondary">Analyzing...</UITypographyText>
+                          </UISpace>
                         ) : msg.role === 'assistant' ? (
                           <MarkdownViewer className="ai-insights-markdown">
                             {msg.content}
                           </MarkdownViewer>
                         ) : (
-                          <Paragraph
+                          <UITypographyParagraph
                             style={{
                               margin: 0,
                               whiteSpace: 'pre-wrap',
@@ -292,14 +292,14 @@ export function AIInsightsPage() {
                             }}
                           >
                             {msg.content}
-                          </Paragraph>
+                          </UITypographyParagraph>
                         )}
                         {msg.context && msg.context.length > 0 && (
                           <div style={{ marginTop: 8 }}>
                             {msg.context.map(c => (
-                              <Tag key={c} color="default" style={{ fontSize: 10 }}>
+                              <UITag key={c} color="default" style={{ fontSize: 10 }}>
                                 {c}
-                              </Tag>
+                              </UITag>
                             ))}
                           </div>
                         )}
@@ -308,7 +308,7 @@ export function AIInsightsPage() {
                     </div>
                     {msg.role === 'assistant' && !msg.thinking && (
                       <div style={{ marginTop: 8, textAlign: 'right' }}>
-                        <Button
+                        <UIButton
                           type="text"
                           size="small"
                           icon={copiedId === msg.id ? <CheckOutlined /> : <CopyOutlined />}
@@ -316,7 +316,7 @@ export function AIInsightsPage() {
                           style={{ color: '#8c8c8c' }}
                         >
                           {copiedId === msg.id ? 'Copied' : 'Copy'}
-                        </Button>
+                        </UIButton>
                       </div>
                     )}
                   </div>
@@ -329,8 +329,8 @@ export function AIInsightsPage() {
 
         {/* Input Area */}
         <div style={{ padding: 16, borderTop: '1px solid #f0f0f0' }}>
-          <Space.Compact style={{ width: '100%' }}>
-            <TextArea
+          <UISpace.Compact style={{ width: '100%' }}>
+            <UITypographyTextArea
               ref={inputRef}
               value={input}
               onChange={e => setInput(e.target.value)}
@@ -344,7 +344,7 @@ export function AIInsightsPage() {
               }}
               style={{ flex: 1 }}
             />
-            <Button
+            <UIButton
               type="primary"
               icon={<SendOutlined />}
               onClick={handleSend}
@@ -352,21 +352,21 @@ export function AIInsightsPage() {
               disabled={!input.trim()}
             >
               Send
-            </Button>
-          </Space.Compact>
-          <Text type="secondary" style={{ fontSize: 11, marginTop: 4, display: 'block' }}>
+            </UIButton>
+          </UISpace.Compact>
+          <UITypographyText type="secondary" style={{ fontSize: 11, marginTop: 4, display: 'block' }}>
             Press Enter to send, Shift+Enter for new line
-          </Text>
+          </UITypographyText>
         </div>
-      </Card>
+      </UICard>
 
       {/* Context Panel */}
-      <Card
+      <UICard
         title={
-          <Space>
+          <UISpace>
             <InfoCircleOutlined />
             <span>Context</span>
-          </Space>
+          </UISpace>
         }
         style={{ width: 320, flexShrink: 0 }}
         styles={{ body: { padding: 16 } }}
@@ -374,10 +374,10 @@ export function AIInsightsPage() {
         {/* System Summary */}
         {contextSummary && (
           <div style={{ marginBottom: 24 }}>
-            <Text strong style={{ display: 'block', marginBottom: 12 }}>System Summary</Text>
+            <UITypographyText strong style={{ display: 'block', marginBottom: 12 }}>System Summary</UITypographyText>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <Statistic title="Requests" value={contextSummary.requests} valueStyle={{ fontSize: 18 }} />
-              <Statistic
+              <UIStatistic title="Requests" value={contextSummary.requests} valueStyle={{ fontSize: 18 }} />
+              <UIStatistic
                 title="Error Rate"
                 value={contextSummary.errorRate}
                 suffix="%"
@@ -386,8 +386,8 @@ export function AIInsightsPage() {
                   color: parseFloat(contextSummary.errorRate) > 5 ? '#ff4d4f' : parseFloat(contextSummary.errorRate) > 1 ? '#faad14' : '#52c41a',
                 }}
               />
-              <Statistic title="P99 Latency" value={contextSummary.p99Latency} suffix="ms" valueStyle={{ fontSize: 18 }} />
-              <Statistic title="Incidents" value={contextSummary.incidentCount} valueStyle={{ fontSize: 18 }} />
+              <UIStatistic title="P99 Latency" value={contextSummary.p99Latency} suffix="ms" valueStyle={{ fontSize: 18 }} />
+              <UIStatistic title="Incidents" value={contextSummary.incidentCount} valueStyle={{ fontSize: 18 }} />
             </div>
           </div>
         )}
@@ -395,7 +395,7 @@ export function AIInsightsPage() {
         {/* Recent Incidents */}
         {incidents && incidents.length > 0 && (
           <div style={{ marginBottom: 24 }}>
-            <Text strong style={{ display: 'block', marginBottom: 12 }}>Recent Incidents</Text>
+            <UITypographyText strong style={{ display: 'block', marginBottom: 12 }}>Recent Incidents</UITypographyText>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {incidents.slice(0, 5).map(incident => (
                 <div
@@ -410,7 +410,7 @@ export function AIInsightsPage() {
                     }`,
                   }}
                 >
-                  <Text style={{ fontSize: 12 }}>{incident.title}</Text>
+                  <UITypographyText style={{ fontSize: 12 }}>{incident.title}</UITypographyText>
                 </div>
               ))}
             </div>
@@ -420,33 +420,33 @@ export function AIInsightsPage() {
         {/* Context Configuration */}
         {showConfig && (
           <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: 16 }}>
-            <Text strong style={{ display: 'block', marginBottom: 12 }}>Context Settings</Text>
+            <UITypographyText strong style={{ display: 'block', marginBottom: 12 }}>Context Settings</UITypographyText>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <Checkbox
+              <UICheckbox
                 checked={contextConfig.includeMetrics}
                 onChange={e => setContextConfig(prev => ({ ...prev, includeMetrics: e.target.checked }))}
               >
                 Include current metrics
-              </Checkbox>
-              <Checkbox
+              </UICheckbox>
+              <UICheckbox
                 checked={contextConfig.includeIncidents}
                 onChange={e => setContextConfig(prev => ({ ...prev, includeIncidents: e.target.checked }))}
               >
                 Include incidents
-              </Checkbox>
-              <Checkbox
+              </UICheckbox>
+              <UICheckbox
                 checked={contextConfig.includeHistory}
                 onChange={e => setContextConfig(prev => ({ ...prev, includeHistory: e.target.checked }))}
               >
                 Include historical trends
-              </Checkbox>
+              </UICheckbox>
 
               <div>
-                <Text type="secondary" style={{ fontSize: 12, marginBottom: 4, display: 'block' }}>
+                <UITypographyText type="secondary" style={{ fontSize: 12, marginBottom: 4, display: 'block' }}>
                   Time Range
-                </Text>
-                <Select
+                </UITypographyText>
+                <UISelect
                   value={contextConfig.timeRange}
                   onChange={value => setContextConfig(prev => ({ ...prev, timeRange: value }))}
                   options={TIME_RANGE_OPTIONS}
@@ -457,10 +457,10 @@ export function AIInsightsPage() {
 
               {availablePlugins.length > 0 && (
                 <div>
-                  <Text type="secondary" style={{ fontSize: 12, marginBottom: 4, display: 'block' }}>
+                  <UITypographyText type="secondary" style={{ fontSize: 12, marginBottom: 4, display: 'block' }}>
                     Focus on plugins
-                  </Text>
-                  <Select
+                  </UITypographyText>
+                  <UISelect
                     mode="multiple"
                     value={contextConfig.plugins}
                     onChange={value => setContextConfig(prev => ({ ...prev, plugins: value }))}
@@ -478,24 +478,24 @@ export function AIInsightsPage() {
 
         {/* Suggested Questions */}
         <div style={{ marginTop: 24 }}>
-          <Text strong style={{ display: 'block', marginBottom: 12 }}>
+          <UITypographyText strong style={{ display: 'block', marginBottom: 12 }}>
             <BulbOutlined /> Quick Questions
-          </Text>
+          </UITypographyText>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {SUGGESTED_QUESTIONS.slice(0, 4).map((q, i) => (
-              <Button
+              <UIButton
                 key={i}
                 type="text"
                 size="small"
                 style={{ textAlign: 'left', height: 'auto', padding: '4px 8px' }}
                 onClick={() => handleSuggestion(q.text)}
               >
-                <Text ellipsis style={{ fontSize: 12 }}>{q.text}</Text>
-              </Button>
+                <UITypographyText ellipsis style={{ fontSize: 12 }}>{q.text}</UITypographyText>
+              </UIButton>
             ))}
           </div>
         </div>
-      </Card>
+      </UICard>
 
       {/* Custom styles for markdown in chat context */}
       <style>{`

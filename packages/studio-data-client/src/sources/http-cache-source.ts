@@ -13,7 +13,7 @@ export class HttpCacheSource implements CacheDataSource {
   constructor(private client: HttpClient) {}
 
   async invalidateCache(): Promise<CacheInvalidationResult> {
-    return await this.client.fetch<CacheInvalidationResult>('/cache/invalidate', {
+    return this.client.fetch<CacheInvalidationResult>('/cache/invalidate', {
       method: 'POST',
       // No Content-Type header needed for empty body POST
     });

@@ -5,27 +5,20 @@
 
 import * as React from 'react';
 import {
-  Button,
-  Card,
-  Empty,
-  Spin,
-  Table,
-  Typography,
-  Space,
-  Tag,
-  message,
-  Checkbox,
-  Collapse,
-  Timeline,
-} from 'antd';
-import {
-  ThunderboltOutlined,
-  CheckCircleOutlined,
-  BranchesOutlined,
-  ArrowUpOutlined,
-  DownOutlined,
-  UpOutlined,
-} from '@ant-design/icons';
+  UIButton,
+  UICard,
+  UIEmptyState,
+  UISpin,
+  UITable,
+  UITypographyText,
+  UISpace,
+  UITag,
+  UIMessage,
+  UICheckbox,
+  UIAccordion,
+  UITimeline,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import {
   useReleaseStatus,
@@ -33,8 +26,6 @@ import {
   useGenerateReleasePlan,
   useGitTimeline,
 } from '@kb-labs/studio-data-client';
-
-const { Text } = Typography;
 
 interface PlanStepProps {
   selectedScope: string;
@@ -89,50 +80,50 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
       const tokensInfo = result.tokensUsed ? `, ${result.tokensUsed} tokens` : '';
       const method = useLLM ? 'AI-powered' : 'Simple';
 
-      message.success(`${method} plan generated (${confidencePercent}% confidence${tokensInfo})`);
+      UIMessage.success(`${method} plan generated (${confidencePercent}% confidence${tokensInfo})`);
     } catch (error) {
-      message.error(`Failed to generate plan: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      UIMessage.error(`Failed to generate plan: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
   if (statusLoading) {
-    return <Spin size="large" style={{ display: 'block', margin: '48px auto' }} />;
+    return <UISpin size="large" style={{ display: 'block', margin: '48px auto' }} />;
   }
 
   // No plan exists - show generate UI
   if (!statusData?.hasPlan && !planData?.plan) {
     return (
-      <Card>
-        <Empty
+      <UICard>
+        <UIEmptyState
           description="No release plan generated yet"
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          image={UIEmptyState.PRESENTED_IMAGE_SIMPLE}
         >
-          <Space direction="vertical" size="middle" style={{ display: 'flex', alignItems: 'center' }}>
-            <Checkbox checked={useLLM} onChange={(e) => setUseLLM(e.target.checked)}>
+          <UISpace direction="vertical" size="middle" style={{ display: 'flex', alignItems: 'center' }}>
+            <UICheckbox checked={useLLM} onChange={(e) => setUseLLM(e.target.checked)}>
               Use AI-powered analysis (requires LLM)
-            </Checkbox>
-            <Button
+            </UICheckbox>
+            <UIButton
               type="primary"
-              icon={<ThunderboltOutlined />}
+              icon={<UIIcon name="ThunderboltOutlined" />}
               onClick={handleGenerate}
               loading={generateMutation.isPending}
               size="large"
             >
               Generate Release Plan
-            </Button>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            </UIButton>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               {useLLM
                 ? 'AI will analyze git history and provide intelligent reasoning for version bumps'
                 : 'Generate plan using conventional commits analysis'}
-            </Text>
-          </Space>
-        </Empty>
-      </Card>
+            </UITypographyText>
+          </UISpace>
+        </UIEmptyState>
+      </UICard>
     );
   }
 
   if (planLoading || !planData?.plan) {
-    return <Spin size="large" style={{ display: 'block', margin: '48px auto' }} />;
+    return <UISpin size="large" style={{ display: 'block', margin: '48px auto' }} />;
   }
 
   const { plan } = planData;
@@ -140,29 +131,29 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
   // Plan exists but no packages - show regenerate prompt
   if (plan.packages.length === 0) {
     return (
-      <Card>
-        <Empty
+      <UICard>
+        <UIEmptyState
           description="Plan exists but contains no packages"
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          image={UIEmptyState.PRESENTED_IMAGE_SIMPLE}
         >
-          <Space direction="vertical" size="middle" style={{ display: 'flex', alignItems: 'center' }}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+          <UISpace direction="vertical" size="middle" style={{ display: 'flex', alignItems: 'center' }}>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               This may happen if there are no changes to release or the scope has no packages.
-            </Text>
-            <Checkbox checked={useLLM} onChange={(e) => setUseLLM(e.target.checked)}>
+            </UITypographyText>
+            <UICheckbox checked={useLLM} onChange={(e) => setUseLLM(e.target.checked)}>
               Use AI-powered analysis
-            </Checkbox>
-            <Button
+            </UICheckbox>
+            <UIButton
               type="primary"
-              icon={<ThunderboltOutlined />}
+              icon={<UIIcon name="ThunderboltOutlined" />}
               onClick={handleGenerate}
               loading={generateMutation.isPending}
             >
               Regenerate Plan
-            </Button>
-          </Space>
-        </Empty>
-      </Card>
+            </UIButton>
+          </UISpace>
+        </UIEmptyState>
+      </UICard>
     );
   }
 
@@ -174,9 +165,9 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
       width: 280,
       ellipsis: true,
       render: (name: string) => (
-        <Text strong ellipsis={{ tooltip: name }}>
+        <UITypographyText strong ellipsis={{ tooltip: name }}>
           {name}
-        </Text>
+        </UITypographyText>
       ),
     },
     {
@@ -184,14 +175,14 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
       dataIndex: 'currentVersion',
       key: 'currentVersion',
       width: 90,
-      render: (version: string) => version ? <Tag color="blue">{version}</Tag> : '-',
+      render: (version: string) => version ? <UITag color="blue">{version}</UITag> : '-',
     },
     {
       title: 'Next',
       dataIndex: 'nextVersion',
       key: 'nextVersion',
       width: 90,
-      render: (version: string) => version ? <Tag color="green">{version}</Tag> : '-',
+      render: (version: string) => version ? <UITag color="green">{version}</UITag> : '-',
     },
     {
       title: 'Bump',
@@ -199,13 +190,13 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
       key: 'bump',
       width: 80,
       render: (bump: string) => {
-        if (!bump) return '-';
+        if (!bump) {return '-';}
         const colorMap: Record<string, string> = {
           major: 'red',
           minor: 'orange',
           patch: 'blue',
         };
-        return <Tag color={colorMap[bump] || 'default'}>{bump}</Tag>;
+        return <UITag color={colorMap[bump] || 'default'}>{bump}</UITag>;
       },
     },
     {
@@ -214,82 +205,82 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
       key: 'reason',
       ellipsis: { showTitle: false },
       render: (reason: string) => (
-        <Text
+        <UITypographyText
           type="secondary"
           ellipsis={{ tooltip: { title: reason, overlayStyle: { maxWidth: 400 } } }}
           style={{ fontSize: 12 }}
         >
           {reason || '-'}
-        </Text>
+        </UITypographyText>
       ),
     },
   ];
 
   return (
-    <Card
+    <UICard
       title={
-        <Space>
-          <CheckCircleOutlined style={{ color: '#52c41a' }} />
+        <UISpace>
+          <UIIcon name="CheckCircleOutlined" style={{ color: '#52c41a' }} />
           <span>Release Plan Ready</span>
-          <Tag color="blue">{plan.packages.length} package(s)</Tag>
-        </Space>
+          <UITag color="blue">{plan.packages.length} package(s)</UITag>
+        </UISpace>
       }
       extra={
-        <Space>
-          <Checkbox
+        <UISpace>
+          <UICheckbox
             checked={useLLM}
             onChange={(e) => setUseLLM(e.target.checked)}
             style={{ fontSize: 12 }}
           >
             Use AI
-          </Checkbox>
-          <Button
-            icon={<ThunderboltOutlined />}
+          </UICheckbox>
+          <UIButton
+            icon={<UIIcon name="ThunderboltOutlined" />}
             onClick={handleGenerate}
             loading={generateMutation.isPending}
             size="small"
           >
             Regenerate
-          </Button>
-        </Space>
+          </UIButton>
+        </UISpace>
       }
     >
       {/* Git Timeline */}
       {gitTimelineData && gitTimelineData.hasUnreleasedChanges && (
-        <Collapse
+        <UIAccordion
           size="small"
           style={{ marginBottom: 16 }}
           items={[
             {
               key: 'timeline',
               label: (
-                <Space>
-                  <BranchesOutlined />
+                <UISpace>
+                  <UIIcon name="BranchesOutlined" />
                   <span>Git Timeline</span>
-                  <Tag>{gitTimelineData.unreleased} commits</Tag>
-                </Space>
+                  <UITag>{gitTimelineData.unreleased} commits</UITag>
+                </UISpace>
               ),
               children: (
                 <>
                   {gitTimelineData.suggestedVersion && (
                     <div style={{ marginBottom: 16, padding: '8px 12px', background: '#f6ffed', borderRadius: 4 }}>
-                      <Space>
-                        <ArrowUpOutlined />
-                        <Text strong>
+                      <UISpace>
+                        <UIIcon name="ArrowUpOutlined" />
+                        <UITypographyText strong>
                           {gitTimelineData.currentVersion || '0.0.0'} → {gitTimelineData.suggestedVersion}
-                        </Text>
-                        <Tag color={
+                        </UITypographyText>
+                        <UITag color={
                           gitTimelineData.suggestedBump === 'major' ? 'red' :
                           gitTimelineData.suggestedBump === 'minor' ? 'orange' :
                           'blue'
                         }>
                           {gitTimelineData.suggestedBump}
-                        </Tag>
-                      </Space>
+                        </UITag>
+                      </UISpace>
                     </div>
                   )}
 
-                  <Timeline
+                  <UITimeline
                     mode="left"
                     items={gitTimelineData.commits
                       .slice(0, showAllCommits ? undefined : INITIAL_COMMITS_COUNT)
@@ -301,19 +292,19 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
                           'gray',
                         children: (
                           <div>
-                            <Space size="small">
-                              <Tag color={
+                            <UISpace size="small">
+                              <UITag color={
                                 commit.type === 'feat' ? 'green' :
                                 commit.type === 'fix' ? 'red' :
                                 commit.type === 'BREAKING' ? 'volcano' :
                                 'default'
                               } style={{ fontSize: 10 }}>
                                 {commit.type}
-                              </Tag>
-                              <Text code style={{ fontSize: 10 }}>{commit.shortSha}</Text>
-                            </Space>
+                              </UITag>
+                              <UITypographyText code style={{ fontSize: 10 }}>{commit.shortSha}</UITypographyText>
+                            </UISpace>
                             <div style={{ marginTop: 2 }}>
-                              <Text style={{ fontSize: 12 }}>{commit.message}</Text>
+                              <UITypographyText style={{ fontSize: 12 }}>{commit.message}</UITypographyText>
                             </div>
                           </div>
                         ),
@@ -321,17 +312,17 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
                   />
 
                   {gitTimelineData.commits.length > INITIAL_COMMITS_COUNT && (
-                    <Button
+                    <UIButton
                       type="link"
                       size="small"
-                      icon={showAllCommits ? <UpOutlined /> : <DownOutlined />}
+                      icon={showAllCommits ? <UIIcon name="UpOutlined" /> : <UIIcon name="DownOutlined" />}
                       onClick={() => setShowAllCommits(!showAllCommits)}
                       style={{ padding: 0 }}
                     >
                       {showAllCommits
                         ? 'Show less'
                         : `Show ${gitTimelineData.commits.length - INITIAL_COMMITS_COUNT} more`}
-                    </Button>
+                    </UIButton>
                   )}
                 </>
               ),
@@ -340,7 +331,7 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
         />
       )}
 
-      <Table
+      <UITable
         columns={columns}
         dataSource={plan.packages}
         rowKey="name"
@@ -349,6 +340,6 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
         scroll={{ x: 700 }}
         tableLayout="fixed"
       />
-    </Card>
+    </UICard>
   );
 }

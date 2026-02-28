@@ -5,12 +5,12 @@
 
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { message } from 'antd';
-import { KBQuickSearch, type SearchableItem } from '@kb-labs/studio-ui-react';
+import { UIMessage } from '@kb-labs/studio-ui-kit';
 import { useRegistry } from './registry-provider';
 import { useDataSources } from './data-sources-provider';
 import { useSettings } from './settings-provider';
 import { getCommands, saveRecentCommand, getRecentCommands, type Command } from '@/utils/commands';
+import { KBQuickSearch, type SearchableItem } from '@/components/ui';
 
 interface CommandPaletteContextValue {
   /** Open command palette */
@@ -43,14 +43,14 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
           const currentTheme = settings.appearance.theme;
           const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
           updateSettings({ appearance: { ...settings.appearance, theme: newTheme } });
-          message.success(`Switched to ${newTheme} mode`);
+          UIMessage.success(`Switched to ${newTheme} mode`);
         },
         refreshRegistry: async () => {
           try {
             await refresh();
-            message.success('Registry refreshed successfully');
+            UIMessage.success('Registry refreshed successfully');
           } catch (error) {
-            message.error(
+            UIMessage.error(
               `Failed to refresh registry: ${error instanceof Error ? error.message : String(error)}`
             );
           }
@@ -58,12 +58,12 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
         invalidateCache: async () => {
           try {
             const result = await sources.cache.invalidateCache();
-            message.success(
+            UIMessage.success(
               `Cache invalidated! Rev: ${result.previousRev ?? 'N/A'} → ${result.newRev}`
             );
             await refresh();
           } catch (error) {
-            message.error(
+            UIMessage.error(
               `Failed to invalidate cache: ${error instanceof Error ? error.message : String(error)}`
             );
           }
@@ -117,7 +117,7 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
   const handleNavigate = React.useCallback(
     (path: string) => {
       const command = allCommands.find((cmd) => cmd.path === path);
-      if (!command) return;
+      if (!command) {return;}
 
       // Save to recent
       saveRecentCommand(command.id);

@@ -1,9 +1,10 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import { Card, Drawer, Descriptions, Badge, Tag, Statistic, Row, Col } from 'antd';
+import { UICard, UIDrawer, UIDescriptions, UIBadge, UITag, UIStatistic, UIRow, UICol } from '@kb-labs/studio-ui-kit';
 import { HolderOutlined, ApartmentOutlined, CloseOutlined } from '@ant-design/icons';
-import ReactFlow, {
+import type {
   Node,
-  Edge,
+  Edge} from 'reactflow';
+import ReactFlow, {
   Controls,
   Background,
   BackgroundVariant,
@@ -48,8 +49,8 @@ export function SystemTopologyWidget() {
       data: { label: '👤 User', type: 'user', status: 'healthy' },
       position: { x: 400, y: 0 },
       style: {
-        background: '#e6f7ff',
-        border: '2px solid #1890ff',
+        background: 'var(--accent-subtle)',
+        border: '2px solid var(--info)',
         borderRadius: 8,
         padding: 10,
         fontSize: 14,
@@ -73,8 +74,8 @@ export function SystemTopologyWidget() {
       } as NodeData,
       position: { x: 400, y: 100 },
       style: {
-        background: apiStatus === 'healthy' ? '#f6ffed' : apiStatus === 'warning' ? '#fffbe6' : '#fff1f0',
-        border: `2px solid ${apiStatus === 'healthy' ? '#52c41a' : apiStatus === 'warning' ? '#faad14' : '#ff4d4f'}`,
+        background: apiStatus === 'healthy' ? 'var(--bg-tertiary)' : apiStatus === 'warning' ? 'var(--bg-tertiary)' : 'var(--bg-tertiary)',
+        border: `2px solid ${apiStatus === 'healthy' ? 'var(--success)' : apiStatus === 'warning' ? 'var(--warning)' : 'var(--error)'}`,
         borderRadius: 8,
         padding: 12,
         fontSize: 13,
@@ -87,8 +88,8 @@ export function SystemTopologyWidget() {
       source: 'user',
       target: 'api',
       animated: true,
-      style: { stroke: '#1890ff', strokeWidth: 2 },
-      markerEnd: { type: MarkerType.ArrowClosed, color: '#1890ff' },
+      style: { stroke: 'var(--info)', strokeWidth: 2 },
+      markerEnd: { type: MarkerType.ArrowClosed, color: 'var(--info)' },
     });
 
     // Plugin nodes
@@ -108,8 +109,8 @@ export function SystemTopologyWidget() {
       const errorRate = pluginRequests > 0 ? (pluginErrors / pluginRequests) * 100 : 0;
 
       let status: 'healthy' | 'warning' | 'error' = 'healthy';
-      if (errorRate > 5) status = 'error';
-      else if (errorRate > 1) status = 'warning';
+      if (errorRate > 5) {status = 'error';}
+      else if (errorRate > 1) {status = 'warning';}
 
       nodes.push({
         id: plugin.pluginId,
@@ -123,8 +124,8 @@ export function SystemTopologyWidget() {
         } as NodeData,
         position: { x, y },
         style: {
-          background: status === 'healthy' ? '#f6ffed' : status === 'warning' ? '#fffbe6' : '#fff1f0',
-          border: `2px solid ${status === 'healthy' ? '#52c41a' : status === 'warning' ? '#faad14' : '#ff4d4f'}`,
+          background: status === 'healthy' ? 'var(--bg-tertiary)' : status === 'warning' ? 'var(--bg-tertiary)' : 'var(--bg-tertiary)',
+          border: `2px solid ${status === 'healthy' ? 'var(--success)' : status === 'warning' ? 'var(--warning)' : 'var(--error)'}`,
           borderRadius: 8,
           padding: 10,
           fontSize: 12,
@@ -139,15 +140,15 @@ export function SystemTopologyWidget() {
         target: plugin.pluginId,
         animated: pluginRequests > 100, // Animate high-traffic routes
         style: {
-          stroke: status === 'error' ? '#ff4d4f' : status === 'warning' ? '#faad14' : '#52c41a',
+          stroke: status === 'error' ? 'var(--error)' : status === 'warning' ? 'var(--warning)' : 'var(--success)',
           strokeWidth: Math.min(3, 1 + pluginRequests / 1000), // Width based on traffic
         },
         markerEnd: {
           type: MarkerType.ArrowClosed,
-          color: status === 'error' ? '#ff4d4f' : status === 'warning' ? '#faad14' : '#52c41a',
+          color: status === 'error' ? 'var(--error)' : status === 'warning' ? 'var(--warning)' : 'var(--success)',
         },
         label: pluginRequests > 100 ? `${pluginRequests}` : undefined,
-        labelBgStyle: { fill: '#fff', fillOpacity: 0.8 },
+        labelBgStyle: { fill: 'var(--bg-secondary)', fillOpacity: 0.8 },
         labelStyle: { fontSize: 10 },
       });
     });
@@ -178,7 +179,7 @@ export function SystemTopologyWidget() {
   };
 
   return (
-    <Card
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <ApartmentOutlined />
@@ -203,9 +204,9 @@ export function SystemTopologyWidget() {
           <MiniMap
             nodeColor={(node) => {
               const data = node.data as NodeData;
-              if (data.status === 'error') return '#ff4d4f';
-              if (data.status === 'warning') return '#faad14';
-              return '#52c41a';
+              if (data.status === 'error') {return 'var(--error)';}
+              if (data.status === 'warning') {return 'var(--warning)';}
+              return 'var(--success)';
             }}
             nodeStrokeWidth={3}
             zoomable
@@ -215,12 +216,12 @@ export function SystemTopologyWidget() {
       </div>
 
       {/* Node Details Drawer */}
-      <Drawer
+      <UIDrawer
         title={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <ApartmentOutlined />
             <span>{selectedNode?.data.label}</span>
-            <Badge
+            <UIBadge
               status={
                 selectedNode?.data.status === 'error' ? 'error' :
                 selectedNode?.data.status === 'warning' ? 'warning' :
@@ -237,44 +238,44 @@ export function SystemTopologyWidget() {
       >
         {selectedNode && (
           <div>
-            <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-              <Col span={12}>
-                <Statistic
+            <UIRow gutter={[16, 16]} style={{ marginBottom: 24 }}>
+              <UICol span={12}>
+                <UIStatistic
                   title="Requests"
                   value={selectedNode.data.requests ?? 0}
                   valueStyle={{ fontSize: 24 }}
                 />
-              </Col>
-              <Col span={12}>
-                <Statistic
+              </UICol>
+              <UICol span={12}>
+                <UIStatistic
                   title="Errors"
                   value={selectedNode.data.errors ?? 0}
                   valueStyle={{
                     fontSize: 24,
-                    color: (selectedNode.data.errors ?? 0) > 0 ? '#ff4d4f' : '#52c41a',
+                    color: (selectedNode.data.errors ?? 0) > 0 ? 'var(--error)' : 'var(--success)',
                   }}
                 />
-              </Col>
+              </UICol>
               {selectedNode.data.latency !== undefined && (
-                <Col span={12}>
-                  <Statistic
+                <UICol span={12}>
+                  <UIStatistic
                     title="Avg Latency"
                     value={selectedNode.data.latency.toFixed(0)}
                     suffix="ms"
                     valueStyle={{ fontSize: 24 }}
                   />
-                </Col>
+                </UICol>
               )}
-            </Row>
+            </UIRow>
 
-            <Descriptions title="Details" bordered size="small" column={1}>
-              <Descriptions.Item label="Node ID">
+            <UIDescriptions title="Details" bordered size="small" column={1}>
+              <UIDescriptions.Item label="Node ID">
                 <code>{selectedNode.id}</code>
-              </Descriptions.Item>
-              <Descriptions.Item label="Type">
+              </UIDescriptions.Item>
+              <UIDescriptions.Item label="Type">
                 <Tag color="blue">{selectedNode.data.type}</Tag>
-              </Descriptions.Item>
-              <Descriptions.Item label="Status">
+              </UIDescriptions.Item>
+              <UIDescriptions.Item label="Status">
                 <Tag
                   color={
                     selectedNode.data.status === 'error' ? 'red' :
@@ -284,18 +285,18 @@ export function SystemTopologyWidget() {
                 >
                   {selectedNode.data.status.toUpperCase()}
                 </Tag>
-              </Descriptions.Item>
+              </UIDescriptions.Item>
               {selectedNode.data.requests && (
-                <Descriptions.Item label="Error Rate">
+                <UIDescriptions.Item label="Error Rate">
                   {selectedNode.data.requests > 0
                     ? `${((selectedNode.data.errors ?? 0) / selectedNode.data.requests * 100).toFixed(2)}%`
                     : 'N/A'}
-                </Descriptions.Item>
+                </UIDescriptions.Item>
               )}
-            </Descriptions>
+            </UIDescriptions>
           </div>
         )}
-      </Drawer>
-    </Card>
+      </UIDrawer>
+    </UICard>
   );
 }

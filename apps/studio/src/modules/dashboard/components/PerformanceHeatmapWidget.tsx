@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { Card, Select, Space, Typography, Tooltip } from 'antd';
+import { UICard, UISelect, UISpace, UITypographyText, UITooltip } from '@kb-labs/studio-ui-kit';
 import { FireOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { useMetricsHeatmap } from '@kb-labs/studio-data-client';
 
-const { Text } = Typography;
+
 
 interface HeatmapCell {
   hour: number;
@@ -31,7 +31,7 @@ export function PerformanceHeatmapWidget() {
 
   // Transform backend data to include colors and labels
   const heatmapData = useMemo(() => {
-    if (!heatmapQuery.data) return [];
+    if (!heatmapQuery.data) {return [];}
 
     return heatmapQuery.data.map((cell) => ({
       hour: cell.hour,
@@ -44,7 +44,7 @@ export function PerformanceHeatmapWidget() {
 
   // Calculate statistics
   const stats = useMemo(() => {
-    if (heatmapData.length === 0) return { min: 0, max: 0, avg: 0, peak: { hour: 0, day: '' } };
+    if (heatmapData.length === 0) {return { min: 0, max: 0, avg: 0, peak: { hour: 0, day: '' } };}
 
     const values = heatmapData.map((c) => c.value);
     const min = Math.min(...values);
@@ -65,7 +65,7 @@ export function PerformanceHeatmapWidget() {
   const hasError = heatmapQuery.isError;
 
   return (
-    <Card
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <FireOutlined />
@@ -73,7 +73,7 @@ export function PerformanceHeatmapWidget() {
         </div>
       }
       extra={
-        <Select
+        <UISelect
           value={selectedMetric}
           onChange={setSelectedMetric}
           style={{ width: 120 }}
@@ -94,7 +94,7 @@ export function PerformanceHeatmapWidget() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#999',
+          color: 'var(--text-tertiary)',
         }}>
           Loading heatmap...
         </div>
@@ -104,12 +104,12 @@ export function PerformanceHeatmapWidget() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#ff4d4f',
+          color: 'var(--error)',
         }}>
           Failed to load heatmap
         </div>
       ) : (
-      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+      <UISpace direction="vertical" size="middle" style={{ width: '100%' }}>
         {/* Stats Summary */}
         <div
           style={{
@@ -117,38 +117,38 @@ export function PerformanceHeatmapWidget() {
             gridTemplateColumns: 'repeat(4, 1fr)',
             gap: 12,
             padding: 12,
-            background: '#fafafa',
+            background: 'var(--bg-tertiary)',
             borderRadius: 8,
           }}
         >
           <div style={{ textAlign: 'center' }}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               Min
-            </Text>
-            <div style={{ fontSize: 18, fontWeight: 600, color: '#52c41a' }}>
+            </UITypographyText>
+            <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--success)' }}>
               {formatValue(stats.min, selectedMetric)}
             </div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               Average
-            </Text>
-            <div style={{ fontSize: 18, fontWeight: 600, color: '#1890ff' }}>
+            </UITypographyText>
+            <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--info)' }}>
               {formatValue(stats.avg, selectedMetric)}
             </div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               Max
-            </Text>
-            <div style={{ fontSize: 18, fontWeight: 600, color: '#ff4d4f' }}>
+            </UITypographyText>
+            <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--error)' }}>
               {formatValue(stats.max, selectedMetric)}
             </div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               Peak Time
-            </Text>
+            </UITypographyText>
             <div style={{ fontSize: 14, fontWeight: 600 }}>
               {stats.peak.day} {stats.peak.hour}:00
             </div>
@@ -159,7 +159,7 @@ export function PerformanceHeatmapWidget() {
         <div>
           <div style={{ display: 'flex', gap: 4, marginBottom: 8, paddingLeft: 40 }}>
             {[0, 3, 6, 9, 12, 15, 18, 21].map((h) => (
-              <div key={h} style={{ flex: 1, fontSize: 11, color: '#999', textAlign: 'center' }}>
+              <div key={h} style={{ flex: 1, fontSize: 11, color: 'var(--text-tertiary)', textAlign: 'center' }}>
                 {h}:00
               </div>
             ))}
@@ -167,14 +167,14 @@ export function PerformanceHeatmapWidget() {
 
           {DAYS.map((day) => (
             <div key={day} style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-              <div style={{ width: 35, fontSize: 12, color: '#666', fontWeight: 500 }}>{day}</div>
+              <div style={{ width: 35, fontSize: 12, color: 'var(--text-secondary)', fontWeight: 500 }}>{day}</div>
               <div style={{ display: 'flex', gap: 2, flex: 1 }}>
                 {HOURS.map((hour) => {
                   const cell = heatmapData.find((c) => c.day === day && c.hour === hour);
-                  if (!cell) return null;
+                  if (!cell) {return null;}
 
                   return (
-                    <Tooltip
+                    <UITooltip
                       key={`${day}-${hour}`}
                       title={
                         <div>
@@ -204,7 +204,7 @@ export function PerformanceHeatmapWidget() {
                           e.currentTarget.style.zIndex = '1';
                         }}
                       />
-                    </Tooltip>
+                    </UITooltip>
                   );
                 })}
               </div>
@@ -214,21 +214,21 @@ export function PerformanceHeatmapWidget() {
 
         {/* Legend */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 12 }}>
-          <Text type="secondary" style={{ fontSize: 12 }}>
+          <UITypographyText type="secondary" style={{ fontSize: 12 }}>
             <ClockCircleOutlined /> Data represents typical weekly patterns
-          </Text>
+          </UITypographyText>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               Low
-            </Text>
+            </UITypographyText>
             <div style={{ display: 'flex', gap: 2 }}>
               {['#f0f9ff', '#bae6fd', '#7dd3fc', '#38bdf8', '#0ea5e9', '#0284c7', '#0369a1'].map((color, i) => (
                 <div key={i} style={{ width: 16, height: 16, backgroundColor: color, borderRadius: 2 }} />
               ))}
             </div>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               High
-            </Text>
+            </UITypographyText>
           </div>
         </div>
 
@@ -236,15 +236,15 @@ export function PerformanceHeatmapWidget() {
         <div
           style={{
             padding: 12,
-            background: '#f0f5ff',
+            background: 'var(--accent-subtle)',
             borderRadius: 8,
-            borderLeft: '3px solid #1890ff',
+            borderLeft: '3px solid var(--info)',
           }}
         >
-          <Text strong style={{ fontSize: 13 }}>
+          <UITypographyText strong style={{ fontSize: 13 }}>
             💡 Insights:
-          </Text>
-          <div style={{ marginTop: 8, fontSize: 12, color: '#666' }}>
+          </UITypographyText>
+          <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text-secondary)' }}>
             {selectedMetric === 'latency' && (
               <>
                 • Peak latency occurs during business hours (9-17:00)
@@ -268,18 +268,18 @@ export function PerformanceHeatmapWidget() {
             )}
           </div>
         </div>
-      </Space>
+      </UISpace>
       )}
-    </Card>
+    </UICard>
   );
 }
 
 // Helper: Calculate average latency across all plugins
 function calculateAverageLatency(data: any): number {
-  if (!data?.perPlugin || data.perPlugin.length === 0) return 100;
+  if (!data?.perPlugin || data.perPlugin.length === 0) {return 100;}
 
   const latencies = data.perPlugin.map((p: any) => p.latency?.average ?? 0).filter((l: number) => l > 0);
-  if (latencies.length === 0) return 100;
+  if (latencies.length === 0) {return 100;}
 
   return latencies.reduce((a: number, b: number) => a + b, 0) / latencies.length;
 }

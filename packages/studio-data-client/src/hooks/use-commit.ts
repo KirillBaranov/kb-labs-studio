@@ -3,6 +3,8 @@ import type { CommitDataSource } from '../sources/commit-source';
 import type {
   SummarizeRequest,
   GenerateRequest,
+  PatchPlanRequest,
+  RegenerateCommitRequest,
   ApplyRequest,
   PushRequest,
 } from '@kb-labs/commit-contracts';
@@ -105,23 +107,61 @@ export function useGeneratePlan(source: CommitDataSource) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (request: Omit<GenerateRequest, 'dryRun'> & { dryRun?: boolean }) => {
+    mutationFn: (request: Omit<GenerateRequest, 'dryRun' | 'allowSecrets' | 'autoConfirm'> & { dryRun?: boolean; allowSecrets?: boolean; autoConfirm?: boolean }) => {
       const fullRequest: GenerateRequest = {
         scope: request.scope,
         dryRun: request.dryRun ?? false,
+        allowSecrets: request.allowSecrets ?? false,
+        autoConfirm: request.autoConfirm ?? false,
       };
       return source.generatePlan(fullRequest);
     },
-    onSuccess: (_, variables) => {
-      // Invalidate related queries
-      queryClient.invalidateQueries({ queryKey: commitQueryKeys.plan(variables.scope) });
+    onSuccess: (data, variables) => {
+      // Seed plan cache directly from response (plan data is already available)
+      if (data.success && data.plan) {
+        queryClient.setQueryData(commitQueryKeys.plan(variables.scope), {
+          hasPlan: true,
+          plan: data.plan,
+          scope: variables.scope,
+        });
+      }
+      // Invalidate status + gitStatus for up-to-date counters
       queryClient.invalidateQueries({ queryKey: commitQueryKeys.status(variables.scope) });
+      queryClient.invalidateQueries({ queryKey: commitQueryKeys.gitStatus(variables.scope) });
     },
   });
 }
 
 /**
- * Hook to apply commits
+ * Hook to edit a single commit in the plan (message, type, scope, body)
+ */
+export function usePatchPlan(source: CommitDataSource) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (request: PatchPlanRequest) => source.patchPlan(request),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: commitQueryKeys.plan(variables.scope) });
+    },
+  });
+}
+
+/**
+ * Hook to regenerate a single commit using LLM
+ */
+export function useRegenerateCommit(source: CommitDataSource) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (request: RegenerateCommitRequest) => source.regenerateCommit(request),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: commitQueryKeys.plan(variables.scope) });
+    },
+  });
+}
+
+/**
+ * Hook to apply commits (supports selective apply via commitIds)
  */
 export function useApplyCommits(source: CommitDataSource) {
   const queryClient = useQueryClient();
@@ -131,6 +171,7 @@ export function useApplyCommits(source: CommitDataSource) {
       const fullRequest: ApplyRequest = {
         scope: request.scope,
         force: request.force ?? false,
+        commitIds: request.commitIds,
       };
       return source.applyCommits(fullRequest);
     },
@@ -146,6 +187,8 @@ export function useApplyCommits(source: CommitDataSource) {
  * Hook to push commits
  */
 export function usePushCommits(source: CommitDataSource) {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (request: Omit<PushRequest, 'remote' | 'force'> & { remote?: string; force?: boolean }) => {
       const fullRequest: PushRequest = {
@@ -154,6 +197,11 @@ export function usePushCommits(source: CommitDataSource) {
         force: request.force ?? false,
       };
       return source.pushCommits(fullRequest);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: commitQueryKeys.status(variables.scope) });
+      queryClient.invalidateQueries({ queryKey: commitQueryKeys.plan(variables.scope) });
+      queryClient.invalidateQueries({ queryKey: commitQueryKeys.gitStatus(variables.scope) });
     },
   });
 }

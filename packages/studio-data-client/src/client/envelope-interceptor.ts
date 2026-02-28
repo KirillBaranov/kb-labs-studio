@@ -4,7 +4,6 @@
  */
 
 import type { ResponseInterceptor } from './types';
-import type { SuccessEnvelope, ErrorEnvelope } from '@kb-labs/rest-api-contracts';
 
 /**
  * Envelope response structure
@@ -61,13 +60,11 @@ export function createEnvelopeInterceptor(): ResponseInterceptor {
           headers.set('Content-Type', 'application/json');
           
           // Create new response with unwrapped data
-          const newResponse = new Response(JSON.stringify(unwrappedData), {
+          return new Response(JSON.stringify(unwrappedData), {
             status: response.status,
             statusText: response.statusText,
             headers,
           });
-          
-          return newResponse;
         } else if (envelope.ok === false && 'error' in envelope) {
           // Error envelope: leave as is for error handler
           return response;
@@ -76,7 +73,7 @@ export function createEnvelopeInterceptor(): ResponseInterceptor {
 
       // Not an envelope, return as is
       return response;
-    } catch (error) {
+    } catch (_error) {
       // If parsing fails, return original response
       return response;
     }

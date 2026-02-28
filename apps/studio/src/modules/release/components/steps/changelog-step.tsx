@@ -5,26 +5,20 @@
 
 import * as React from 'react';
 import {
-  Button,
-  Card,
-  Empty,
-  Spin,
-  Space,
-  message,
-  Input,
-  Row,
-  Col,
-  Typography,
-  Checkbox,
-  Tag,
-} from 'antd';
-import {
-  ThunderboltOutlined,
-  SaveOutlined,
-  EyeOutlined,
-  EditOutlined,
-  CheckCircleOutlined,
-} from '@ant-design/icons';
+  UIButton,
+  UICard,
+  UIEmptyState,
+  UISpin,
+  UISpace,
+  UIMessage,
+  UIInput,
+  UIRow,
+  UICol,
+  UITypographyText,
+  UICheckbox,
+  UITag,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import {
   useReleaseChangelog,
@@ -33,8 +27,7 @@ import {
 } from '@kb-labs/studio-data-client';
 import { MarkdownViewer } from '@/components/markdown';
 
-const { TextArea } = Input;
-const { Text } = Typography;
+const { TextArea } = UIInput;
 
 interface ChangelogStepProps {
   selectedScope: string;
@@ -88,9 +81,9 @@ export function ChangelogStep({ selectedScope, onChangelogReady }: ChangelogStep
       setHasUnsavedChanges(true);
       const tokensInfo = result.tokensUsed ? ` (${result.tokensUsed} tokens)` : '';
       const method = useLLM ? 'AI-powered' : 'Simple';
-      message.success(`${method} changelog generated${tokensInfo}`);
+      UIMessage.success(`${method} changelog generated${tokensInfo}`);
     } catch (error) {
-      message.error(`Failed to generate changelog: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      UIMessage.error(`Failed to generate changelog: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -101,9 +94,9 @@ export function ChangelogStep({ selectedScope, onChangelogReady }: ChangelogStep
         markdown,
       });
       setHasUnsavedChanges(false);
-      message.success('Changelog saved');
+      UIMessage.success('Changelog saved');
     } catch (error) {
-      message.error(`Failed to save: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      UIMessage.error(`Failed to save: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -113,95 +106,95 @@ export function ChangelogStep({ selectedScope, onChangelogReady }: ChangelogStep
   };
 
   if (changelogLoading) {
-    return <Spin size="large" style={{ display: 'block', margin: '48px auto' }} />;
+    return <UISpin size="large" style={{ display: 'block', margin: '48px auto' }} />;
   }
 
   // No changelog exists - show generate UI
   if (!changelogData?.markdown && !markdown) {
     return (
-      <Card>
-        <Empty
+      <UICard>
+        <UIEmptyState
           description="No changelog generated yet"
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          image={UIEmptyState.PRESENTED_IMAGE_SIMPLE}
         >
-          <Space direction="vertical" size="middle" style={{ display: 'flex', alignItems: 'center' }}>
-            <Checkbox checked={useLLM} onChange={(e) => setUseLLM(e.target.checked)}>
+          <UISpace direction="vertical" size="middle" style={{ display: 'flex', alignItems: 'center' }}>
+            <UICheckbox checked={useLLM} onChange={(e) => setUseLLM(e.target.checked)}>
               Use AI-powered generation (requires LLM)
-            </Checkbox>
-            <Button
+            </UICheckbox>
+            <UIButton
               type="primary"
-              icon={<ThunderboltOutlined />}
+              icon={<UIIcon name="ThunderboltOutlined" />}
               onClick={handleGenerate}
               loading={generateMutation.isPending}
               size="large"
             >
               Generate Changelog
-            </Button>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            </UIButton>
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               {useLLM
                 ? 'AI will analyze git commits and generate a detailed changelog'
                 : 'Generate a simple changelog from package versions'}
-            </Text>
-          </Space>
-        </Empty>
-      </Card>
+            </UITypographyText>
+          </UISpace>
+        </UIEmptyState>
+      </UICard>
     );
   }
 
   return (
-    <Card
+    <UICard
       title={
-        <Space>
+        <UISpace>
           {hasUnsavedChanges ? (
-            <Tag color="warning">Unsaved</Tag>
+            <UITag color="warning">Unsaved</UITag>
           ) : (
             <>
-              <CheckCircleOutlined style={{ color: '#52c41a' }} />
-              <Tag color="success">Saved</Tag>
+              <UIIcon name="CheckCircleOutlined" style={{ color: '#52c41a' }} />
+              <UITag color="success">Saved</UITag>
             </>
           )}
           <span>Changelog</span>
-        </Space>
+        </UISpace>
       }
       extra={
-        <Space>
-          <Checkbox
+        <UISpace>
+          <UICheckbox
             checked={useLLM}
             onChange={(e) => setUseLLM(e.target.checked)}
             style={{ fontSize: 12 }}
           >
             Use AI
-          </Checkbox>
-          <Button
-            icon={<ThunderboltOutlined />}
+          </UICheckbox>
+          <UIButton
+            icon={<UIIcon name="ThunderboltOutlined" />}
             onClick={handleGenerate}
             loading={generateMutation.isPending}
             size="small"
           >
             Regenerate
-          </Button>
-          <Button
-            icon={editMode ? <EyeOutlined /> : <EditOutlined />}
+          </UIButton>
+          <UIButton
+            icon={editMode ? <UIIcon name="EyeOutlined" /> : <UIIcon name="EditOutlined" />}
             onClick={() => setEditMode(!editMode)}
             size="small"
           >
             {editMode ? 'Preview' : 'Edit'}
-          </Button>
-          <Button
+          </UIButton>
+          <UIButton
             type="primary"
-            icon={<SaveOutlined />}
+            icon={<UIIcon name="SaveOutlined" />}
             onClick={handleSave}
             loading={saveMutation.isPending}
             disabled={!hasUnsavedChanges}
             size="small"
           >
             Save
-          </Button>
-        </Space>
+          </UIButton>
+        </UISpace>
       }
     >
-      <Row gutter={16}>
-        <Col span={editMode ? 12 : 24}>
+      <UIRow gutter={16}>
+        <UICol span={editMode ? 12 : 24}>
           {editMode ? (
             <TextArea
               value={markdown}
@@ -215,9 +208,9 @@ export function ChangelogStep({ selectedScope, onChangelogReady }: ChangelogStep
               <MarkdownViewer>{markdown}</MarkdownViewer>
             </div>
           )}
-        </Col>
+        </UICol>
         {editMode && (
-          <Col span={12}>
+          <UICol span={12}>
             <div
               style={{
                 border: '1px solid #d9d9d9',
@@ -228,22 +221,22 @@ export function ChangelogStep({ selectedScope, onChangelogReady }: ChangelogStep
                 background: '#fafafa',
               }}
             >
-              <Text type="secondary" style={{ fontSize: 11, display: 'block', marginBottom: 8 }}>
+              <UITypographyText type="secondary" style={{ fontSize: 11, display: 'block', marginBottom: 8 }}>
                 Preview
-              </Text>
+              </UITypographyText>
               <MarkdownViewer>{markdown}</MarkdownViewer>
             </div>
-          </Col>
+          </UICol>
         )}
-      </Row>
+      </UIRow>
 
       {hasUnsavedChanges && (
         <div style={{ marginTop: 16, textAlign: 'center' }}>
-          <Text type="warning" style={{ fontSize: 12 }}>
+          <UITypographyText type="warning" style={{ fontSize: 12 }}>
             Save changelog to proceed to the next step
-          </Text>
+          </UITypographyText>
         </div>
       )}
-    </Card>
+    </UICard>
   );
 }

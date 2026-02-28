@@ -6,7 +6,6 @@ import type {
   LogRecord,
   LogQuery,
   LogQueryResponse,
-  LogEvent,
   LogSummarizeRequest,
   LogSummarizeResponse,
   HistoricalDataPoint,
@@ -19,7 +18,6 @@ import type {
   IncidentsListResponse,
   IncidentDetailResponse,
   IncidentAnalysisResponse,
-  IncidentResolveRequest,
   SystemMetricsData,
 } from '../contracts/observability';
 

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Card, Row, Col, Statistic, Tag, Alert, Select, Typography, Space, Progress } from 'antd';
+import { UICard, UIRow, UICol, UIStatistic, UITag, UIAlert, UISelect, UITypographyText, UITitle, UISpace, UIProgress } from '@kb-labs/studio-ui-kit';
 import {
   HolderOutlined,
   ExperimentOutlined,
@@ -8,11 +8,11 @@ import {
   WarningOutlined,
   ThunderboltOutlined,
 } from '@ant-design/icons';
-import { KBLineChart } from '@kb-labs/studio-ui-react';
+import { UILineChart } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { usePrometheusMetrics } from '@kb-labs/studio-data-client';
 
-const { Text, Title } = Typography;
+
 
 interface Prediction {
   timestamp: number;
@@ -41,7 +41,7 @@ export function PredictiveAnalyticsWidget() {
 
   // Simple moving average prediction (can be replaced with ML model)
   const predictions = useMemo(() => {
-    if (!metrics.data?.requests) return [];
+    if (!metrics.data?.requests) {return [];}
 
     const historicalData = generateHistoricalData(selectedMetric, metrics.data);
     return forecastWithMovingAverage(historicalData, timeHorizon);
@@ -49,7 +49,7 @@ export function PredictiveAnalyticsWidget() {
 
   // Anomaly detection using statistical methods
   const anomalies = useMemo(() => {
-    if (!metrics.data) return [];
+    if (!metrics.data) {return [];}
 
     const detected: Anomaly[] = [];
     const threshold = 2; // 2 standard deviations
@@ -112,7 +112,7 @@ export function PredictiveAnalyticsWidget() {
     yField: 'value',
     seriesField: 'type',
     smooth: true,
-    color: ['#1890ff', '#52c41a'],
+    color: ['var(--info)', 'var(--success)'],
     lineStyle: (datum: any) => {
       if (datum.type === 'Predicted') {
         return { lineDash: [4, 4], opacity: 0.7 };
@@ -156,14 +156,14 @@ export function PredictiveAnalyticsWidget() {
 
   // Calculate prediction confidence score
   const overallConfidence = useMemo(() => {
-    if (predictions.length === 0) return 0;
+    if (predictions.length === 0) {return 0;}
     const avg = predictions.reduce((sum, p) => sum + p.confidence, 0) / predictions.length;
     return avg;
   }, [predictions]);
 
   // Trend analysis
   const trendAnalysis = useMemo(() => {
-    if (predictions.length < 2) return null;
+    if (predictions.length < 2) {return null;}
 
     const first = predictions[0].value;
     const last = predictions[predictions.length - 1].value;
@@ -177,10 +177,10 @@ export function PredictiveAnalyticsWidget() {
   }, [predictions, selectedMetric]);
 
   return (
-    <Card
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: '#999' }} />
+          <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
           <ExperimentOutlined />
           <span>Predictive Analytics</span>
         </div>
@@ -188,11 +188,11 @@ export function PredictiveAnalyticsWidget() {
       style={{ height: '100%' }}
       bodyStyle={{ padding: '16px', maxHeight: 'calc(100% - 57px)', overflowY: 'auto' }}
     >
-      <Row gutter={[16, 16]}>
+      <UIRow gutter={[16, 16]}>
         {/* Controls */}
-        <Col span={24}>
-          <Space>
-            <Select
+        <UICol span={24}>
+          <UISpace>
+            <UISelect
               value={selectedMetric}
               onChange={setSelectedMetric}
               style={{ width: 150 }}
@@ -202,7 +202,7 @@ export function PredictiveAnalyticsWidget() {
                 { label: 'Latency (ms)', value: 'latency' },
               ]}
             />
-            <Select
+            <UISelect
               value={timeHorizon}
               onChange={setTimeHorizon}
               style={{ width: 120 }}
@@ -213,68 +213,68 @@ export function PredictiveAnalyticsWidget() {
                 { label: '2 hours', value: '2h' },
               ]}
             />
-          </Space>
-        </Col>
+          </UISpace>
+        </UICol>
 
         {/* Prediction Summary */}
-        <Col xs={24} md={8}>
-          <div style={{ padding: '12px', background: '#f0f5ff', borderRadius: 8, textAlign: 'center' }}>
-            <Text type="secondary">Prediction Confidence</Text>
-            <Title level={2} style={{ margin: '8px 0', color: overallConfidence > 70 ? '#52c41a' : '#faad14' }}>
+        <UICol xs={24} md={8}>
+          <div style={{ padding: '12px', background: 'var(--accent-subtle)', borderRadius: 8, textAlign: 'center' }}>
+            <UITypographyText type="secondary">Prediction Confidence</UITypographyText>
+            <UITitle level={2} style={{ margin: '8px 0', color: overallConfidence > 70 ? 'var(--success)' : 'var(--warning)' }}>
               {overallConfidence.toFixed(0)}%
-            </Title>
-            <Progress
+            </UITitle>
+            <UIProgress
               percent={overallConfidence}
               showInfo={false}
-              strokeColor={overallConfidence > 70 ? '#52c41a' : '#faad14'}
+              strokeColor={overallConfidence > 70 ? 'var(--success)' : 'var(--warning)'}
             />
           </div>
-        </Col>
+        </UICol>
 
-        <Col xs={24} md={8}>
-          <div style={{ padding: '12px', background: '#f6ffed', borderRadius: 8, textAlign: 'center' }}>
-            <Text type="secondary">Forecasted Trend</Text>
+        <UICol xs={24} md={8}>
+          <div style={{ padding: '12px', background: 'var(--bg-tertiary)', borderRadius: 8, textAlign: 'center' }}>
+            <UITypographyText type="secondary">Forecasted Trend</UITypographyText>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 8, gap: 8 }}>
               {trendAnalysis && (
                 <>
                   {trendAnalysis.direction === 'up' ? (
-                    <RiseOutlined style={{ fontSize: 32, color: trendAnalysis.isPositive ? '#52c41a' : '#ff4d4f' }} />
+                    <RiseOutlined style={{ fontSize: 32, color: trendAnalysis.isPositive ? 'var(--success)' : 'var(--error)' }} />
                   ) : (
-                    <FallOutlined style={{ fontSize: 32, color: trendAnalysis.isPositive ? '#52c41a' : '#ff4d4f' }} />
+                    <FallOutlined style={{ fontSize: 32, color: trendAnalysis.isPositive ? 'var(--success)' : 'var(--error)' }} />
                   )}
-                  <Title
+                  <UITitle
                     level={2}
-                    style={{ margin: 0, color: trendAnalysis.isPositive ? '#52c41a' : '#ff4d4f' }}
+                    style={{ margin: 0, color: trendAnalysis.isPositive ? 'var(--success)' : 'var(--error)' }}
                   >
                     {trendAnalysis.percentage.toFixed(1)}%
-                  </Title>
+                  </UITitle>
                 </>
               )}
             </div>
-            <Text type="secondary">{timeHorizon} forecast</Text>
+            <UITypographyText type="secondary">{timeHorizon} forecast</UITypographyText>
           </div>
-        </Col>
+        </UICol>
 
-        <Col xs={24} md={8}>
-          <div style={{ padding: '12px', background: '#fff1f0', borderRadius: 8, textAlign: 'center' }}>
-            <Text type="secondary">Anomalies Detected</Text>
-            <Title level={2} style={{ margin: '8px 0', color: anomalies.length > 0 ? '#ff4d4f' : '#52c41a' }}>
+        <UICol xs={24} md={8}>
+          <div style={{ padding: '12px', background: 'var(--bg-tertiary)', borderRadius: 8, textAlign: 'center' }}>
+            <UITypographyText type="secondary">Anomalies Detected</UITypographyText>
+            <UITitle level={2} style={{ margin: '8px 0', color: anomalies.length > 0 ? 'var(--error)' : 'var(--success)' }}>
               {anomalies.length}
-            </Title>
-            <Text type="secondary">{anomalies.length > 0 ? 'Needs attention' : 'All clear'}</Text>
+            </UITitle>
+            <UITypographyText type="secondary">{anomalies.length > 0 ? 'Needs attention' : 'All clear'}</UITypographyText>
           </div>
-        </Col>
+        </UICol>
 
         {/* Forecast Chart */}
-        <Col span={24}>
-          <Title level={5}>Forecast: {selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</Title>
-          <KBLineChart {...chartConfig} />
-        </Col>
+        <UICol span={24}>
+          <UITitle level={5}>Forecast: {selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)}</UITitle>
+          <UILineChart {...chartConfig} />
+        </UICol>
 
         {/* Anomaly List */}
         {anomalies.length > 0 && (
-          <Col span={24}>
-            <Alert
+          <UICol span={24}>
+            <UIAlert
               message="Detected Anomalies"
               description={
                 <div style={{ marginTop: 8 }}>
@@ -285,19 +285,19 @@ export function PredictiveAnalyticsWidget() {
                         key={index}
                         style={{
                           padding: '8px 12px',
-                          background: '#fff',
-                          border: '1px solid #f0f0f0',
+                          background: 'var(--bg-secondary)',
+                          border: '1px solid var(--border-primary)',
                           borderRadius: 4,
                           marginBottom: 8,
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                          <Tag color={config.color} icon={config.icon}>
+                          <UITag color={config.color} icon={config.icon}>
                             {anomaly.severity.toUpperCase()}
-                          </Tag>
-                          <Text strong>{anomaly.metric}</Text>
+                          </UITag>
+                          <UITypographyText strong>{anomaly.metric}</UITypographyText>
                         </div>
-                        <div style={{ fontSize: 12, color: '#666' }}>
+                        <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
                           Expected: {anomaly.expectedValue.toFixed(1)} | Actual: {anomaly.actualValue.toFixed(1)} |
                           Deviation: +{anomaly.deviation.toFixed(0)}%
                         </div>
@@ -309,12 +309,12 @@ export function PredictiveAnalyticsWidget() {
               type="warning"
               showIcon
             />
-          </Col>
+          </UICol>
         )}
 
         {/* Recommendations */}
-        <Col span={24}>
-          <Alert
+        <UICol span={24}>
+          <UIAlert
             message="ML Insights"
             description={
               <ul style={{ paddingLeft: 20, marginBottom: 0 }}>
@@ -339,9 +339,9 @@ export function PredictiveAnalyticsWidget() {
             type="info"
             showIcon
           />
-        </Col>
-      </Row>
-    </Card>
+        </UICol>
+      </UIRow>
+    </UICard>
   );
 }
 
@@ -378,7 +378,7 @@ function forecastWithMovingAverage(
   historical: { timestamp: number; value: number }[],
   horizon: '15m' | '30m' | '1h' | '2h'
 ): Prediction[] {
-  if (historical.length < 3) return [];
+  if (historical.length < 3) {return [];}
 
   const predictions: Prediction[] = [];
   const windowSize = 3; // 3-point moving average
@@ -409,10 +409,10 @@ function forecastWithMovingAverage(
 
 // Helper: Calculate average latency across all plugins
 function calculateAverageLatency(data: any): number {
-  if (!data?.perPlugin || data.perPlugin.length === 0) return 0;
+  if (!data?.perPlugin || data.perPlugin.length === 0) {return 0;}
 
   const latencies = data.perPlugin.map((p: any) => p.latency?.average ?? 0).filter((l: number) => l > 0);
-  if (latencies.length === 0) return 0;
+  if (latencies.length === 0) {return 0;}
 
   return latencies.reduce((a: number, b: number) => a + b, 0) / latencies.length;
 }

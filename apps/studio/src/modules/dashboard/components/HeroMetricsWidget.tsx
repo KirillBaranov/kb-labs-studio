@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col } from 'antd';
+import { UIRow, UICol } from '@kb-labs/studio-ui-kit';
+import { useNavigate } from 'react-router-dom';
 import {
   ThunderboltOutlined,
   RiseOutlined,
@@ -9,9 +10,10 @@ import {
 import { HeroMetricCard } from './HeroMetricCard';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import {
-  useDevKitHealth,
   usePrometheusMetrics,
   useStateBrokerStats,
+  useQualityHealth,
+  useQualityStale,
 } from '@kb-labs/studio-data-client';
 
 interface MetricsHistoryPoint {
@@ -22,9 +24,11 @@ interface MetricsHistoryPoint {
 
 export function HeroMetricsWidget() {
   const sources = useDataSources();
+  const navigate = useNavigate();
 
   // Data hooks with auto-refresh
-  const devkit = useDevKitHealth(sources.observability);
+  const quality = useQualityHealth(sources.quality, false);
+  const stale = useQualityStale(sources.quality, false);
   const metrics = usePrometheusMetrics(sources.observability);
   const stateBroker = useStateBrokerStats(sources.observability);
 
@@ -49,7 +53,7 @@ export function HeroMetricsWidget() {
 
   // Calculate uptime percentage
   const calculateUptime = (metricsData: any) => {
-    if (!metricsData?.requests) return 100;
+    if (!metricsData?.requests) {return 100;}
     const total = metricsData.requests.total ?? 0;
     const success = metricsData.requests.success ?? 0;
     return total > 0 ? (success / total) * 100 : 100;
@@ -57,15 +61,15 @@ export function HeroMetricsWidget() {
 
   // Calculate trend from history
   const calculateTrend = (data: number[]) => {
-    if (data.length < 2) return null;
+    if (data.length < 2) {return null;}
     const recent = data.slice(-5); // Last 5 points
     const older = data.slice(-10, -5); // Previous 5 points
-    if (older.length === 0 || recent.length === 0) return null;
+    if (older.length === 0 || recent.length === 0) {return null;}
 
     const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
     const olderAvg = older.reduce((a, b) => a + b, 0) / older.length;
 
-    if (olderAvg === 0) return null;
+    if (olderAvg === 0) {return null;}
 
     const change = ((recentAvg - olderAvg) / olderAvg) * 100;
     return {
@@ -77,14 +81,14 @@ export function HeroMetricsWidget() {
 
   // Format uptime seconds to human-readable
   const formatUptime = (seconds: number | undefined) => {
-    if (!seconds) return '0s';
+    if (!seconds) {return '0s';}
 
     const days = Math.floor(seconds / 86400);
     const hours = Math.floor((seconds % 86400) / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
 
-    if (days > 0) return `${days}d ${hours}h`;
-    if (hours > 0) return `${hours}h ${minutes}m`;
+    if (days > 0) {return `${days}d ${hours}h`;}
+    if (hours > 0) {return `${hours}h ${minutes}m`;}
     return `${minutes}m`;
   };
 
@@ -96,42 +100,40 @@ export function HeroMetricsWidget() {
   const requestsTrend = calculateTrend(requestsSparkline);
 
   // Metric values
-  const healthScore = devkit.data?.healthScore ?? 0;
-  const healthGrade = devkit.data?.grade ?? 'F';
+  const healthScore = quality.data?.score ?? 0;
+  const healthGrade = quality.data?.grade ?? 'F';
+  const staleCount = stale.data?.totalStale ?? 0;
   const currentUptime = calculateUptime(metrics.data);
   const totalRequests = metrics.data?.requests?.total ?? 0;
   const runtimeSeconds = metrics.data?.uptime?.seconds ?? 0;
 
   // Determine health status
   const getHealthStatus = () => {
-    if (healthScore >= 80) return 'healthy';
-    if (healthScore >= 60) return 'warning';
+    if (healthScore >= 80) {return 'healthy';}
+    if (healthScore >= 60) {return 'warning';}
     return 'critical';
   };
 
   const getUptimeStatus = () => {
-    if (currentUptime >= 99.9) return 'healthy';
-    if (currentUptime >= 99) return 'warning';
+    if (currentUptime >= 99.9) {return 'healthy';}
+    if (currentUptime >= 99) {return 'warning';}
     return 'critical';
   };
 
   return (
-    <Row gutter={[16, 16]}>
-      <Col xs={24} sm={12} lg={6}>
+    <UIRow gutter={[16, 16]}>
+      <UICol xs={24} sm={12} lg={6}>
         <HeroMetricCard
-          title="System Health"
+          title="Code Quality"
           value={`${healthScore}/100`}
-          subtitle={`Grade ${healthGrade}`}
+          subtitle={staleCount > 0 ? `Stale: ${staleCount} pkg` : `Grade ${healthGrade}`}
           status={getHealthStatus()}
           icon={<ThunderboltOutlined />}
-          onClick={() => {
-            // Navigate to DevKit health page
-            window.location.hash = '#/platform';
-          }}
+          onClick={() => navigate('/quality')}
         />
-      </Col>
+      </UICol>
 
-      <Col xs={24} sm={12} lg={6}>
+      <UICol xs={24} sm={12} lg={6}>
         <HeroMetricCard
           title="Uptime"
           value={`${currentUptime.toFixed(2)}%`}
@@ -140,9 +142,9 @@ export function HeroMetricsWidget() {
           status={getUptimeStatus()}
           icon={<RiseOutlined />}
         />
-      </Col>
+      </UICol>
 
-      <Col xs={24} sm={12} lg={6}>
+      <UICol xs={24} sm={12} lg={6}>
         <HeroMetricCard
           title="Total Requests"
           value={totalRequests.toLocaleString()}
@@ -152,9 +154,9 @@ export function HeroMetricsWidget() {
           status="default"
           icon={<ApiOutlined />}
         />
-      </Col>
+      </UICol>
 
-      <Col xs={24} sm={12} lg={6}>
+      <UICol xs={24} sm={12} lg={6}>
         <HeroMetricCard
           title="Runtime"
           value={formatUptime(runtimeSeconds)}
@@ -163,7 +165,7 @@ export function HeroMetricsWidget() {
           pulsing={true}
           icon={<ClockCircleOutlined />}
         />
-      </Col>
-    </Row>
+      </UICol>
+    </UIRow>
   );
 }

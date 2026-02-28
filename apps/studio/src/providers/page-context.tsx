@@ -59,7 +59,7 @@ export function PageContextProvider({
 
   // Sync state changes to URL
   React.useEffect(() => {
-    if (syncKeys.length === 0) return;
+    if (syncKeys.length === 0) {return;}
 
     const newSearchParams = new URLSearchParams(searchParams);
     let hasChanges = false;
@@ -87,7 +87,7 @@ export function PageContextProvider({
 
   // Sync URL changes to state
   React.useEffect(() => {
-    if (syncKeys.length === 0) return;
+    if (syncKeys.length === 0) {return;}
 
     const urlUpdates: Record<string, unknown> = {};
     let hasUpdates = false;

@@ -1,15 +1,18 @@
-import { Card, Alert, Badge, Tag, Timeline, Row, Col, Statistic } from 'antd';
 import {
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  SyncOutlined,
-  DatabaseOutlined,
-  ApiOutlined,
-} from '@ant-design/icons';
-import { KBPageContainer, KBPageHeader } from '@kb-labs/studio-ui-react';
+  UICard,
+  UIAlert,
+  UIBadge,
+  UITag,
+  UITimeline,
+  UIRow,
+  UICol,
+  UIStatistic,
+  UIIcon,
+} from '@kb-labs/studio-ui-kit';
 import { useSystemEvents } from '@kb-labs/studio-data-client';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import type { SystemEvent, RegistryEvent, HealthEvent } from '@kb-labs/studio-data-client';
+import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
 /**
  * Format timestamp to time string
@@ -43,17 +46,17 @@ export function SystemEventsPage() {
 
       {/* Connection Status */}
       {!isConnected && !error && (
-        <Alert
+        <UIAlert
           message="Connecting to event stream..."
           type="info"
           showIcon
-          icon={<SyncOutlined spin />}
+          icon={<UIIcon name="SyncOutlined" spin />}
           style={{ marginBottom: 24 }}
         />
       )}
 
       {error && (
-        <Alert
+        <UIAlert
           message="Connection failed"
           description={error.message + ' - Make sure REST API is running on localhost:5050'}
           type="error"
@@ -63,23 +66,23 @@ export function SystemEventsPage() {
       )}
 
       {isConnected && (
-        <Alert
+        <UIAlert
           message="Connected to event stream"
           type="success"
           showIcon
-          icon={<CheckCircleOutlined />}
+          icon={<UIIcon name="CheckCircleOutlined" />}
           style={{ marginBottom: 24 }}
         />
       )}
 
       {/* Current System Status */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col xs={24} lg={12}>
-          <Card
+      <UIRow gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <UICol xs={24} lg={12}>
+          <UICard
             title="Latest Health Status"
             extra={
               latestHealth ? (
-                <Badge
+                <UIBadge
                   status={latestHealth.ready ? 'success' : 'error'}
                   text={latestHealth.ready ? 'Ready' : 'Not Ready'}
                 />
@@ -87,25 +90,25 @@ export function SystemEventsPage() {
             }
           >
             {latestHealth ? (
-              <Row gutter={16}>
-                <Col span={8}>
-                  <Statistic
+              <UIRow gutter={16}>
+                <UICol span={8}>
+                  <UIStatistic
                     title="Status"
                     value={latestHealth.status}
                     valueStyle={{ color: latestHealth.status === 'healthy' ? '#52c41a' : '#ff4d4f' }}
                   />
-                </Col>
-                <Col span={8}>
-                  <Statistic
+                </UICol>
+                <UICol span={8}>
+                  <UIStatistic
                     title="Plugins Mounted"
                     value={latestHealth.pluginsMounted ?? 0}
                     suffix={latestHealth.pluginsMounted !== undefined && latestHealth.pluginsFailed !== undefined
                       ? `/ ${latestHealth.pluginsMounted + latestHealth.pluginsFailed}`
                       : ''}
                   />
-                </Col>
-                <Col span={8}>
-                  <Statistic
+                </UICol>
+                <UICol span={8}>
+                  <UIStatistic
                     title="Redis"
                     value={latestHealth.redisEnabled
                       ? (latestHealth.redisHealthy ? 'Healthy' : 'Unhealthy')
@@ -116,54 +119,54 @@ export function SystemEventsPage() {
                         : (latestHealth.redisHealthy ? '#52c41a' : '#ff4d4f')
                     }}
                   />
-                </Col>
-              </Row>
+                </UICol>
+              </UIRow>
             ) : (
-              <Alert message="No health data received yet" type="info" showIcon />
+              <UIAlert message="No health data received yet" type="info" showIcon />
             )}
-          </Card>
-        </Col>
+          </UICard>
+        </UICol>
 
-        <Col xs={24} lg={12}>
-          <Card
+        <UICol xs={24} lg={12}>
+          <UICard
             title="Latest Registry"
             extra={
               latestRegistry ? (
-                <Tag color={latestRegistry.stale ? 'orange' : 'green'}>
+                <UITag color={latestRegistry.stale ? 'orange' : 'green'}>
                   {latestRegistry.stale ? 'Stale' : 'Fresh'}
-                </Tag>
+                </UITag>
               ) : null
             }
           >
             {latestRegistry ? (
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Statistic
+              <UIRow gutter={16}>
+                <UICol span={12}>
+                  <UIStatistic
                     title="Revision"
                     value={String(latestRegistry.rev).substring(0, 8)}
                     valueStyle={{ fontSize: 18 }}
                   />
-                </Col>
-                <Col span={12}>
-                  <Statistic
+                </UICol>
+                <UICol span={12}>
+                  <UIStatistic
                     title="Generated"
                     value={formatTime(latestRegistry.generatedAt)}
                     valueStyle={{ fontSize: 18 }}
                   />
-                </Col>
-              </Row>
+                </UICol>
+              </UIRow>
             ) : (
-              <Alert message="No registry data received yet" type="info" showIcon />
+              <UIAlert message="No registry data received yet" type="info" showIcon />
             )}
-          </Card>
-        </Col>
-      </Row>
+          </UICard>
+        </UICol>
+      </UIRow>
 
       {/* Event Timeline */}
-      <Card
+      <UICard
         title="Live Event Feed"
         extra={
-          <Badge
+          <UIBadge
             count={events.length}
             overflowCount={99}
             style={{ backgroundColor: '#1890ff' }}
@@ -171,24 +174,24 @@ export function SystemEventsPage() {
         }
       >
         {events.length > 0 ? (
-          <Timeline
+          <UITimeline
             items={events.map((event, index) => {
               if (event.type === 'health') {
                 const healthEvent = event as HealthEvent;
                 return {
                   key: index,
                   color: healthEvent.ready ? 'green' : 'red',
-                  dot: healthEvent.ready ? <CheckCircleOutlined /> : <CloseCircleOutlined />,
+                  dot: healthEvent.ready ? <UIIcon name="CheckCircleOutlined" /> : <UIIcon name="CloseCircleOutlined" />,
                   children: (
                     <div>
                       <div style={{ marginBottom: 4 }}>
-                        <Tag color="blue">HEALTH</Tag>
-                        <Tag color={healthEvent.status === 'healthy' ? 'green' : 'red'}>
+                        <UITag color="blue">HEALTH</UITag>
+                        <UITag color={healthEvent.status === 'healthy' ? 'green' : 'red'}>
                           {healthEvent.status}
-                        </Tag>
-                        {healthEvent.ready && <Tag color="green">READY</Tag>}
+                        </UITag>
+                        {healthEvent.ready && <UITag color="green">READY</UITag>}
                         {!healthEvent.ready && healthEvent.reason && (
-                          <Tag color="orange">{healthEvent.reason}</Tag>
+                          <UITag color="orange">{healthEvent.reason}</UITag>
                         )}
                         <span style={{ fontSize: 12, color: '#8c8c8c', marginLeft: 8 }}>
                           {formatTime(healthEvent.ts)}
@@ -212,14 +215,14 @@ export function SystemEventsPage() {
                 return {
                   key: index,
                   color: registryEvent.stale ? 'orange' : 'blue',
-                  dot: <ApiOutlined />,
+                  dot: <UIIcon name="ApiOutlined" />,
                   children: (
                     <div>
                       <div style={{ marginBottom: 4 }}>
-                        <Tag color="purple">REGISTRY</Tag>
-                        <Tag>{String(registryEvent.rev).substring(0, 8)}</Tag>
-                        {registryEvent.stale && <Tag color="orange">STALE</Tag>}
-                        {registryEvent.partial && <Tag color="orange">PARTIAL</Tag>}
+                        <UITag color="purple">REGISTRY</UITag>
+                        <UITag>{String(registryEvent.rev).substring(0, 8)}</UITag>
+                        {registryEvent.stale && <UITag color="orange">STALE</UITag>}
+                        {registryEvent.partial && <UITag color="orange">PARTIAL</UITag>}
                         <span style={{ fontSize: 12, color: '#8c8c8c', marginLeft: 8 }}>
                           {formatTime(registryEvent.generatedAt)}
                         </span>
@@ -237,15 +240,15 @@ export function SystemEventsPage() {
             })}
           />
         ) : (
-          <Alert
+          <UIAlert
             message="No events received yet"
             description="Waiting for system events..."
             type="info"
             showIcon
-            icon={<SyncOutlined spin />}
+            icon={<UIIcon name="SyncOutlined" spin />}
           />
         )}
-      </Card>
+      </UICard>
     </KBPageContainer>
   );
 }

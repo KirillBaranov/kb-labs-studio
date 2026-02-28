@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Statistic } from 'antd';
+import { UICard, UIStatistic } from '@kb-labs/studio-ui-kit';
 import './AnimatedMetricCard.css';
 
 export interface AnimatedMetricCardProps {
@@ -23,7 +23,7 @@ export function AnimatedMetricCard({
   prefix,
   precision = 0,
   icon,
-  color = '#1890ff',
+  color = 'var(--info)',
   animationDuration = 1000,
   loading = false,
 }: AnimatedMetricCardProps) {
@@ -31,7 +31,7 @@ export function AnimatedMetricCard({
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
-    if (value === displayValue) return;
+    if (value === displayValue) {return;}
 
     setIsAnimating(true);
     const startValue = displayValue;
@@ -65,7 +65,7 @@ export function AnimatedMetricCard({
   const isIncrease = changePercent > 0;
 
   return (
-    <Card
+    <UICard
       bordered={false}
       className={`animated-metric-card ${isAnimating ? 'animating' : ''}`}
       style={{
@@ -76,7 +76,7 @@ export function AnimatedMetricCard({
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ flex: 1 }}>
-          <Statistic
+          <UIStatistic
             title={title}
             value={displayValue}
             precision={precision}
@@ -94,7 +94,7 @@ export function AnimatedMetricCard({
               style={{
                 marginTop: 8,
                 fontSize: 12,
-                color: isIncrease ? '#52c41a' : '#ff4d4f',
+                color: isIncrease ? 'var(--success)' : 'var(--error)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 4,
@@ -102,7 +102,7 @@ export function AnimatedMetricCard({
             >
               <span>{isIncrease ? '↑' : '↓'}</span>
               <span>{Math.abs(changePercent).toFixed(1)}%</span>
-              <span style={{ color: '#999' }}>from previous</span>
+              <span style={{ color: 'var(--text-tertiary)' }}>from previous</span>
             </div>
           )}
         </div>
@@ -120,6 +120,6 @@ export function AnimatedMetricCard({
           </div>
         )}
       </div>
-    </Card>
+    </UICard>
   );
 }

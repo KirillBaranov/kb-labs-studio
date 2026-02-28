@@ -27,13 +27,13 @@ export function TwoPane({
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   const handleMouseDown = () => {
-    if (!resizable) return;
+    if (!resizable) {return;}
     setIsResizing(true);
   };
 
   const handleMouseMove = React.useCallback(
     (e: MouseEvent) => {
-      if (!isResizing || !containerRef.current) return;
+      if (!isResizing || !containerRef.current) {return;}
 
       const container = containerRef.current;
       const rect = container.getBoundingClientRect();

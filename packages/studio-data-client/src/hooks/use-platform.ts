@@ -14,7 +14,7 @@ export function usePlatformConfig(source: PlatformDataSource) {
   return useQuery({
     queryKey: qk.platform.config(),
     queryFn: async () => {
-      return await source.getConfig();
+      return source.getConfig();
     },
     staleTime: 60000, // Cache for 1 minute (config rarely changes)
     retry: 2,

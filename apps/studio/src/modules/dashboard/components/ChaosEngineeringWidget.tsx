@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Table, Tag, Button, Progress, Space, Typography, Modal, Form, Select, InputNumber, Descriptions, Alert } from 'antd';
+import { UICard, UITable, UITag, UIButton, UIProgress, UISpace, UITypographyText, UITitle, UIModal, UIForm, UISelect, UIInputNumber, UIDescriptions, UIAlert } from '@kb-labs/studio-ui-kit';
 import {
   ExperimentOutlined,
   PlayCircleOutlined,
@@ -9,7 +9,7 @@ import {
   WarningOutlined,
 } from '@ant-design/icons';
 
-const { Text, Title } = Typography;
+
 
 interface ChaosExperiment {
   id: string;
@@ -91,7 +91,7 @@ const EXPERIMENT_LIBRARY: ChaosExperiment[] = [
 // Calculate resilience score based on experiment results
 const calculateResilienceScore = (experiments: ChaosExperiment[]): number => {
   const completed = experiments.filter(e => e.lastRun);
-  if (completed.length === 0) return 0;
+  if (completed.length === 0) {return 0;}
 
   const successRate = completed.filter(e => e.lastRun?.status === 'success').length / completed.length;
   const coverage = completed.length / experiments.length;
@@ -184,8 +184,8 @@ export function ChaosEngineeringWidget() {
       key: 'name',
       render: (name: string, record: ChaosExperiment) => (
         <div>
-          <Text strong>{name}</Text>
-          <div style={{ fontSize: 12, color: '#666' }}>{record.target}</div>
+          <UITypographyText strong>{name}</UITypographyText>
+          <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{record.target}</div>
         </div>
       ),
     },
@@ -194,7 +194,7 @@ export function ChaosEngineeringWidget() {
       dataIndex: 'type',
       key: 'type',
       width: 100,
-      render: (type: string) => <Tag color={getTypeColor(type)}>{type}</Tag>,
+      render: (type: string) => <UITag color={getTypeColor(type)}>{type}</UITag>,
     },
     {
       title: 'Last Run',
@@ -202,12 +202,12 @@ export function ChaosEngineeringWidget() {
       key: 'lastRun',
       width: 120,
       render: (lastRun?: ChaosExperiment['lastRun']) => {
-        if (!lastRun) return <Text type="secondary">Never</Text>;
+        if (!lastRun) {return <UITypographyText type="secondary">Never</UITypographyText>;}
         const daysAgo = Math.floor((Date.now() - lastRun.timestamp) / 86400000);
         return (
           <div>
-            <Tag color={getStatusColor(lastRun.status)}>{lastRun.status}</Tag>
-            <div style={{ fontSize: 11, color: '#999' }}>{daysAgo}d ago</div>
+            <UITag color={getStatusColor(lastRun.status)}>{lastRun.status}</UITag>
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>{daysAgo}d ago</div>
           </div>
         );
       },
@@ -217,7 +217,7 @@ export function ChaosEngineeringWidget() {
       key: 'action',
       width: 100,
       render: (_: any, record: ChaosExperiment) => (
-        <Button
+        <UIButton
           type="primary"
           size="small"
           icon={<PlayCircleOutlined />}
@@ -228,13 +228,13 @@ export function ChaosEngineeringWidget() {
           disabled={runningExperiment !== null}
         >
           Run
-        </Button>
+        </UIButton>
       ),
     },
   ];
 
   return (
-    <Card
+    <UICard
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <ExperimentOutlined />
@@ -242,26 +242,26 @@ export function ChaosEngineeringWidget() {
         </div>
       }
       extra={
-        <Space>
-          <SafetyOutlined style={{ color: resilienceScore >= 70 ? '#52c41a' : '#faad14' }} />
-          <Text strong>Resilience: {resilienceScore}%</Text>
-        </Space>
+        <UISpace>
+          <SafetyOutlined style={{ color: resilienceScore >= 70 ? 'var(--success)' : 'var(--warning)' }} />
+          <UITypographyText strong>Resilience: {resilienceScore}%</UITypographyText>
+        </UISpace>
       }
     >
       {/* Mock Mode Banner */}
-      <Alert
+      <UIAlert
         type="info"
         message={
-          <Space>
+          <UISpace>
             <span>Mock Mode</span>
-            <Text type="secondary">—</Text>
-            <Text type="secondary">
+            <UITypographyText type="secondary">—</UITypographyText>
+            <UITypographyText type="secondary">
               Experiments are simulated. Real fault injection planned in Phase 2.
-            </Text>
-            <Text type="secondary" style={{ marginLeft: 8 }}>
+            </UITypographyText>
+            <UITypographyText type="secondary" style={{ marginLeft: 8 }}>
               See: docs/CHAOS-ENGINEERING-ROADMAP.md
-            </Text>
-          </Space>
+            </UITypographyText>
+          </UISpace>
         }
         style={{ marginBottom: 16 }}
         showIcon={false}
@@ -274,62 +274,62 @@ export function ChaosEngineeringWidget() {
         gap: 16,
         marginBottom: 16,
         padding: 16,
-        background: '#fafafa',
+        background: 'var(--bg-tertiary)',
         borderRadius: 8,
       }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: resilienceScore >= 70 ? '#52c41a' : '#faad14' }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: resilienceScore >= 70 ? 'var(--success)' : 'var(--warning)' }}>
             {resilienceScore}
           </div>
-          <Text type="secondary" style={{ fontSize: 12 }}>Resilience Score</Text>
+          <UITypographyText type="secondary" style={{ fontSize: 12 }}>Resilience Score</UITypographyText>
         </div>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: '#1890ff' }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--info)' }}>
             {experiments.filter(e => e.lastRun?.status === 'success').length}
           </div>
-          <Text type="secondary" style={{ fontSize: 12 }}>Passed Tests</Text>
+          <UITypographyText type="secondary" style={{ fontSize: 12 }}>Passed Tests</UITypographyText>
         </div>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: '#ff4d4f' }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--error)' }}>
             {experiments.filter(e => e.lastRun?.status === 'failed').length}
           </div>
-          <Text type="secondary" style={{ fontSize: 12 }}>Failed Tests</Text>
+          <UITypographyText type="secondary" style={{ fontSize: 12 }}>Failed Tests</UITypographyText>
         </div>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: '#595959' }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-secondary)' }}>
             {experiments.filter(e => !e.lastRun).length}
           </div>
-          <Text type="secondary" style={{ fontSize: 12 }}>Not Tested</Text>
+          <UITypographyText type="secondary" style={{ fontSize: 12 }}>Not Tested</UITypographyText>
         </div>
       </div>
 
       {/* Running Experiment Status */}
       {runningExperiment && (
-        <Alert
+        <UIAlert
           type={runningExperiment.status === 'running' ? 'info' : runningExperiment.status === 'success' ? 'success' : 'warning'}
           message={
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Space>
+              <UISpace>
                 <ThunderboltOutlined />
-                <Text strong>
+                <UITypographyText strong>
                   {runningExperiment.status === 'running' ? 'Experiment Running...' :
                    runningExperiment.status === 'success' ? 'Experiment Complete' : 'Experiment Aborted'}
-                </Text>
-              </Space>
+                </UITypographyText>
+              </UISpace>
               {runningExperiment.status === 'running' && (
-                <Button size="small" danger icon={<PauseCircleOutlined />} onClick={stopExperiment}>
+                <UIButton size="small" danger icon={<PauseCircleOutlined />} onClick={stopExperiment}>
                   Stop
-                </Button>
+                </UIButton>
               )}
             </div>
           }
           description={
             <div style={{ marginTop: 8 }}>
-              <Progress percent={runningExperiment.progress} status={runningExperiment.status === 'running' ? 'active' : undefined} />
+              <UIProgress percent={runningExperiment.progress} status={runningExperiment.status === 'running' ? 'active' : undefined} />
               <div style={{ display: 'flex', gap: 24, marginTop: 8 }}>
-                <Text type="secondary">Requests: {runningExperiment.metrics.requestsProcessed}</Text>
-                <Text type="secondary">Errors: {runningExperiment.metrics.errorsDetected}</Text>
-                <Text type="secondary">SLO Violations: {runningExperiment.metrics.sloViolations}</Text>
+                <UITypographyText type="secondary">Requests: {runningExperiment.metrics.requestsProcessed}</UITypographyText>
+                <UITypographyText type="secondary">Errors: {runningExperiment.metrics.errorsDetected}</UITypographyText>
+                <UITypographyText type="secondary">SLO Violations: {runningExperiment.metrics.sloViolations}</UITypographyText>
               </div>
             </div>
           }
@@ -338,7 +338,7 @@ export function ChaosEngineeringWidget() {
       )}
 
       {/* Experiment Library Table */}
-      <Table
+      <UITable
         dataSource={experiments}
         columns={columns}
         pagination={false}
@@ -349,10 +349,10 @@ export function ChaosEngineeringWidget() {
       {/* Run Experiment Modal */}
       <Modal
         title={
-          <Space>
+          <UISpace>
             <ExperimentOutlined />
             <span>Run Experiment: {selectedExperiment?.name}</span>
-          </Space>
+          </UISpace>
         }
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
@@ -367,7 +367,7 @@ export function ChaosEngineeringWidget() {
       >
         {selectedExperiment && (
           <div>
-            <Alert
+            <UIAlert
               type="warning"
               message="This will inject faults into your system"
               description="Make sure you're running in a safe environment. The experiment will auto-abort if SLO violations exceed threshold."
@@ -375,24 +375,24 @@ export function ChaosEngineeringWidget() {
               icon={<WarningOutlined />}
             />
 
-            <Descriptions column={1} size="small" bordered>
-              <Descriptions.Item label="Target">{selectedExperiment.target}</Descriptions.Item>
-              <Descriptions.Item label="Type">
-                <Tag color={getTypeColor(selectedExperiment.type)}>{selectedExperiment.type}</Tag>
-              </Descriptions.Item>
-              <Descriptions.Item label="Hypothesis">{selectedExperiment.hypothesis}</Descriptions.Item>
+            <UIDescriptions column={1} size="small" bordered>
+              <UIDescriptions.Item label="Target">{selectedExperiment.target}</UIDescriptions.Item>
+              <UIDescriptions.Item label="Type">
+                <UITag color={getTypeColor(selectedExperiment.type)}>{selectedExperiment.type}</UITag>
+              </UIDescriptions.Item>
+              <UIDescriptions.Item label="Hypothesis">{selectedExperiment.hypothesis}</UIDescriptions.Item>
               {selectedExperiment.config.latencyMs && (
-                <Descriptions.Item label="Latency">{selectedExperiment.config.latencyMs}ms</Descriptions.Item>
+                <UIDescriptions.Item label="Latency">{selectedExperiment.config.latencyMs}ms</UIDescriptions.Item>
               )}
               {selectedExperiment.config.errorRate && (
-                <Descriptions.Item label="Error Rate">{selectedExperiment.config.errorRate}%</Descriptions.Item>
+                <UIDescriptions.Item label="Error Rate">{selectedExperiment.config.errorRate}%</UIDescriptions.Item>
               )}
-              <Descriptions.Item label="Duration">{(selectedExperiment.config.duration ?? 60000) / 1000}s</Descriptions.Item>
-              <Descriptions.Item label="Blast Radius">{selectedExperiment.config.blastRadius ?? 100}%</Descriptions.Item>
-            </Descriptions>
+              <UIDescriptions.Item label="Duration">{(selectedExperiment.config.duration ?? 60000) / 1000}s</UIDescriptions.Item>
+              <UIDescriptions.Item label="Blast Radius">{selectedExperiment.config.blastRadius ?? 100}%</UIDescriptions.Item>
+            </UIDescriptions>
           </div>
         )}
       </Modal>
-    </Card>
+    </UICard>
   );
 }

@@ -1,7 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Result, Space } from 'antd';
-import { HomeOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import { KBButton } from '@kb-labs/studio-ui-react';
+import { UIResult, UISpace, UIButton, UIIcon } from '@kb-labs/studio-ui-kit';
 
 export function NotFoundPage() {
   const navigate = useNavigate();
@@ -17,26 +15,26 @@ export function NotFoundPage() {
         padding: 24,
       }}
     >
-      <Result
+      <UIResult
         status="404"
         title="404"
         subTitle="Страница не найдена"
         extra={
-          <Space size="middle">
-            <KBButton
-              type="primary"
-              icon={<HomeOutlined />}
+          <UISpace size="middle">
+            <UIButton
+              variant="primary"
+              icon={<UIIcon name="HomeOutlined" />}
               onClick={() => navigate('/')}
             >
               На главную
-            </KBButton>
-            <KBButton
-              icon={<ArrowLeftOutlined />}
+            </UIButton>
+            <UIButton
+              icon={<UIIcon name="ArrowLeftOutlined" />}
               onClick={() => navigate(-1)}
             >
               Назад
-            </KBButton>
-          </Space>
+            </UIButton>
+          </UISpace>
         }
       />
     </div>
