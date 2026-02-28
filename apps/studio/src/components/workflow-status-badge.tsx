@@ -1,4 +1,4 @@
-import { KBBadge } from '@kb-labs/studio-ui-react'
+import { UIBadge } from '@kb-labs/studio-ui-kit';
 import type { WorkflowRun, JobRun } from '@kb-labs/studio-data-client'
 
 type WorkflowLikeStatus = WorkflowRun['status'] | JobRun['status']
@@ -14,5 +14,5 @@ const STATUS_VARIANTS: Record<WorkflowLikeStatus, 'info' | 'success' | 'warning'
 
 export function WorkflowStatusBadge({ status }: { status: WorkflowLikeStatus }) {
   const variant = STATUS_VARIANTS[status] ?? 'info'
-  return <KBBadge variant={variant}>{status.toUpperCase()}</KBBadge>
+  return <UIBadge variant={variant}>{status.toUpperCase()}</UIBadge>
 }

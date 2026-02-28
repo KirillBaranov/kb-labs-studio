@@ -4,12 +4,10 @@
  */
 
 import * as React from 'react';
-import { Typography } from 'antd';
+import { UITitle, UITypographyText } from '@kb-labs/studio-ui-kit';
 import type { ReactNode } from 'react';
 import type { WidgetAction } from '@kb-labs/studio-contracts';
 import { ActionToolbar } from './action-toolbar';
-
-const { Title, Text } = Typography;
 
 export interface PageHeaderProps {
   /** Page title */
@@ -67,7 +65,7 @@ export function PageHeader({
         }}
       >
         <div style={{ flex: 1, minWidth: 0 }}>
-          <Title
+          <UITitle
             level={1}
             className="typo-page-title"
             style={{
@@ -77,9 +75,9 @@ export function PageHeader({
             }}
           >
             {title}
-          </Title>
+          </UITitle>
           {description && (
-            <Text
+            <UITypographyText
               className="typo-description"
               style={{
                 color: 'var(--text-secondary)',
@@ -87,7 +85,7 @@ export function PageHeader({
               }}
             >
               {description}
-            </Text>
+            </UITypographyText>
           )}
         </div>
         {(actions || widgetActions) && (

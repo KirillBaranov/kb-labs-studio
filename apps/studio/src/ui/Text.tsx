@@ -6,10 +6,10 @@
  */
 
 import * as React from 'react';
-import { theme } from 'antd';
+import { useUITheme } from '@kb-labs/studio-ui-kit';
 import { typography } from '@kb-labs/studio-ui-core';
 
-const { useToken } = theme;
+
 
 export type TextSize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
 export type TextWeight = 'normal' | 'medium' | 'semibold' | 'bold';
@@ -47,7 +47,7 @@ export function Text({
   as: Component = 'span',
   className,
 }: TextProps) {
-  const { token } = useToken();
+  const { token } = useUITheme();
 
   // Map semantic colors to Ant Design tokens
   const colorMap: Record<TextColor, string> = {

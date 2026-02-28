@@ -1,4 +1,4 @@
-import { KBBadge } from '@kb-labs/studio-ui-react';
+import { UIBadge } from '@kb-labs/studio-ui-kit';
 
 export function RunBadge({ status }: { status: 'pending' | 'ok' | 'warn' | 'fail' }) {
   const variantMap = {
@@ -8,6 +8,6 @@ export function RunBadge({ status }: { status: 'pending' | 'ok' | 'warn' | 'fail
     pending: 'info' as const,
   };
 
-  return <KBBadge variant={variantMap[status]}>{status.toUpperCase()}</KBBadge>;
+  return <UIBadge variant={variantMap[status]}>{status.toUpperCase()}</UIBadge>;
 }
 

@@ -26,7 +26,11 @@
  */
 
 import * as React from 'react';
-import { ErrorState, Skeleton } from '../components/widgets/shared/index';
+// TODO: replace with new widget system components
+const ErrorState = ({ error, hint }: { error: string; hint?: string; retryable?: boolean; onRetry?: () => void }) => (
+  <div style={{ padding: 16, color: 'red' }}>{error}{hint ? ` — ${hint}` : ''}</div>
+);
+const Skeleton = (_props: { variant?: string }) => <div style={{ padding: 16 }}>Loading…</div>;
 
 /**
  * Widget registry entry interface (simplified for HOC validation)

@@ -9,7 +9,7 @@ import { useWidgetData } from '../hooks/useWidgetData';
 import type { StudioRegistryEntry } from '@kb-labs/rest-api-contracts';
 import { isCompositeWidget } from '@kb-labs/rest-api-contracts';
 import type { WidgetProps } from '@kb-labs/studio-contracts';
-import * as Widgets from './widgets/index';
+// TODO: widget library removed, pending new widget system
 import { trackWidgetEvent } from '../utils/analytics';
 import { studioConfig } from '../config/studio.config';
 import { WidgetErrorBoundary } from './widget-error-boundary';
@@ -34,47 +34,8 @@ import { WithWidgetState } from '../hocs/WithWidgetState';
  *
  * 🎯 TYPE SAFETY: Now uses WidgetProps discriminated union instead of `any`
  */
-const WIDGET_COMPONENTS: Record<string, React.ComponentType<WidgetProps>> = {
-  // Display widgets (14)
-  'metric': Widgets.Metric,
-  'metric-group': Widgets.MetricGroup,
-  'table': Widgets.Table,
-  'card': Widgets.Card,
-  'cardlist': Widgets.CardList,
-  'chart-line': Widgets.ChartLine,
-  'chart-bar': Widgets.ChartBar,
-  'chart-pie': Widgets.ChartPie,
-  'chart-area': Widgets.ChartArea,
-  'timeline': Widgets.Timeline,
-  'tree': Widgets.Tree,
-  'json': Widgets.Json,
-  'diff': Widgets.Diff,
-  'logs': Widgets.Logs,
-
-  // Form widgets (6)
-  'form': Widgets.Form,
-  'input': Widgets.Input,
-  'select': Widgets.Select,
-  'checkbox-group': Widgets.CheckboxGroup,
-  'switch': Widgets.Switch,
-  'date-picker': Widgets.DatePicker,
-
-  // Layout widgets (5) - composite with children
-  'section': Widgets.Section,
-  'grid': Widgets.Grid,
-  'stack': Widgets.Stack,
-  'tabs': Widgets.Tabs,
-  'modal': Widgets.Modal,
-
-  // Navigation widgets (3)
-  'breadcrumb': Widgets.Breadcrumb,
-  'stepper': Widgets.Stepper,
-  'menu': Widgets.Menu,
-
-  // Feedback widgets (2)
-  'alert': Widgets.Alert,
-  'confirm': Widgets.Confirm,
-};
+// TODO: widget library removed, pending new widget system
+const WIDGET_COMPONENTS: Record<string, React.ComponentType<WidgetProps>> = {};
 
 /**
  * Widget renderer props

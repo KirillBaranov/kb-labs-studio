@@ -1,4 +1,4 @@
-import { KBBadge } from '@kb-labs/studio-ui-react';
+import { UIBadge } from '@kb-labs/studio-ui-kit';
 
 export function HealthIndicator({ status }: { status: 'ok' | 'degraded' | 'down' }) {
   const variantMap = {
@@ -7,6 +7,6 @@ export function HealthIndicator({ status }: { status: 'ok' | 'degraded' | 'down'
     down: 'error' as const,
   };
 
-  return <KBBadge variant={variantMap[status]}>{status.toUpperCase()}</KBBadge>;
+  return <UIBadge variant={variantMap[status]}>{status.toUpperCase()}</UIBadge>;
 }
 

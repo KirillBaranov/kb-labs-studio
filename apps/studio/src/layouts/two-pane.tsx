@@ -6,9 +6,7 @@
  */
 
 import * as React from 'react';
-import { theme } from 'antd';
-
-const { useToken } = theme;
+import { useUITheme } from '@kb-labs/studio-ui-kit';
 
 export interface TwoPaneProps {
   left: React.ReactNode;
@@ -27,7 +25,7 @@ export function TwoPane({
   minLeftWidth = '20%',
   maxLeftWidth = '80%',
 }: TwoPaneProps) {
-  const { token } = useToken();
+  const { token } = useUITheme();
   const [leftWidthState, setLeftWidthState] = React.useState(leftWidth);
   const [isResizing, setIsResizing] = React.useState(false);
   const containerRef = React.useRef<HTMLDivElement>(null);

@@ -6,12 +6,12 @@
  */
 
 import * as React from 'react';
-import { Card, theme } from 'antd';
+import { UICard, useUITheme } from '@kb-labs/studio-ui-kit';
 import { Text } from './Text';
 import { Flex } from './Flex';
 import { Box } from './Box';
 
-const { useToken } = theme;
+
 
 export interface MetricCardProps {
   /** Metric label */
@@ -58,7 +58,7 @@ export function MetricCard({
   showDelta = true,
   loading = false,
 }: MetricCardProps) {
-  const { token } = useToken();
+  const { token } = useUITheme();
 
   // Determine trend color using Ant Design tokens
   const trendColor =
@@ -69,7 +69,7 @@ export function MetricCard({
   const trendIcon = trend === 'up' ? '↑' : trend === 'down' ? '↓' : '';
 
   return (
-    <Card
+    <UICard
       size={size}
       loading={loading}
       style={{ height: '100%' }}
@@ -113,6 +113,6 @@ export function MetricCard({
           </Flex>
         )}
       </Box>
-    </Card>
+    </UICard>
   );
 }

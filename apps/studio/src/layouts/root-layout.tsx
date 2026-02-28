@@ -5,14 +5,6 @@
 
 import * as React from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import {
-  KBPageLayout,
-  type NavigationItem,
-  AVAILABLE_ICONS,
-  KBStatusBar,
-  StatusBarItem,
-  StatusBarPresets,
-} from '@kb-labs/studio-ui-react';
 import type { StudioRegistry } from '@kb-labs/rest-api-contracts';
 import { useAuth } from '../providers/auth-provider';
 import { useRegistry } from '../providers/registry-provider';
@@ -24,6 +16,9 @@ import { WidgetModalManager } from '../components/widget-modal';
 import { PageTransition } from '../components/page-transition';
 import { createStudioLogger } from '../utils/logger';
 import { renderIcon } from '../routes/helpers';
+import { useSettings } from '../providers/settings-provider';
+import { NavigationItemsProvider } from '../providers/navigation-items-provider';
+import { applyNavigationCategories } from '../utils/apply-navigation-categories';
 
 // Import navigation from all modules
 import { dashboardNavigation } from '../modules/dashboard/routes';
@@ -36,6 +31,7 @@ import { releaseNavigation } from '../modules/release/routes';
 import { analyticsNavigation } from '../modules/analytics/routes';
 import { observabilityNavigation } from '../modules/observability/routes';
 import { settingsNavigation } from '../modules/settings/routes';
+import { AVAILABLE_ICONS, KBPageLayout, KBStatusBar, type NavigationItem, StatusBarItem, StatusBarPresets } from '@/components/ui';
 
 type PluginNavRoute = {
   key: string;
@@ -149,6 +145,7 @@ function LayoutContent() {
   const { registry, loading, error, hasData, registryMeta, health } = useRegistry();
   const commandPalette = useCommandPalette();
   const sources = useDataSources();
+  const { settings } = useSettings();
 
   const {
     notifications,
@@ -177,7 +174,8 @@ function LayoutContent() {
     setPluginNavModel(prev => (arePluginModelsEqual(prev, nextModel) ? prev : nextModel));
   }, [registry, hasData]);
 
-  const allNavigationItems = React.useMemo<NavigationItem[]>(() => {
+  // Build flat navigation items (before category grouping)
+  const flatNavigationItems = React.useMemo<NavigationItem[]>(() => {
     const items: NavigationItem[] = [
       dashboardNavigation,
       workflowNavigation,
@@ -211,6 +209,21 @@ function LayoutContent() {
     return items;
   }, [pluginNavModel]);
 
+  // Available items for NavigationSettings UI (top-level items except settings)
+  const availableNavItems = React.useMemo(
+    () =>
+      flatNavigationItems
+        .filter(item => item.key !== 'settings')
+        .map(item => ({ key: item.key, label: item.label })),
+    [flatNavigationItems],
+  );
+
+  // Apply user's category configuration
+  const allNavigationItems = React.useMemo<NavigationItem[]>(
+    () => applyNavigationCategories(flatNavigationItems, settings.navigation.categories),
+    [flatNavigationItems, settings.navigation.categories],
+  );
+
   React.useEffect(() => {
     if (error) {
       logger.error('Registry load failure in router', error);
@@ -218,7 +231,7 @@ function LayoutContent() {
   }, [error, logger]);
 
   return (
-    <>
+    <NavigationItemsProvider items={availableNavItems}>
       <KBPageLayout
         headerProps={{
           LinkComponent: Link as any,
@@ -286,7 +299,7 @@ function LayoutContent() {
         </PageTransition>
         <WidgetModalManager />
       </KBPageLayout>
-    </>
+    </NavigationItemsProvider>
   );
 }
 

@@ -1,8 +1,8 @@
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useHealthStatus, useReadyStatus } from '@kb-labs/studio-data-client';
 import { studioConfig } from '@/config/studio.config';
-import { Alert } from 'antd';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { UIAlert } from '@kb-labs/studio-ui-kit';
+import { RefreshCw } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRegistry } from '@/providers/registry-provider';
 
@@ -95,7 +95,7 @@ export function HealthBanner() {
     : 'REST API not available. Using mock data for development.';
 
   return (
-    <Alert
+    <UIAlert
       message={statusMessage}
       description={
         <div>
@@ -135,8 +135,7 @@ export function HealthBanner() {
           )}
         </div>
       }
-      type={isDown ? 'error' : isDegraded ? 'warning' : 'info'}
-      icon={<AlertTriangle size={16} />}
+      variant={isDown ? 'error' : isDegraded ? 'warning' : 'info'}
       showIcon
       action={
         <button

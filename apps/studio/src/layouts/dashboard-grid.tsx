@@ -7,9 +7,7 @@
 
 import * as React from 'react';
 import { spacing } from '@kb-labs/studio-ui-core';
-import { theme } from 'antd';
-
-const { useToken } = theme;
+import { useUITheme } from '@kb-labs/studio-ui-kit';
 
 export interface DashboardGridProps {
   children: React.ReactNode;
@@ -28,7 +26,7 @@ export function DashboardGrid({
   rowHeight = 8,
   gap = 16
 }: DashboardGridProps) {
-  const { token } = useToken();
+  const { token } = useUITheme();
   const childrenArray = React.Children.toArray(children);
 
   // Use spacing tokens for gap if available
