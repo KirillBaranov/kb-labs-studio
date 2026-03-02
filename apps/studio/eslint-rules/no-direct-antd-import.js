@@ -119,18 +119,10 @@ const rule = {
       ImportDeclaration(node) {
         const source = node.source.value;
 
-        // antd/es/... or antd/lib/... subpath imports
+        // antd/es/... or antd/lib/... subpath imports — allow type-only imports
         if (typeof source === 'string' && source.startsWith('antd/')) {
+          if (node.importKind === 'type') return;
           context.report({ node, messageId: 'noAntdSubpath' });
-          return;
-        }
-
-        // @ant-design/icons
-        if (
-          typeof source === 'string' &&
-          (source === '@ant-design/icons' || source.startsWith('@ant-design/icons/'))
-        ) {
-          context.report({ node, messageId: 'noAntdIcons' });
           return;
         }
 
