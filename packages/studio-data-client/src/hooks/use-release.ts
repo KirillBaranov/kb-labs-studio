@@ -8,6 +8,7 @@ import type {
   PublishRequest,
   RollbackRequest,
   BuildRequest,
+  RunChecksRequest,
 } from '@kb-labs/release-manager-contracts';
 
 /**
@@ -29,6 +30,7 @@ export const releaseQueryKeys = {
   historyChangelog: (scope: string, id: string) => [...releaseQueryKeys.all, 'history', scope, id, 'changelog'] as const,
   gitTimeline: (scope: string) => [...releaseQueryKeys.all, 'git-timeline', scope] as const,
   checklist: (scope: string) => [...releaseQueryKeys.all, 'checklist', scope] as const,
+  checks: (scope: string) => [...releaseQueryKeys.all, 'checks', scope] as const,
 };
 
 /**
@@ -310,6 +312,26 @@ export function useReleaseChecklist(source: ReleaseDataSource, scope: string, en
     enabled: enabled && !!scope,
     staleTime: 5000, // Refetch frequently to show updates
     refetchInterval: 10000, // Auto-refetch every 10s
+  });
+}
+
+/**
+ * Hook to get list of configured checks (without running them)
+ */
+export function useGetChecks(source: ReleaseDataSource, scope: string, enabled = true) {
+  return useQuery({
+    queryKey: releaseQueryKeys.checks(scope),
+    queryFn: () => source.getChecks(scope),
+    enabled: enabled && !!scope,
+  });
+}
+
+/**
+ * Hook to run pre-release checks
+ */
+export function useRunChecks(source: ReleaseDataSource) {
+  return useMutation({
+    mutationFn: (request: RunChecksRequest) => source.runChecks(request),
   });
 }
 

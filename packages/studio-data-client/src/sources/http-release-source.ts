@@ -33,6 +33,9 @@ import type {
   BuildRequest,
   BuildResponse,
   ReleaseChecklist,
+  RunChecksRequest,
+  RunChecksResponse,
+  GetChecksResponse,
 } from '@kb-labs/release-manager-contracts';
 
 /**
@@ -187,6 +190,18 @@ export class HttpReleaseSource implements ReleaseDataSource {
   async getChecklist(scope: string): Promise<ReleaseChecklist> {
     const params = new URLSearchParams({ scope });
     return this.client.fetch<ReleaseChecklist>(`${this.basePath}/checklist?${params}`);
+  }
+
+  // === Pre-release Checks ===
+  async getChecks(scope: string): Promise<GetChecksResponse> {
+    return this.client.fetch<GetChecksResponse>(`${this.basePath}/checks?scope=${encodeURIComponent(scope)}`);
+  }
+
+  async runChecks(request: RunChecksRequest): Promise<RunChecksResponse> {
+    return this.client.fetch<RunChecksResponse>(`${this.basePath}/checks/run`, {
+      method: 'POST',
+      data: request,
+    });
   }
 }
 

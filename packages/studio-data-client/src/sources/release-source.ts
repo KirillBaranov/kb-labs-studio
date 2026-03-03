@@ -31,6 +31,9 @@ import type {
   BuildRequest,
   BuildResponse,
   ReleaseChecklist,
+  RunChecksRequest,
+  RunChecksResponse,
+  GetChecksResponse,
 } from '@kb-labs/release-manager-contracts';
 
 /**
@@ -81,5 +84,9 @@ export interface ReleaseDataSource {
 
   // === Checklist ===
   getChecklist(scope: string): Promise<ReleaseChecklist>;
+
+  // === Pre-release Checks ===
+  getChecks(scope: string): Promise<GetChecksResponse>;
+  runChecks(request: RunChecksRequest): Promise<RunChecksResponse>;
 }
 

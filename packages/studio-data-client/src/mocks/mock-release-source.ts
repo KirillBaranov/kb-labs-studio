@@ -34,6 +34,9 @@ import type {
   BuildRequest,
   BuildResponse,
   ReleaseChecklist,
+  RunChecksRequest,
+  RunChecksResponse,
+  GetChecksResponse,
 } from '@kb-labs/release-manager-contracts';
 
 /**
@@ -665,7 +668,43 @@ export class MockReleaseSource implements ReleaseDataSource {
         filesCount: plan ? 6 : undefined,
         totalSize: plan ? 19928 : undefined,
       },
+      npm: {
+        status: plan && changelog ? 'ready' : 'pending',
+        message: plan && changelog ? 'Ready to publish' : 'Waiting for plan and changelog',
+      },
       canPublish: !!(plan && changelog),
+    };
+  }
+
+  // === Pre-release Checks ===
+  async getChecks(scope: string): Promise<GetChecksResponse> {
+    await this.delay(200);
+    return {
+      scope,
+      checks: [
+        { id: 'build', name: 'Build' },
+        { id: 'typecheck', name: 'Type Check', optional: true },
+        { id: 'lint', name: 'Lint', optional: true },
+        { id: 'tests', name: 'Tests', optional: true },
+      ],
+    };
+  }
+
+  async runChecks(request: RunChecksRequest): Promise<RunChecksResponse> {
+    await this.delay(1500);
+
+    const checks = [
+      { id: 'build', name: 'Build', success: true, durationMs: 850 },
+      { id: 'typecheck', name: 'Type Check', success: true, durationMs: 420, optional: true },
+      { id: 'lint', name: 'Lint', success: true, durationMs: 310, optional: true },
+      { id: 'tests', name: 'Tests', success: true, durationMs: 290, optional: true },
+    ];
+
+    return {
+      scope: request.scope,
+      success: true,
+      checks,
+      totalDurationMs: 1870,
     };
   }
 
