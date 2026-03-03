@@ -46,13 +46,13 @@ function MyComponent() {
 
 ## 📊 Component Stats
 
-- **Total Components:** 47
-- **With Tests:** 4/47 (9%)
+- **Total Components:** 48
+- **With Tests:** 4/48 (8%)
 
 **By Category:**
 
 - Primitives: 4
-- Core: 7
+- Core: 8
 - Layout: 4
 - Form: 10
 - Navigation: 7
@@ -85,6 +85,7 @@ Essential UI components
 | **UIButton** | UIButton component - Action button with semantic variants | ✅ |
 | **UICard** | UICard component - Card container with header/footer | ❌ |
 | **UIIcon** | UIIcon component - Icon wrapper with proper theming | ❌ |
+| **UIShimmerText** | UIShimmerText - Animated gradient shimmer on text | ❌ |
 | **UITag** | UITag component - Label/category tag with semantic colors | ❌ |
 | **UITitle** | UITitle component - Page/section titles with hierarchy | ❌ |
 
