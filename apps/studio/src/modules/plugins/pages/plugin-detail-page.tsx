@@ -19,7 +19,7 @@ import {
 } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import type { PluginManifestEntry } from '@kb-labs/studio-data-client';
-import type { ColumnsType } from 'antd/es/table';
+import type { UITableColumn } from '@kb-labs/studio-ui-kit';
 import { PluginAIAssistantModal } from '../components/plugin-ai-assistant-modal';
 import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
@@ -81,7 +81,7 @@ export function PluginDetailPage() {
         <KBPageHeader title="Plugin Not Found" />
         <UIEmptyState description="Plugin not found in registry" />
         <div style={{ textAlign: 'center', marginTop: 24 }}>
-          <UIButton type="primary" onClick={() => navigate('/plugins')}>
+          <UIButton variant="primary" onClick={() => navigate('/plugins')}>
             Back to Plugins
           </UIButton>
         </div>
@@ -95,7 +95,7 @@ export function PluginDetailPage() {
   const cliCommands = manifest.cli?.commands || [];
   const restRoutes = manifest.rest?.routes || [];
   const workflowHandlers = manifest.workflows?.handlers || [];
-  const jobs = manifest.jobs || [];
+  const jobs = manifest.jobs?.handlers || [];
   const permissions = manifest.permissions;
   const platformReqs = manifest.platform;
 
@@ -108,7 +108,7 @@ export function PluginDetailPage() {
           {/* Validation Errors Alert */}
           {plugin.validation && !plugin.validation.valid && (
             <UIAlert
-              type="error"
+              variant="error"
               icon={<UIIcon name="CloseCircleOutlined" />}
               message={`Manifest Validation Failed (${plugin.validation.errors.length} error${plugin.validation.errors.length > 1 ? 's' : ''})`}
               description={
@@ -260,7 +260,7 @@ export function PluginDetailPage() {
                 items={[
                   {
                     key: 'root',
-                    label: <UITypographyText type="secondary">Plugin Root Path</UITypographyText>,
+                    label: 'Plugin Root Path',
                     children: (
                       <UITypographyText code copyable style={{ fontSize: 12 }}>
                         {plugin.pluginRoot}
@@ -309,7 +309,7 @@ export function PluginDetailPage() {
               {permissions && (
                 <UIAlert
                   icon={<UIIcon name="LockOutlined" />}
-                  type="warning"
+                  variant="warning"
                   message="This plugin requires permissions"
                   description="See Permissions tab for details"
                   showIcon
@@ -318,7 +318,7 @@ export function PluginDetailPage() {
               {platformReqs?.requires && platformReqs.requires.length > 0 && (
                 <UIAlert
                   icon={<UIIcon name="DatabaseOutlined" />}
-                  type="info"
+                  variant="info"
                   message="Platform Requirements"
                   description={
                     <UISpace wrap>
@@ -339,47 +339,32 @@ export function PluginDetailPage() {
     },
     cliCommands.length > 0 && {
       key: 'cli',
-      label: (
-        <span>
-          <UIIcon name="CodeOutlined" /> CLI Commands ({cliCommands.length})
-        </span>
-      ),
+      label: `CLI Commands (${cliCommands.length})`,
+      icon: <UIIcon name="CodeOutlined" />,
       children: <CLICommandsTable commands={cliCommands} />,
     },
     restRoutes.length > 0 && {
       key: 'rest',
-      label: (
-        <span>
-          <UIIcon name="ApiOutlined" /> REST API ({restRoutes.length})
-        </span>
-      ),
+      label: `REST API (${restRoutes.length})`,
+      icon: <UIIcon name="ApiOutlined" />,
       children: <RestRoutesTable routes={restRoutes} basePath={manifest.rest?.basePath} apiBasePath={apiBasePath} />,
     },
     workflowHandlers.length > 0 && {
       key: 'workflows',
-      label: (
-        <span>
-          <UIIcon name="NodeIndexOutlined" /> Workflows ({workflowHandlers.length})
-        </span>
-      ),
+      label: `Workflows (${workflowHandlers.length})`,
+      icon: <UIIcon name="NodeIndexOutlined" />,
       children: <WorkflowsTable handlers={workflowHandlers} />,
     },
     jobs.length > 0 && {
       key: 'jobs',
-      label: (
-        <span>
-          <UIIcon name="ClockCircleOutlined" /> Jobs ({jobs.length})
-        </span>
-      ),
+      label: `Jobs (${jobs.length})`,
+      icon: <UIIcon name="ClockCircleOutlined" />,
       children: <JobsTable jobs={jobs} />,
     },
     permissions && {
       key: 'permissions',
-      label: (
-        <span>
-          <UIIcon name="LockOutlined" /> Permissions
-        </span>
-      ),
+      label: 'Permissions',
+      icon: <UIIcon name="LockOutlined" />,
       children: <PermissionsView permissions={permissions} />,
     },
     {
@@ -408,20 +393,20 @@ export function PluginDetailPage() {
         <UIButton
           icon={<UIIcon name="ArrowLeftOutlined" />}
           onClick={() => navigate('/plugins')}
-          type="text"
+          variant="text"
         >
           Back to Plugins
         </UIButton>
         <UIButton
           icon={<UIIcon name="QuestionCircleOutlined" />}
           onClick={() => setAiModalOpen(true)}
-          type="primary"
+          variant="primary"
         >
           AI Assistant
         </UIButton>
       </UISpace>
 
-      <UITabs items={tabItems as any} defaultActiveKey="overview" />
+      <UITabs items={tabItems as any} />
 
       <PluginAIAssistantModal
         open={aiModalOpen}
@@ -437,7 +422,7 @@ export function PluginDetailPage() {
 // Sub-components for different sections
 
 function CLICommandsTable({ commands }: { commands: any[] }) {
-  const columns: ColumnsType<any> = [
+  const columns: UITableColumn<any>[] = [
     {
       title: 'Command',
       dataIndex: 'id',
@@ -534,7 +519,7 @@ function RestRoutesTable({ routes, basePath, apiBasePath }: { routes: any[]; bas
       ? apiBasePath + basePath.slice(3) // Remove /v1 from plugin basePath if API already has /api/v1
       : apiBasePath + basePath
     : basePath || '';
-  const columns: ColumnsType<any> = [
+  const columns: UITableColumn<any>[] = [
     {
       title: 'Method',
       dataIndex: 'method',
@@ -602,7 +587,7 @@ function RestRoutesTable({ routes, basePath, apiBasePath }: { routes: any[]; bas
               Base Path: <UITypographyText code>{fullBasePath}</UITypographyText>
             </span>
           }
-          type="info"
+          variant="info"
           style={{ marginBottom: 16 }}
         />
       )}
@@ -657,7 +642,7 @@ function RestRoutesTable({ routes, basePath, apiBasePath }: { routes: any[]; bas
 }
 
 function WorkflowsTable({ handlers }: { handlers: any[] }) {
-  const columns: ColumnsType<any> = [
+  const columns: UITableColumn<any>[] = [
     {
       title: 'ID',
       dataIndex: 'id',
@@ -690,7 +675,7 @@ function WorkflowsTable({ handlers }: { handlers: any[] }) {
 }
 
 function JobsTable({ jobs }: { jobs: any[] }) {
-  const columns: ColumnsType<any> = [
+  const columns: UITableColumn<any>[] = [
     {
       title: 'ID',
       dataIndex: 'id',
@@ -877,7 +862,7 @@ function PermissionsView({ permissions }: { permissions: any }) {
             </div>
           ) : (
             <UIAlert
-              type="warning"
+              variant="warning"
               message="Shell access disabled"
               description="This plugin has no shell execution permissions."
               showIcon

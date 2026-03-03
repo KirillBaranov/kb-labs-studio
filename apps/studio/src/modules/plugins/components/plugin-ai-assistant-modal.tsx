@@ -115,7 +115,7 @@ export function PluginAIAssistantModal({
         </UIButton>,
         <UIButton
           key="ask"
-          type="primary"
+          variant="primary"
           icon={<UIIcon name="ThunderboltOutlined" />}
           loading={loading}
           onClick={handleSubmit}
@@ -189,7 +189,7 @@ export function PluginAIAssistantModal({
           <UIAlert
             message="Error"
             description={error}
-            type="error"
+            variant="error"
             closable
             onClose={() => setError(null)}
             showIcon

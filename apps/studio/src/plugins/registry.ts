@@ -7,6 +7,7 @@
  */
 
 import type { StudioRegistry, StudioRegistryResponse } from '@kb-labs/rest-api-contracts';
+import { flattenRegistry } from '@kb-labs/rest-api-contracts';
 import { createStudioLogger } from '../utils/logger';
 
 const registryLogger = createStudioLogger('registry-loader');
@@ -37,16 +38,17 @@ export async function loadRegistry(
         : envelope;
 
     // Validate schema
-    if (data.schema !== 'kb.studio-registry/1') {
+    if (data.schema !== 'kb.studio/1') {
       registryLogger.warn('Unknown registry schema', { schema: data.schema });
     }
 
+    const flat = flattenRegistry(data);
     registryLogger.info('Registry loaded', {
       plugins: data.plugins?.length ?? 0,
-      widgets: data.widgets?.length ?? 0,
-      menus: data.menus?.length ?? 0,
-      layouts: data.layouts?.length ?? 0,
-      registryVersion: data.registryVersion,
+      widgets: flat.widgets.length,
+      menus: flat.menus.length,
+      layouts: flat.layouts.length,
+      schemaVersion: data.schemaVersion,
     });
 
     return data;
@@ -58,13 +60,10 @@ export async function loadRegistry(
 
     // Return empty registry on error
     return {
-      schema: 'kb.studio-registry/1',
-      registryVersion: '0',
+      schema: 'kb.studio/1',
+      schemaVersion: 1,
       generatedAt: new Date().toISOString(),
       plugins: [],
-      widgets: [],
-      menus: [],
-      layouts: [],
     };
   }
 }
@@ -75,8 +74,9 @@ export async function loadRegistry(
 export function getWidgetById(
   registry: StudioRegistry,
   widgetId: string
-): typeof registry.widgets[0] | undefined {
-  return registry.widgets.find((w: typeof registry.widgets[0]) => w.id === widgetId);
+): ReturnType<typeof flattenRegistry>['widgets'][0] | undefined {
+  const flat = flattenRegistry(registry);
+  return flat.widgets.find((w) => w.id === widgetId);
 }
 
 /**
@@ -85,7 +85,7 @@ export function getWidgetById(
 export function getMenuEntriesByTarget(
   registry: StudioRegistry,
   target: string
-): typeof registry.menus {
-  return registry.menus.filter((m: typeof registry.menus[0]) => m.target === target);
+): ReturnType<typeof flattenRegistry>['menus'] {
+  const flat = flattenRegistry(registry);
+  return flat.menus.filter((m) => m.target === target);
 }
-

@@ -36,7 +36,7 @@ export function CLICommandsTable({ commands }: CLICommandsTableProps) {
             {flags.map((flag: any) => (
               <UITag key={flag.name}>
                 --{flag.name}
-                {flag.required && <UIText color="danger">*</UIText>}
+                {flag.required && <UIText color="error">*</UIText>}
               </UITag>
             ))}
           </UISpace>

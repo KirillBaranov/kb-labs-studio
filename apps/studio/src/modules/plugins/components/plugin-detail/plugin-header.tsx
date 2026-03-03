@@ -154,7 +154,7 @@ export function PluginHeader({ plugin }: PluginHeaderProps) {
           items={[
             {
               key: 'root',
-              label: <UIText color="secondary">Plugin Root Path</UIText>,
+              label: 'Plugin Root Path',
               children: (
                 <UIText style={{ fontSize: token.fontSizeSM, fontFamily: token.fontFamilyCode }}>
                   {plugin.pluginRoot}

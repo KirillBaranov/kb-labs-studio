@@ -75,7 +75,7 @@ export function PluginsPage() {
           case 'workflows':
             return p.manifest.workflows && p.manifest.workflows.handlers.length > 0;
           case 'jobs':
-            return p.manifest.jobs && p.manifest.jobs.length > 0;
+            return p.manifest.jobs && p.manifest.jobs.handlers.length > 0;
           default:
             return true;
         }
@@ -125,7 +125,7 @@ export function PluginsPage() {
           <UISelect
             style={{ width: '100%' }}
             value={filterType}
-            onChange={setFilterType}
+            onChange={(v) => setFilterType(v as string)}
             options={[
               { label: 'All Plugins', value: 'all' },
               { label: 'Has CLI Commands', value: 'cli' },
@@ -139,7 +139,7 @@ export function PluginsPage() {
           <UISelect
             style={{ width: 140 }}
             value={viewMode}
-            onChange={setViewMode}
+            onChange={(v) => setViewMode(v as ViewMode)}
             options={[
               { value: 'grid', label: 'Grid View' },
               { value: 'table', label: 'Table View' },

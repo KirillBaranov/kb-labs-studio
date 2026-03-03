@@ -72,7 +72,7 @@ export function CapabilitiesSummary({
         {permissions && (
           <UIAlert
             icon={<UIIcon name="LockOutlined" />}
-            type="warning"
+            variant="warning"
             message="This plugin requires permissions"
             description="See Permissions tab for details"
             showIcon
@@ -81,7 +81,7 @@ export function CapabilitiesSummary({
         {platformReqs?.requires && platformReqs.requires.length > 0 && (
           <UIAlert
             icon={<UIIcon name="DatabaseOutlined" />}
-            type="info"
+            variant="info"
             message="Platform Requirements"
             description={
               <UISpace wrap>

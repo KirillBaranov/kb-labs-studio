@@ -44,7 +44,7 @@ export function ShellPermissions({ permissions }: ShellPermissionsProps) {
         </div>
       ) : (
         <UIAlert
-          type="warning"
+          variant="warning"
           message="Shell access disabled"
           description="This plugin has no shell execution permissions."
           showIcon

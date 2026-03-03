@@ -6,7 +6,7 @@ import {
   UITooltip,
   UIIcon,
 } from '@kb-labs/studio-ui-kit';
-import type { ColumnsType } from 'antd/es/table';
+import type { UITableColumn } from '@kb-labs/studio-ui-kit';
 import type { PluginManifestEntry } from '@kb-labs/studio-data-client';
 
 interface PluginTableProps {
@@ -15,15 +15,15 @@ interface PluginTableProps {
 }
 
 export function PluginTable({ plugins, onPluginClick }: PluginTableProps) {
-  const columns: ColumnsType<PluginManifestEntry> = [
+  const columns: UITableColumn<PluginManifestEntry>[] = [
     {
       title: 'Plugin',
-      dataIndex: ['manifest', 'id'],
       key: 'id',
       width: 250,
       fixed: 'left',
-      render: (id, record) => {
+      render: (_value, record) => {
         const { display } = record.manifest;
+        const id = record.manifest.id;
         return (
           <UISpace>
             <span style={{ fontSize: 20 }}>{display?.icon || ''}</span>
@@ -40,21 +40,24 @@ export function PluginTable({ plugins, onPluginClick }: PluginTableProps) {
     },
     {
       title: 'Version',
-      dataIndex: ['manifest', 'version'],
       key: 'version',
       width: 100,
-      render: (version) => <UITypographyText code>{version}</UITypographyText>,
+      render: (_value, record) => (
+        <UITypographyText code>{record.manifest.version}</UITypographyText>
+      ),
     },
     {
       title: 'Description',
-      dataIndex: ['manifest', 'display', 'description'],
       key: 'description',
-      ellipsis: { showTitle: false },
-      render: (desc) => (
-        <UITooltip title={desc}>
-          <UITypographyText type="secondary">{desc || '--'}</UITypographyText>
-        </UITooltip>
-      ),
+      ellipsis: true,
+      render: (_value, record) => {
+        const desc = record.manifest.display?.description;
+        return (
+          <UITooltip title={desc}>
+            <UITypographyText type="secondary">{desc || '--'}</UITypographyText>
+          </UITooltip>
+        );
+      },
     },
     {
       title: 'CLI',
@@ -116,7 +119,7 @@ export function PluginTable({ plugins, onPluginClick }: PluginTableProps) {
       width: 80,
       align: 'center',
       render: (_, record) => {
-        const count = record.manifest.jobs?.length ?? 0;
+        const count = record.manifest.jobs?.handlers.length ?? 0;
         return count > 0 ? (
           <UITooltip title={`${count} job${count > 1 ? 's' : ''}`}>
             <UITag icon={<UIIcon name="ClockCircleOutlined" />} color="orange">
@@ -165,14 +168,11 @@ export function PluginTable({ plugins, onPluginClick }: PluginTableProps) {
       rowKey="pluginId"
       pagination={{
         pageSize: 20,
-        showSizeChanger: true,
-        showTotal: (total) => `Total ${total} plugin${total === 1 ? '' : 's'}`,
       }}
       onRow={(record) => ({
         onClick: () => onPluginClick(record),
         style: { cursor: 'pointer' },
       })}
-      scroll={{ x: 1200 }}
     />
   );
 }

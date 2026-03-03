@@ -21,7 +21,7 @@ export function PluginCard({ plugin, onClick }: PluginCardProps) {
   const cliCount = manifest.cli?.commands.length ?? 0;
   const restCount = manifest.rest?.routes.length ?? 0;
   const workflowCount = manifest.workflows?.handlers.length ?? 0;
-  const jobCount = manifest.jobs?.length ?? 0;
+  const jobCount = manifest.jobs?.handlers.length ?? 0;
 
   const hasPermissions = !!manifest.permissions;
   const requiresPlatform = manifest.platform?.requires && manifest.platform.requires.length > 0;

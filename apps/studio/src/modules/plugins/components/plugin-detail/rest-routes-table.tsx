@@ -97,7 +97,7 @@ export function RestRoutesTable({ routes, basePath, apiBasePath }: RestRoutesTab
               </UIText>
             </span>
           }
-          type="info"
+          variant="info"
           style={{ marginBottom: 16 }}
         />
       )}

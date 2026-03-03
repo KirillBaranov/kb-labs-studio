@@ -14,7 +14,7 @@ export function EnvPermissions({ permissions }: EnvPermissionsProps) {
         secrets management.
       </UIText>
       <div>
-        <UIText strong>Read Access:</UIText>
+        <UIText weight="bold">Read Access:</UIText>
         <div style={{ marginTop: 8 }}>
           <UISpace wrap>
             {permissions.read.map((env: string, idx: number) => (
