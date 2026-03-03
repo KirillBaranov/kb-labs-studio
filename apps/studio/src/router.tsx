@@ -41,7 +41,6 @@ import { QADashboardPage } from './modules/qa/pages/qa-page';
 import { PluginsPage } from './modules/plugins/pages/plugins-page';
 import { PluginDetailPage } from './modules/plugins/pages/plugin-detail-page';
 import { WorkflowPage } from './modules/workflow/pages/workflow-page';
-import { WidgetModalManager } from './components/widget-modal';
 import { PageTransition } from './components/page-transition';
 import { createStudioLogger } from './utils/logger';
 import { ErrorBoundary } from './components/error-boundary';
@@ -423,7 +422,6 @@ function LayoutContent() {
             <Outlet />
           </div>
         </PageTransition>
-        <WidgetModalManager />
       </KBPageLayout>
     </NavigationItemsProvider>
   );
