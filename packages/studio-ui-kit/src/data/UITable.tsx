@@ -66,6 +66,8 @@ export interface UITableProps<T = any> {
   className?: string;
   /** Additional styles */
   style?: React.CSSProperties;
+  /** Scroll config */
+  scroll?: { x?: number | string | true; y?: number | string };
 }
 
 /**
@@ -113,6 +115,7 @@ export function UITable<T extends Record<string, any> = any>({
   expandable,
   className,
   style,
+  scroll,
 }: UITableProps<T>) {
   return (
     <AntTable<T>
@@ -128,6 +131,7 @@ export function UITable<T extends Record<string, any> = any>({
       expandable={expandable}
       className={className}
       style={style}
+      scroll={scroll}
     />
   );
 }
