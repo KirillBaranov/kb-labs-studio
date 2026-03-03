@@ -5,7 +5,7 @@
 
 import * as React from 'react';
 import { UICard, UITable, UITag, UISpin, UIAlert, UISelect, UISpace } from '@kb-labs/studio-ui-kit';
-import type { ColumnsType } from 'antd/es/table';
+import type { UITableColumn } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useQualityBuildOrder, useQualityCycles } from '@kb-labs/studio-data-client';
 
@@ -25,10 +25,10 @@ export function BuildOrderTab() {
   }
 
   if (error) {
-    return <UIAlert message="Failed to load build order" type="error" showIcon />;
+    return <UIAlert message="Failed to load build order" variant="error" showIcon />;
   }
 
-  const layersColumns: ColumnsType<{ layer: number; packages: string[] }> = [
+  const layersColumns: UITableColumn<{ layer: number; packages: string[]; key: number }>[] = [
     {
       title: 'Layer',
       dataIndex: 'layer',
@@ -63,7 +63,7 @@ export function BuildOrderTab() {
         <UIAlert
           message="Circular Dependencies Detected!"
           description={`Found ${data.circular.length} circular dependency cycles. Build order may not be correct.`}
-          type="error"
+          variant="error"
           showIcon
           style={{ marginBottom: 24 }}
         />
@@ -75,7 +75,7 @@ export function BuildOrderTab() {
           style={{ width: 400 }}
           placeholder="Select package to see its build dependencies"
           value={selectedPackage}
-          onChange={setSelectedPackage}
+          onChange={(val) => setSelectedPackage(val as string | undefined)}
           allowClear
           showSearch
           options={data?.sorted.map((pkg) => ({
@@ -91,7 +91,7 @@ export function BuildOrderTab() {
         style={{ marginBottom: 24 }}
       >
         <UITable
-          dataSource={layersData}
+          dataSource={layersData ?? []}
           columns={layersColumns}
           pagination={false}
           expandable={{
@@ -119,7 +119,7 @@ export function BuildOrderTab() {
               key={idx}
               message={`Cycle ${idx + 1}`}
               description={cycle.join(' → ')}
-              type="warning"
+              variant="warning"
               showIcon
               style={{ marginBottom: 12 }}
             />

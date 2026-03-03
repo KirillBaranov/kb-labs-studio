@@ -40,7 +40,7 @@ export function ConfigurationSettings() {
   if (isLoading) {
     return (
       <UIStack>
-        <UISkeleton active paragraph={{ rows: 5 }} />
+        <UISkeleton active lines={5} />
       </UIStack>
     );
   }
@@ -57,7 +57,7 @@ export function ConfigurationSettings() {
             </UITypographyText>
           </UISpace>
         }
-        type="error"
+        variant="error"
         showIcon
       />
     );
@@ -217,7 +217,7 @@ export function ConfigurationSettings() {
                               <UIIcon name="CheckCircleOutlined" style={{ color: 'var(--ant-success-color)' }} />
                               <UIButton
                                 size="small"
-                                type="text"
+                                variant="text"
                                 icon={copiedKey === itemKey ? <UIIcon name="CheckOutlined" /> : <UIIcon name="CopyOutlined" />}
                                 onClick={() => handleCopy(itemPackage, itemKey)}
                               >
@@ -272,18 +272,10 @@ export function ConfigurationSettings() {
               const category = categories.find((cat) => cat.adapters.includes(adapterName));
               const categoryColor = category?.color || 'blue';
 
+              const optionsCount = options ? Object.keys(options as object).length : 0;
               return {
                 key: adapterName,
-                label: (
-                  <UISpace>
-                    <UITypographyText strong>{adapterName}</UITypographyText>
-                    {options && (
-                      <UITag color={categoryColor}>
-                        {Object.keys(options as object).length} option(s)
-                      </UITag>
-                    )}
-                  </UISpace>
-                ),
+                label: options ? `${adapterName} (${optionsCount} option${optionsCount !== 1 ? 's' : ''})` : adapterName,
                 children: options ? (
                   <pre
                     style={{
@@ -309,7 +301,7 @@ export function ConfigurationSettings() {
       {/* Redacted Fields Info */}
       {hasRedacted && (
         <UIAlert
-          type="warning"
+          variant="warning"
           showIcon
           message="Security Notice"
           description={

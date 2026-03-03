@@ -12,7 +12,6 @@ import { CommandPaletteProvider, useCommandPalette } from '../providers/command-
 import { useNotifications } from '@kb-labs/studio-data-client';
 import { useDataSources } from '../providers/data-sources-provider';
 import { HealthBanner } from '../components/health-banner';
-import { WidgetModalManager } from '../components/widget-modal';
 import { PageTransition } from '../components/page-transition';
 import { createStudioLogger } from '../utils/logger';
 import { renderIcon } from '../routes/helpers';
@@ -24,7 +23,7 @@ import { applyNavigationCategories } from '../utils/apply-navigation-categories'
 import { dashboardNavigation } from '../modules/dashboard/routes';
 import { workflowNavigation } from '../modules/workflow/routes';
 import { pluginsNavigation } from '../modules/plugins/routes';
-import { assistantNavigation } from '../modules/assistant/routes';
+import { agentsNavigation as assistantNavigation } from '../modules/agents/routes';
 import { commitNavigation } from '../modules/commit/routes';
 import { qualityNavigation } from '../modules/quality/routes';
 import { releaseNavigation } from '../modules/release/routes';
@@ -297,7 +296,6 @@ function LayoutContent() {
             <Outlet />
           </div>
         </PageTransition>
-        <WidgetModalManager />
       </KBPageLayout>
     </NavigationItemsProvider>
   );

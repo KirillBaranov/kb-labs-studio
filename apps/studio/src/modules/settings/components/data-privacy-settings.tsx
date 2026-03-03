@@ -65,7 +65,6 @@ export function DataPrivacySettings() {
         <UIButton
           icon={<UIIcon name="DownloadOutlined" />}
           onClick={handleExport}
-          type="default"
         >
           Export Settings
         </UIButton>
@@ -102,7 +101,7 @@ export function DataPrivacySettings() {
         <UIButton
           icon={<UIIcon name="DeleteOutlined" />}
           onClick={handleClearData}
-          type="primary"
+          variant="primary"
           danger
         >
           Clear All Data

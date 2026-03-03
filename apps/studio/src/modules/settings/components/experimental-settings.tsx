@@ -88,7 +88,7 @@ export function ExperimentalSettings() {
       <UIAlert
         message="Experimental Features Notice"
         description="Features marked as Alpha or Beta are actively being developed and may change or be removed without notice. High-risk features may affect application stability."
-        type="warning"
+        variant="warning"
         showIcon
         icon={<UIIcon name="WarningOutlined" />}
       />
@@ -96,7 +96,6 @@ export function ExperimentalSettings() {
       {/* Feature Groups */}
       <UIAccordion
         defaultActiveKey={['ui-ux', 'performance', 'ai', 'data']}
-        expandIconPosition="end"
         style={{ backgroundColor: 'transparent' }}
         items={(Object.keys(groupedFeatures) as FeatureGroup[]).map((groupId) => {
           const group = FEATURE_GROUPS[groupId];
@@ -105,20 +104,7 @@ export function ExperimentalSettings() {
 
           return {
             key: groupId,
-            label: (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontSize: 18 }}>{GROUP_ICONS[groupId]}</span>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 15, fontWeight: 500 }}>{group.name}</div>
-                  <UITypographyText type="secondary" style={{ fontSize: 12 }}>
-                    {group.description}
-                  </UITypographyText>
-                </div>
-                <UITag color="blue">
-                  {enabledInGroup} / {features.length}
-                </UITag>
-              </div>
-            ),
+            label: `${group.name} (${enabledInGroup}/${features.length})`,
             style: { marginBottom: 8 },
             children: (
               <UISpace direction="vertical" size="middle" style={{ width: '100%' }}>
@@ -187,7 +173,7 @@ export function ExperimentalSettings() {
                             <div style={{ marginTop: 8 }}>
                               <UIAlert
                                 message={`Requires: ${feature.dependencies.map((d) => FEATURE_FLAGS[d].name).join(', ')}`}
-                                type="info"
+                                variant="info"
                                 showIcon
                                 icon={<UIIcon name="InfoCircleOutlined" />}
                                 style={{ fontSize: 12, padding: '4px 8px' }}
@@ -200,7 +186,7 @@ export function ExperimentalSettings() {
                             <div style={{ marginTop: 8 }}>
                               <UIAlert
                                 message="This feature is deprecated and will be removed soon"
-                                type="warning"
+                                variant="warning"
                                 showIcon
                                 style={{ fontSize: 12, padding: '4px 8px' }}
                               />
@@ -249,7 +235,7 @@ export function ExperimentalSettings() {
             </div>
           </div>
         }
-        type="info"
+        variant="info"
         showIcon
       />
     </UISpace>

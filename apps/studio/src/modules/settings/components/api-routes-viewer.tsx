@@ -117,7 +117,7 @@ function treeNodeToAntdNode(
             </UITypographyText>
             <UITooltip title={copiedUrl === fullUrl ? 'Copied!' : 'Copy full URL'}>
               <UIButton
-                type="text"
+                variant="text"
                 size="small"
                 icon={
                   copiedUrl === fullUrl ? (
@@ -274,7 +274,7 @@ export function ApiRoutesViewer() {
           placeholder="Search routes..."
           prefix={<UIIcon name="SearchOutlined" />}
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(value) => setSearchQuery(value)}
           style={{ width: 300 }}
           allowClear
         />
@@ -282,8 +282,8 @@ export function ApiRoutesViewer() {
           placeholder="Filter by method"
           allowClear
           style={{ width: 150 }}
-          value={methodFilter}
-          onChange={setMethodFilter}
+          value={methodFilter ?? undefined}
+          onChange={(v) => setMethodFilter(v as string | null)}
           options={availableMethods.map((m) => ({ label: m, value: m }))}
         />
         <UISegmented
@@ -302,7 +302,7 @@ export function ApiRoutesViewer() {
       {/* Stats */}
       {data && (
         <UIAlert
-          type="info"
+          variant="info"
           showIcon={false}
           message={
             <UISpace split={<span style={{ color: '#d9d9d9' }}>|</span>}>
@@ -327,7 +327,7 @@ export function ApiRoutesViewer() {
 
       {/* Error */}
       {error && (
-        <UIAlert type="error" message="Failed to load routes" description={error} showIcon />
+        <UIAlert variant="error" message="Failed to load routes" description={error} showIcon />
       )}
 
       {/* Loading */}
@@ -389,7 +389,7 @@ export function ApiRoutesViewer() {
                   </UITypographyText>
                   <UITooltip title={copiedUrl === fullUrl ? 'Copied!' : 'Copy full URL'}>
                     <UIButton
-                      type="text"
+                      variant="text"
                       size="small"
                       icon={
                         copiedUrl === fullUrl ? (

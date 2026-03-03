@@ -75,7 +75,7 @@ export function useWidgetActions(options: UseWidgetActionsOptions = {}) {
               headers: {
                 'Content-Type': 'application/json',
               },
-              ...(body && { body: JSON.stringify(body) }),
+              ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
             });
 
             if (!response.ok) {

@@ -55,6 +55,9 @@ export function useWidgetChangeHandler(
       }
 
       const eventConfig = widget.events.emit[0]; // Use first event config
+      if (!eventConfig) {
+        return;
+      }
       const eventName = typeof eventConfig === 'string' ? eventConfig : eventConfig.name;
       const payloadMap = typeof eventConfig === 'object' ? eventConfig.payloadMap : undefined;
 

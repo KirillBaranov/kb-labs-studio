@@ -5,6 +5,7 @@
 import * as React from 'react';
 import { Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
+import { UIShimmerText } from '@kb-labs/studio-ui-kit';
 
 export interface KBFullPageLoaderProps {
   /** Whether to show the loader */
@@ -75,28 +76,24 @@ export function KBFullPageLoader({
             gap: 8,
           }}
         >
-          <div
-            style={{
-              fontSize: '18px',
-              fontWeight: 600,
-              color: 'var(--text-primary)',
-              transition: 'color 150ms ease-in-out',
-            }}
+          <UIShimmerText
+            style={{ fontSize: '18px', fontWeight: 600 }}
+            color="var(--text-secondary, #9CA3AF)"
+            highlight="var(--text-primary, #111827)"
+            duration="2s"
           >
             {message}
-          </div>
+          </UIShimmerText>
 
           {tip && (
-            <div
-              style={{
-                fontSize: '14px',
-                fontWeight: 400,
-                color: 'var(--text-secondary)',
-                transition: 'color 150ms ease-in-out',
-              }}
+            <UIShimmerText
+              style={{ fontSize: '14px', fontWeight: 400 }}
+              color="var(--text-tertiary, #D1D5DB)"
+              highlight="var(--text-secondary, #6B7280)"
+              duration="2s"
             >
               {tip}
-            </div>
+            </UIShimmerText>
           )}
         </div>
       </div>

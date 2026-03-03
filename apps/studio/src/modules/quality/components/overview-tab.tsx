@@ -59,9 +59,9 @@ export function OverviewTab() {
     return 'normal';
   };
 
-  const getSeverityType = (severity: string): 'error' | 'warning' | 'info' => {
-    if (severity === 'high') {return 'error';}
-    if (severity === 'medium') {return 'warning';}
+  const getSeverityVariant = (severity: number): 'error' | 'warning' | 'info' => {
+    if (severity >= 3) {return 'error';}
+    if (severity >= 2) {return 'warning';}
     return 'info';
   };
 
@@ -70,7 +70,7 @@ export function OverviewTab() {
       {/* Stale Packages Alert */}
       {!staleLoading && staleData && staleData.totalStale > 0 && (
         <UIAlert
-          type="error"
+          variant="error"
           showIcon
           icon={<UIIcon name="ClockCircleOutlined" />}
           message={`${staleData.totalStale} stale package${staleData.totalStale > 1 ? 's' : ''} detected`}
@@ -93,7 +93,7 @@ export function OverviewTab() {
                 </div>
               )}
               <UISpace>
-                <UIButton type="primary" danger icon={<UIIcon name="ThunderboltOutlined" />} size="small">
+                <UIButton variant="primary" danger icon={<UIIcon name="ThunderboltOutlined" />} size="small">
                   Rebuild All Stale
                 </UIButton>
                 <UIButton size="small">View Details</UIButton>
@@ -157,18 +157,17 @@ export function OverviewTab() {
                 <UIAlert
                   message={
                     <UISpace>
-                      <span>{issue.message}</span>
-                      <UITag color={getSeverityType(issue.severity) === 'error' ? 'red' : 'orange'}>
-                        {issue.severity}
+                      <span>{issue.description}</span>
+                      <UITag color={getSeverityVariant(issue.severity) === 'error' ? 'red' : 'orange'}>
+                        severity: {issue.severity}
                       </UITag>
-                      <UITag>{issue.count} affected</UITag>
-                      <UITag color="red">-{issue.penalty} points</UITag>
+                      {issue.count !== undefined && <UITag>{issue.count} affected</UITag>}
                     </UISpace>
                   }
-                  type={getSeverityType(issue.severity)}
+                  variant={getSeverityVariant(issue.severity)}
                   showIcon
                   icon={
-                    getSeverityType(issue.severity) === 'error' ? (
+                    getSeverityVariant(issue.severity) === 'error' ? (
                       <UIIcon name="WarningOutlined" />
                     ) : (
                       <UIIcon name="CheckCircleOutlined" />

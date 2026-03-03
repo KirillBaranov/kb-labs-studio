@@ -5,7 +5,7 @@
 
 import * as React from 'react';
 import { UICard, UITable, UITag, UISpin, UIAlert } from '@kb-labs/studio-ui-kit';
-import type { ColumnsType } from 'antd/es/table';
+import type { UITableColumn } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useQualityDependencies } from '@kb-labs/studio-data-client';
 import type {
@@ -28,10 +28,10 @@ export function DependenciesTab() {
   }
 
   if (error) {
-    return <UIAlert message="Failed to load dependencies" type="error" showIcon />;
+    return <UIAlert message="Failed to load dependencies" variant="error" showIcon />;
   }
 
-  const duplicatesColumns: ColumnsType<DuplicateDependency> = [
+  const duplicatesColumns: UITableColumn<DuplicateDependency>[] = [
     {
       title: 'Dependency',
       dataIndex: 'name',
@@ -60,7 +60,7 @@ export function DependenciesTab() {
     },
   ];
 
-  const unusedColumns: ColumnsType<UnusedDependency> = [
+  const unusedColumns: UITableColumn<UnusedDependency>[] = [
     {
       title: 'Dependency',
       dataIndex: 'name',
@@ -75,7 +75,7 @@ export function DependenciesTab() {
     },
   ];
 
-  const missingColumns: ColumnsType<MissingDependency> = [
+  const missingColumns: UITableColumn<MissingDependency>[] = [
     {
       title: 'Dependency',
       dataIndex: 'name',
@@ -102,7 +102,7 @@ export function DependenciesTab() {
         <UIAlert
           message="No dependency issues found!"
           description="Your monorepo has no duplicate, unused, or missing dependencies."
-          type="success"
+          variant="success"
           showIcon
           style={{ marginBottom: 24 }}
         />

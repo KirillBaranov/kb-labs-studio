@@ -7,7 +7,7 @@ export function NotificationsSettings() {
       <UIAlert
         message="Feature in Development"
         description="Notification preferences will be configurable soon. We're working on bringing you more control over alerts and notifications."
-        type="warning"
+        variant="warning"
         showIcon
         icon={<UIIcon name="BellOutlined" />}
       />

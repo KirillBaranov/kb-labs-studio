@@ -35,7 +35,7 @@ export function GraphTab() {
   }
 
   if (error) {
-    return <UIAlert message="Failed to load graph" type="error" showIcon />;
+    return <UIAlert message="Failed to load graph" variant="error" showIcon />;
   }
 
   const convertToTreeData = (node: GraphNode, path: string = ''): DataNode => {
@@ -49,7 +49,7 @@ export function GraphTab() {
 
   const renderTreeMode = () => {
     if (!data?.tree) {
-      return <UIAlert message="No tree data available" type="info" />;
+      return <UIAlert message="No tree data available" variant="info" />;
     }
 
     return (
@@ -63,7 +63,7 @@ export function GraphTab() {
 
   const renderPackagesMode = () => {
     if (!data?.packages || data.packages.length === 0) {
-      return <UIAlert message="No packages found" type="info" />;
+      return <UIAlert message="No packages found" variant="info" />;
     }
 
     return (
@@ -77,7 +77,7 @@ export function GraphTab() {
 
   const renderStatsMode = () => {
     if (!data?.stats) {
-      return <UIAlert message="No stats available" type="info" />;
+      return <UIAlert message="No stats available" variant="info" />;
     }
 
     return (
@@ -129,7 +129,7 @@ export function GraphTab() {
             <UISelect
               style={{ width: '100%', marginTop: 8 }}
               value={mode}
-              onChange={setMode}
+              onChange={(val) => setMode(val as GraphMode)}
               options={[
                 { label: 'Dependency Tree', value: 'tree' },
                 { label: 'Reverse Dependencies', value: 'reverse' },
@@ -145,7 +145,7 @@ export function GraphTab() {
                 style={{ width: '100%', marginTop: 8 }}
                 placeholder={mode === 'tree' ? 'All packages' : 'Select a package'}
                 value={selectedPackage}
-                onChange={setSelectedPackage}
+                onChange={(val) => setSelectedPackage(val as string | undefined)}
                 allowClear
                 showSearch
                 options={

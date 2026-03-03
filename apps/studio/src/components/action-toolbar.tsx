@@ -4,8 +4,7 @@
  */
 
 import * as React from 'react';
-import { UIButton, UIDropdown, UISpace, UITooltip, UIModalConfirm } from '@kb-labs/studio-ui-kit';
-import type { UIMenuProps } from '@kb-labs/studio-ui-kit';
+import { UIButton, UISpace, UIModalConfirm } from '@kb-labs/studio-ui-kit';
 import type { WidgetAction } from '@kb-labs/studio-contracts';
 import { useWidgetActions } from '../hooks/useWidgetActions';
 import { renderIcon } from '@/components/ui';
@@ -42,9 +41,9 @@ export function ActionToolbar({
   basePath,
   callbacks,
   size = 'middle',
-  _responsive = true,
+  responsive: _responsive = true,
   className,
-}: ActionToolbarProps): React.ReactElement {
+}: ActionToolbarProps): React.ReactElement | null {
   const { handleAction } = useWidgetActions({
     widgetId,
     pluginId,
@@ -99,11 +98,6 @@ export function ActionToolbar({
         UIModalConfirm({
           title: action.confirm.title,
           content: action.confirm.description,
-          okText: action.confirm.okText || 'OK',
-          cancelText: action.confirm.cancelText || 'Cancel',
-          okButtonProps: action.confirm.danger
-            ? { danger: true }
-            : undefined,
           onOk: async () => {
             setLoadingActions((prev) => new Set(prev).add(action.id));
             try {
@@ -153,49 +147,11 @@ export function ActionToolbar({
       </UIButton>
     );
 
-    if (action.tooltip) {
-      return (
-        <UITooltip key={action.id} title={action.tooltip}>
-          {button}
-        </UITooltip>
-      );
-    }
-
     return button;
-  };
-
-  // Render dropdown action
-  const renderDropdown = (action: WidgetAction) => {
-    if (!action.children || action.children.length === 0) {
-      return renderButton(action);
-    }
-
-    const menuItems: UIMenuProps['items'] = action.children.map((child) => ({
-      key: child.id,
-      label: child.label,
-      icon: renderIcon(child.icon),
-      danger: child.variant === 'danger',
-      disabled: child.disabled === true,
-      onClick: () => handleActionClick(child),
-    }));
-
-    return (
-      <UIDropdown key={action.id} menu={{ items: menuItems }} trigger={['click']}>
-        <UIButton
-          icon={renderIcon(action.icon)}
-          size={size}
-        >
-          {action.label}
-        </UIButton>
-      </UIDropdown>
-    );
   };
 
   // Render actions
   const renderedActions = visibleActions.map((action) => {
-    if (action.type === 'dropdown' || action.children) {
-      return renderDropdown(action);
-    }
     return renderButton(action);
   });
 

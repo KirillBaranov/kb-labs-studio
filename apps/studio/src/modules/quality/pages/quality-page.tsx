@@ -4,7 +4,6 @@
  */
 
 import * as React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { UITabs } from '@kb-labs/studio-ui-kit';
 import { OverviewTab } from '../components/overview-tab';
 import { DependenciesTab } from '../components/dependencies-tab';
@@ -14,15 +13,6 @@ import { StaleTab } from '../components/stale-tab';
 import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
 export function QualityPage() {
-  const params = useParams<{ tab?: string }>();
-  const navigate = useNavigate();
-
-  const activeTab = params.tab || 'overview';
-
-  const handleTabChange = (key: string) => {
-    navigate(`/quality/${key}`);
-  };
-
   const tabItems = [
     {
       key: 'overview',
@@ -59,9 +49,8 @@ export function QualityPage() {
       />
 
       <UITabs
-        activeKey={activeTab}
-        onChange={handleTabChange}
         items={tabItems}
+        syncUrl={{ mode: 'path', basePath: '/quality' }}
         size="large"
         style={{ marginTop: 24 }}
       />

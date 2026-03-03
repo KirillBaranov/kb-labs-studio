@@ -131,8 +131,8 @@ export function NavigationSettings() {
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                     <UIInput
                       value={cat.label}
-                      onChange={e =>
-                        updateCategory(cat.id, { label: e.target.value })
+                      onChange={value =>
+                        updateCategory(cat.id, { label: value })
                       }
                       placeholder="Category name"
                       style={{ flex: 1 }}
@@ -162,7 +162,7 @@ export function NavigationSettings() {
                     mode="multiple"
                     value={validItemKeys}
                     onChange={keys =>
-                      updateCategory(cat.id, { itemKeys: keys })
+                      updateCategory(cat.id, { itemKeys: (keys as string[]) })
                     }
                     options={selectableOptions.map(i => ({
                       value: i.key,
@@ -180,7 +180,7 @@ export function NavigationSettings() {
       )}
 
       <UISpace>
-        <UIButton type="dashed" icon={<UIIcon name="PlusOutlined" />} onClick={addCategory}>
+        <UIButton variant="dashed" icon={<UIIcon name="PlusOutlined" />} onClick={addCategory}>
           Add Category
         </UIButton>
         {categories.length > 0 && (

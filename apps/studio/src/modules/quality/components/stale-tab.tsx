@@ -8,7 +8,7 @@ import {
   UICard, UITable, UITag, UISpin, UIAlert, UISpace, UIButton,
   UITypographyText, UIIcon,
 } from '@kb-labs/studio-ui-kit';
-import type { ColumnsType } from 'antd/es/table';
+import type { UITableColumn } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useQualityStale } from '@kb-labs/studio-data-client';
 import type { StalePackage, StaleChain } from '@kb-labs/quality-contracts';
@@ -28,7 +28,7 @@ export function StaleTab() {
   }
 
   if (error) {
-    return <UIAlert message="Failed to load stale packages" type="error" showIcon />;
+    return <UIAlert message="Failed to load stale packages" variant="error" showIcon />;
   }
 
   const getSeverityColor = (severity: string): string => {
@@ -72,7 +72,7 @@ export function StaleTab() {
     }
   };
 
-  const staleColumns: ColumnsType<StalePackage> = [
+  const staleColumns: UITableColumn<StalePackage>[] = [
     {
       title: 'Package',
       dataIndex: 'name',
@@ -147,7 +147,7 @@ export function StaleTab() {
     },
   ];
 
-  const chainColumns: ColumnsType<StaleChain> = [
+  const chainColumns: UITableColumn<StaleChain>[] = [
     {
       title: 'Root Package',
       dataIndex: 'root',
@@ -181,7 +181,7 @@ export function StaleTab() {
       {/* Summary Alert */}
       {data && data.totalStale > 0 ? (
         <UIAlert
-          type="error"
+          variant="error"
           showIcon
           icon={<UIIcon name="ClockCircleOutlined" />}
           message={
@@ -197,7 +197,7 @@ export function StaleTab() {
           }
           action={
             <UISpace>
-              <UIButton type="primary" danger icon={<UIIcon name="ThunderboltOutlined" />} size="small">
+              <UIButton variant="primary" danger icon={<UIIcon name="ThunderboltOutlined" />} size="small">
                 Rebuild All
               </UIButton>
               <UIButton size="small">Export Report</UIButton>
@@ -207,7 +207,7 @@ export function StaleTab() {
         />
       ) : (
         <UIAlert
-          type="success"
+          variant="success"
           showIcon
           message="All packages are up to date"
           description="No stale packages detected. Your monorepo build state is healthy."
@@ -227,7 +227,7 @@ export function StaleTab() {
           style={{ marginBottom: 24 }}
         >
           <UIAlert
-            type="warning"
+            variant="warning"
             showIcon
             message="High-impact stale packages"
             description="These packages affect many downstream packages. Rebuilding them will trigger cascading rebuilds."

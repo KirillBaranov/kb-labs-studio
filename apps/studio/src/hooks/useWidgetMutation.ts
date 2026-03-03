@@ -5,11 +5,9 @@
 
 import { useMemo, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { StudioHeaderHints } from '@kb-labs/rest-api-contracts';
 import { studioConfig } from '@/config/studio.config';
 import { createStudioLogger } from '../utils/logger';
 import { useWidgetEvents } from './useWidgetEvents';
-import { filterHeaders } from './useWidgetData';
 
 interface ErrorEnvelope {
   ok: false;
@@ -17,15 +15,6 @@ interface ErrorEnvelope {
     message: string;
     code?: string;
   };
-}
-
-function headerCase(name: string): string {
-  return name
-    .toLowerCase()
-    .split('-')
-    .filter(Boolean)
-    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-    .join('-');
 }
 
 function getDefaultHeaders(): Record<string, string> {
@@ -48,7 +37,6 @@ async function executeMutation<TData, TVariables>(
     routeId,
     method,
     basePath,
-    headerHints,
     traceId,
     headers,
   }: {
@@ -56,19 +44,10 @@ async function executeMutation<TData, TVariables>(
     routeId: string;
     method: 'POST' | 'PUT' | 'DELETE' | 'PATCH';
     basePath: string;
-    headerHints?: StudioHeaderHints;
     traceId: string;
     headers?: Record<string, string>;
   }
 ): Promise<TData> {
-  const filtered = filterHeaders(headers, headerHints);
-
-  if (headerHints && filtered.missingRequired.length > 0) {
-    console.warn(
-      `[Studio] Missing required headers for ${pluginId}:${routeId} -> ${filtered.missingRequired.join(', ')}`
-    );
-  }
-
   const packageName = pluginId.includes('/')
     ? pluginId.split('/').pop() || pluginId
     : pluginId;
@@ -80,7 +59,7 @@ async function executeMutation<TData, TVariables>(
     method,
     headers: {
       ...getDefaultHeaders(),
-      ...filtered.headers,
+      ...(headers as Record<string, string> | undefined),
     },
   };
 
@@ -151,8 +130,6 @@ export interface UseWidgetMutationOptions<TData, TVariables> {
   method?: 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   /** Base path for REST API */
   basePath?: string;
-  /** Header hints from manifest */
-  headerHints?: StudioHeaderHints;
   /** Custom headers */
   headers?: Record<string, string>;
   /** Callback on successful mutation */
@@ -194,7 +171,6 @@ export function useWidgetMutation<TData = unknown, TVariables = unknown>({
   routeId,
   method = 'POST',
   basePath,
-  headerHints,
   headers,
   onSuccess,
   onError,
@@ -236,7 +212,6 @@ export function useWidgetMutation<TData = unknown, TVariables = unknown>({
         routeId,
         method,
         basePath: resolvedBasePath,
-        headerHints,
         traceId: traceIdRef.current,
         headers,
       });

@@ -7,7 +7,7 @@
  */
 
 import * as React from 'react';
-import type { StudioRegistryEntry } from '@kb-labs/rest-api-contracts';
+import type { StudioWidgetDecl } from '@kb-labs/studio-contracts';
 import { useWidgetEvents } from './useWidgetEvents';
 
 /**
@@ -33,7 +33,7 @@ export interface WidgetEventState {
  * ```
  */
 export function useWidgetEventSubscription(
-  widget: StudioRegistryEntry | undefined,
+  widget: StudioWidgetDecl | undefined,
   widgetId: string
 ): WidgetEventState {
   const { subscribe } = useWidgetEvents();

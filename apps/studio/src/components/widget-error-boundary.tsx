@@ -45,7 +45,7 @@ export class WidgetErrorBoundary extends React.Component<
     };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     // Track error in analytics
     if (this.props.widgetId && this.props.pluginId) {
       trackWidgetEvent('error', {
@@ -66,7 +66,7 @@ export class WidgetErrorBoundary extends React.Component<
     });
   };
 
-  render(): React.ReactNode {
+  override render(): React.ReactNode {
     if (this.state.hasError && this.state.error) {
       if (this.props.fallback) {
         const FallbackComponent = this.props.fallback;

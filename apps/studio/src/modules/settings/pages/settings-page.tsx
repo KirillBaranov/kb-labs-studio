@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import {
   UITabs,
   UIList,
@@ -29,18 +28,10 @@ import { UICard, UISkeleton, UIStack } from '@kb-labs/studio-ui-kit';
 import { KBListItem, KBPageContainer, KBPageHeader, KBSection } from '@/components/ui';
 
 export function SettingsPage() {
-  const params = useParams<{ tab?: string }>();
-  const navigate = useNavigate();
   const sources = useDataSources();
   const { data, isLoading } = useHealthStatus(sources.system);
   const { registryMeta, refresh } = useRegistry();
   const [invalidating, setInvalidating] = React.useState(false);
-
-  const activeTab = params.tab || 'appearance';
-
-  const handleTabChange = (key: string) => {
-    navigate(`/settings/${key}`);
-  };
 
   const handleInvalidateCache = async () => {
     setInvalidating(true);
@@ -70,12 +61,8 @@ export function SettingsPage() {
   const tabItems = [
     {
       key: 'appearance',
-      label: (
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <UIIcon name="BgColorsOutlined" />
-          Appearance
-        </span>
-      ),
+      label: 'Appearance',
+      icon: <UIIcon name="BgColorsOutlined" />,
       children: (
         <KBSection>
           <UICard>
@@ -86,12 +73,8 @@ export function SettingsPage() {
     },
     {
       key: 'navigation',
-      label: (
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <UIIcon name="MenuOutlined" />
-          Navigation
-        </span>
-      ),
+      label: 'Navigation',
+      icon: <UIIcon name="MenuOutlined" />,
       children: (
         <KBSection>
           <UICard>
@@ -102,12 +85,8 @@ export function SettingsPage() {
     },
     {
       key: 'notifications',
-      label: (
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6, opacity: 0.6 }}>
-          <UIIcon name="BellOutlined" />
-          Notifications
-        </span>
-      ),
+      label: 'Notifications',
+      icon: <UIIcon name="BellOutlined" />,
       children: (
         <KBSection>
           <UICard>
@@ -118,12 +97,8 @@ export function SettingsPage() {
     },
     {
       key: 'privacy',
-      label: (
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <UIIcon name="LockOutlined" />
-          Data & Privacy
-        </span>
-      ),
+      label: 'Data & Privacy',
+      icon: <UIIcon name="LockOutlined" />,
       children: (
         <KBSection>
           <UICard>
@@ -134,19 +109,15 @@ export function SettingsPage() {
     },
     {
       key: 'system',
-      label: (
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <UIIcon name="DatabaseOutlined" />
-          System Info
-        </span>
-      ),
+      label: 'System Info',
+      icon: <UIIcon name="DatabaseOutlined" />,
       children: (
         <>
           <KBSection>
             <UICard title="Data Sources Health">
               {isLoading ? (
                 <UIStack>
-                  <UISkeleton active paragraph={{ rows: 3 }} />
+                  <UISkeleton active lines={3} />
                 </UIStack>
               ) : data ? (
                 <UIList
@@ -213,12 +184,8 @@ export function SettingsPage() {
     },
     {
       key: 'configuration',
-      label: (
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <UIIcon name="SettingOutlined" />
-          Configuration
-        </span>
-      ),
+      label: 'Configuration',
+      icon: <UIIcon name="SettingOutlined" />,
       children: (
         <KBSection>
           <UICard>
@@ -229,12 +196,8 @@ export function SettingsPage() {
     },
     {
       key: 'experimental',
-      label: (
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <UIIcon name="ExperimentOutlined" />
-          Experimental
-        </span>
-      ),
+      label: 'Experimental',
+      icon: <UIIcon name="ExperimentOutlined" />,
       children: (
         <KBSection>
           <UICard>
@@ -245,12 +208,8 @@ export function SettingsPage() {
     },
     {
       key: 'authentication',
-      label: (
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <UIIcon name="UserOutlined" />
-          Authentication
-        </span>
-      ),
+      label: 'Authentication',
+      icon: <UIIcon name="UserOutlined" />,
       children: (
         <KBSection>
           <UICard>
@@ -261,12 +220,8 @@ export function SettingsPage() {
     },
     {
       key: 'developer',
-      label: (
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <UIIcon name="ToolOutlined" />
-          Developer
-        </span>
-      ),
+      label: 'Developer',
+      icon: <UIIcon name="ToolOutlined" />,
       children: (
         <>
           <KBSection>
@@ -281,7 +236,6 @@ export function SettingsPage() {
                   <UIButton
                     icon={<UIIcon name="ReloadOutlined" />}
                     onClick={handleRefreshRegistry}
-                    type="default"
                   >
                     Refresh Registry
                   </UIButton>
@@ -300,7 +254,7 @@ export function SettingsPage() {
                     icon={<UIIcon name="DeleteOutlined" />}
                     onClick={handleInvalidateCache}
                     loading={invalidating}
-                    type="primary"
+                    variant="primary"
                     danger
                   >
                     Invalidate Cache & Re-discover
@@ -328,9 +282,8 @@ export function SettingsPage() {
       />
 
       <UITabs
-        activeKey={activeTab}
-        onChange={handleTabChange}
         items={tabItems}
+        syncUrl={{ mode: 'path', basePath: '/settings' }}
         size="large"
         style={{ marginTop: 24 }}
       />

@@ -15,6 +15,8 @@ export interface KBPageHeaderProps {
   extra?: React.ReactNode;
   breadcrumbItems?: BreadcrumbItem[];
   children?: React.ReactNode;
+  onBack?: () => void | Promise<void>;
+  icon?: React.ReactNode;
 }
 
 export function KBPageHeader({
@@ -23,6 +25,8 @@ export function KBPageHeader({
   extra,
   breadcrumbItems,
   children,
+  onBack: _onBack,
+  icon: _icon,
 }: KBPageHeaderProps) {
   return (
     <div style={{ marginBottom: 24 }}>

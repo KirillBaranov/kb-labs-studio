@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App';
 import { ConfigProvider } from './providers/config-provider';
+import '@kb-labs/studio-ui-kit/dist/index.css';
 import { registerIconRenderer } from '@kb-labs/studio-ui-kit';
 import { renderIcon } from './components/ui/icons';
 import './index.css';

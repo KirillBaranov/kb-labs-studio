@@ -118,12 +118,7 @@ export function ErrorBoundary() {
                   items={[
                     {
                       key: 'details',
-                      label: (
-                        <UISpace>
-                          <UIIcon name="BugOutlined" />
-                          <UITypographyText strong>Детали ошибки (для разработчиков)</UITypographyText>
-                        </UISpace>
-                      ),
+                      label: 'Детали ошибки (для разработчиков)',
                       children: (
                         <UISpace direction="vertical" size="middle" style={{ width: '100%' }}>
                           {/* Error Type */}
