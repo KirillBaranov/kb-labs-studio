@@ -11,4 +11,5 @@ export * from './UITag';
 export * from './UITitle';
 export * from './UIIcon';
 export * from './UIAvatar';
-export * from './useUITheme';
+export * from './useUiTheme';
+export * from './UIShimmerText';

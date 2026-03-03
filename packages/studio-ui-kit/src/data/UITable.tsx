@@ -8,6 +8,7 @@
 import * as React from 'react';
 import { Table as AntTable } from 'antd';
 import type { ColumnType } from 'antd/es/table';
+import type { ExpandableConfig } from 'antd/es/table/interface';
 
 export interface UITableColumn<T = any> extends ColumnType<T> {
   /** Column key */
@@ -59,6 +60,8 @@ export interface UITableProps<T = any> {
   size?: 'small' | 'middle' | 'large';
   /** Show border */
   bordered?: boolean;
+  /** Expandable row config */
+  expandable?: ExpandableConfig<T>;
   /** Additional CSS class */
   className?: string;
   /** Additional styles */
@@ -107,6 +110,7 @@ export function UITable<T extends Record<string, any> = any>({
   onRow,
   size = 'middle',
   bordered = false,
+  expandable,
   className,
   style,
 }: UITableProps<T>) {
@@ -121,6 +125,7 @@ export function UITable<T extends Record<string, any> = any>({
       onRow={onRow}
       size={size}
       bordered={bordered}
+      expandable={expandable}
       className={className}
       style={style}
     />
