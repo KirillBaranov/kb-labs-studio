@@ -3,10 +3,15 @@
  *
  * Wraps Ant Design Tabs with simplified API.
  * NO hardcoded colors, uses Ant Design theme.
+ *
+ * syncUrl modes:
+ *  - "search" — syncs with ?tab= query param (for pages at a fixed path, e.g. /)
+ *  - "path"   — syncs with /:tab path segment via navigate (for pages like /settings/:tab)
  */
 
 import * as React from 'react';
 import { Tabs as AntTabs } from 'antd';
+import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 
 export interface UITabItem {
   /** Tab key */
@@ -26,7 +31,13 @@ export interface UITabItem {
 export interface UITabsProps {
   /** Tab items */
   items: UITabItem[];
-  /** Active tab key */
+  /**
+   * Sync active tab with URL automatically.
+   * - true / "search" — uses ?tab= query param, default tab = first item (clean URL)
+   * - { mode: "path", basePath } — uses /:tab path segment (e.g. "/settings")
+   */
+  syncUrl?: boolean | 'search' | { mode: 'path'; basePath: string };
+  /** Controlled active tab key (ignored when syncUrl is set) */
   activeKey?: string;
   /** Default active tab key */
   defaultActiveKey?: string;
@@ -36,7 +47,7 @@ export interface UITabsProps {
   type?: 'line' | 'card';
   /** Tab size */
   size?: 'small' | 'middle' | 'large';
-  /** Change handler */
+  /** Change handler (called in addition to URL sync) */
   onChange?: (activeKey: string) => void;
   /** Tab edit handler (for closable tabs) */
   onEdit?: (targetKey: string, action: 'add' | 'remove') => void;
@@ -46,38 +57,10 @@ export interface UITabsProps {
   style?: React.CSSProperties;
 }
 
-/**
- * UITabs - Tabbed navigation
- *
- * @example
- * ```tsx
- * <UITabs
- *   items={[
- *     {
- *       key: 'overview',
- *       label: 'Overview',
- *       children: <OverviewContent />,
- *     },
- *     {
- *       key: 'details',
- *       label: 'Details',
- *       icon: <InfoIcon />,
- *       children: <DetailsContent />,
- *     },
- *   ]}
- *   onChange={(key) => console.log('Active tab:', key)}
- * />
- *
- * <UITabs
- *   type="card"
- *   items={cardItems}
- *   onEdit={(key, action) => handleEdit(key, action)}
- * />
- * ```
- */
-export function UITabs({
+function UITabsInner({
   items,
-  activeKey,
+  syncUrl,
+  activeKey: controlledActiveKey,
   defaultActiveKey,
   tabPosition = 'top',
   type = 'line',
@@ -87,10 +70,37 @@ export function UITabs({
   className,
   style,
 }: UITabsProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const params = useParams<{ tab?: string }>();
+
+  const defaultKey = items[0]?.key ?? '';
+
+  let activeKey: string | undefined = controlledActiveKey;
+
+  const isSearch = syncUrl === true || syncUrl === 'search';
+  const isPath = syncUrl && typeof syncUrl === 'object' && syncUrl.mode === 'path';
+
+  if (isSearch) {
+    activeKey = searchParams.get('tab') ?? defaultKey;
+  } else if (isPath) {
+    activeKey = params.tab ?? defaultKey;
+  }
+
+  const handleChange = (key: string) => {
+    if (isSearch) {
+      setSearchParams(key === defaultKey ? {} : { tab: key });
+    } else if (isPath && typeof syncUrl === 'object') {
+      const path = key === defaultKey ? syncUrl.basePath : `${syncUrl.basePath}/${key}`;
+      navigate(path);
+    }
+    onChange?.(key);
+  };
+
   const tabItems = items.map((item) => ({
     key: item.key,
     label: item.icon ? (
-      <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
         {item.icon}
         <span>{item.label}</span>
       </span>
@@ -111,14 +121,18 @@ export function UITabs({
     <AntTabs
       items={tabItems}
       activeKey={activeKey}
-      defaultActiveKey={defaultActiveKey}
+      defaultActiveKey={syncUrl ? undefined : defaultActiveKey}
       tabPosition={tabPosition}
       type={type}
       size={size}
-      onChange={onChange}
+      onChange={handleChange}
       onEdit={handleEdit}
       className={className}
       style={style}
     />
   );
+}
+
+export function UITabs(props: UITabsProps) {
+  return <UITabsInner {...props} />;
 }
