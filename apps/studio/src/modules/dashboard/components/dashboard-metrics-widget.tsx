@@ -59,30 +59,27 @@ export function DashboardMetricsWidget() {
           <KBStatCard
             label="Requests"
             value={totalRequests.toLocaleString()}
-            valueColor="var(--info)"
           />
         </UICol>
         <UICol span={6}>
           <KBStatCard
             label="Error Rate"
             value={`${errorRate.toFixed(1)}%`}
-            valueColor={errorRate > 5 ? 'var(--error)' : errorRate > 1 ? 'var(--warning)' : 'var(--success)'}
+            variant={errorRate > 5 ? 'negative' : errorRate > 1 ? 'warning' : 'positive'}
           />
         </UICol>
         <UICol span={6}>
           <KBStatCard
             label="Latency (avg)"
             value={`${avgLatency.toFixed(1)}ms`}
-            subValue={`p50 ${p50.toFixed(1)}ms`}
-            valueColor={avgLatency > 500 ? 'var(--error)' : avgLatency > 200 ? 'var(--warning)' : 'var(--success)'}
+            variant={avgLatency > 500 ? 'negative' : avgLatency > 200 ? 'warning' : 'positive'}
           />
         </UICol>
         <UICol span={6}>
           <KBStatCard
             label="Latency (p95/p99)"
             value={`${p95.toFixed(1)}ms`}
-            subValue={`p99 ${p99.toFixed(1)}ms`}
-            valueColor={p95 > 1000 ? 'var(--error)' : p95 > 500 ? 'var(--warning)' : 'var(--success)'}
+            variant={p95 > 1000 ? 'negative' : p95 > 500 ? 'warning' : 'positive'}
           />
         </UICol>
       </UIRow>
@@ -91,7 +88,7 @@ export function DashboardMetricsWidget() {
           <KBStatCard
             label="Uptime"
             value={formatUptime(uptime)}
-            valueColor="var(--success)"
+            variant="positive"
           />
         </UICol>
       </UIRow>

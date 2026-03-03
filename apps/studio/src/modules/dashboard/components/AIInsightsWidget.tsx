@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { UICard, UIInput, UIButton, UISpace, UITypographyText, UITypographyParagraph, UITitle, UIAvatar, UISpin, UITag } from '@kb-labs/studio-ui-kit';
+import { UICard, UIInput, UIInputTextArea, UIButton, UISpace, UITypographyText, UITypographyParagraph, UITitle, UIAvatar, UISpin, UITag } from '@kb-labs/studio-ui-kit';
 import {
   RobotOutlined,
   SendOutlined,
@@ -10,8 +10,6 @@ import {
 } from '@ant-design/icons';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { usePrometheusMetrics, useAdaptersLLMUsage } from '@kb-labs/studio-data-client';
-
-const { TextArea } = UIInput;
 
 interface Message {
   id: string;
@@ -166,8 +164,8 @@ export function AIInsightsWidget() {
     errorRate: metrics.data?.requests?.total
       ? ((metrics.data.requests.clientErrors + metrics.data.requests.serverErrors) / metrics.data.requests.total) * 100
       : 0,
-    avgLatency: metrics.data?.perPlugin?.reduce((sum, p) => sum + (p.latency?.average ?? 0), 0) /
-      (metrics.data?.perPlugin?.length || 1) ?? 100,
+    avgLatency: (metrics.data?.perPlugin?.reduce((sum, p) => sum + (p.latency?.average ?? 0), 0) ?? 0) /
+      (metrics.data?.perPlugin?.length || 1),
     totalCost: llmUsage.data?.totalCost ?? 0,
     topModel: Object.entries(llmUsage.data?.byModel ?? {})
       .sort(([, a], [, b]) => (b.cost ?? 0) - (a.cost ?? 0))[0]?.[0] ?? 'gpt-4',
@@ -245,7 +243,7 @@ export function AIInsightsWidget() {
         {messages.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 20px' }}>
             <BulbOutlined style={{ fontSize: 48, color: 'var(--border-primary)', marginBottom: 16 }} />
-            <UITitle level={5} type="secondary">Ask me anything about your system</UITitle>
+            <UITitle level={5}>Ask me anything about your system</UITitle>
             <UITypographyParagraph type="secondary" style={{ fontSize: 13 }}>
               I can analyze costs, performance, health metrics, and suggest optimizations.
             </UITypographyParagraph>
@@ -301,7 +299,7 @@ export function AIInsightsWidget() {
                 )}
                 {msg.role === 'assistant' && (
                   <UIButton
-                    type="text"
+                    variant="text"
                     size="small"
                     icon={copiedId === msg.id ? <CheckOutlined /> : <CopyOutlined />}
                     style={{ marginTop: 4, padding: '0 4px', height: 20 }}
@@ -335,12 +333,12 @@ export function AIInsightsWidget() {
         display: 'flex',
         gap: 8,
       }}>
-        <UITypographyTextArea
+        <UIInputTextArea
           value={input}
-          onChange={e => setInput(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value)}
           placeholder="Ask about costs, performance, health..."
           autoSize={{ minRows: 1, maxRows: 3 }}
-          onPressEnter={e => {
+          onPressEnter={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
             if (!e.shiftKey) {
               e.preventDefault();
               sendMessage(input);
@@ -349,7 +347,7 @@ export function AIInsightsWidget() {
           style={{ flex: 1 }}
         />
         <UIButton
-          type="primary"
+          variant="primary"
           icon={<SendOutlined />}
           onClick={() => sendMessage(input)}
           disabled={!input.trim() || isTyping}

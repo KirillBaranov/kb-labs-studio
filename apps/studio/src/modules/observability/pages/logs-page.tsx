@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {
   UICard,
   UIAlert,
@@ -17,7 +18,7 @@ import {
   UITooltip,
   UIMessage,
   UIModal,
-  UIInput,
+  UIInputTextArea,
   UIDivider,
   UISpin,
   UIIcon,
@@ -31,7 +32,6 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
-const { TextArea } = UIInput;
 
 /**
  * Time range presets for quick filtering
@@ -297,44 +297,22 @@ export function LogsPage() {
       );
     }
 
+    const labelText = [
+      formatTime(log.time),
+      `[${log.level.toUpperCase()}]`,
+      log.plugin ? `[${log.plugin}]` : '',
+      String(log.msg || '(no message)'),
+      log.err ? `(${String(log.err.name || 'Error')})` : '',
+    ].filter(Boolean).join(' ');
+
     return (
       <UIAccordion
         ghost
         key={`${log.time}-${index}`}
         items={[
           {
-            key: index,
-            label: (
-              <UISpace>
-                <UITypographyText type="secondary" style={{ fontSize: 12 }}>
-                  {formatTime(log.time)}
-                </UITypographyText>
-                {getLevelIcon(log.level)}
-                <UITag color={getLevelColor(log.level)}>{log.level.toUpperCase()}</UITag>
-                {log.plugin && <UITag color="purple">{log.plugin}</UITag>}
-                <UITypographyText>{log.msg || '(no message)'}</UITypographyText>
-                {log.err && (
-                  <UITag color="red" icon={<UIIcon name="CloseCircleOutlined" />}>
-                    {String(log.err.name || log.err.type || 'Error')}
-                  </UITag>
-                )}
-                {log.traceId && (
-                  <UITooltip title="Click to copy trace ID">
-                    <UITag
-                      color="default"
-                      style={{ fontSize: 11, cursor: 'pointer', color: '#8c8c8c' }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        copyToClipboard(String(log.traceId), 'Trace ID');
-                      }}
-                      icon={<UIIcon name="CopyOutlined" />}
-                    >
-                      {String(log.traceId).slice(0, 8)}
-                    </UITag>
-                  </UITooltip>
-                )}
-              </UISpace>
-            ),
+            key: String(index),
+            label: labelText,
             children: (
               <div style={{ backgroundColor: '#fafafa', padding: 16, borderRadius: 4, marginLeft: -24, marginRight: -24 }}>
                 <UITypographyParagraph
@@ -370,13 +348,7 @@ export function LogsPage() {
       <UIAccordion
         items={groups.map(([key, groupLogs]) => ({
           key,
-          label: (
-            <UISpace>
-              <UIIcon name="GroupOutlined" />
-              <UITypographyText strong>{key}</UITypographyText>
-              <UIBadge count={groupLogs.length} style={{ backgroundColor: '#52c41a' }} />
-            </UISpace>
-          ),
+          label: `${key} (${groupLogs.length} logs)`,
           children: (
             <UIList
               dataSource={groupLogs}
@@ -428,7 +400,7 @@ export function LogsPage() {
       const result = await sources.observability.summarizeLogs(request);
 
       // Store the full result data for structured rendering
-      setSummaryResult(result);
+      setSummaryResult(result.data);
     } catch (err: any) {
       UIMessage.error('Failed to generate summary: ' + err.message);
     } finally {
@@ -456,7 +428,7 @@ export function LogsPage() {
       {!isConnected && !error && (
         <UIAlert
           message="Connecting to log stream..."
-          type="info"
+          variant="info"
           showIcon
           icon={<UIIcon name="SyncOutlined" spin />}
           style={{ marginBottom: 24 }}
@@ -467,7 +439,7 @@ export function LogsPage() {
         <UIAlert
           message="Connection failed"
           description={error.message + ' - Make sure REST API is running on localhost:5050'}
-          type="error"
+          variant="error"
           showIcon
           style={{ marginBottom: 24 }}
         />
@@ -476,7 +448,7 @@ export function LogsPage() {
       {isConnected && (
         <UIAlert
           message="Connected to log stream"
-          type="success"
+          variant="success"
           showIcon
           icon={<UIIcon name="CheckCircleOutlined" />}
           style={{ marginBottom: 24 }}
@@ -491,13 +463,7 @@ export function LogsPage() {
           items={[
             {
               key: 'filters',
-              label: (
-                <UISpace>
-                  <UIIcon name="FilterOutlined" />
-                  <UITypographyText strong>Filters & Statistics</UITypographyText>
-                  <UIBadge count={filteredLogs.length} style={{ backgroundColor: '#52c41a' }} />
-                </UISpace>
-              ),
+              label: `Filters & Statistics (${filteredLogs.length} logs)`,
               children: (
                 <>
                   <UIRow gutter={[16, 16]}>
@@ -510,8 +476,8 @@ export function LogsPage() {
                           style={{ width: '100%' }}
                           placeholder="All levels"
                           allowClear
-                          value={levelFilter}
-                          onChange={setLevelFilter}
+                          value={levelFilter ?? undefined}
+                          onChange={(v) => setLevelFilter(v as string | null)}
                           options={[
                             { label: 'Trace', value: 'trace' },
                             { label: 'Debug', value: 'debug' },
@@ -532,9 +498,9 @@ export function LogsPage() {
                           style={{ width: '100%' }}
                           placeholder="All plugins"
                           allowClear
-                          value={pluginFilter}
-                          onChange={setPluginFilter}
-                          options={uniquePlugins.map((plugin) => ({ label: plugin, value: plugin }))}
+                          value={pluginFilter ?? undefined}
+                          onChange={(v) => setPluginFilter(v as string | null)}
+                          options={uniquePlugins.map((plugin) => ({ label: String(plugin), value: String(plugin) }))}
                         />
                       </UISpace>
                     </UICol>
@@ -547,7 +513,7 @@ export function LogsPage() {
                         <UISelect
                           style={{ width: '100%' }}
                           value={timeRange}
-                          onChange={setTimeRange}
+                          onChange={(v) => setTimeRange(v as string)}
                           options={Object.entries(TIME_RANGES).map(([key, { label }]) => ({
                             label,
                             value: key,
@@ -564,7 +530,7 @@ export function LogsPage() {
                         <UISelect
                           style={{ width: '100%' }}
                           value={groupBy}
-                          onChange={setGroupBy}
+                          onChange={(v) => setGroupBy(v as 'none' | 'trace' | 'plugin' | 'execution')}
                           options={[
                             { label: 'No grouping', value: 'none' },
                             { label: 'Trace ID', value: 'trace' },
@@ -650,7 +616,7 @@ export function LogsPage() {
                     </UICol>
                     <UICol span={4}>
                       <UIButton
-                        type="primary"
+                        variant="primary"
                         icon={<UIIcon name="RobotOutlined" />}
                         onClick={openSummarizeModal}
                         disabled={filteredLogs.length === 0}
@@ -680,7 +646,7 @@ export function LogsPage() {
               size="small"
               icon={isPaused ? <UIIcon name="SyncOutlined" /> : <UIIcon name="ClockCircleOutlined" />}
               onClick={() => setIsPaused(!isPaused)}
-              type={isPaused ? 'primary' : 'default'}
+              variant={isPaused ? 'primary' : 'default'}
             >
               {isPaused ? 'Resume' : 'Pause'}
             </UIButton>
@@ -694,7 +660,7 @@ export function LogsPage() {
           <UIAlert
             message="No logs match current filters"
             description="Adjust filters or wait for new logs to arrive"
-            type="info"
+            variant="info"
             showIcon
           />
         ) : groupBy === 'none' ? (
@@ -738,7 +704,7 @@ export function LogsPage() {
           </UIButton>,
           <UIButton
             key="summarize"
-            type="primary"
+            variant="primary"
             icon={<UIIcon name="ThunderboltOutlined" />}
             loading={summarizing}
             onClick={handleSummarize}
@@ -806,9 +772,9 @@ export function LogsPage() {
           {/* Custom Question */}
           <div>
             <UITypographyText strong>Your Question:</UITypographyText>
-            <TextArea
+            <UIInputTextArea
               value={customQuestion}
-              onChange={(e) => setCustomQuestion(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCustomQuestion(e.target.value)}
               placeholder="Ask anything about these logs... (e.g., 'What went wrong in the last 5 minutes?')"
               rows={3}
               style={{ marginTop: 8 }}
@@ -963,7 +929,7 @@ export function LogsPage() {
               {/* AI Analysis Card */}
               {summaryResult.aiSummary && (
                 <UIAlert
-                  type="info"
+                  variant="info"
                   showIcon
                   icon={<UIIcon name="RobotOutlined" />}
                   message="AI Analysis"
@@ -983,7 +949,7 @@ export function LogsPage() {
               {!summaryResult.aiSummary && summaryResult.message && (
                 <UIAlert
                   message={summaryResult.message}
-                  type="info"
+                  variant="info"
                   showIcon
                 />
               )}

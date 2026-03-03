@@ -78,7 +78,7 @@ export function TimeTravelWidget() {
       setState(prev => ({
         ...prev,
         isActive: true,
-        selectedTime: data.length > 0 ? dayjs(data[0].timestamp) : startOfDay,
+        selectedTime: data.length > 0 ? dayjs(data[0]?.timestamp) : startOfDay,
         isPlaying: false,
       }));
     }
@@ -115,7 +115,7 @@ export function TimeTravelWidget() {
 
           return {
             ...prev,
-            selectedTime: dayjs(historicalData[nextIndex].timestamp),
+            selectedTime: dayjs(historicalData[nextIndex]?.timestamp),
           };
         });
       }, 1000 / state.playbackSpeed);
@@ -137,7 +137,7 @@ export function TimeTravelWidget() {
     const prevIndex = Math.max(0, currentIndex - 1);
     setState(prev => ({
       ...prev,
-      selectedTime: dayjs(historicalData[prevIndex].timestamp),
+      selectedTime: dayjs(historicalData[prevIndex]?.timestamp),
       isPlaying: false,
     }));
   };
@@ -151,7 +151,7 @@ export function TimeTravelWidget() {
     const nextIndex = Math.min(historicalData.length - 1, currentIndex + 1);
     setState(prev => ({
       ...prev,
-      selectedTime: dayjs(historicalData[nextIndex].timestamp),
+      selectedTime: dayjs(historicalData[nextIndex]?.timestamp),
       isPlaying: false,
     }));
   };
@@ -172,7 +172,7 @@ export function TimeTravelWidget() {
     const index = Math.floor((value / 100) * (historicalData.length - 1));
     setState(prev => ({
       ...prev,
-      selectedTime: dayjs(historicalData[index].timestamp),
+      selectedTime: dayjs(historicalData[index]?.timestamp),
       isPlaying: false,
     }));
   };
@@ -200,7 +200,7 @@ export function TimeTravelWidget() {
       }
       extra={
         state.isActive && (
-          <UIButton type="link" icon={<ReloadOutlined />} onClick={resetToLive}>
+          <UIButton variant="link" icon={<ReloadOutlined />} onClick={resetToLive}>
             Back to Live
           </UIButton>
         )
@@ -225,7 +225,7 @@ export function TimeTravelWidget() {
         <>
           {/* Current Time Display */}
           <UIAlert
-            type="info"
+            variant="info"
             message={
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <UISpace>
@@ -254,7 +254,7 @@ export function TimeTravelWidget() {
               <UIButton icon={<StepBackwardOutlined />} onClick={stepBackward} />
             </UITooltip>
             <UIButton
-              type="primary"
+              variant="primary"
               shape="circle"
               size="large"
               icon={state.isPlaying ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
@@ -269,7 +269,7 @@ export function TimeTravelWidget() {
                 <UIButton
                   key={speed}
                   size="small"
-                  type={state.playbackSpeed === speed ? 'primary' : 'default'}
+                  variant={state.playbackSpeed === speed ? 'primary' : 'default'}
                   onClick={() => setState(prev => ({ ...prev, playbackSpeed: speed }))}
                   style={{ marginRight: 4 }}
                 >
@@ -288,17 +288,18 @@ export function TimeTravelWidget() {
                 formatter: (value) => {
                   if (!value || historicalData.length === 0) {return '';}
                   const index = Math.floor((value / 100) * (historicalData.length - 1));
-                  return dayjs(historicalData[index].timestamp).format('HH:mm');
+                  return dayjs(historicalData[index]?.timestamp).format('HH:mm');
                 },
               }}
             />
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <UITypographyText type="secondary" style={{ fontSize: 11 }}>
-                {historicalData[0] && dayjs(historicalData[0].timestamp).format('HH:mm')}
+                {historicalData[0] ? dayjs(historicalData[0].timestamp).format('HH:mm') : ''}
               </UITypographyText>
               <UITypographyText type="secondary" style={{ fontSize: 11 }}>
-                {historicalData[historicalData.length - 1] &&
-                  dayjs(historicalData[historicalData.length - 1].timestamp).format('HH:mm')}
+                {historicalData[historicalData.length - 1]
+                  ? dayjs(historicalData[historicalData.length - 1]!.timestamp).format('HH:mm')
+                  : ''}
               </UITypographyText>
             </div>
           </div>

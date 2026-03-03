@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { UITabs, UIProgress, UIStatistic, UIRow, UICol, UITag, UIEmptyState } from '@kb-labs/studio-ui-kit';
 import {
   CloudServerOutlined,
@@ -169,7 +169,6 @@ function InstanceMetrics({ instance }: { instance: SystemMetricsData['instances'
  */
 export function SystemResourcesWidget() {
   const sources = useDataSources();
-  const [activeInstanceTab, setActiveInstanceTab] = useState<string>('0');
 
   // Fetch system metrics from backend
   const metricsQuery = useSystemMetrics(sources.observability);
@@ -185,15 +184,10 @@ export function SystemResourcesWidget() {
     const isDead = age >= 60000;
     const isStale = age >= 30000 && age < 60000;
 
+    const statusSuffix = isDead ? ' (Dead)' : isStale ? ' (Stale)' : '';
     return {
       key: String(index),
-      label: (
-        <span>
-          Instance #{index + 1}
-          {isDead && <UITag color="red" style={{ marginLeft: 4 }}>Dead</UITag>}
-          {isStale && <UITag color="orange" style={{ marginLeft: 4 }}>Stale</UITag>}
-        </span>
-      ),
+      label: `Instance #${index + 1}${statusSuffix}`,
       children: <InstanceMetrics instance={instance} />,
       disabled: isDead, // Disable tab for dead instances
     };
@@ -282,14 +276,12 @@ export function SystemResourcesWidget() {
           {/* Instance tabs */}
           {instanceTabs && instanceTabs.length > 1 ? (
             <UITabs
-              activeKey={activeInstanceTab}
-              onChange={setActiveInstanceTab}
               items={instanceTabs}
               size="small"
             />
           ) : (
             // Single instance - show directly without tabs
-            instanceTabs && instanceTabs.length === 1 && (
+            instanceTabs && instanceTabs.length === 1 && data.instances[0] && (
               <InstanceMetrics instance={data.instances[0]} />
             )
           )}

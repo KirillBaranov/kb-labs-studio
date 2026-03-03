@@ -94,9 +94,9 @@ export function PerformanceBudgetWidget() {
   }, [metrics.data]);
 
   // Error budget gauge status
-  const getGaugeStatus = (usedPercent: number) => {
+  const getGaugeStatus = (usedPercent: number): 'success' | 'normal' | 'exception' => {
     if (usedPercent < 70) {return 'success';}
-    if (usedPercent < 90) {return 'warning';}
+    if (usedPercent < 90) {return 'normal';}
     return 'exception';
   };
 

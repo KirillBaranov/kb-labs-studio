@@ -165,8 +165,8 @@ export function PredictiveAnalyticsWidget() {
   const trendAnalysis = useMemo(() => {
     if (predictions.length < 2) {return null;}
 
-    const first = predictions[0].value;
-    const last = predictions[predictions.length - 1].value;
+    const first = predictions[0]?.value ?? 0;
+    const last = predictions[predictions.length - 1]?.value ?? 0;
     const change = ((last - first) / first) * 100;
 
     return {
@@ -194,7 +194,7 @@ export function PredictiveAnalyticsWidget() {
           <UISpace>
             <UISelect
               value={selectedMetric}
-              onChange={setSelectedMetric}
+              onChange={(value) => setSelectedMetric(value as MetricType)}
               style={{ width: 150 }}
               options={[
                 { label: 'Requests', value: 'requests' },
@@ -204,7 +204,7 @@ export function PredictiveAnalyticsWidget() {
             />
             <UISelect
               value={timeHorizon}
-              onChange={setTimeHorizon}
+              onChange={(value) => setTimeHorizon(value as '15m' | '30m' | '1h' | '2h')}
               style={{ width: 120 }}
               options={[
                 { label: '15 minutes', value: '15m' },
@@ -306,7 +306,7 @@ export function PredictiveAnalyticsWidget() {
                   })}
                 </div>
               }
-              type="warning"
+              variant="warning"
               showIcon
             />
           </UICol>
@@ -336,7 +336,7 @@ export function PredictiveAnalyticsWidget() {
                 )}
               </ul>
             }
-            type="info"
+            variant="info"
             showIcon
           />
         </UICol>
@@ -392,10 +392,10 @@ function forecastWithMovingAverage(
   const avgValue = recentValues.reduce((a, b) => a + b, 0) / recentValues.length;
 
   // Simple linear trend
-  const trend = (recentValues[recentValues.length - 1] - recentValues[0]) / (recentValues.length - 1);
+  const trend = ((recentValues[recentValues.length - 1] ?? 0) - (recentValues[0] ?? 0)) / (recentValues.length - 1);
 
   for (let i = 1; i <= futurePoints; i++) {
-    const timestamp = historical[historical.length - 1].timestamp + i * 5 * 60 * 1000;
+    const timestamp = (historical[historical.length - 1]?.timestamp ?? Date.now()) + i * 5 * 60 * 1000;
     const value = Math.max(0, avgValue + trend * i); // Ensure non-negative
 
     // Confidence decreases with time

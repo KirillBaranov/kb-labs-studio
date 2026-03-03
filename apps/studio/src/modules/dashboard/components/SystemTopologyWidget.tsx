@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import { UICard, UIDrawer, UIDescriptions, UIBadge, UITag, UIStatistic, UIRow, UICol } from '@kb-labs/studio-ui-kit';
+import { UICard, UIDrawer, UIDescriptions, UIDescriptionsItem, UIBadge, UITag, UIStatistic, UIRow, UICol } from '@kb-labs/studio-ui-kit';
 import { HolderOutlined, ApartmentOutlined, CloseOutlined } from '@ant-design/icons';
 import type {
   Node,
@@ -222,7 +222,7 @@ export function SystemTopologyWidget() {
             <ApartmentOutlined />
             <span>{selectedNode?.data.label}</span>
             <UIBadge
-              status={
+              variant={
                 selectedNode?.data.status === 'error' ? 'error' :
                 selectedNode?.data.status === 'warning' ? 'warning' :
                 'success'
@@ -269,29 +269,29 @@ export function SystemTopologyWidget() {
             </UIRow>
 
             <UIDescriptions title="Details" bordered size="small" column={1}>
-              <UIDescriptions.Item label="Node ID">
+              <UIDescriptionsItem label="Node ID">
                 <code>{selectedNode.id}</code>
-              </UIDescriptions.Item>
-              <UIDescriptions.Item label="Type">
-                <Tag color="blue">{selectedNode.data.type}</Tag>
-              </UIDescriptions.Item>
-              <UIDescriptions.Item label="Status">
-                <Tag
-                  color={
-                    selectedNode.data.status === 'error' ? 'red' :
-                    selectedNode.data.status === 'warning' ? 'orange' :
-                    'green'
+              </UIDescriptionsItem>
+              <UIDescriptionsItem label="Type">
+                <UITag variant="info">{selectedNode.data.type}</UITag>
+              </UIDescriptionsItem>
+              <UIDescriptionsItem label="Status">
+                <UITag
+                  variant={
+                    selectedNode.data.status === 'error' ? 'error' :
+                    selectedNode.data.status === 'warning' ? 'warning' :
+                    'success'
                   }
                 >
                   {selectedNode.data.status.toUpperCase()}
-                </Tag>
-              </UIDescriptions.Item>
+                </UITag>
+              </UIDescriptionsItem>
               {selectedNode.data.requests && (
-                <UIDescriptions.Item label="Error Rate">
+                <UIDescriptionsItem label="Error Rate">
                   {selectedNode.data.requests > 0
                     ? `${((selectedNode.data.errors ?? 0) / selectedNode.data.requests * 100).toFixed(2)}%`
                     : 'N/A'}
-                </UIDescriptions.Item>
+                </UIDescriptionsItem>
               )}
             </UIDescriptions>
           </div>

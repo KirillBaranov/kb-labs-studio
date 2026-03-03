@@ -39,7 +39,7 @@ export function SmartIncidentsWidget() {
   // Fetch incidents from backend
   const incidentsQuery = useIncidents(sources.observability, {
     severity: severityFilter === 'all' ? undefined : severityFilter,
-    status: 'all',
+    includeResolved: true,
   });
 
   // Filter and sort incidents
@@ -132,10 +132,10 @@ export function SmartIncidentsWidget() {
       error_rate: <BugOutlined />,
       latency_spike: <LineChartOutlined />,
       plugin_failure: <ThunderboltOutlined />,
-      cache_failure: <UIAlertOutlined />,
+      cache_failure: <AlertOutlined />,
       resource_exhaustion: <WarningOutlined />,
     };
-    return icons[type] || <UIAlertOutlined />;
+    return icons[type] || <AlertOutlined />;
   };
 
   const isLoading = incidentsQuery.isLoading;
@@ -146,7 +146,7 @@ export function SmartIncidentsWidget() {
       title={
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <UIAlertOutlined />
+            <AlertOutlined />
             <span>Smart Incidents</span>
             {incidents.length > 0 && (
               <UIBadge
@@ -169,7 +169,7 @@ export function SmartIncidentsWidget() {
         </div>
       }
       style={{ height: '100%' }}
-      bodyStyle={{ padding: '16px', maxHeight: 'calc(100% - 57px)', overflowY: 'auto' }}
+      styles={{ body: { padding: '16px', maxHeight: 'calc(100% - 57px)', overflowY: 'auto' } }}
     >
       {isLoading ? (
         <div style={{
@@ -240,7 +240,7 @@ export function SmartIncidentsWidget() {
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
                       <UIButton
-                        type="text"
+                        variant="text"
                         size="small"
                         icon={<EyeOutlined />}
                         onClick={() => navigate(`/observability/incidents/${incident.id}`)}
@@ -248,7 +248,7 @@ export function SmartIncidentsWidget() {
                         View
                       </UIButton>
                       <UIButton
-                        type="text"
+                        variant="text"
                         size="small"
                         icon={isExpanded ? <UpOutlined /> : <DownOutlined />}
                         onClick={() => {
@@ -327,7 +327,7 @@ export function SmartIncidentsWidget() {
                         <UIAlert
                           message="Top Recommendation"
                           description={rca.recommendations[0]}
-                          type="info"
+                          variant="info"
                           showIcon
                           style={{ fontSize: 12 }}
                         />

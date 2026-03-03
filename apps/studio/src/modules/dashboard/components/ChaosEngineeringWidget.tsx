@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UICard, UITable, UITag, UIButton, UIProgress, UISpace, UITypographyText, UITitle, UIModal, UIForm, UISelect, UIInputNumber, UIDescriptions, UIAlert } from '@kb-labs/studio-ui-kit';
+import { UICard, UITable, UITag, UIButton, UIProgress, UISpace, UITypographyText, UITitle, UIModal, UIForm, UISelect, UIInputNumber, UIDescriptions, UIDescriptionsItem, UIAlert } from '@kb-labs/studio-ui-kit';
 import {
   ExperimentOutlined,
   PlayCircleOutlined,
@@ -218,7 +218,7 @@ export function ChaosEngineeringWidget() {
       width: 100,
       render: (_: any, record: ChaosExperiment) => (
         <UIButton
-          type="primary"
+          variant="primary"
           size="small"
           icon={<PlayCircleOutlined />}
           onClick={() => {
@@ -250,7 +250,7 @@ export function ChaosEngineeringWidget() {
     >
       {/* Mock Mode Banner */}
       <UIAlert
-        type="info"
+        variant="info"
         message={
           <UISpace>
             <span>Mock Mode</span>
@@ -306,7 +306,7 @@ export function ChaosEngineeringWidget() {
       {/* Running Experiment Status */}
       {runningExperiment && (
         <UIAlert
-          type={runningExperiment.status === 'running' ? 'info' : runningExperiment.status === 'success' ? 'success' : 'warning'}
+          variant={runningExperiment.status === 'running' ? 'info' : runningExperiment.status === 'success' ? 'success' : 'warning'}
           message={
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <UISpace>
@@ -347,7 +347,7 @@ export function ChaosEngineeringWidget() {
       />
 
       {/* Run Experiment Modal */}
-      <Modal
+      <UIModal
         title={
           <UISpace>
             <ExperimentOutlined />
@@ -363,12 +363,11 @@ export function ChaosEngineeringWidget() {
           setIsModalOpen(false);
         }}
         okText="Start Experiment"
-        okButtonProps={{ danger: true }}
       >
         {selectedExperiment && (
           <div>
             <UIAlert
-              type="warning"
+              variant="warning"
               message="This will inject faults into your system"
               description="Make sure you're running in a safe environment. The experiment will auto-abort if SLO violations exceed threshold."
               style={{ marginBottom: 16 }}
@@ -376,23 +375,23 @@ export function ChaosEngineeringWidget() {
             />
 
             <UIDescriptions column={1} size="small" bordered>
-              <UIDescriptions.Item label="Target">{selectedExperiment.target}</UIDescriptions.Item>
-              <UIDescriptions.Item label="Type">
+              <UIDescriptionsItem label="Target">{selectedExperiment.target}</UIDescriptionsItem>
+              <UIDescriptionsItem label="Type">
                 <UITag color={getTypeColor(selectedExperiment.type)}>{selectedExperiment.type}</UITag>
-              </UIDescriptions.Item>
-              <UIDescriptions.Item label="Hypothesis">{selectedExperiment.hypothesis}</UIDescriptions.Item>
+              </UIDescriptionsItem>
+              <UIDescriptionsItem label="Hypothesis">{selectedExperiment.hypothesis}</UIDescriptionsItem>
               {selectedExperiment.config.latencyMs && (
-                <UIDescriptions.Item label="Latency">{selectedExperiment.config.latencyMs}ms</UIDescriptions.Item>
+                <UIDescriptionsItem label="Latency">{selectedExperiment.config.latencyMs}ms</UIDescriptionsItem>
               )}
               {selectedExperiment.config.errorRate && (
-                <UIDescriptions.Item label="Error Rate">{selectedExperiment.config.errorRate}%</UIDescriptions.Item>
+                <UIDescriptionsItem label="Error Rate">{selectedExperiment.config.errorRate}%</UIDescriptionsItem>
               )}
-              <UIDescriptions.Item label="Duration">{(selectedExperiment.config.duration ?? 60000) / 1000}s</UIDescriptions.Item>
-              <UIDescriptions.Item label="Blast Radius">{selectedExperiment.config.blastRadius ?? 100}%</UIDescriptions.Item>
+              <UIDescriptionsItem label="Duration">{(selectedExperiment.config.duration ?? 60000) / 1000}s</UIDescriptionsItem>
+              <UIDescriptionsItem label="Blast Radius">{selectedExperiment.config.blastRadius ?? 100}%</UIDescriptionsItem>
             </UIDescriptions>
           </div>
         )}
-      </Modal>
+      </UIModal>
     </UICard>
   );
 }

@@ -60,8 +60,8 @@ export function IndustryBenchmarkWidget() {
     const totalErrors = (metrics.data?.requests?.clientErrors ?? 0) + (metrics.data?.requests?.serverErrors ?? 0);
     const errorRate = (totalErrors / totalRequests) * 100;
 
-    const avgLatency = metrics.data?.perPlugin?.reduce((sum, p) => sum + (p.latency?.average ?? 0), 0) /
-      (metrics.data?.perPlugin?.length || 1) ?? 85;
+    const avgLatency = (metrics.data?.perPlugin?.reduce((sum, p) => sum + (p.latency?.average ?? 0), 0) ?? 0) /
+      (metrics.data?.perPlugin?.length || 1);
 
     const p95Latency = avgLatency * 1.4; // Estimated p95
 

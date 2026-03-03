@@ -75,7 +75,7 @@ export function PerformanceHeatmapWidget() {
       extra={
         <UISelect
           value={selectedMetric}
-          onChange={setSelectedMetric}
+          onChange={(value) => setSelectedMetric(value as MetricType)}
           style={{ width: 120 }}
           options={[
             { label: 'Latency', value: 'latency' },
@@ -310,7 +310,7 @@ function getColorForValue(value: number, metric: MetricType): string {
   if (metric === 'errors') {
     const redColors = ['#fef2f2', '#fee2e2', '#fecaca', '#fca5a5', '#f87171', '#ef4444', '#dc2626'];
     const index = Math.floor(percentage * (redColors.length - 1));
-    return redColors[index];
+    return redColors[index] ?? '#fef2f2';
   }
 
   // For latency, use yellow-red gradient for high values
@@ -318,11 +318,11 @@ function getColorForValue(value: number, metric: MetricType): string {
     const warmColors = ['#fef3c7', '#fde68a', '#fcd34d', '#fbbf24', '#f59e0b', '#f97316', '#ef4444'];
     const warmPercentage = (percentage - 0.5) * 2;
     const index = Math.floor(warmPercentage * (warmColors.length - 1));
-    return warmColors[index];
+    return warmColors[index] ?? '#fef3c7';
   }
 
   const index = Math.floor(percentage * (colors.length - 1));
-  return colors[index];
+  return colors[index] ?? '#f0f9ff';
 }
 
 // Helper: Format value based on metric type

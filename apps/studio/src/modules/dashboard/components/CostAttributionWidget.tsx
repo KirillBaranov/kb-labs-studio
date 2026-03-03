@@ -38,7 +38,7 @@ export function CostAttributionWidget() {
   const costData = useMemo(() => {
     const llmCost = llmUsage.data?.totalCost ?? 0;
     const embeddingsCost = embeddingsUsage.data?.totalCost ?? 0;
-    const vectorStoreCost = vectorStoreUsage.data?.totalCost ?? 0;
+    const vectorStoreCost = 0; // VectorStoreUsageStats has no cost tracking
 
     const totalCost = llmCost + embeddingsCost + vectorStoreCost;
 
@@ -59,7 +59,7 @@ export function CostAttributionWidget() {
         adapter: 'VectorStore',
         cost: vectorStoreCost,
         percentage: totalCost > 0 ? (vectorStoreCost / totalCost) * 100 : 0,
-        requests: vectorStoreUsage.data?.totalOperations ?? 0,
+        requests: (vectorStoreUsage.data?.searchQueries ?? 0) + (vectorStoreUsage.data?.upsertOperations ?? 0),
       },
     ].filter(item => item.cost > 0);
 
@@ -83,16 +83,14 @@ export function CostAttributionWidget() {
       });
     }
 
-    // Embeddings models
-    if (embeddingsUsage.data?.byModel) {
-      Object.entries(embeddingsUsage.data.byModel).forEach(([model, stats]) => {
-        spenders.push({
-          model,
-          cost: stats.cost ?? 0,
-          requests: stats.requests,
-          avgDuration: stats.avgDurationMs ?? 0,
-          adapter: 'Embeddings',
-        });
+    // Embeddings (no byModel breakdown available)
+    if (embeddingsUsage.data && embeddingsUsage.data.totalCost > 0) {
+      spenders.push({
+        model: 'embeddings',
+        cost: embeddingsUsage.data.totalCost,
+        requests: embeddingsUsage.data.totalRequests,
+        avgDuration: embeddingsUsage.data.avgDurationMs ?? 0,
+        adapter: 'Embeddings',
       });
     }
 
@@ -287,7 +285,6 @@ export function CostAttributionWidget() {
             pagination={false}
             size="small"
             rowKey="model"
-            scroll={{ y: 200 }}
           />
         </UICol>
       </UIRow>

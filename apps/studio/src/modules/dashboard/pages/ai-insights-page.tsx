@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   UICard,
-  UIInput,
+  UIInputTextArea,
   UIButton,
   UITypographyText,
   UITypographyParagraph,
@@ -28,8 +28,6 @@ import {
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { usePrometheusMetrics, useIncidents } from '@kb-labs/studio-data-client';
 import { MarkdownViewer } from '../../../components/markdown/markdown-viewer';
-
-const { TextArea } = UIInput;
 
 interface Message {
   id: string;
@@ -216,7 +214,7 @@ export function AIInsightsPage() {
               <UIButton
                 icon={<SettingOutlined />}
                 onClick={() => setShowConfig(!showConfig)}
-                type={showConfig ? 'primary' : 'default'}
+                variant={showConfig ? 'primary' : 'default'}
               />
             </UITooltip>
           </UISpace>
@@ -309,7 +307,7 @@ export function AIInsightsPage() {
                     {msg.role === 'assistant' && !msg.thinking && (
                       <div style={{ marginTop: 8, textAlign: 'right' }}>
                         <UIButton
-                          type="text"
+                          variant="text"
                           size="small"
                           icon={copiedId === msg.id ? <CheckOutlined /> : <CopyOutlined />}
                           onClick={() => handleCopy(msg.content, msg.id)}
@@ -330,13 +328,13 @@ export function AIInsightsPage() {
         {/* Input Area */}
         <div style={{ padding: 16, borderTop: '1px solid #f0f0f0' }}>
           <UISpace.Compact style={{ width: '100%' }}>
-            <UITypographyTextArea
+            <UIInputTextArea
               ref={inputRef}
               value={input}
-              onChange={e => setInput(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value)}
               placeholder="Ask about your system..."
               autoSize={{ minRows: 1, maxRows: 4 }}
-              onPressEnter={e => {
+              onPressEnter={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
                 if (!e.shiftKey) {
                   e.preventDefault();
                   handleSend();
@@ -345,7 +343,7 @@ export function AIInsightsPage() {
               style={{ flex: 1 }}
             />
             <UIButton
-              type="primary"
+              variant="primary"
               icon={<SendOutlined />}
               onClick={handleSend}
               loading={isLoading}
@@ -425,19 +423,19 @@ export function AIInsightsPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <UICheckbox
                 checked={contextConfig.includeMetrics}
-                onChange={e => setContextConfig(prev => ({ ...prev, includeMetrics: e.target.checked }))}
+                onChange={(checked) => setContextConfig(prev => ({ ...prev, includeMetrics: checked }))}
               >
                 Include current metrics
               </UICheckbox>
               <UICheckbox
                 checked={contextConfig.includeIncidents}
-                onChange={e => setContextConfig(prev => ({ ...prev, includeIncidents: e.target.checked }))}
+                onChange={(checked) => setContextConfig(prev => ({ ...prev, includeIncidents: checked }))}
               >
                 Include incidents
               </UICheckbox>
               <UICheckbox
                 checked={contextConfig.includeHistory}
-                onChange={e => setContextConfig(prev => ({ ...prev, includeHistory: e.target.checked }))}
+                onChange={(checked) => setContextConfig(prev => ({ ...prev, includeHistory: checked }))}
               >
                 Include historical trends
               </UICheckbox>
@@ -448,7 +446,7 @@ export function AIInsightsPage() {
                 </UITypographyText>
                 <UISelect
                   value={contextConfig.timeRange}
-                  onChange={value => setContextConfig(prev => ({ ...prev, timeRange: value }))}
+                  onChange={value => setContextConfig(prev => ({ ...prev, timeRange: value as ContextConfig['timeRange'] }))}
                   options={TIME_RANGE_OPTIONS}
                   style={{ width: '100%' }}
                   size="small"
@@ -463,7 +461,7 @@ export function AIInsightsPage() {
                   <UISelect
                     mode="multiple"
                     value={contextConfig.plugins}
-                    onChange={value => setContextConfig(prev => ({ ...prev, plugins: value }))}
+                    onChange={value => setContextConfig(prev => ({ ...prev, plugins: value as string[] }))}
                     options={availablePlugins.map(p => ({ value: p, label: p }))}
                     style={{ width: '100%' }}
                     size="small"
@@ -485,7 +483,7 @@ export function AIInsightsPage() {
             {SUGGESTED_QUESTIONS.slice(0, 4).map((q, i) => (
               <UIButton
                 key={i}
-                type="text"
+                variant="text"
                 size="small"
                 style={{ textAlign: 'left', height: 'auto', padding: '4px 8px' }}
                 onClick={() => handleSuggestion(q.text)}

@@ -18,7 +18,7 @@ export function DashboardKpisWidget() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
           <span>System Status</span>
-          <UIBadge status={statusType as 'success' | 'error'} />
+          <UIBadge variant={statusType as 'success' | 'error'} />
         </div>
       }
       style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
@@ -29,28 +29,27 @@ export function DashboardKpisWidget() {
           <KBStatCard
             label="Status"
             value={systemStatus}
-            valueColor={health?.ready ? 'var(--success)' : 'var(--error)'}
+            variant={health?.ready ? 'positive' : 'negative'}
           />
         </UICol>
         <UICol span={6}>
           <KBStatCard
             label="Plugins Mounted"
-            value={pluginsMounted.toString()}
-            subValue={`of ${totalPlugins}`}
+            value={`${pluginsMounted} of ${totalPlugins}`}
           />
         </UICol>
         <UICol span={6}>
           <KBStatCard
             label="Failed"
             value={pluginsFailed.toString()}
-            valueColor={pluginsFailed > 0 ? 'var(--error)' : 'var(--success)'}
+            variant={pluginsFailed > 0 ? 'negative' : 'positive'}
           />
         </UICol>
         <UICol span={6}>
           <KBStatCard
             label="Redis"
             value={health?.redisHealthy ? 'Healthy' : health?.redisEnabled ? 'Unhealthy' : 'Disabled'}
-            valueColor={health?.redisHealthy ? 'var(--success)' : health?.redisEnabled ? 'var(--error)' : 'var(--text-tertiary)'}
+            variant={health?.redisHealthy ? 'positive' : health?.redisEnabled ? 'negative' : 'default'}
           />
         </UICol>
       </UIRow>

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { UITabs } from '@kb-labs/studio-ui-kit';
 import {
   DashboardOutlined,
@@ -27,17 +26,11 @@ import { SystemResourcesWidget } from '../components/SystemResourcesWidget';
  * Displays all monitoring widgets organized in tabs.
  */
 export function DashboardPage() {
-  const [activeTab, setActiveTab] = useState('overview');
-
   const items = [
     {
       key: 'overview',
-      label: (
-        <span>
-          <DashboardOutlined style={{ marginRight: 8 }} />
-          Overview
-        </span>
-      ),
+      label: 'Overview',
+      icon: <DashboardOutlined />,
       children: (
         <div className="dashboard-content">
           {/* Hero Metrics */}
@@ -67,12 +60,8 @@ export function DashboardPage() {
     },
     {
       key: 'performance',
-      label: (
-        <span>
-          <ThunderboltOutlined style={{ marginRight: 8 }} />
-          Performance
-        </span>
-      ),
+      label: 'Performance',
+      icon: <ThunderboltOutlined />,
       children: (
         <div className="dashboard-content">
           {/* Performance Budget */}
@@ -103,12 +92,8 @@ export function DashboardPage() {
     },
     {
       key: 'incidents',
-      label: (
-        <span>
-          <AlertOutlined style={{ marginRight: 8 }} />
-          Incidents
-        </span>
-      ),
+      label: 'Incidents',
+      icon: <AlertOutlined />,
       children: (
         <div className="dashboard-content">
           {/* Smart Incidents */}
@@ -126,12 +111,8 @@ export function DashboardPage() {
     },
     {
       key: 'resources',
-      label: (
-        <span>
-          <AppstoreOutlined style={{ marginRight: 8 }} />
-          Resources
-        </span>
-      ),
+      label: 'Resources',
+      icon: <AppstoreOutlined />,
       children: (
         <div className="dashboard-content">
           {/* Cost Attribution */}
@@ -150,12 +131,8 @@ export function DashboardPage() {
     },
     {
       key: 'experiments',
-      label: (
-        <span>
-          <ExperimentOutlined style={{ marginRight: 8 }} />
-          Experiments
-        </span>
-      ),
+      label: 'Experiments',
+      icon: <ExperimentOutlined />,
       children: (
         <div className="dashboard-content">
           {/* Chaos Engineering */}
@@ -171,9 +148,8 @@ export function DashboardPage() {
   return (
     <>
       <UITabs
-        activeKey={activeTab}
-        onChange={setActiveTab}
         items={items}
+        syncUrl
         size="large"
         style={{ marginTop: -16 }}
       />
