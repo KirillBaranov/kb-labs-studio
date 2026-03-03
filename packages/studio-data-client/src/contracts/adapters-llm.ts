@@ -16,6 +16,9 @@ export interface LLMModelStats {
   tokensPerRequest: number;
   errorRate: number;
   avgDurationMs: number;
+  cacheReadTokens: number;
+  billableTokens: number;
+  cacheSavingsUsd: number;
 }
 
 /**
@@ -25,6 +28,9 @@ export interface LLMUsageStats {
   totalRequests: number;
   totalTokens: number;
   totalCost: number;
+  totalCacheReadTokens: number;
+  totalBillableTokens: number;
+  totalCacheSavingsUsd: number;
   byModel: Record<string, LLMModelStats>;
   errors: number;
   timeRange: {
