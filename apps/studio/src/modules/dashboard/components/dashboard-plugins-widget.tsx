@@ -77,7 +77,6 @@ export function DashboardPluginsWidget() {
         dataSource={dataSource}
         pagination={false}
         size="small"
-        scroll={{ y: 240 }}
       />
 
     </UICard>
