@@ -10,6 +10,7 @@ import {
   UITypographyText,
   UITag,
   UISpin,
+  UIIcon,
 } from '@kb-labs/studio-ui-kit';
 import type { AgentSpecification } from '@kb-labs/agent-contracts';
 
@@ -36,8 +37,8 @@ export function AgentSelector({
         <UIIcon name="RobotOutlined" />
         <UITypographyText strong>Agent:</UITypographyText>
         <UISelect
-          value={selectedAgentId}
-          onChange={onSelect}
+          value={selectedAgentId ?? undefined}
+          onChange={(v) => onSelect(v as string)}
           loading={loading}
           disabled={disabled}
           style={{ minWidth: 200 }}

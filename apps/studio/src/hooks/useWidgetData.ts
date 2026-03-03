@@ -1,14 +1,15 @@
 /**
  * @module @kb-labs/studio-app/hooks/useWidgetData
- * Widget data hook with policy-aware header handling, retry logic, and diagnostics.
+ * Widget data hook with retry logic and diagnostics.
  */
 
-import { useMemo, useEffect, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import type { DataSource, StudioHeaderHints } from '@kb-labs/rest-api-contracts';
+import type { DataSource } from '@kb-labs/rest-api-contracts';
 import { studioConfig } from '@/config/studio.config';
 import { useRegistry } from '../providers/registry-provider';
 import { createStudioLogger } from '../utils/logger';
+import { useEffect } from 'react';
 
 interface ErrorEnvelope {
   ok: false;
@@ -18,27 +19,10 @@ interface ErrorEnvelope {
   };
 }
 
-interface HeaderFilterResult {
-  headers: Record<string, string>;
-  missingRequired: string[];
-  provided: string[];
-}
-
-export interface HeaderStatus {
-  required: string[];
-  optional: string[];
-  autoInjected: string[];
-  deny: string[];
-  provided: string[];
-  missingRequired: string[];
-  patterns?: string[];
-}
-
 export interface WidgetDataState<T = unknown> {
   data?: T;
   loading: boolean;
   error: string | null;
-  headers: HeaderStatus | null;
   refetch: () => Promise<void>;
 }
 
@@ -48,96 +32,12 @@ export interface UseWidgetDataParams {
   source: DataSource;
   basePath?: string;
   pollingMs?: number;
-  headerHints?: StudioHeaderHints;
   enabled?: boolean;
 }
 
-function headerCase(name: string): string {
-  return name
-    .toLowerCase()
-    .split('-')
-    .filter(Boolean)
-    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-    .join('-');
-}
-
-export function filterHeaders(
-  headers: Record<string, string> | undefined,
-  hints?: StudioHeaderHints
-): HeaderFilterResult {
-  const headerConfig = studioConfig.headers ?? {
-    allowedPrefixes: ['x-'],
-    allowAuthorization: false,
-  };
-
-  const requiredLower = new Set<string>((hints?.required ?? []).map((h: string) => h.toLowerCase()));
-  const optionalLower = new Set<string>((hints?.optional ?? []).map((h: string) => h.toLowerCase()));
-  const denyLower = new Set<string>((hints?.deny ?? []).map((h: string) => h.toLowerCase()));
-  const autoLower = new Set<string>((hints?.autoInjected ?? []).map((h: string) => h.toLowerCase()));
-  const allowedLower = new Set<string>([...requiredLower, ...optionalLower]);
-  const allowPrefixes = headerConfig.allowedPrefixes.map((prefix) => prefix.toLowerCase());
-
-  if (!headers) {
-    const missingRequired = Array.from(requiredLower)
-      .filter((name) => !autoLower.has(name))
-      .map(headerCase);
-    return {
-      headers: {},
-      missingRequired,
-      provided: [],
-    };
-  }
-
-  const filtered: Record<string, string> = {};
-  const providedLower = new Set<string>();
-
-  for (const [key, value] of Object.entries(headers)) {
-    const lowerKey = key.toLowerCase();
-
-    if (denyLower.has(lowerKey)) {
-      console.warn(`[Studio] Dropping header "${key}" (denied by manifest policy)`);
-      continue;
-    }
-
-    if (allowedLower.size > 0) {
-      if (allowedLower.has(lowerKey)) {
-        filtered[key] = value;
-        providedLower.add(lowerKey);
-        continue;
-      }
-
-      if (allowPrefixes.some((prefix) => lowerKey.startsWith(prefix))) {
-        filtered[key] = value;
-        providedLower.add(lowerKey);
-        continue;
-      }
-
-      console.warn(`[Studio] Dropping header "${key}" (not included in manifest allow-list)`);
-      continue;
-    }
-
-    if (headerConfig.allowAuthorization && lowerKey === 'authorization') {
-      filtered[key] = value;
-      providedLower.add(lowerKey);
-      continue;
-    }
-
-    if (allowPrefixes.some((prefix) => lowerKey.startsWith(prefix))) {
-      filtered[key] = value;
-      providedLower.add(lowerKey);
-    }
-  }
-
-  const missingRequired = Array.from(requiredLower)
-    .filter((name) => !providedLower.has(name) && !autoLower.has(name))
-    .map(headerCase);
-
-  const provided = Array.from(providedLower).map(headerCase);
-
+function getDefaultHeaders(): Record<string, string> {
   return {
-    headers: filtered,
-    missingRequired,
-    provided,
+    'Content-Type': 'application/json',
   };
 }
 
@@ -150,42 +50,15 @@ function buildWidgetQueryKey(
   return ['widget-data', registryVersion, { pluginId, widgetId, params }];
 }
 
-function getDefaultHeaders(): Record<string, string> {
-  return {
-    'Content-Type': 'application/json',
-  };
-}
-
 async function fetchRestData(
   source: Extract<DataSource, { type: 'rest' }>,
   basePath: string,
   manifestId: string,
   signal: AbortSignal,
   traceId: string | undefined,
-  headerHints: StudioHeaderHints | undefined,
-  onHeadersFiltered?: (status: HeaderStatus) => void
 ): Promise<unknown> {
-  const { routeId, headers, params } = source;
+  const { routeId, params } = source;
   const method: 'GET' | 'POST' = source.method ?? 'GET';
-  const filtered = filterHeaders(headers, headerHints);
-
-  if (headerHints && filtered.missingRequired.length > 0) {
-    console.warn(
-      `[Studio] Missing required headers for ${manifestId}:${routeId} -> ${filtered.missingRequired.join(', ')}`
-    );
-  }
-
-  if (onHeadersFiltered) {
-    onHeadersFiltered({
-      required: headerHints?.required ?? [],
-      optional: headerHints?.optional ?? [],
-      autoInjected: headerHints?.autoInjected ?? [],
-      deny: headerHints?.deny ?? [],
-      provided: filtered.provided,
-      missingRequired: filtered.missingRequired,
-      patterns: headerHints?.patterns,
-    });
-  }
 
   const packageName = manifestId.includes('/')
     ? manifestId.split('/').pop() || manifestId
@@ -193,7 +66,6 @@ async function fetchRestData(
 
   const cleanRouteId = routeId.startsWith('/') ? routeId.slice(1) : routeId;
 
-  // Build URL with query parameters
   let url = `${basePath}/plugins/${packageName}/${cleanRouteId}`;
   if (params && Object.keys(params).length > 0) {
     const searchParams = new URLSearchParams();
@@ -207,7 +79,6 @@ async function fetchRestData(
     method,
     headers: {
       ...getDefaultHeaders(),
-      ...filtered.headers,
     },
     signal,
   };
@@ -311,8 +182,6 @@ interface QueryFactoryParams {
   basePath: string;
   manifestId: string;
   traceId: string;
-  headerHints?: StudioHeaderHints;
-  onHeadersFiltered?: (status: HeaderStatus) => void;
 }
 
 function createQueryFn({
@@ -320,20 +189,10 @@ function createQueryFn({
   basePath,
   manifestId,
   traceId,
-  headerHints,
-  onHeadersFiltered,
 }: QueryFactoryParams): (ctx: { signal: AbortSignal }) => Promise<unknown> {
   if (source.type === 'rest') {
     return ({ signal }) =>
-      fetchRestData(
-        source,
-        basePath,
-        manifestId,
-        signal,
-        traceId,
-        headerHints,
-        onHeadersFiltered
-      );
+      fetchRestData(source, basePath, manifestId, signal, traceId);
   }
 
   if (source.type === 'mock') {
@@ -341,7 +200,6 @@ function createQueryFn({
   }
 
   if (source.type === 'static') {
-    // Static data sources return their value immediately (null for composite widgets without value)
     const staticSource = source as Extract<DataSource, { type: 'static' }>;
     return async () => staticSource.value ?? null;
   }
@@ -355,7 +213,6 @@ export function useWidgetData<T = unknown>({
   source,
   basePath,
   pollingMs = 0,
-  headerHints,
   enabled = true,
 }: UseWidgetDataParams): WidgetDataState<T> {
   const { registry } = useRegistry();
@@ -399,32 +256,10 @@ export function useWidgetData<T = unknown>({
         pluginId,
         widgetId,
         source,
-        registry.registryVersion ?? '0'
+        registry.generatedAt ?? '0'
       ),
-    [pluginId, widgetId, source, registry.registryVersion]
+    [pluginId, widgetId, source, registry.generatedAt]
   );
-
-  const initialHeaderStatus = useMemo<HeaderStatus | null>(() => {
-    if (!headerHints) {
-      return null;
-    }
-    const initial = filterHeaders(undefined, headerHints);
-    return {
-      required: headerHints.required ?? [],
-      optional: headerHints.optional ?? [],
-      autoInjected: headerHints.autoInjected ?? [],
-      deny: headerHints.deny ?? [],
-      provided: [],
-      missingRequired: initial.missingRequired,
-      patterns: headerHints.patterns,
-    };
-  }, [headerHints]);
-
-  const [headerStatus, setHeaderStatus] = useState<HeaderStatus | null>(initialHeaderStatus);
-
-  useEffect(() => {
-    setHeaderStatus(initialHeaderStatus);
-  }, [initialHeaderStatus]);
 
   const queryFn = useMemo(
     () =>
@@ -433,17 +268,15 @@ export function useWidgetData<T = unknown>({
         basePath: resolvedBasePath,
         manifestId: pluginId,
         traceId: traceIdRef.current,
-        headerHints,
-        onHeadersFiltered: headerHints ? setHeaderStatus : undefined,
       }),
-    [source, resolvedBasePath, pluginId, headerHints]
+    [source, resolvedBasePath, pluginId]
   );
 
   // Don't auto-fetch POST requests without explicit body (they should use mutations)
-  const isPostWithoutBody = source.type === 'rest' 
-    && (source.method === 'POST' || source.method === 'PUT' || source.method === 'PATCH')
+  const isPostWithoutBody = source.type === 'rest'
+    && source.method === 'POST'
     && !('body' in source && source.body !== undefined);
-  
+
   const effectiveEnabled = enabled && !isPostWithoutBody;
 
   const {
@@ -517,7 +350,6 @@ export function useWidgetData<T = unknown>({
     data: data as T | undefined,
     loading: isLoading || isFetching,
     error: error instanceof Error ? error.message : null,
-    headers: headerStatus,
     refetch: async () => {
       lastStatusRef.current = 'idle';
       await refetch();

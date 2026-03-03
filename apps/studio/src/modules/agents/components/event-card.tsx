@@ -95,16 +95,6 @@ function getEventStyle(event: AgentEvent): EventStyle {
     case 'agent:error':
       return { icon: <UIIcon name="CloseCircleOutlined" />, color: 'red', title: 'Error', showInCompact: true };
 
-    // Orchestrator Events
-    case 'orchestrator:start':
-      return { icon: <UIIcon name="PlayCircleOutlined" />, color: 'purple', title: 'Planning', showInCompact: true };
-    case 'orchestrator:end':
-      return {
-        icon: event.data.success ? <UIIcon name="CheckCircleOutlined" /> : <UIIcon name="CloseCircleOutlined" />,
-        color: event.data.success ? 'green' : 'red',
-        title: 'Plan Complete',
-        showInCompact: true,
-      };
     case 'subtask:start':
       return { icon: <UIIcon name="PlayCircleOutlined" />, color: 'cyan', title: `Subtask ${event.data.index + 1}/${event.data.total}`, showInCompact: true };
     case 'subtask:end':
@@ -253,34 +243,6 @@ function EventContent({ event }: { event: AgentEvent }) {
           {event.data.error}
           {event.data.recoverable && <UITag color="orange" style={{ marginLeft: 8 }}>Recoverable</UITag>}
         </UITypographyText>
-      );
-
-    // Orchestrator
-    case 'orchestrator:start':
-      return (
-        <UISpace size={8}>
-          <UITypographyText style={{ fontSize: 13 }}>{truncate(event.data.task, 100)}</UITypographyText>
-          <UITag color={event.data.complexity === 'complex' ? 'orange' : 'green'} style={{ margin: 0 }}>
-            {event.data.complexity}
-          </UITag>
-        </UISpace>
-      );
-
-    case 'orchestrator:end':
-      return (
-        <UISpace direction="vertical" size={4} style={{ width: '100%' }}>
-          {event.data.summary && <UITypographyText style={{ fontSize: 13 }}>{event.data.summary}</UITypographyText>}
-          <UISpace size={8}>
-            <UITypographyText type="secondary" style={{ fontSize: 12 }}>
-              {event.data.completedCount}/{event.data.subtaskCount} subtasks
-            </UITypographyText>
-            {event.data.durationMs && (
-              <UITypographyText type="secondary" style={{ fontSize: 12 }}>
-                <UIIcon name="ClockCircleOutlined" /> {formatDuration(event.data.durationMs)}
-              </UITypographyText>
-            )}
-          </UISpace>
-        </UISpace>
       );
 
     case 'subtask:start':
@@ -489,7 +451,7 @@ function ToolInputDisplay({ input, metadata }: { input: Record<string, unknown>;
       ghost
       items={[{
         key: 'input',
-        label: <UITypographyText type="secondary" style={{ fontSize: 11 }}>Show input</UITypographyText>,
+        label: 'Show input',
         children: (
           <pre style={{ margin: 0, fontSize: 11, overflow: 'auto', maxHeight: 150 }}>
             {JSON.stringify(input, null, 2)}
@@ -534,11 +496,7 @@ function ToolOutputDisplay({ output, success, metadata }: { output: string; succ
       ghost
       items={[{
         key: 'output',
-        label: (
-          <UITypographyText type={success ? 'success' : 'danger'} style={{ fontSize: 11 }}>
-            {success ? 'Show output' : 'Show error'} ({output.length} chars)
-          </UITypographyText>
-        ),
+        label: `${success ? 'Show output' : 'Show error'} (${output.length} chars)`,
         children: (
           <pre
             style={{

@@ -508,8 +508,8 @@ function ToolRow({ step, isStreaming }: { step: import('@kb-labs/agent-contracts
             </span>
           )}
           {/* Line count for write tools (total lines written) */}
-          {isDone && step.metadata?.lines !== undefined && step.metadata?.linesAdded === undefined && (
-            <span className="cv-tool-badge">{step.metadata.lines} lines</span>
+          {isDone && (step.metadata as any)?.lines !== undefined && step.metadata?.linesAdded === undefined && (
+            <span className="cv-tool-badge">{(step.metadata as any).lines} lines</span>
           )}
           {!isPending && step.durationMs !== undefined && (
             <span className="cv-step-duration">{step.durationMs}ms</span>

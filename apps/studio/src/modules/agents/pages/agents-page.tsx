@@ -325,28 +325,21 @@ export function AgentsPage() {
             />
             <div className="agent-input-toolbar">
               <UISpace size={6}>
-                <UISelect<'execute' | 'plan'>
+                <UISelect
                   value={agentMode}
-                  onChange={setAgentMode}
+                  onChange={(v) => setAgentMode(v as 'execute' | 'plan')}
                   disabled={isRunning}
                   size="small"
                   variant="borderless"
                   style={{ width: 110 }}
-                  optionLabelProp="label"
                   options={[
-                    {
-                      value: 'execute',
-                      label: <span><span className="agent-mode-dot agent-mode-dot--execute" />Execute</span>,
-                    },
-                    {
-                      value: 'plan',
-                      label: <span><span className="agent-mode-dot agent-mode-dot--plan" />Plan</span>,
-                    },
+                    { value: 'execute', label: 'Execute' },
+                    { value: 'plan', label: 'Plan' },
                   ]}
                 />
-                <UISelect<AgentResponseMode>
+                <UISelect
                   value={responseMode}
-                  onChange={setResponseMode}
+                  onChange={(v) => setResponseMode(v as AgentResponseMode)}
                   disabled={isRunning}
                   size="small"
                   variant="borderless"
@@ -357,9 +350,9 @@ export function AgentsPage() {
                     { value: 'deep', label: 'Deep' },
                   ]}
                 />
-                <UISelect<'small' | 'medium' | 'large'>
+                <UISelect
                   value={tier}
-                  onChange={setTier}
+                  onChange={(v) => setTier(v as 'small' | 'medium' | 'large')}
                   disabled={isRunning}
                   size="small"
                   variant="borderless"
@@ -395,7 +388,7 @@ export function AgentsPage() {
                   </UIButton>
                 ) : (
                   <UIButton
-                    type="primary"
+                    variant="primary"
                     size="small"
                     icon={startRunMutation.isPending ? <UIIcon name="LoadingOutlined" /> : <UIIcon name="SendOutlined" />}
                     onClick={handleStart}

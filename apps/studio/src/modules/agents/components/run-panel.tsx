@@ -82,7 +82,7 @@ export function RunPanel({
         <UISpace>
           {!isRunning ? (
             <UIButton
-              type="primary"
+              variant="primary"
               icon={isStarting ? <UIIcon name="LoadingOutlined" /> : <UIIcon name="PlayCircleOutlined" />}
               onClick={handleStart}
               disabled={!task.trim() || disabled || isStarting}

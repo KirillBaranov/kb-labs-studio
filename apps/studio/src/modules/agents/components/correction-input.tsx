@@ -68,13 +68,13 @@ export function CorrectionInput({
       <UISpace.Compact style={{ width: '100%' }}>
         <UIInput
           value={correction}
-          onChange={(e) => setCorrection(e.target.value)}
+          onChange={(value) => setCorrection(value)}
           onKeyDown={handleKeyDown}
           placeholder="Send a correction or feedback to the agent..."
           disabled={disabled || isPending}
         />
         <UIButton
-          type="primary"
+          variant="primary"
           icon={isPending ? <UIIcon name="LoadingOutlined" /> : <UIIcon name="SendOutlined" />}
           onClick={handleSend}
           disabled={!correction.trim() || disabled || isPending}

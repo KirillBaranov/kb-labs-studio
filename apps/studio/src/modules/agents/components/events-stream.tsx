@@ -48,13 +48,7 @@ export function EventsStream({
         }}
       >
         <UIEmptyState
-          description={
-            <UITypographyText type="secondary">
-              {isConnected
-                ? 'Waiting for events...'
-                : 'Start a task to see agent events'}
-            </UITypographyText>
-          }
+          description={isConnected ? 'Waiting for events...' : 'Start a task to see agent events'}
         />
       </div>
     );

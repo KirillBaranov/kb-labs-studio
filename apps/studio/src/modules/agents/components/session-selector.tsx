@@ -69,7 +69,7 @@ export function SessionSelector({
         style={{ flex: 1, minWidth: 200 }}
         placeholder="New chat"
         value={currentSessionId ?? undefined}
-        onChange={handleSessionSelect}
+        onChange={(v) => handleSessionSelect(v as string)}
         loading={sessionsQuery.isLoading}
         allowClear
         onClear={onNewChat}
@@ -100,7 +100,7 @@ export function SessionSelector({
 
       <UITooltip title="New Chat">
         <UIButton
-          type="primary"
+          variant="primary"
           icon={<UIIcon name="PlusOutlined" />}
           onClick={onNewChat}
         />
