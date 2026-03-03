@@ -11,7 +11,7 @@ import {
   UISpin,
   UISpace,
   UIMessage,
-  UIInput,
+  UIInputTextArea,
   UIRow,
   UICol,
   UITypographyText,
@@ -27,7 +27,6 @@ import {
 } from '@kb-labs/studio-data-client';
 import { MarkdownViewer } from '@/components/markdown';
 
-const { TextArea } = UIInput;
 
 interface ChangelogStepProps {
   selectedScope: string;
@@ -118,11 +117,11 @@ export function ChangelogStep({ selectedScope, onChangelogReady }: ChangelogStep
           image={UIEmptyState.PRESENTED_IMAGE_SIMPLE}
         >
           <UISpace direction="vertical" size="middle" style={{ display: 'flex', alignItems: 'center' }}>
-            <UICheckbox checked={useLLM} onChange={(e) => setUseLLM(e.target.checked)}>
+            <UICheckbox checked={useLLM} onChange={(checked) => setUseLLM(checked)}>
               Use AI-powered generation (requires LLM)
             </UICheckbox>
             <UIButton
-              type="primary"
+              variant="primary"
               icon={<UIIcon name="ThunderboltOutlined" />}
               onClick={handleGenerate}
               loading={generateMutation.isPending}
@@ -160,8 +159,7 @@ export function ChangelogStep({ selectedScope, onChangelogReady }: ChangelogStep
         <UISpace>
           <UICheckbox
             checked={useLLM}
-            onChange={(e) => setUseLLM(e.target.checked)}
-            style={{ fontSize: 12 }}
+            onChange={(checked) => setUseLLM(checked)}
           >
             Use AI
           </UICheckbox>
@@ -181,7 +179,7 @@ export function ChangelogStep({ selectedScope, onChangelogReady }: ChangelogStep
             {editMode ? 'Preview' : 'Edit'}
           </UIButton>
           <UIButton
-            type="primary"
+            variant="primary"
             icon={<UIIcon name="SaveOutlined" />}
             onClick={handleSave}
             loading={saveMutation.isPending}
@@ -196,7 +194,7 @@ export function ChangelogStep({ selectedScope, onChangelogReady }: ChangelogStep
       <UIRow gutter={16}>
         <UICol span={editMode ? 12 : 24}>
           {editMode ? (
-            <TextArea
+            <UIInputTextArea
               value={markdown}
               onChange={handleMarkdownChange}
               rows={20}

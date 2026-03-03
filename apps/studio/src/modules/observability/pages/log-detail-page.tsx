@@ -58,7 +58,7 @@ function formatRelativeTime(timestamp: string | number): string {
 /**
  * Get log level icon
  */
-function getLevelIcon(level: LogRecord['level']) {
+function getLevelIcon(level: LogRecord['level'] | string) {
   switch (level) {
     case 'trace':
     case 'debug':
@@ -69,6 +69,7 @@ function getLevelIcon(level: LogRecord['level']) {
       return <UIIcon name="WarningOutlined" style={{ fontSize: 20, color: '#faad14' }} />;
     case 'error':
     case 'fatal':
+    default:
       return <UIIcon name="CloseCircleOutlined" style={{ fontSize: 20, color: '#ff4d4f' }} />;
   }
 }
@@ -76,7 +77,7 @@ function getLevelIcon(level: LogRecord['level']) {
 /**
  * Get log level tag color
  */
-function getLevelColor(level: LogRecord['level']): string {
+function getLevelColor(level: LogRecord['level'] | string): string {
   switch (level) {
     case 'trace':
     case 'debug':
@@ -87,6 +88,7 @@ function getLevelColor(level: LogRecord['level']): string {
       return 'orange';
     case 'error':
     case 'fatal':
+    default:
       return 'red';
   }
 }
@@ -180,29 +182,34 @@ export function LogDetailPage() {
         <UIAlert
           message={error ? 'Error loading log' : 'Log not found'}
           description={error ? error.message : `Log with ID '${id}' does not exist`}
-          type="error"
+          variant="error"
           showIcon
         />
       </KBPageContainer>
     );
   }
 
+  // Extract correlation ID fields (not part of LogRecord type, accessed via index signature)
+  const logTraceId = log.traceId as string | undefined;
+  const logRequestId = log.requestId as string | undefined;
+  const logSessionId = log.sessionId as string | undefined;
+
   // Extract error details if present
-  const errorDetails = log.err || log.error;
+  const errorDetails = (log.err || log.error) as { name?: string; message?: string; stack?: string } | undefined;
   const hasError = !!errorDetails;
 
   // Build metadata fields (exclude standard fields and error)
-  const metadataFields = { ...log };
-  delete metadataFields.time;
-  delete metadataFields.level;
-  delete metadataFields.msg;
-  delete metadataFields.plugin;
-  delete metadataFields.err;
-  delete metadataFields.error;
-  delete metadataFields.traceId;
-  delete metadataFields.executionId;
-  delete metadataFields.requestId;
-  delete metadataFields.sessionId;
+  const metadataFields: Record<string, unknown> = { ...log };
+  delete metadataFields['time'];
+  delete metadataFields['level'];
+  delete metadataFields['msg'];
+  delete metadataFields['plugin'];
+  delete metadataFields['err'];
+  delete metadataFields['error'];
+  delete metadataFields['traceId'];
+  delete metadataFields['executionId'];
+  delete metadataFields['requestId'];
+  delete metadataFields['sessionId'];
 
   return (
     <KBPageContainer>
@@ -249,35 +256,35 @@ export function LogDetailPage() {
           </UIDescriptionsItem>
 
           <UIDescriptionsItem label="Source">
-            <UITag color="purple">{log.plugin || log.source || 'unknown'}</UITag>
+            <UITag color="purple">{String(log.plugin || log.source || 'unknown')}</UITag>
           </UIDescriptionsItem>
 
           <UIDescriptionsItem label="Message" span={2}>
             <UITypographyText strong style={{ fontSize: 14 }}>
-              {log.msg || '(no message)'}
+              {String(log.msg || '(no message)')}
             </UITypographyText>
           </UIDescriptionsItem>
 
           {/* Correlation IDs */}
-          {log.traceId && (
+          {logTraceId && (
             <UIDescriptionsItem label="Trace ID">
               <UISpace>
-                <UITypographyText code>{log.traceId}</UITypographyText>
+                <UITypographyText code>{logTraceId}</UITypographyText>
                 <UITooltip title="Copy trace ID">
                   <UIButton
                     size="small"
                     icon={<UIIcon name="CopyOutlined" />}
-                    onClick={() => copyToClipboard(String(log.traceId), 'Trace ID')}
+                    onClick={() => copyToClipboard(logTraceId, 'Trace ID')}
                   />
                 </UITooltip>
               </UISpace>
             </UIDescriptionsItem>
           )}
 
-          {log.executionId && (
+          {Boolean(log.executionId) && (
             <UIDescriptionsItem label="Execution ID">
               <UISpace>
-                <UITypographyText code>{log.executionId}</UITypographyText>
+                <UITypographyText code>{String(log.executionId)}</UITypographyText>
                 <UITooltip title="Copy execution ID">
                   <UIButton
                     size="small"
@@ -289,30 +296,30 @@ export function LogDetailPage() {
             </UIDescriptionsItem>
           )}
 
-          {log.requestId && (
+          {logRequestId && (
             <UIDescriptionsItem label="Request ID">
               <UISpace>
-                <UITypographyText code>{log.requestId}</UITypographyText>
+                <UITypographyText code>{logRequestId}</UITypographyText>
                 <UITooltip title="Copy request ID">
                   <UIButton
                     size="small"
                     icon={<UIIcon name="CopyOutlined" />}
-                    onClick={() => copyToClipboard(String(log.requestId), 'Request ID')}
+                    onClick={() => copyToClipboard(logRequestId, 'Request ID')}
                   />
                 </UITooltip>
               </UISpace>
             </UIDescriptionsItem>
           )}
 
-          {log.sessionId && (
+          {logSessionId && (
             <UIDescriptionsItem label="Session ID">
               <UISpace>
-                <UITypographyText code>{log.sessionId}</UITypographyText>
+                <UITypographyText code>{logSessionId}</UITypographyText>
                 <UITooltip title="Copy session ID">
                   <UIButton
                     size="small"
                     icon={<UIIcon name="CopyOutlined" />}
-                    onClick={() => copyToClipboard(String(log.sessionId), 'Session ID')}
+                    onClick={() => copyToClipboard(logSessionId, 'Session ID')}
                   />
                 </UITooltip>
               </UISpace>
@@ -415,7 +422,7 @@ export function LogDetailPage() {
                     )}
                   </UISpace>
                 }
-                type="info"
+                variant="info"
                 style={{ marginBottom: 16 }}
                 closable
               />
@@ -429,7 +436,7 @@ export function LogDetailPage() {
                 return {
                   color: isCurrentLog ? 'red' : getLevelColor(relatedLog.level),
                   dot: isCurrentLog ? (
-                    <UIBadge status="processing" />
+                    <UIBadge variant="info" />
                   ) : (
                     getLevelIcon(relatedLog.level)
                   ),
@@ -452,16 +459,16 @@ export function LogDetailPage() {
                             {relatedLog.level.toUpperCase()}
                           </UITag>
                           {relatedLog.plugin && (
-                            <UITag color="purple">{relatedLog.plugin}</UITag>
+                            <UITag color="purple">{String(relatedLog.plugin)}</UITag>
                           )}
                           {isCurrentLog && (
                             <UITag color="orange">YOU ARE HERE</UITag>
                           )}
                         </UISpace>
-                        <UITypographyText>{relatedLog.msg || '(no message)'}</UITypographyText>
+                        <UITypographyText>{String(relatedLog.msg || '(no message)')}</UITypographyText>
                         {relatedLog.err && (
                           <UITag color="red" icon={<UIIcon name="CloseCircleOutlined" />}>
-                            {String(relatedLog.err.name || relatedLog.err.type || 'Error')}
+                            {String(relatedLog.err.name || 'Error')}
                           </UITag>
                         )}
                       </UISpace>

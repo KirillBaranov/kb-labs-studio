@@ -48,7 +48,7 @@ export function SystemEventsPage() {
       {!isConnected && !error && (
         <UIAlert
           message="Connecting to event stream..."
-          type="info"
+          variant="info"
           showIcon
           icon={<UIIcon name="SyncOutlined" spin />}
           style={{ marginBottom: 24 }}
@@ -59,7 +59,7 @@ export function SystemEventsPage() {
         <UIAlert
           message="Connection failed"
           description={error.message + ' - Make sure REST API is running on localhost:5050'}
-          type="error"
+          variant="error"
           showIcon
           style={{ marginBottom: 24 }}
         />
@@ -68,7 +68,7 @@ export function SystemEventsPage() {
       {isConnected && (
         <UIAlert
           message="Connected to event stream"
-          type="success"
+          variant="success"
           showIcon
           icon={<UIIcon name="CheckCircleOutlined" />}
           style={{ marginBottom: 24 }}
@@ -83,9 +83,10 @@ export function SystemEventsPage() {
             extra={
               latestHealth ? (
                 <UIBadge
-                  status={latestHealth.ready ? 'success' : 'error'}
-                  text={latestHealth.ready ? 'Ready' : 'Not Ready'}
-                />
+                  variant={latestHealth.ready ? 'success' : 'error'}
+                >
+                  {latestHealth.ready ? 'Ready' : 'Not Ready'}
+                </UIBadge>
               ) : null
             }
           >
@@ -122,7 +123,7 @@ export function SystemEventsPage() {
                 </UICol>
               </UIRow>
             ) : (
-              <UIAlert message="No health data received yet" type="info" showIcon />
+              <UIAlert message="No health data received yet" variant="info" showIcon />
             )}
           </UICard>
         </UICol>
@@ -156,7 +157,7 @@ export function SystemEventsPage() {
                 </UICol>
               </UIRow>
             ) : (
-              <UIAlert message="No registry data received yet" type="info" showIcon />
+              <UIAlert message="No registry data received yet" variant="info" showIcon />
             )}
           </UICard>
         </UICol>
@@ -243,7 +244,7 @@ export function SystemEventsPage() {
           <UIAlert
             message="No events received yet"
             description="Waiting for system events..."
-            type="info"
+            variant="info"
             showIcon
             icon={<UIIcon name="SyncOutlined" spin />}
           />

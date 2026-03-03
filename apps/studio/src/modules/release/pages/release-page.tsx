@@ -4,6 +4,7 @@
  */
 
 import * as React from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { UISelect, UIAccordion, UIDescriptions, UIDescriptionsItem, UITag } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useReleaseScopes } from '@kb-labs/studio-data-client';
@@ -17,7 +18,17 @@ interface ReleasePageProps {
 
 export function ReleasePage({ view = 'overview' }: ReleasePageProps) {
   const sources = useDataSources();
-  const [selectedScope, setSelectedScope] = React.useState<string>('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedScope = searchParams.get('scope') ?? '';
+
+  const setSelectedScope = (scope: string) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('scope', scope);
+      next.delete('step'); // reset step when scope changes
+      return next;
+    });
+  };
 
   // Fetch available scopes
   const { data: scopesData, isLoading: scopesLoading } = useReleaseScopes(sources.release);
@@ -26,9 +37,11 @@ export function ReleasePage({ view = 'overview' }: ReleasePageProps) {
   React.useEffect(() => {
     if (scopesData?.scopes && scopesData.scopes.length > 0 && !selectedScope) {
       const rootScope = scopesData.scopes.find((s) => s.id === 'root');
-      setSelectedScope(rootScope?.id || scopesData.scopes[0].id);
+      const firstScope = scopesData.scopes[0];
+      setSelectedScope(rootScope?.id ?? firstScope?.id ?? '');
     }
-  }, [scopesData, selectedScope]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scopesData]);
 
   // Get current scope info
   const currentScope = scopesData?.scopes?.find((s) => s.id === selectedScope);
@@ -56,7 +69,7 @@ export function ReleasePage({ view = 'overview' }: ReleasePageProps) {
     // Overview with stepper-based release flow
     return (
       <div style={{ marginTop: 16 }}>
-        <ReleaseStepper selectedScope={selectedScope} />
+        <ReleaseStepper selectedScope={selectedScope} selectedScopePath={currentScope?.path} />
       </div>
     );
   };
@@ -76,15 +89,14 @@ export function ReleasePage({ view = 'overview' }: ReleasePageProps) {
             style={{ width: 400 }}
             placeholder="Select scope (package or monorepo)"
             value={selectedScope}
-            onChange={setSelectedScope}
+            onChange={(v) => setSelectedScope(v as string)}
             loading={scopesLoading}
             showSearch
             optionFilterProp="label"
             options={scopesData?.scopes?.map((s) => ({
               label: `${s.name} (${s.type})`,
               value: s.id,
-              title: `${s.path} · v${s.currentVersion || '?'}`,
-            }))}
+            })) ?? []}
           />
         }
       />
@@ -97,18 +109,13 @@ export function ReleasePage({ view = 'overview' }: ReleasePageProps) {
           items={[
             {
               key: 'scope-info',
-              label: (
-                <span>
-                  <strong>{currentScope.name}</strong>
-                  {currentScope.currentVersion && (
-                    <span style={{ marginLeft: 8, color: '#8c8c8c' }}>
-                      v{currentScope.currentVersion}
-                    </span>
-                  )}
-                  <UITag color={getTypeColor(currentScope.type)} style={{ marginLeft: 8 }}>
-                    {currentScope.type}
-                  </UITag>
-                </span>
+              label: currentScope.currentVersion
+                ? `${currentScope.name} v${currentScope.currentVersion}`
+                : currentScope.name,
+              extra: (
+                <UITag color={getTypeColor(currentScope.type)}>
+                  {currentScope.type}
+                </UITag>
               ),
               children: (
                 <UIDescriptions size="small" column={1} bordered>

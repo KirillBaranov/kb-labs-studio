@@ -89,7 +89,7 @@ export function PrometheusMetricsPage() {
         <UIAlert
           message="Failed to load Prometheus metrics"
           description={error instanceof Error ? error.message : 'Unknown error. Make sure REST API is running on localhost:5050'}
-          type="error"
+          variant="error"
           showIcon
           style={{ marginBottom: 24 }}
         />
@@ -375,7 +375,7 @@ export function PrometheusMetricsPage() {
                 ))}
             </UIRow>
             {Object.keys(data.errors?.byStatusCode ?? {}).length === 0 && (
-              <UIAlert message="No errors recorded" type="success" showIcon />
+              <UIAlert message="No errors recorded" variant="success" showIcon />
             )}
           </UICard>
         </UICol>
@@ -401,7 +401,7 @@ export function PrometheusMetricsPage() {
                 }))}
               />
             ) : (
-              <UIAlert message="No recent errors" type="success" showIcon />
+              <UIAlert message="No recent errors" variant="success" showIcon />
             )}
           </UICard>
         </UICol>
@@ -439,7 +439,7 @@ export function PrometheusMetricsPage() {
                 </div>
               </>
             ) : (
-              <UIAlert message="No Redis status data available" type="info" showIcon />
+              <UIAlert message="No Redis status data available" variant="info" showIcon />
             )}
           </UICard>
         </UICol>
@@ -476,7 +476,7 @@ export function PrometheusMetricsPage() {
                 </div>
               </>
             ) : (
-              <UIAlert message="No plugin mount data available" type="info" showIcon />
+              <UIAlert message="No plugin mount data available" variant="info" showIcon />
             )}
           </UICard>
         </UICol>

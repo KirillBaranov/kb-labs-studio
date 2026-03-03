@@ -18,12 +18,15 @@ import {
   UIDivider,
   UIMessage,
   UIIcon,
+  UISkeleton,
 } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import {
   useReleasePlan,
   useRunRelease,
   useRollback,
+  useRunChecks,
+  useGetChecks,
 } from '@kb-labs/studio-data-client';
 
 type CheckStatus = 'pending' | 'running' | 'success' | 'error';
@@ -31,10 +34,10 @@ type CheckStatus = 'pending' | 'running' | 'success' | 'error';
 interface PreCheck {
   id: string;
   name: string;
-  description: string;
   status: CheckStatus;
   error?: string;
   duration?: number;
+  optional?: boolean;
 }
 
 interface ReleaseStepProps {
@@ -49,21 +52,8 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
   const [otp, setOtp] = React.useState('');
   const [otpError, setOtpError] = React.useState('');
 
-  // Pre-checks state
-  const [checks, setChecks] = React.useState<PreCheck[]>([
-    {
-      id: 'build',
-      name: 'Build Packages',
-      description: 'Compile TypeScript and bundle packages',
-      status: 'pending',
-    },
-    {
-      id: 'tests',
-      name: 'Run Tests',
-      description: 'Execute test suite (mocked for demo)',
-      status: 'pending',
-    },
-  ]);
+  // Pre-checks state — populated from API on mount
+  const [checks, setChecks] = React.useState<PreCheck[]>([]);
   const [checksComplete, setChecksComplete] = React.useState(false);
   const [checksRunning, setChecksRunning] = React.useState(false);
 
@@ -75,61 +65,62 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
   // Fetch plan to show summary
   const { data: planData } = useReleasePlan(sources.release, selectedScope, !!selectedScope);
 
+  // Fetch configured checks from API (shows what will run before actually running)
+  const { data: checksConfig, isLoading: checksConfigLoading } = useGetChecks(sources.release, selectedScope, !!selectedScope);
+
+  // Sync check definitions from API into local state (pending) when loaded and not yet run
+  React.useEffect(() => {
+    if (checksConfig && !checksComplete && !checksRunning && checks.length === 0) {
+      setChecks(checksConfig.checks.map((c) => ({
+        id: c.id,
+        name: c.name,
+        status: 'pending' as const,
+        optional: c.optional,
+      })));
+    }
+  }, [checksConfig, checksComplete, checksRunning, checks.length]);
+
   // Mutations
   const runReleaseMutation = useRunRelease(sources.release);
   const rollbackMutation = useRollback(sources.release);
+  const runChecksMutation = useRunChecks(sources.release);
 
-  const allChecksPassed = checks.every(c => c.status === 'success');
+  const allChecksPassed = checks.length > 0 && checks.every(c => c.status === 'success');
   const anyCheckFailed = checks.some(c => c.status === 'error');
 
-  // Mock pre-check runner
   const runPreChecks = async () => {
     setChecksRunning(true);
     setChecksComplete(false);
+    // Mark all as running so user sees spinner on each item
+    setChecks((prev) => prev.map((c) => ({ ...c, status: 'running' as const, error: undefined, duration: undefined })));
 
-    for (let i = 0; i < checks.length; i++) {
-      const check = checks[i];
+    try {
+      const result = await runChecksMutation.mutateAsync({ scope: selectedScope });
 
-      // Set current check to running
-      setChecks(prev => prev.map((c, idx) =>
-        idx === i ? { ...c, status: 'running' as CheckStatus } : c
-      ));
+      // Merge results by id — preserve any checks not returned by server as pending
+      setChecks((prev) => {
+        const resultById = new Map(result.checks.map((c) => [c.id, c]));
+        return prev.map((c) => {
+          const r = resultById.get(c.id);
+          if (!r) { return { ...c, status: 'pending' as const }; }
+          return { ...c, status: r.success ? 'success' as const : 'error' as const, error: r.error, duration: r.durationMs };
+        });
+      });
+      setChecksComplete(result.success);
 
-      // Simulate check (1-3 seconds)
-      const startTime = Date.now();
-      await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1500));
-      const duration = Date.now() - startTime;
-
-      // Simulate success (95% success rate for demo)
-      const success = Math.random() > 0.05;
-
-      setChecks(prev => prev.map((c, idx) =>
-        idx === i
-          ? {
-              ...c,
-              status: success ? 'success' : 'error',
-              duration,
-              error: success ? undefined : `${check.name} failed with exit code 1`,
-            }
-          : c
-      ));
-
-      if (!success) {
-        setChecksRunning(false);
-        return;
+      if (!result.success) {
+        UIMessage.error('Some checks failed');
       }
+    } catch (error) {
+      setChecks((prev) => prev.map((c) => ({ ...c, status: 'pending' as const })));
+      UIMessage.error(`Checks failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setChecksRunning(false);
     }
-
-    setChecksRunning(false);
-    setChecksComplete(true);
   };
 
   const validateOtp = (): boolean => {
-    if (!otp) {
-      setOtpError('OTP is required for npm publish');
-      return false;
-    }
-    if (!/^\d{6}$/.test(otp)) {
+    if (otp && !/^\d{6}$/.test(otp)) {
       setOtpError('OTP must be 6 digits');
       return false;
     }
@@ -188,7 +179,7 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
   };
 
   const resetChecks = () => {
-    setChecks(prev => prev.map(c => ({ ...c, status: 'pending', error: undefined, duration: undefined })));
+    setChecks((prev) => prev.map((c) => ({ ...c, status: 'pending' as const, error: undefined, duration: undefined })));
     setChecksComplete(false);
   };
 
@@ -253,6 +244,15 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
         style={{ marginBottom: 16 }}
       >
         <UISpace direction="vertical" style={{ width: '100%' }} size="middle">
+          {checksConfigLoading && checks.length === 0 && (
+            <UISkeleton active lines={4} title={false} />
+          )}
+          {!checksConfigLoading && checks.length === 0 && (
+            <UITypographyText type="secondary">
+              No checks configured in kb.config.json release.checks
+            </UITypographyText>
+          )}
+
           {checks.map((check) => (
             <div
               key={check.id}
@@ -269,11 +269,18 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
               <UISpace>
                 {getCheckIcon(check.status)}
                 <div>
-                  <UITypographyText strong>{check.name}</UITypographyText>
-                  <br />
-                  <UITypographyText type="secondary" style={{ fontSize: 12 }}>
-                    {check.error || check.description}
-                  </UITypographyText>
+                  <UISpace>
+                    <UITypographyText strong>{check.name}</UITypographyText>
+                    {check.optional && <UITag>optional</UITag>}
+                  </UISpace>
+                  {check.error && (
+                    <>
+                      <br />
+                      <UITypographyText type="danger" style={{ fontSize: 12 }}>
+                        {check.error}
+                      </UITypographyText>
+                    </>
+                  )}
                 </div>
               </UISpace>
               {check.duration && (
@@ -284,7 +291,7 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
 
           <div style={{ display: 'flex', gap: 8 }}>
             <UIButton
-              type="primary"
+              variant="primary"
               icon={<UIIcon name="BuildOutlined" />}
               onClick={runPreChecks}
               loading={checksRunning}
@@ -314,7 +321,7 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
           <UIAlert
             message="Complete pre-release checks first"
             description="All checks must pass before you can publish to npm."
-            type="info"
+            variant="info"
             showIcon
             style={{ marginBottom: 16 }}
           />
@@ -324,7 +331,7 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
           <UIAlert
             message="Release Failed"
             description={releaseError}
-            type="error"
+            variant="error"
             showIcon
             closable
             onClose={() => setReleaseError(null)}
@@ -340,11 +347,9 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
               items={[
                 {
                   key: 'summary',
-                  label: (
-                    <UISpace>
-                      <span>Release Summary</span>
-                      <UITag color="blue">{planData.plan.packages.length} package(s)</UITag>
-                    </UISpace>
+                  label: 'Release Summary',
+                  extra: (
+                    <UITag color="blue">{planData.plan.packages.length} package(s)</UITag>
                   ),
                   children: (
                     <div>
@@ -367,17 +372,17 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
           {/* OTP Input */}
           <div>
             <UITypographyText strong style={{ display: 'block', marginBottom: 8 }}>
-              npm One-Time Password (OTP)
+              npm One-Time Password (OTP) <UITypographyText type="secondary" style={{ fontWeight: 'normal' }}>— optional</UITypographyText>
             </UITypographyText>
             <UITypographyText type="secondary" style={{ display: 'block', marginBottom: 8, fontSize: 12 }}>
-              Enter the 6-digit code from your authenticator app
+              Required only if your npm account uses 2FA. Leave empty to publish via NPM_TOKEN.
             </UITypographyText>
             <UIInput
               prefix={<UIIcon name="LockOutlined" />}
               placeholder="123456"
               value={otp}
-              onChange={(e) => {
-                setOtp(e.target.value.replace(/\D/g, '').slice(0, 6));
+              onChange={(value) => {
+                setOtp(value.replace(/\D/g, '').slice(0, 6));
                 setOtpError('');
               }}
               maxLength={6}
@@ -396,12 +401,12 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
 
           {/* Publish Button */}
           <UIButton
-            type="primary"
+            variant="primary"
             size="large"
             icon={<UIIcon name="RocketOutlined" />}
             onClick={handleRunRelease}
             loading={runReleaseMutation.isPending}
-            disabled={!allChecksPassed || !otp || releaseStarted}
+            disabled={!allChecksPassed || releaseStarted}
             block
           >
             Publish to npm

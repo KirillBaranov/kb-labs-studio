@@ -174,7 +174,7 @@ export function IncidentDetailPage() {
         <UIAlert
           message="Failed to load incident"
           description={(incidentError as Error)?.message ?? 'Incident not found'}
-          type="error"
+          variant="error"
           showIcon
         />
       </KBPageContainer>
@@ -186,18 +186,14 @@ export function IncidentDetailPage() {
   return (
     <KBPageContainer>
       <KBPageHeader
-        title={
-          <UISpace>
-            <UIButton icon={<UIIcon name="ArrowLeftOutlined" />} onClick={handleGoBack} />
-            {incident.title}
-          </UISpace>
-        }
+        title={incident.title}
         description={`Incident ID: ${incident.id}`}
         extra={[
+          <UIButton key="back" icon={<UIIcon name="ArrowLeftOutlined" />} onClick={handleGoBack} />,
           !incident.resolvedAt && (
             <UIButton
               key="resolve"
-              type="primary"
+              variant="primary"
               icon={<UIIcon name="CheckCircleOutlined" />}
               onClick={() => setResolveModalVisible(true)}
             >
@@ -319,7 +315,7 @@ export function IncidentDetailPage() {
             ]}
             pagination={false}
             size="small"
-            rowKey={(record, index) => `${record.endpoint}-${index}`}
+            rowKey={(record: { endpoint: string; method: string; durationMs: number; statusCode?: number }) => record.endpoint}
           />
         </UICard>
       )}
@@ -379,9 +375,8 @@ export function IncidentDetailPage() {
                 label={formatTime(event.timestamp)}
               >
                 <UIBadge
-                  status={event.source === 'detector' ? 'error' : 'processing'}
-                  text={event.source.toUpperCase()}
-                />
+                  variant={event.source === 'detector' ? 'error' : 'info'}
+                />{event.source.toUpperCase()}
                 <div style={{ marginTop: 4 }}>{event.event}</div>
               </UITimelineItem>
             ))}
@@ -425,7 +420,7 @@ export function IncidentDetailPage() {
             ]}
             pagination={false}
             size="small"
-            rowKey={(record, index) => `${record.endpoint}-${index}`}
+            rowKey={(record: { endpoint: string; count: number; sample: string }) => record.endpoint}
           />
         </UICard>
       )}
@@ -439,7 +434,7 @@ export function IncidentDetailPage() {
                 key={idx}
                 message={`Error ${idx + 1}`}
                 description={<pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontSize: 12 }}>{error}</pre>}
-                type="error"
+                variant="error"
                 showIcon
               />
             ))}
@@ -461,7 +456,7 @@ export function IncidentDetailPage() {
           <UIAlert
             message="Analysis Failed"
             description={(analysisError as Error).message}
-            type="error"
+            variant="error"
             showIcon
           />
         </UICard>
@@ -473,7 +468,7 @@ export function IncidentDetailPage() {
           style={{ marginBottom: 16 }}
           extra={
             analysisData?.data.cached && (
-              <UIBadge status="success" text="Cached" />
+              <UIBadge variant="success">Cached</UIBadge>
             )
           }
         >
@@ -481,7 +476,7 @@ export function IncidentDetailPage() {
           <UIAlert
             message="Summary"
             description={analysis.summary}
-            type="info"
+            variant="info"
             showIcon
             icon={<UIIcon name="BulbOutlined" />}
             style={{ marginBottom: 16 }}
@@ -540,7 +535,7 @@ export function IncidentDetailPage() {
                     key={idx}
                     message={`Recommendation ${idx + 1}`}
                     description={rec}
-                    type="success"
+                    variant="success"
                     showIcon
                   />
                 ))}
@@ -562,7 +557,6 @@ export function IncidentDetailPage() {
         onCancel={() => setResolveModalVisible(false)}
         confirmLoading={resolveMutation.isPending}
         okText="Resolve"
-        okButtonProps={{ danger: false, type: 'primary' }}
       >
         <UISpace direction="vertical" style={{ width: '100%' }}>
           <p>Are you sure you want to mark this incident as resolved?</p>

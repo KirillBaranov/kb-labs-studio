@@ -11,7 +11,7 @@ import {
   UISpin,
   UISpace,
   UIMessage,
-  UIInput,
+  UIInputTextArea,
   UIRow,
   UICol,
   UITitle,
@@ -26,8 +26,6 @@ import {
   useSaveChangelog,
 } from '@kb-labs/studio-data-client';
 import { MarkdownViewer } from '@/components/markdown';
-
-const { TextArea } = UIInput;
 
 interface ChangelogTabProps {
   selectedScope: string;
@@ -115,11 +113,11 @@ export function ChangelogTab({ selectedScope }: ChangelogTabProps) {
           image={UIEmptyState.PRESENTED_IMAGE_SIMPLE}
         >
           <UISpace direction="vertical" size="middle" style={{ display: 'flex', alignItems: 'center' }}>
-            <UICheckbox checked={useLLM} onChange={(e) => setUseLLM(e.target.checked)}>
+            <UICheckbox checked={useLLM} onChange={(checked) => setUseLLM(checked)}>
               Use AI-powered generation (requires LLM)
             </UICheckbox>
             <UIButton
-              type="primary"
+              variant="primary"
               icon={<UIIcon name="ThunderboltOutlined" />}
               onClick={handleGenerate}
               loading={generateMutation.isPending}
@@ -154,8 +152,7 @@ export function ChangelogTab({ selectedScope }: ChangelogTabProps) {
         <UISpace>
           <UICheckbox
             checked={useLLM}
-            onChange={(e) => setUseLLM(e.target.checked)}
-            style={{ fontSize: 12 }}
+            onChange={(checked) => setUseLLM(checked)}
           >
             Use AI
           </UICheckbox>
@@ -173,7 +170,7 @@ export function ChangelogTab({ selectedScope }: ChangelogTabProps) {
             {editMode ? 'Preview' : 'Edit'}
           </UIButton>
           <UIButton
-            type="primary"
+            variant="primary"
             icon={<UIIcon name="SaveOutlined" />}
             onClick={handleSave}
             loading={saveMutation.isPending}
@@ -188,7 +185,7 @@ export function ChangelogTab({ selectedScope }: ChangelogTabProps) {
         <UIAlert
           message="Unsaved changes"
           description="Don't forget to save your changes before closing this tab."
-          type="warning"
+          variant="warning"
           showIcon
           closable
           style={{ marginBottom: 16 }}
@@ -200,7 +197,7 @@ export function ChangelogTab({ selectedScope }: ChangelogTabProps) {
           {editMode ? (
             <div>
               <UITitle level={5}>Editor</UITitle>
-              <TextArea
+              <UIInputTextArea
                 value={markdown}
                 onChange={handleMarkdownChange}
                 rows={20}

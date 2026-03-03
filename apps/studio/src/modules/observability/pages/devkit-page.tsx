@@ -93,7 +93,7 @@ export function DevKitPage() {
         <UIAlert
           message="Failed to load DevKit health"
           description={error instanceof Error ? error.message : 'Unknown error. Make sure DevKit is installed and executable.'}
-          type="error"
+          variant="error"
           showIcon
           style={{ marginBottom: 24 }}
         />
@@ -115,7 +115,7 @@ export function DevKitPage() {
     );
   }
 
-  const totalIssues = Object.values(data.issues).reduce((sum: number, count) => sum + count, 0);
+  const totalIssues = Object.values(data.issues).reduce((sum: number, count) => sum + (count ?? 0), 0);
 
   return (
     <KBPageContainer>
@@ -212,8 +212,8 @@ export function DevKitPage() {
             .map(([key, count]) => ({
               key,
               issue: formatIssueLabel(key),
-              count,
-              severity: count > 100 ? 'high' : count > 10 ? 'medium' : 'low',
+              count: count ?? 0,
+              severity: (count ?? 0) > 100 ? 'high' : (count ?? 0) > 10 ? 'medium' : 'low',
             }))
             .sort((a, b) => b.count - a.count)} // Sort by count descending
           columns={[

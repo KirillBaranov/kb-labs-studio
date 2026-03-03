@@ -72,7 +72,6 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
     try {
       const result = await generateMutation.mutateAsync({
         scope: selectedScope,
-        dryRun: false,
         useLLM,
       });
 
@@ -108,7 +107,7 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
         scope: selectedScope,
         dryRun: false,
       });
-      UIMessage.success(`Release completed! ${result.packagesReleased} package(s) released in ${result.duration}ms`);
+      UIMessage.success(`Release completed successfully!`);
     } catch (error) {
       UIMessage.error(`Failed to run release: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -131,11 +130,11 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
           image={UIEmptyState.PRESENTED_IMAGE_SIMPLE}
         >
           <UISpace direction="vertical" size="middle" style={{ display: 'flex', alignItems: 'center' }}>
-            <UICheckbox checked={useLLM} onChange={(e) => setUseLLM(e.target.checked)}>
+            <UICheckbox checked={useLLM} onChange={(checked) => setUseLLM(checked)}>
               Use AI-powered analysis (requires LLM)
             </UICheckbox>
             <UIButton
-              type="primary"
+              variant="primary"
               icon={<UIIcon name="ThunderboltOutlined" />}
               onClick={handleGenerate}
               loading={generateMutation.isPending}
@@ -159,7 +158,7 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
   }
 
   const { plan } = planData;
-  const columns = [
+  const columns: import('@kb-labs/studio-ui-kit').UITableColumn<import('@kb-labs/release-manager-contracts').PackageVersion>[] = [
     {
       title: 'Package',
       dataIndex: 'name',
@@ -220,11 +219,10 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
       dataIndex: 'reason',
       key: 'reason',
       width: 260,
-      ellipsis: { showTitle: false },
+      ellipsis: true,
       render: (reason: string) => (
         <UITypographyText
           type="secondary"
-          ellipsis={{ tooltip: { title: reason, overlayStyle: { maxWidth: 400 } } }}
           style={{ fontSize: 12 }}
         >
           {reason || '-'}
@@ -251,8 +249,7 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
         <UISpace>
           <UICheckbox
             checked={useLLM}
-            onChange={(e) => setUseLLM(e.target.checked)}
-            style={{ fontSize: 12 }}
+            onChange={(checked) => setUseLLM(checked)}
           >
             Use AI
           </UICheckbox>
@@ -275,7 +272,7 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
             </UIButton>
           </UIPopconfirm>
           <UIButton
-            type="primary"
+            variant="primary"
             icon={<UIIcon name="RocketOutlined" />}
             onClick={handleRunRelease}
             loading={runReleaseMutation.isPending}
@@ -294,10 +291,9 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
           items={[
             {
               key: 'timeline',
-              label: (
+              label: 'Git Timeline & Version Preview',
+              extra: (
                 <UISpace>
-                  <UIIcon name="BranchesOutlined" />
-                  <span>Git Timeline & Version Preview</span>
                   <UITag>{gitTimelineData.unreleased} commits</UITag>
                 </UISpace>
               ),
@@ -322,7 +318,7 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
                         </UISpace>
                       }
                       description={`Based on ${gitTimelineData.unreleased} unreleased commit(s) since ${gitTimelineData.lastTag || 'initial commit'}`}
-                      type="info"
+                      variant="info"
                       showIcon
                       style={{ marginBottom: 16 }}
                     />
@@ -373,7 +369,7 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
 
                   {gitTimelineData.commits.length > INITIAL_COMMITS_COUNT && (
                     <UIButton
-                      type="link"
+                      variant="link"
                       size="small"
                       icon={showAllCommits ? <UIIcon name="UpOutlined" /> : <UIIcon name="DownOutlined" />}
                       onClick={() => setShowAllCommits(!showAllCommits)}
@@ -397,15 +393,13 @@ export function PlanTab({ selectedScope }: PlanTabProps) {
         rowKey="name"
         pagination={false}
         size="small"
-        scroll={{ x: 800 }}
-        tableLayout="fixed"
       />
 
       {allPublished && (
         <UIAlert
           message="All packages have been published"
           description="This release plan has been fully executed."
-          type="success"
+          variant="success"
           showIcon
           style={{ marginTop: 16 }}
         />

@@ -4,6 +4,7 @@
  */
 
 import * as React from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   UISteps,
   UIButton,
@@ -15,13 +16,41 @@ import { PlanStep } from './steps/plan-step';
 import { ChangelogStep } from './steps/changelog-step';
 import { PreviewStep } from './steps/preview-step';
 import { ReleaseStep } from './steps/release-step';
+import { useDataSources } from '@/providers/data-sources-provider';
+import { useResetReleasePlan } from '@kb-labs/studio-data-client';
+
+type StepKey = 'plan' | 'changelog' | 'preview' | 'release';
+
+const STEP_KEYS: StepKey[] = ['plan', 'changelog', 'preview', 'release'];
+
+const STEP_INDEX: Record<StepKey, number> = {
+  plan: 0,
+  changelog: 1,
+  preview: 2,
+  release: 3,
+};
 
 interface ReleaseStepperProps {
   selectedScope: string;
+  selectedScopePath?: string;
 }
 
-export function ReleaseStepper({ selectedScope }: ReleaseStepperProps) {
-  const [currentStep, setCurrentStep] = React.useState(0);
+export function ReleaseStepper({ selectedScope, selectedScopePath }: ReleaseStepperProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const sources = useDataSources();
+  const resetPlan = useResetReleasePlan(sources.release);
+
+  const stepParam = searchParams.get('step') as StepKey | null;
+  const currentStep = STEP_INDEX[stepParam as StepKey] ?? 0;
+
+  const setCurrentStep = (index: number) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('step', STEP_KEYS[index] ?? 'plan');
+      return next;
+    });
+  };
+
   const [releaseComplete, setReleaseComplete] = React.useState(false);
 
   // Step validation states
@@ -30,28 +59,16 @@ export function ReleaseStepper({ selectedScope }: ReleaseStepperProps) {
   const [previewReady, setPreviewReady] = React.useState(false);
 
   const steps = [
-    {
-      title: 'Plan',
-      icon: <UIIcon name="FileTextOutlined" />,
-    },
-    {
-      title: 'Changelog',
-      icon: <UIIcon name="EditOutlined" />,
-    },
-    {
-      title: 'Preview',
-      icon: <UIIcon name="FolderOutlined" />,
-    },
-    {
-      title: 'Release',
-      icon: <UIIcon name="RocketOutlined" />,
-    },
+    { title: 'Plan', icon: <UIIcon name="FileTextOutlined" /> },
+    { title: 'Changelog', icon: <UIIcon name="EditOutlined" /> },
+    { title: 'Preview', icon: <UIIcon name="FolderOutlined" /> },
+    { title: 'Release', icon: <UIIcon name="RocketOutlined" /> },
   ];
 
   const canGoNext = () => {
-    if (currentStep === 0) {return planReady;}
-    if (currentStep === 1) {return changelogReady;}
-    if (currentStep === 2) {return previewReady;}
+    if (currentStep === 0) { return planReady; }
+    if (currentStep === 1) { return changelogReady; }
+    if (currentStep === 2) { return previewReady; }
     return false;
   };
 
@@ -72,6 +89,7 @@ export function ReleaseStepper({ selectedScope }: ReleaseStepperProps) {
   };
 
   const handleStartOver = () => {
+    resetPlan.mutate({ scope: selectedScope });
     setCurrentStep(0);
     setReleaseComplete(false);
     setPlanReady(false);
@@ -102,7 +120,7 @@ export function ReleaseStepper({ selectedScope }: ReleaseStepperProps) {
             <UIButton key="history" onClick={() => window.location.href = '/release/history'}>
               View History
             </UIButton>,
-            <UIButton key="new" type="primary" onClick={handleStartOver}>
+            <UIButton key="new" variant="primary" onClick={handleStartOver}>
               Start New Release
             </UIButton>,
           ]}
@@ -114,33 +132,13 @@ export function ReleaseStepper({ selectedScope }: ReleaseStepperProps) {
   const renderStepContent = () => {
     switch (currentStep) {
       case 0:
-        return (
-          <PlanStep
-            selectedScope={selectedScope}
-            onPlanReady={setPlanReady}
-          />
-        );
+        return <PlanStep selectedScope={selectedScope} selectedScopePath={selectedScopePath} onPlanReady={setPlanReady} />;
       case 1:
-        return (
-          <ChangelogStep
-            selectedScope={selectedScope}
-            onChangelogReady={setChangelogReady}
-          />
-        );
+        return <ChangelogStep selectedScope={selectedScope} onChangelogReady={setChangelogReady} />;
       case 2:
-        return (
-          <PreviewStep
-            selectedScope={selectedScope}
-            onPreviewReady={setPreviewReady}
-          />
-        );
+        return <PreviewStep selectedScope={selectedScope} onPreviewReady={setPreviewReady} />;
       case 3:
-        return (
-          <ReleaseStep
-            selectedScope={selectedScope}
-            onReleaseComplete={handleReleaseComplete}
-          />
-        );
+        return <ReleaseStep selectedScope={selectedScope} onReleaseComplete={handleReleaseComplete} />;
       default:
         return null;
     }
@@ -157,7 +155,7 @@ export function ReleaseStepper({ selectedScope }: ReleaseStepperProps) {
             type="navigation"
             size="small"
             onChange={(step) => {
-              // Only allow going back to completed steps
+              // Allow clicking back to any already-visited step
               if (step < currentStep) {
                 setCurrentStep(step);
               }
@@ -165,27 +163,27 @@ export function ReleaseStepper({ selectedScope }: ReleaseStepperProps) {
             style={{ flex: 1 }}
           />
 
-          {/* Navigation buttons */}
-          {currentStep < 3 && (
-            <div style={{ display: 'flex', gap: 8, marginLeft: 32, flexShrink: 0 }}>
+          {/* Navigation buttons — always visible */}
+          <div style={{ display: 'flex', gap: 8, marginLeft: 32, flexShrink: 0 }}>
+            <UIButton
+              icon={<UIIcon name="ArrowLeftOutlined" />}
+              onClick={handlePrev}
+              disabled={currentStep === 0}
+              size="small"
+            >
+              Back
+            </UIButton>
+            {currentStep < steps.length - 1 && (
               <UIButton
-                icon={<UIIcon name="ArrowLeftOutlined" />}
-                onClick={handlePrev}
-                disabled={currentStep === 0}
-                size="small"
-              >
-                Back
-              </UIButton>
-              <UIButton
-                type="primary"
+                variant="primary"
                 onClick={handleNext}
                 disabled={!canGoNext()}
                 size="small"
               >
                 Next <UIIcon name="ArrowRightOutlined" />
               </UIButton>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </UICard>
 

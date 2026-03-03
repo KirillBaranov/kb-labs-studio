@@ -117,16 +117,16 @@ export function IncidentsPage() {
   const summary = data?.data?.summary;
 
   // Handle filter changes
-  const handleSeverityChange = (value: IncidentSeverity | undefined) => {
-    setFilters({ ...filters, severity: value });
+  const handleSeverityChange = (value: string | number | (string | number)[]) => {
+    setFilters({ ...filters, severity: (value as IncidentSeverity) || undefined });
   };
 
-  const handleTypeChange = (value: IncidentType | undefined) => {
-    setFilters({ ...filters, type: value });
+  const handleTypeChange = (value: string | number | (string | number)[]) => {
+    setFilters({ ...filters, type: (value as IncidentType) || undefined });
   };
 
-  const handleIncludeResolvedChange = (value: boolean) => {
-    setFilters({ ...filters, includeResolved: value });
+  const handleIncludeResolvedChange = (value: string | number | (string | number)[]) => {
+    setFilters({ ...filters, includeResolved: value === 'true' });
   };
 
   const handleViewIncident = (id: string) => {
@@ -210,9 +210,9 @@ export function IncidentsPage() {
       align: 'center' as const,
       render: (aiAnalysis: any) => {
         if (aiAnalysis) {
-          return <UIBadge status="success" text="Yes" />;
+          return <UIBadge variant="success">Yes</UIBadge>;
         }
-        return <UIBadge status="default" text="No" />;
+        return <UIBadge variant="default">No</UIBadge>;
       },
     },
     {
@@ -222,7 +222,7 @@ export function IncidentsPage() {
       align: 'center' as const,
       render: (_: any, record: Incident) => (
         <UIButton
-          type="link"
+          variant="link"
           icon={<UIIcon name="EyeOutlined" />}
           onClick={() => handleViewIncident(record.id)}
         >
@@ -253,7 +253,7 @@ export function IncidentsPage() {
         <UIAlert
           message="Failed to load incidents"
           description={(error as Error).message}
-          type="error"
+          variant="error"
           showIcon
           style={{ marginBottom: 24 }}
         />
@@ -344,11 +344,11 @@ export function IncidentsPage() {
           />
           <UISelect
             style={{ width: 180 }}
-            value={filters.includeResolved ?? false}
+            value={filters.includeResolved ? 'true' : 'false'}
             onChange={handleIncludeResolvedChange}
             options={[
-              { label: 'Active Only', value: false },
-              { label: 'Include Resolved', value: true },
+              { label: 'Active Only', value: 'false' },
+              { label: 'Include Resolved', value: 'true' },
             ]}
           />
         </UISpace>
@@ -363,8 +363,6 @@ export function IncidentsPage() {
           loading={isLoading}
           pagination={{
             pageSize: 20,
-            showSizeChanger: true,
-            showTotal: (total) => `Total ${total} incidents`,
           }}
         />
       </UICard>

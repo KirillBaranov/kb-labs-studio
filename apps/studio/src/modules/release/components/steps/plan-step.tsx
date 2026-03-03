@@ -29,12 +29,13 @@ import {
 
 interface PlanStepProps {
   selectedScope: string;
+  selectedScopePath?: string;
   onPlanReady: (ready: boolean) => void;
 }
 
 const INITIAL_COMMITS_COUNT = 5;
 
-export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
+export function PlanStep({ selectedScope, selectedScopePath, onPlanReady }: PlanStepProps) {
   const sources = useDataSources();
   const [useLLM, setUseLLM] = React.useState(true);
   const [showAllCommits, setShowAllCommits] = React.useState(false);
@@ -70,7 +71,7 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
     try {
       const result = await generateMutation.mutateAsync({
         scope: selectedScope,
-        dryRun: false,
+        scopePath: selectedScopePath,
         useLLM,
       });
 
@@ -90,8 +91,22 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
     return <UISpin size="large" style={{ display: 'block', margin: '48px auto' }} />;
   }
 
-  // No plan exists - show generate UI
+  // No plan exists - check if there's anything to release
   if (!statusData?.hasPlan && !planData?.plan) {
+    // gitTimeline loaded and explicitly says no unreleased changes
+    const noChanges = gitTimelineData !== undefined && !gitTimelineData.hasUnreleasedChanges;
+
+    if (noChanges) {
+      return (
+        <UICard>
+          <UIEmptyState
+            description={`No unreleased changes since ${gitTimelineData?.lastTag ?? 'last release'}`}
+            image={UIEmptyState.PRESENTED_IMAGE_SIMPLE}
+          />
+        </UICard>
+      );
+    }
+
     return (
       <UICard>
         <UIEmptyState
@@ -99,11 +114,11 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
           image={UIEmptyState.PRESENTED_IMAGE_SIMPLE}
         >
           <UISpace direction="vertical" size="middle" style={{ display: 'flex', alignItems: 'center' }}>
-            <UICheckbox checked={useLLM} onChange={(e) => setUseLLM(e.target.checked)}>
+            <UICheckbox checked={useLLM} onChange={(checked) => setUseLLM(checked)}>
               Use AI-powered analysis (requires LLM)
             </UICheckbox>
             <UIButton
-              type="primary"
+              variant="primary"
               icon={<UIIcon name="ThunderboltOutlined" />}
               onClick={handleGenerate}
               loading={generateMutation.isPending}
@@ -140,11 +155,11 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
             <UITypographyText type="secondary" style={{ fontSize: 12 }}>
               This may happen if there are no changes to release or the scope has no packages.
             </UITypographyText>
-            <UICheckbox checked={useLLM} onChange={(e) => setUseLLM(e.target.checked)}>
+            <UICheckbox checked={useLLM} onChange={(checked) => setUseLLM(checked)}>
               Use AI-powered analysis
             </UICheckbox>
             <UIButton
-              type="primary"
+              variant="primary"
               icon={<UIIcon name="ThunderboltOutlined" />}
               onClick={handleGenerate}
               loading={generateMutation.isPending}
@@ -157,7 +172,7 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
     );
   }
 
-  const columns = [
+  const columns: import('@kb-labs/studio-ui-kit').UITableColumn<{ name: string; path: string; currentVersion: string; nextVersion: string; bump: 'auto' | 'patch' | 'major' | 'minor'; isPublished: boolean; dependencies?: string[]; reason?: string }>[] = [
     {
       title: 'Package',
       dataIndex: 'name',
@@ -203,11 +218,10 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
       title: 'Reason',
       dataIndex: 'reason',
       key: 'reason',
-      ellipsis: { showTitle: false },
+      ellipsis: true,
       render: (reason: string) => (
         <UITypographyText
           type="secondary"
-          ellipsis={{ tooltip: { title: reason, overlayStyle: { maxWidth: 400 } } }}
           style={{ fontSize: 12 }}
         >
           {reason || '-'}
@@ -229,8 +243,7 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
         <UISpace>
           <UICheckbox
             checked={useLLM}
-            onChange={(e) => setUseLLM(e.target.checked)}
-            style={{ fontSize: 12 }}
+            onChange={(checked) => setUseLLM(checked)}
           >
             Use AI
           </UICheckbox>
@@ -253,10 +266,9 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
           items={[
             {
               key: 'timeline',
-              label: (
+              label: 'Git Timeline',
+              extra: (
                 <UISpace>
-                  <UIIcon name="BranchesOutlined" />
-                  <span>Git Timeline</span>
                   <UITag>{gitTimelineData.unreleased} commits</UITag>
                 </UISpace>
               ),
@@ -313,7 +325,7 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
 
                   {gitTimelineData.commits.length > INITIAL_COMMITS_COUNT && (
                     <UIButton
-                      type="link"
+                      variant="link"
                       size="small"
                       icon={showAllCommits ? <UIIcon name="UpOutlined" /> : <UIIcon name="DownOutlined" />}
                       onClick={() => setShowAllCommits(!showAllCommits)}
@@ -337,8 +349,6 @@ export function PlanStep({ selectedScope, onPlanReady }: PlanStepProps) {
         rowKey="name"
         pagination={false}
         size="small"
-        scroll={{ x: 700 }}
-        tableLayout="fixed"
       />
     </UICard>
   );

@@ -40,7 +40,7 @@ function formatBytes(bytes: number): string {
  */
 function getFileExtension(path: string): string {
   const parts = path.split('.');
-  return parts.length > 1 ? parts[parts.length - 1] : '';
+  return parts.length > 1 ? (parts[parts.length - 1] ?? '') : '';
 }
 
 /**
@@ -131,11 +131,7 @@ export function PreviewStep({ selectedScope, onPreviewReady }: PreviewStepProps)
     return (
       <UICard>
         <UIEmptyState
-          description={
-            <UITypographyText type="danger">
-              Failed to load package preview: {error instanceof Error ? error.message : 'Unknown error'}
-            </UITypographyText>
-          }
+          description={`Failed to load package preview: ${error instanceof Error ? error.message : 'Unknown error'}`}
         />
       </UICard>
     );
@@ -247,7 +243,7 @@ export function PreviewStep({ selectedScope, onPreviewReady }: PreviewStepProps)
         <div style={{ marginTop: 16 }}>
           <UISpace>
             <UIButton
-              type="primary"
+              variant="primary"
               icon={<UIIcon name="BuildOutlined" />}
               onClick={handleBuild}
               loading={buildMutation.isPending}
@@ -266,7 +262,7 @@ export function PreviewStep({ selectedScope, onPreviewReady }: PreviewStepProps)
           </UISpace>
           {needsBuild && (
             <UIAlert
-              type="warning"
+              variant="warning"
               message="Some packages need to be built before publishing"
               style={{ marginTop: 12 }}
               showIcon
@@ -347,8 +343,7 @@ export function PreviewStep({ selectedScope, onPreviewReady }: PreviewStepProps)
             columns={columns}
             rowKey="path"
             size="small"
-            pagination={pkg.files.length > 10 ? { pageSize: 10, size: 'small' } : false}
-            scroll={{ y: 300 }}
+            pagination={pkg.files.length > 10 ? { pageSize: 10 } : false}
           />
         </UICard>
       ))}

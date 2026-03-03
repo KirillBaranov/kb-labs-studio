@@ -27,53 +27,50 @@ export function ReportTab() {
 
   const { report } = reportData;
 
-  const getStatusIcon = (status: typeof report.status) => {
-    switch (status) {
-      case 'completed':
-        return <UIIcon name="CheckCircleOutlined" style={{ color: '#52c41a', fontSize: 48 }} />;
-      case 'failed':
-        return <UIIcon name="CloseCircleOutlined" style={{ color: '#ff4d4f', fontSize: 48 }} />;
-      default:
-        return <UIIcon name="ClockCircleOutlined" style={{ color: '#1890ff', fontSize: 48 }} />;
+  const getStatusIcon = (ok: boolean) => {
+    if (ok) {
+      return <UIIcon name="CheckCircleOutlined" style={{ color: '#52c41a', fontSize: 48 }} />;
     }
+    return <UIIcon name="CloseCircleOutlined" style={{ color: '#ff4d4f', fontSize: 48 }} />;
   };
 
-  const getStatusColor = (status: typeof report.status) => {
-    switch (status) {
-      case 'completed':
-        return 'success';
-      case 'failed':
-        return 'error';
-      default:
-        return 'processing';
-    }
+  const getStatusColor = (ok: boolean) => {
+    return ok ? 'success' : 'error';
   };
+
+  const ok = report.result.ok;
 
   return (
     <UICard title={<UITitle level={4} style={{ margin: 0 }}>Latest Release Report</UITitle>}>
       <div style={{ textAlign: 'center', marginBottom: 24 }}>
-        {getStatusIcon(report.status)}
+        {getStatusIcon(ok)}
         <div style={{ marginTop: 16 }}>
-          <UITag color={getStatusColor(report.status)} style={{ fontSize: 16, padding: '4px 16px' }}>
-            {report.status.toUpperCase()}
+          <UITag color={getStatusColor(ok)} style={{ fontSize: 16, padding: '4px 16px' }}>
+            {report.stage.toUpperCase()}
           </UITag>
         </div>
       </div>
 
       <UIDescriptions bordered column={1}>
-        <UIDescriptionsItem label="Release ID">{report.releaseId}</UIDescriptionsItem>
         <UIDescriptionsItem label="Scope">
           <UITag color="blue">{report.scope}</UITag>
         </UIDescriptionsItem>
-        <UIDescriptionsItem label="Status">
-          <UITag color={getStatusColor(report.status)}>{report.status}</UITag>
+        <UIDescriptionsItem label="Stage">
+          <UITag color={getStatusColor(ok)}>{report.stage}</UITag>
         </UIDescriptionsItem>
         <UIDescriptionsItem label="Timestamp">
-          {new Date(report.timestamp).toLocaleString()}
+          {new Date(report.ts).toLocaleString()}
         </UIDescriptionsItem>
-        <UIDescriptionsItem label="Packages Released">{report.packagesReleased}</UIDescriptionsItem>
-        <UIDescriptionsItem label="Duration">{report.duration}ms ({(report.duration / 1000).toFixed(2)}s)</UIDescriptionsItem>
-        <UIDescriptionsItem label="Summary">{report.summary}</UIDescriptionsItem>
+        {report.result.version && (
+          <UIDescriptionsItem label="Version">{report.result.version}</UIDescriptionsItem>
+        )}
+        {report.result.published && (
+          <UIDescriptionsItem label="Packages Published">{report.result.published.length}</UIDescriptionsItem>
+        )}
+        <UIDescriptionsItem label="Duration">{report.result.timingMs}ms ({(report.result.timingMs / 1000).toFixed(2)}s)</UIDescriptionsItem>
+        {report.result.errors && report.result.errors.length > 0 && (
+          <UIDescriptionsItem label="Errors">{report.result.errors.join(', ')}</UIDescriptionsItem>
+        )}
       </UIDescriptions>
     </UICard>
   );
