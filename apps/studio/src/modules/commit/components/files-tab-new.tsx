@@ -33,7 +33,7 @@ interface StatusGroup {
   files: FileEntry[];
 }
 
-function FileDiffViewer({ scope, file }: { scope: string; file: string }) {
+function FileDiffViewer({ scope, file, status }: { scope: string; file: string; status?: string }) {
   const sources = useDataSources();
 
   const { data: diffData, isLoading } = useQuery({
@@ -54,6 +54,36 @@ function FileDiffViewer({ scope, file }: { scope: string; file: string }) {
     return (
       <div style={{ padding: 16 }}>
         <Text type="secondary">No changes to display</Text>
+      </div>
+    );
+  }
+
+  const isUntracked = status === 'untracked' || status === 'added';
+
+  if (isUntracked) {
+    return (
+      <div style={{ padding: 16 }}>
+        <div style={{ marginBottom: 8 }}>
+          <Text type="secondary">New file content</Text>
+        </div>
+        <pre
+          style={{
+            margin: 0,
+            maxHeight: 700,
+            overflow: 'auto',
+            fontFamily: 'Menlo, Monaco, Consolas, monospace',
+            fontSize: 12,
+            lineHeight: 1.5,
+            padding: 12,
+            borderRadius: 8,
+            background: 'rgba(0, 0, 0, 0.03)',
+            border: '1px solid rgba(0, 0, 0, 0.06)',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+          }}
+        >
+          {diffData.diff}
+        </pre>
       </div>
     );
   }
@@ -129,7 +159,12 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
     return <UICard><UISkeleton active lines={5} /></UICard>;
   }
 
-  const files: FileEntry[] = (gitStatusData?.summaries || []) as FileEntry[];
+  const rows = (gitStatusData as { rows?: Array<{ path?: string; status?: string }> } | undefined)?.rows;
+  const summaries = (gitStatusData as { summaries?: Array<{ path?: string; status?: string }> } | undefined)?.summaries;
+  const rawFiles = rows ?? summaries ?? [];
+  const files: FileEntry[] = rawFiles
+    .filter((f): f is { path: string; status?: string } => typeof f?.path === 'string')
+    .map(f => ({ path: f.path, status: f.status ?? 'modified' }));
 
   if (files.length === 0) {
     return (
@@ -322,7 +357,7 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
                               icon={<UIIcon name="RobotOutlined" />}
                             />
                           )}
-                          <FileDiffViewer scope={selectedScope} file={file.path} />
+                          <FileDiffViewer scope={selectedScope} file={file.path} status={file.status} />
                         </div>
                       )}
                     </div>

@@ -1,54 +1,28 @@
-name: Deploy Studio
+name: Deploy
+
+# Deploys all services to VPS via docker compose
+# Triggered manually with a specific image tag
+#
+# Prerequisites:
+#   Add secrets in GitHub → Settings → Secrets → Actions:
+#     VPS_HOST     - server IP or hostname
+#     VPS_USER     - SSH username (e.g. deploy)
+#     VPS_SSH_KEY  - SSH private key
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Image tag to deploy (e.g. release-1.0.0)
+        required: true
+        type: string
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and push Studio image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ghcr.io/kirillbaranov/kb-labs-studio:latest
-          build-args: |
-            VITE_DATA_SOURCE_MODE=mock
-            VITE_API_BASE_URL=https://api.kblabs.ru/api/v1
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Deploy to server
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u kirillbaranov --password-stdin
-            docker pull ghcr.io/kirillbaranov/kb-labs-studio:latest
-            docker stop kb-labs-studio || true
-            docker rm kb-labs-studio || true
-            docker run -d \
-              --name kb-labs-studio \
-              --restart unless-stopped \
-              -p 3002:80 \
-              ghcr.io/kirillbaranov/kb-labs-studio:latest
+  call:
+    uses: KirillBaranov/kb-labs-devkit/.github/workflows/deploy-reusable.yml@main
+    with:
+      image-tag: ${{ inputs.tag }}
+      compose-file: docker-compose.production.yml
+      deploy-dir: /opt/kb-labs
+      health-check-url: http://localhost:5050/api/v1/health
+    secrets: inherit

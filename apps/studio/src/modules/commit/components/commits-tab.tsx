@@ -153,7 +153,15 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
       { scope: selectedScope },
       {
         onSuccess: (data) => {
-          if (data.result.success) {UIMessage.success('Pushed to remote');}
+          if (data.result.success) {
+            if (data.result.commitsPushed > 0) {
+              UIMessage.success(`Pushed ${data.result.commitsPushed} commit(s) to ${data.result.remote}/${data.result.branch}`);
+            } else {
+              UIMessage.info('No commits to push');
+            }
+          } else {
+            UIMessage.error(data.result.error || 'Push failed');
+          }
         },
         onError: (error: Error) => UIMessage.error(`Push failed: ${error.message}`),
       }
@@ -349,6 +357,17 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
         <UIAlert
           message="Apply Failed"
           description={applyMutation.data.result.errors.map((e, i) => <div key={i}>{e}</div>)}
+          variant="error"
+          showIcon
+          closable
+          style={{ marginBottom: 16 }}
+        />
+      )}
+
+      {pushMutation.isSuccess && pushMutation.data?.result && !pushMutation.data.result.success && (
+        <UIAlert
+          message="Push Failed"
+          description={pushMutation.data.result.error || 'Push failed due to remote checks or git errors'}
           variant="error"
           showIcon
           closable
