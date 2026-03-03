@@ -126,7 +126,7 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
   // Handlers
   const handleGeneratePlan = async () => {
     try {
-      await generatePlanMutation.mutateAsync({ scope: selectedScope });
+      await generatePlanMutation.mutateAsync({ scope: selectedScope, useLLM: false });
       UIMessage.success('Release plan generated');
       setExpandedKeys(['plan']);
     } catch (error) {
@@ -136,7 +136,7 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
 
   const handleGenerateChangelog = async () => {
     try {
-      await generateChangelogMutation.mutateAsync({ scope: selectedScope });
+      await generateChangelogMutation.mutateAsync({ scope: selectedScope, useLLM: false });
       UIMessage.success('Changelog generated');
       setExpandedKeys(['changelog']);
     } catch (error) {
@@ -243,7 +243,7 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
                 Rollback
               </UIButton>
             </UIPopconfirm>,
-            <UIButton key="new" type="primary" onClick={() => {
+            <UIButton key="new" variant="primary" onClick={() => {
               setReleaseComplete(false);
               setOtp('');
               handleRefresh();
@@ -260,19 +260,7 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
     // 1. Plan
     {
       key: 'plan',
-      label: (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-          <UISpace>
-            {getStatusIcon(checklist?.plan.status ?? 'pending')}
-            <UITypographyText strong>1. Plan</UITypographyText>
-            {checklist?.plan.packagesCount && (
-              <UITag color="blue">{checklist.plan.packagesCount} package(s)</UITag>
-            )}
-            {checklist?.plan.bump && <UITag>{checklist.plan.bump}</UITag>}
-          </UISpace>
-          <UITypographyText type="secondary" style={{ fontSize: 12 }}>{checklist?.plan.message}</UITypographyText>
-        </div>
-      ),
+      label: '1. Plan',
       children: (
         <div>
           {planData?.plan ? (
@@ -291,7 +279,7 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
               <UITypographyText type="secondary">No plan generated yet</UITypographyText>
               <div style={{ marginTop: 16 }}>
                 <UIButton
-                  type="primary"
+                  variant="primary"
                   icon={<UIIcon name="FileTextOutlined" />}
                   onClick={handleGeneratePlan}
                   loading={generatePlanMutation.isPending}
@@ -303,37 +291,38 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
           )}
         </div>
       ),
-      extra: checklist?.plan.status !== 'ready' && (
-        <UIButton
-          size="small"
-          type="primary"
-          icon={<UIIcon name="FileTextOutlined" />}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleGeneratePlan();
-          }}
-          loading={generatePlanMutation.isPending}
-        >
-          Generate
-        </UIButton>
+      extra: (
+        <UISpace>
+          {getStatusIcon(checklist?.plan.status ?? 'pending')}
+          {checklist?.plan.packagesCount && (
+            <UITag color="blue">{checklist.plan.packagesCount} package(s)</UITag>
+          )}
+          {checklist?.plan.bump && <UITag>{checklist.plan.bump}</UITag>}
+          {checklist?.plan.message && (
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>{checklist.plan.message}</UITypographyText>
+          )}
+          {checklist?.plan.status !== 'ready' && (
+            <UIButton
+              size="small"
+              variant="primary"
+              icon={<UIIcon name="FileTextOutlined" />}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleGeneratePlan();
+              }}
+              loading={generatePlanMutation.isPending}
+            >
+              Generate
+            </UIButton>
+          )}
+        </UISpace>
       ),
     },
 
     // 2. Changelog
     {
       key: 'changelog',
-      label: (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-          <UISpace>
-            {getStatusIcon(checklist?.changelog.status ?? 'pending')}
-            <UITypographyText strong>2. Changelog</UITypographyText>
-            {checklist?.changelog.commitsCount && (
-              <UITag color="blue">{checklist.changelog.commitsCount} changes</UITag>
-            )}
-          </UISpace>
-          <UITypographyText type="secondary" style={{ fontSize: 12 }}>{checklist?.changelog.message}</UITypographyText>
-        </div>
-      ),
+      label: '2. Changelog',
       children: (
         <div>
           {changelogData?.markdown ? (
@@ -354,7 +343,7 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
               <UITypographyText type="secondary">No changelog generated yet</UITypographyText>
               <div style={{ marginTop: 16 }}>
                 <UIButton
-                  type="primary"
+                  variant="primary"
                   icon={<UIIcon name="EditOutlined" />}
                   onClick={handleGenerateChangelog}
                   loading={generateChangelogMutation.isPending}
@@ -367,42 +356,37 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
           )}
         </div>
       ),
-      extra: checklist?.changelog.status !== 'ready' && checklist?.plan.status === 'ready' && (
-        <UIButton
-          size="small"
-          type="primary"
-          icon={<UIIcon name="EditOutlined" />}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleGenerateChangelog();
-          }}
-          loading={generateChangelogMutation.isPending}
-        >
-          Generate
-        </UIButton>
+      extra: (
+        <UISpace>
+          {getStatusIcon(checklist?.changelog.status ?? 'pending')}
+          {checklist?.changelog.commitsCount && (
+            <UITag color="blue">{checklist.changelog.commitsCount} changes</UITag>
+          )}
+          {checklist?.changelog.message && (
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>{checklist.changelog.message}</UITypographyText>
+          )}
+          {checklist?.changelog.status !== 'ready' && checklist?.plan.status === 'ready' && (
+            <UIButton
+              size="small"
+              variant="primary"
+              icon={<UIIcon name="EditOutlined" />}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleGenerateChangelog();
+              }}
+              loading={generateChangelogMutation.isPending}
+            >
+              Generate
+            </UIButton>
+          )}
+        </UISpace>
       ),
     },
 
     // 3. Build
     {
       key: 'build',
-      label: (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-          <UISpace>
-            {triggerBuildMutation.isPending
-              ? <UIIcon name="LoadingOutlined" style={{ color: '#1890ff', fontSize: 18 }} />
-              : getStatusIcon(checklist?.build.status ?? 'pending')
-            }
-            <UITypographyText strong>3. Build</UITypographyText>
-            {checklist?.build.builtCount !== undefined && checklist?.build.totalCount !== undefined && (
-              <UITag color={checklist.build.builtCount === checklist.build.totalCount ? 'success' : 'warning'}>
-                {checklist.build.builtCount}/{checklist.build.totalCount} built
-              </UITag>
-            )}
-          </UISpace>
-          <UITypographyText type="secondary" style={{ fontSize: 12 }}>{checklist?.build.message}</UITypographyText>
-        </div>
-      ),
+      label: '3. Build',
       children: (
         <div style={{ textAlign: 'center', padding: 16 }}>
           {checklist?.build.status === 'ready' ? (
@@ -416,7 +400,7 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
               <UITypographyText type="secondary">Run build to compile packages before publishing</UITypographyText>
               <div style={{ marginTop: 16 }}>
                 <UIButton
-                  type="primary"
+                  variant="primary"
                   icon={<UIIcon name="BuildOutlined" />}
                   onClick={handleBuild}
                   loading={triggerBuildMutation.isPending}
@@ -429,39 +413,55 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
           )}
         </div>
       ),
-      extra: checklist?.build.status !== 'ready' && checklist?.changelog.status === 'ready' && (
-        <UIButton
-          size="small"
-          type="primary"
-          icon={<UIIcon name="BuildOutlined" />}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleBuild();
-          }}
-          loading={triggerBuildMutation.isPending}
-        >
-          Build
-        </UIButton>
+      extra: (
+        <UISpace>
+          {triggerBuildMutation.isPending
+            ? <UIIcon name="LoadingOutlined" style={{ color: '#1890ff', fontSize: 18 }} />
+            : getStatusIcon(checklist?.build.status ?? 'pending')
+          }
+          {checklist?.build.builtCount !== undefined && checklist?.build.totalCount !== undefined && (
+            <UITag color={checklist.build.builtCount === checklist.build.totalCount ? 'success' : 'warning'}>
+              {checklist.build.builtCount}/{checklist.build.totalCount} built
+            </UITag>
+          )}
+          {checklist?.build.message && (
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>{checklist.build.message}</UITypographyText>
+          )}
+          {checklist?.build.status !== 'ready' && checklist?.changelog.status === 'ready' && (
+            <UIButton
+              size="small"
+              variant="primary"
+              icon={<UIIcon name="BuildOutlined" />}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleBuild();
+              }}
+              loading={triggerBuildMutation.isPending}
+            >
+              Build
+            </UIButton>
+          )}
+        </UISpace>
       ),
     },
 
     // 4. Preview
     {
       key: 'preview',
-      label: (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-          <UISpace>
-            {getStatusIcon(checklist?.preview.status ?? 'pending')}
-            <UITypographyText strong>4. Preview</UITypographyText>
-            {checklist?.preview.filesCount && (
-              <UITag color="blue">{checklist.preview.filesCount} files</UITag>
-            )}
-            {checklist?.preview.totalSize && (
-              <UITag color="green">{formatBytes(checklist.preview.totalSize)}</UITag>
-            )}
-          </UISpace>
-          <UITypographyText type="secondary" style={{ fontSize: 12 }}>{checklist?.preview.message}</UITypographyText>
-        </div>
+      label: '4. Preview',
+      extra: (
+        <UISpace>
+          {getStatusIcon(checklist?.preview.status ?? 'pending')}
+          {checklist?.preview.filesCount && (
+            <UITag color="blue">{checklist.preview.filesCount} files</UITag>
+          )}
+          {checklist?.preview.totalSize && (
+            <UITag color="green">{formatBytes(checklist.preview.totalSize)}</UITag>
+          )}
+          {checklist?.preview.message && (
+            <UITypographyText type="secondary" style={{ fontSize: 12 }}>{checklist.preview.message}</UITypographyText>
+          )}
+        </UISpace>
       ),
       children: (
         <div>
@@ -590,8 +590,8 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
                 prefix={<UIIcon name="LockOutlined" />}
                 placeholder="123456"
                 value={otp}
-                onChange={(e) => {
-                  setOtp(e.target.value.replace(/\D/g, '').slice(0, 6));
+                onChange={(value) => {
+                  setOtp(value.replace(/\D/g, '').slice(0, 6));
                   setOtpError('');
                 }}
                 maxLength={6}
@@ -609,7 +609,7 @@ export function ReleaseChecklist({ selectedScope }: ReleaseChecklistProps) {
 
             {/* Publish Button */}
             <UIButton
-              type="primary"
+              variant="primary"
               size="large"
               icon={<UIIcon name="RocketOutlined" />}
               onClick={handlePublish}
