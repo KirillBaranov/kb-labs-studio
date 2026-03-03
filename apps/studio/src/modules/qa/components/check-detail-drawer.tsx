@@ -55,10 +55,10 @@ export function CheckDetailDrawer({ open, checkType, checkLabel, onClose }: Chec
 
   const handleRunCheck = () => {
     const opts: QARunCheckOptions = { checkType: checkType as 'lint' | 'typeCheck' | 'test' };
-    const hideLoading = UIMessage.loading(`Running ${checkLabel}...`, 0);
+    void UIMessage.loading(`Running ${checkLabel}...`, 0);
     runCheck(opts, {
       onSuccess: (data) => {
-        hideLoading();
+        UIMessage.destroy();
         if (data.status === 'passed') {
           UIMessage.success(`${checkLabel} passed in ${(data.durationMs / 1000).toFixed(1)}s`);
         } else {
@@ -66,7 +66,7 @@ export function CheckDetailDrawer({ open, checkType, checkLabel, onClose }: Chec
         }
       },
       onError: (error) => {
-        hideLoading();
+        UIMessage.destroy();
         UIMessage.error(`${checkLabel} failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
       },
     });
@@ -157,7 +157,7 @@ export function CheckDetailDrawer({ open, checkType, checkLabel, onClose }: Chec
       extra={
         canRerun && (
           <UIButton
-            type="primary"
+            variant="primary"
             icon={<UIIcon name="PlayCircleOutlined" />}
             onClick={handleRunCheck}
             loading={isRunning}
@@ -172,7 +172,7 @@ export function CheckDetailDrawer({ open, checkType, checkLabel, onClose }: Chec
         placeholder="Filter by package or repo..."
         prefix={<UIIcon name="SearchOutlined" />}
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(value) => setSearch(value)}
         style={{ marginBottom: 16 }}
         allowClear
       />
@@ -183,7 +183,7 @@ export function CheckDetailDrawer({ open, checkType, checkLabel, onClose }: Chec
         rowKey="name"
         size="small"
         loading={isLoading}
-        pagination={{ pageSize: 50, showSizeChanger: true }}
+        pagination={{ pageSize: 50 }}
         expandable={{
           expandedRowRender,
           rowExpandable: (record) => !!record.error,

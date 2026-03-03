@@ -37,7 +37,7 @@ export function RegressionsTab() {
   if (!data) {
     return (
       <UIAlert
-        type="info"
+        variant="info"
         showIcon
         message="Not enough data for regression detection"
         description="Need at least 2 history entries. Run 'pnpm qa:save' multiple times."
@@ -49,7 +49,7 @@ export function RegressionsTab() {
     return (
       <div>
         <UIAlert
-          type="success"
+          variant="success"
           showIcon
           icon={<UIIcon name="CheckCircleOutlined" />}
           message="No regressions detected"
@@ -64,7 +64,7 @@ export function RegressionsTab() {
   return (
     <div>
       <UIAlert
-        type="error"
+        variant="error"
         showIcon
         icon={<UIIcon name="WarningOutlined" />}
         message={`${data.regressions.length} regression${data.regressions.length > 1 ? 's' : ''} detected`}
@@ -98,7 +98,7 @@ export function RegressionsTab() {
       ))}
 
       <UIAlert
-        type="warning"
+        variant="warning"
         showIcon
         message="Action required"
         description={

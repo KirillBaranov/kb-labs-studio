@@ -4,7 +4,6 @@
  */
 
 import * as React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { UITabs } from '@kb-labs/studio-ui-kit';
 import { OverviewTab } from '../components/overview-tab';
 import { HistoryTab } from '../components/history-tab';
@@ -13,15 +12,6 @@ import { RegressionsTab } from '../components/regressions-tab';
 import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
 export function QADashboardPage() {
-  const params = useParams<{ tab?: string }>();
-  const navigate = useNavigate();
-
-  const activeTab = params.tab || 'overview';
-
-  const handleTabChange = (key: string) => {
-    navigate(`/qa/${key}`);
-  };
-
   const tabItems = [
     {
       key: 'overview',
@@ -53,9 +43,8 @@ export function QADashboardPage() {
       />
 
       <UITabs
-        activeKey={activeTab}
-        onChange={handleTabChange}
         items={tabItems}
+        syncUrl={{ mode: 'path', basePath: '/qa' }}
         size="large"
         style={{ marginTop: 24 }}
       />

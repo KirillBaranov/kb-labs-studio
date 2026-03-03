@@ -66,6 +66,15 @@ function getTrendTag(trend: string): React.ReactNode {
  * Transform enriched trends timeSeries into chart-ready data for UIStatisticsChart.
  * Creates 4 series (one per check type) with date/value/category fields.
  */
+function formatTimestamp(iso: string): string {
+  const d = new Date(iso);
+  const mo = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  return `${mo}-${dd} ${hh}:${mm}`;
+}
+
 function buildChartData(trends: EnrichedTrendResult[]) {
   const rows: Array<{ date: string; value: number; category: string }> = [];
 
@@ -73,7 +82,7 @@ function buildChartData(trends: EnrichedTrendResult[]) {
     const label = CHECK_LABELS[trend.checkType] ?? trend.checkType;
     for (const point of trend.timeSeries) {
       rows.push({
-        date: point.timestamp.slice(0, 10), // YYYY-MM-DD
+        date: formatTimestamp(point.timestamp), // "MM-DD HH:mm" — readable and unique per measurement
         value: point.failed,
         category: label,
       });
@@ -130,7 +139,7 @@ export function TrendsTab() {
   if (!data || data.trends.length === 0) {
     return (
       <UIAlert
-        type="info"
+        variant="info"
         showIcon
         message="Not enough data for trend analysis"
         description="Need at least 2 history entries. Run 'pnpm qa:save' multiple times."
@@ -152,7 +161,7 @@ export function TrendsTab() {
           <span>Window size:</span>
           <UISelect
             value={window ?? data.window}
-            onChange={(val) => setWindow(val)}
+            onChange={(val) => setWindow(val as number | undefined)}
             style={{ width: 80 }}
             options={[
               { label: '5', value: 5 },

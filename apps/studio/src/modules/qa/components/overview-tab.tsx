@@ -18,6 +18,8 @@ import {
   UIButton,
   UIMessage,
   UIIcon,
+  UICheckbox,
+  UIPopover,
 } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useQASummary, useQARun } from '@kb-labs/studio-data-client';
@@ -32,9 +34,9 @@ const CHECK_ICONS: Record<string, React.ReactNode> = {
   test: <UIIcon name="ExperimentOutlined" />,
 };
 
-function getPassRate(passed: number, total: number): number {
+function getPassRate(passed: number, total: number, skipped: number = 0): number {
   if (total === 0) {return 100;}
-  return Math.round((passed / total) * 100);
+  return Math.round(((passed + skipped) / total) * 100);
 }
 
 function getProgressStatus(rate: number): 'success' | 'exception' | 'normal' {
@@ -59,16 +61,27 @@ export function OverviewTab() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [selectedCheck, setSelectedCheck] = React.useState<{ type: string; label: string } | null>(null);
 
+  // Run QA options (which checks to include)
+  const [runBuild, setRunBuild] = React.useState(true);
+  const [runLint, setRunLint] = React.useState(true);
+  const [runTypes, setRunTypes] = React.useState(true);
+  const [runTests, setRunTests] = React.useState(true);
+
   const handleCheckClick = (checkType: string, label: string) => {
     setSelectedCheck({ type: checkType, label });
     setDrawerOpen(true);
   };
 
   const handleRunQA = () => {
-    const hideLoading = UIMessage.loading('Running QA checks...', 0);
-    runQA(undefined, {
+    void UIMessage.loading('Running QA checks...', 0);
+    runQA({
+      skipBuild: !runBuild,
+      skipLint: !runLint,
+      skipTypes: !runTypes,
+      skipTests: !runTests,
+    }, {
       onSuccess: (data) => {
-        hideLoading();
+        UIMessage.destroy();
         if (data.status === 'passed') {
           UIMessage.success(`QA passed in ${(data.durationMs / 1000).toFixed(1)}s`);
         } else {
@@ -77,7 +90,7 @@ export function OverviewTab() {
         }
       },
       onError: (error) => {
-        hideLoading();
+        UIMessage.destroy();
         UIMessage.error(`QA run failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
       },
     });
@@ -94,7 +107,7 @@ export function OverviewTab() {
   if (!summary) {
     return (
       <UIAlert
-        type="info"
+        variant="info"
         showIcon
         message="No QA data"
         description="Run 'pnpm qa:save' to generate QA history."
@@ -109,21 +122,45 @@ export function OverviewTab() {
     <div>
       {/* Run QA Button */}
       <div style={{ marginBottom: 16 }}>
-        <UIButton
-          type="primary"
-          icon={<UIIcon name="PlayCircleOutlined" />}
-          onClick={handleRunQA}
-          loading={isRunning}
-          disabled={isRunning}
-          size="large"
-        >
-          {isRunning ? 'Running QA Checks...' : 'Run QA'}
-        </UIButton>
+        <UISpace>
+          <UIButton
+            variant="primary"
+            icon={<UIIcon name="PlayCircleOutlined" />}
+            onClick={handleRunQA}
+            loading={isRunning}
+            disabled={isRunning}
+            size="large"
+          >
+            {isRunning ? 'Running QA Checks...' : 'Run QA'}
+          </UIButton>
+          <UIPopover
+            trigger="click"
+            title="Checks to run"
+            content={
+              <UISpace direction="vertical">
+                <UICheckbox checked={runBuild} onChange={(checked) => setRunBuild(checked)}>
+                  <UIIcon name="BuildOutlined" /> Build
+                </UICheckbox>
+                <UICheckbox checked={runLint} onChange={(checked) => setRunLint(checked)}>
+                  <UIIcon name="FileSearchOutlined" /> Lint
+                </UICheckbox>
+                <UICheckbox checked={runTypes} onChange={(checked) => setRunTypes(checked)}>
+                  <UIIcon name="FileTextOutlined" /> Type Check
+                </UICheckbox>
+                <UICheckbox checked={runTests} onChange={(checked) => setRunTests(checked)}>
+                  <UIIcon name="ExperimentOutlined" /> Tests
+                </UICheckbox>
+              </UISpace>
+            }
+          >
+            <UIButton size="large" icon={<UIIcon name="SettingOutlined" />} disabled={isRunning} />
+          </UIPopover>
+        </UISpace>
       </div>
 
       {/* Status Banner */}
       <UIAlert
-        type={overallPassed ? 'success' : 'error'}
+        variant={overallPassed ? 'success' : 'error'}
         showIcon
         icon={overallPassed ? <UIIcon name="CheckCircleOutlined" /> : <UIIcon name="CloseCircleOutlined" />}
         message={
@@ -157,7 +194,7 @@ export function OverviewTab() {
       {/* Check Cards -- clickable for drill-down */}
       <UIRow gutter={[16, 16]} style={{ marginBottom: 24 }}>
         {summary.checks.map((check) => {
-          const rate = getPassRate(check.passed, check.total);
+          const rate = getPassRate(check.passed, check.total, check.skipped);
           return (
             <UICol xs={24} sm={12} lg={6} key={check.checkType}>
               <UICard

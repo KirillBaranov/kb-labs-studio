@@ -35,14 +35,14 @@ export function BaselineDiffCard() {
   const { mutate: updateBaseline, isPending: isUpdating } = useQAUpdateBaseline(sources.qa);
 
   const handleUpdateBaseline = () => {
-    const hideLoading = UIMessage.loading('Updating baseline...', 0);
+    void UIMessage.loading('Updating baseline...', 0);
     updateBaseline(undefined, {
       onSuccess: () => {
-        hideLoading();
+        UIMessage.destroy();
         UIMessage.success('Baseline updated successfully');
       },
       onError: (error) => {
-        hideLoading();
+        UIMessage.destroy();
         UIMessage.error(`Failed to update baseline: ${error instanceof Error ? error.message : 'Unknown error'}`);
       },
     });
@@ -53,13 +53,13 @@ export function BaselineDiffCard() {
   if (!diffData?.baseline) {
     return (
       <UIAlert
-        type="warning"
+        variant="warning"
         showIcon
         message="No baseline set"
         description="Run QA first, then update baseline to enable diff tracking."
         action={
           <UIButton
-            type="primary"
+            variant="primary"
             size="small"
             icon={<UIIcon name="SaveOutlined" />}
             onClick={handleUpdateBaseline}
@@ -75,7 +75,7 @@ export function BaselineDiffCard() {
   if (!diffData.hasDiff) {
     return (
       <UIAlert
-        type="success"
+        variant="success"
         showIcon
         icon={<UIIcon name="CheckCircleOutlined" />}
         message="No changes since baseline"
@@ -119,7 +119,7 @@ export function BaselineDiffCard() {
           description="This will set the current QA state as the new baseline."
           onConfirm={handleUpdateBaseline}
         >
-          <UIButton type="primary" icon={<UIIcon name="SaveOutlined" />} loading={isUpdating} size="small">
+          <UIButton variant="primary" icon={<UIIcon name="SaveOutlined" />} loading={isUpdating} size="small">
             Update Baseline
           </UIButton>
         </UIPopconfirm>

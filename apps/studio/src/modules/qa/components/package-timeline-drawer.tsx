@@ -62,7 +62,7 @@ export function PackageTimelineDrawer({ open, packageName, onClose }: PackageTim
       )}
 
       {!isLoading && !data && (
-        <UIAlert type="info" message={`No history found for ${packageName}`} />
+        <UIAlert variant="info" message={`No history found for ${packageName}`} />
       )}
 
       {!isLoading && data && (
@@ -112,7 +112,7 @@ export function PackageTimelineDrawer({ open, packageName, onClose }: PackageTim
 
           {data.flakyChecks.length > 0 && (
             <UIAlert
-              type="warning"
+              variant="warning"
               showIcon
               icon={<UIIcon name="WarningOutlined" />}
               message="Flaky checks detected"

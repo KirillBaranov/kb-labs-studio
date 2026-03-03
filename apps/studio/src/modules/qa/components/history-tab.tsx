@@ -5,7 +5,7 @@
 
 import * as React from 'react';
 import { UITable, UITag, UISpin, UIAlert, UISpace, UIIcon } from '@kb-labs/studio-ui-kit';
-import type { ColumnsType } from 'antd/es/table';
+import type { UITableColumn } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useQAHistory } from '@kb-labs/studio-data-client';
 import type { HistoryEntry } from '@kb-labs/qa-contracts';
@@ -43,7 +43,7 @@ export function HistoryTab() {
   if (!data || data.entries.length === 0) {
     return (
       <UIAlert
-        type="info"
+        variant="info"
         showIcon
         message="No QA history"
         description="Run 'pnpm qa:save' to record QA results to history."
@@ -51,7 +51,7 @@ export function HistoryTab() {
     );
   }
 
-  const columns: ColumnsType<HistoryEntry> = [
+  const columns: UITableColumn<HistoryEntry>[] = [
     {
       title: 'Date',
       dataIndex: 'timestamp',
@@ -110,7 +110,7 @@ export function HistoryTab() {
       columns={columns}
       dataSource={data.entries}
       rowKey="timestamp"
-      pagination={{ pageSize: 15, showSizeChanger: true, pageSizeOptions: ['10', '15', '25', '50'] }}
+      pagination={{ pageSize: 15 }}
       size="middle"
       expandable={{
         expandedRowRender: (record) => (
