@@ -161,9 +161,6 @@ export function HistoryTab() {
           rowKey="id"
           pagination={{
             pageSize: 20,
-            showTotal: (total) => (
-              <UITypographyText className="typo-caption">Total {total} activities</UITypographyText>
-            ),
           }}
         />
       </UICard>
