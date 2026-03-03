@@ -4,7 +4,6 @@
  */
 
 import * as React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import {
   UITabs,
   UIRow,
@@ -25,61 +24,37 @@ import { UICard } from '@kb-labs/studio-ui-kit';
 import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
 export function WorkflowPage() {
-  const params = useParams<{ tab?: string }>();
-  const navigate = useNavigate();
   const sources = useDataSources();
-
-  const activeTab = params.tab || 'workflows';
 
   const { data: stats } = useQuery<DashboardStatsResponse>({
     queryKey: ['workflow', 'stats'],
     queryFn: () => sources.workflow.getStats(),
-    refetchInterval: 10000, // Refresh every 10s for overview stats
+    refetchInterval: 10000,
   });
-
-  const handleTabChange = (key: string) => {
-    navigate(`/workflow/${key}`);
-  };
 
   const tabItems = [
     {
       key: 'workflows',
-      label: (
-        <UISpace className="gap-tight">
-          <UIIcon name="AppstoreOutlined" />
-          <span>Workflows</span>
-        </UISpace>
-      ),
+      label: 'Workflows',
+      icon: <UIIcon name="AppstoreOutlined" />,
       children: <WorkflowsTab />,
     },
     {
       key: 'jobs',
-      label: (
-        <UISpace className="gap-tight">
-          <UIIcon name="UnorderedListOutlined" />
-          <span>Background Jobs</span>
-        </UISpace>
-      ),
+      label: 'Background Jobs',
+      icon: <UIIcon name="UnorderedListOutlined" />,
       children: <JobsTab />,
     },
     {
       key: 'crons',
-      label: (
-        <UISpace className="gap-tight">
-          <UIIcon name="ClockCircleOutlined" />
-          <span>Cron Jobs</span>
-        </UISpace>
-      ),
+      label: 'Cron Jobs',
+      icon: <UIIcon name="ClockCircleOutlined" />,
       children: <CronsTab />,
     },
     {
       key: 'history',
-      label: (
-        <UISpace className="gap-tight">
-          <UIIcon name="HistoryOutlined" />
-          <span>History</span>
-        </UISpace>
-      ),
+      label: 'History',
+      icon: <UIIcon name="HistoryOutlined" />,
       children: <HistoryTab />,
     },
   ];
@@ -157,9 +132,8 @@ export function WorkflowPage() {
 
       {/* Main Tabs */}
       <UITabs
-        activeKey={activeTab}
-        onChange={handleTabChange}
         items={tabItems}
+        syncUrl={{ mode: 'path', basePath: '/workflow' }}
         size="large"
       />
     </KBPageContainer>

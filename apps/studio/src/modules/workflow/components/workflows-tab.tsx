@@ -13,6 +13,7 @@ import {
   UIModal, UIModalConfirm,
   UIMessage,
   UIIcon,
+  useUIMessage,
 } from '@kb-labs/studio-ui-kit';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDataSources } from '@/providers/data-sources-provider';
@@ -22,7 +23,7 @@ import { UICard } from '@kb-labs/studio-ui-kit';
 export function WorkflowsTab() {
   const sources = useDataSources();
   const queryClient = useQueryClient();
-  const [messageApi, contextHolder] = UIMessage.useMessage();
+  const [messageApi, contextHolder] = useUIMessage();
 
   const { data: workflowsData, isLoading } = useQuery({
     queryKey: ['workflow', 'workflows'],
@@ -133,7 +134,7 @@ export function WorkflowsTab() {
       render: (_: unknown, record: WorkflowInfo) => (
         <UISpace className="gap-tight">
           <UIButton
-            type="link"
+            variant="link"
             size="small"
             icon={<UIIcon name="EyeOutlined" />}
             onClick={() => {
@@ -144,7 +145,7 @@ export function WorkflowsTab() {
             View
           </UIButton>
           <UIButton
-            type="link"
+            variant="link"
             size="small"
             icon={<UIIcon name="PlayCircleOutlined" />}
             loading={runWorkflowMutation.isPending}
@@ -168,9 +169,6 @@ export function WorkflowsTab() {
           rowKey="id"
           pagination={{
             pageSize: 20,
-            showTotal: (total) => (
-              <UITypographyText className="typo-caption">Total {total} workflows</UITypographyText>
-            ),
           }}
         />
       </UICard>

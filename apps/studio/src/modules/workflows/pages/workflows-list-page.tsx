@@ -2,7 +2,7 @@ import { KBPageContainer, KBPageHeader, KBSection } from '@/components/ui';
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { UITable, UIButton, UIModal, UIForm, UIFormItem, useUIForm, UIInput, UIInputTextArea, UIMessage } from '@kb-labs/studio-ui-kit'
-import type { ColumnsType } from 'antd/es/table'
+import type { UITableColumn } from '@kb-labs/studio-ui-kit'
 import { useDataSources } from '@/providers/data-sources-provider'
 import { useWorkflowRuns, useRunWorkflow } from '@kb-labs/studio-data-client'
 import type { WorkflowRun, WorkflowSpec } from '@kb-labs/studio-data-client'
@@ -44,7 +44,7 @@ export function WorkflowsListPage() {
     }
   }
 
-  const columns = useMemo<ColumnsType<WorkflowRun>>(
+  const columns = useMemo<UITableColumn<WorkflowRun>[]>(
     () => [
       {
         title: 'Run ID',
@@ -66,7 +66,6 @@ export function WorkflowsListPage() {
       },
       {
         title: 'Triggered By',
-        dataIndex: ['trigger', 'actor'],
         key: 'actor',
         render: (_value, record) => record.trigger.actor ?? 'unknown',
       },
@@ -96,7 +95,7 @@ export function WorkflowsListPage() {
         description="Latest executions handled by the workflow engine"
         extra={
           <>
-            <UIButton onClick={() => setIsModalOpen(true)} type="primary" style={{ marginRight: 8 }}>
+            <UIButton onClick={() => setIsModalOpen(true)} variant="primary" style={{ marginRight: 8 }}>
               Run Workflow
             </UIButton>
             <UIButton onClick={() => refetch()} disabled={isLoading}>

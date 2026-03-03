@@ -71,14 +71,9 @@ export function CronsTab() {
       dataIndex: 'enabled',
       key: 'enabled',
       render: (enabled: boolean) => (
-        <UIBadge
-          status={enabled ? 'success' : 'default'}
-          text={
-            <UITypographyText className="typo-caption">
-              {enabled ? 'Enabled' : 'Disabled'}
-            </UITypographyText>
-          }
-        />
+        <UIBadge variant={enabled ? 'success' : 'default'}>
+          {enabled ? 'Enabled' : 'Disabled'}
+        </UIBadge>
       ),
     },
     {
@@ -157,9 +152,6 @@ export function CronsTab() {
           rowKey="id"
           pagination={{
             pageSize: 20,
-            showTotal: (total) => (
-              <UITypographyText className="typo-caption">Total {total} cron jobs</UITypographyText>
-            ),
           }}
         />
       </UICard>

@@ -44,16 +44,10 @@ export function RunningNowPanel() {
   const items = [
     {
       key: 'running',
-      label: (
-        <UISpace>
-          <UIIcon name="ThunderboltOutlined" className="text-info" />
-          <UITypographyText className="typo-label">Running Now</UITypographyText>
-          <UIBadge count={activeExecutions.length} className="bg-theme-primary" />
-        </UISpace>
-      ),
+      label: `Running Now (${activeExecutions.length})`,
       extra: (
         <UIButton
-          type="text"
+          variant="text"
           size="small"
           icon={<UIIcon name="ReloadOutlined" spin={isLoading} />}
           onClick={(e) => {

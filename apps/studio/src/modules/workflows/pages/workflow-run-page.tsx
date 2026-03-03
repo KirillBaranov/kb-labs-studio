@@ -2,10 +2,10 @@ import { KBPageContainer, KBPageHeader, KBSection } from '@/components/ui';
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import {
-  UIButton, UIDescriptions, UITable, UITypographyText, UITypographyParagraph,
+  UIButton, UIDescriptions, UIDescriptionsItem, UITable, UITypographyText, UITypographyParagraph,
   UITitle, UIAlert, UIList,
 } from '@kb-labs/studio-ui-kit'
-import type { ColumnsType } from 'antd/es/table'
+import type { UITableColumn } from '@kb-labs/studio-ui-kit'
 import { useDataSources } from '@/providers/data-sources-provider'
 import {
   useWorkflowRun,
@@ -33,7 +33,7 @@ export function WorkflowRunPage() {
     isConnected: presenterConnected,
   } = useWorkflowEvents(runId, { follow: true })
 
-  const jobColumns = useMemo<ColumnsType<JobRun>>(
+  const jobColumns = useMemo<UITableColumn<JobRun>[]>(
     () => [
       {
         title: 'Job',
@@ -84,30 +84,30 @@ export function WorkflowRunPage() {
         }
       />
 
-      {error && <UIAlert type="error" message="Failed to load workflow run" description={String(error)} closable />}
+      {error && <UIAlert variant="error" message="Failed to load workflow run" description={String(error)} closable />}
 
       <KBSection>
         {isLoading && <Text>Loading workflow run...</Text>}
         {!isLoading && !run && !error && <Text>Workflow run not found.</Text>}
         {run && (
           <UIDescriptions bordered column={1} title="Run Metadata" size="small">
-            <UIDescriptions.Item label="Run ID">
+            <UIDescriptionsItem label="Run ID">
               <code>{run.id}</code>
-            </UIDescriptions.Item>
-            <UIDescriptions.Item label="Workflow">
+            </UIDescriptionsItem>
+            <UIDescriptionsItem label="Workflow">
               {run.name}@{run.version}
-            </UIDescriptions.Item>
-            <UIDescriptions.Item label="Status">
+            </UIDescriptionsItem>
+            <UIDescriptionsItem label="Status">
               <WorkflowStatusBadge status={run.status} />
-            </UIDescriptions.Item>
-            <UIDescriptions.Item label="Trigger">
+            </UIDescriptionsItem>
+            <UIDescriptionsItem label="Trigger">
               {run.trigger.type} — {run.trigger.actor ?? 'unknown'}
-            </UIDescriptions.Item>
-            <UIDescriptions.Item label="Queued At">{run.queuedAt}</UIDescriptions.Item>
-            <UIDescriptions.Item label="Started At">{run.startedAt ?? '—'}</UIDescriptions.Item>
-            <UIDescriptions.Item label="Finished At">{run.finishedAt ?? '—'}</UIDescriptions.Item>
+            </UIDescriptionsItem>
+            <UIDescriptionsItem label="Queued At">{run.queuedAt}</UIDescriptionsItem>
+            <UIDescriptionsItem label="Started At">{run.startedAt ?? '—'}</UIDescriptionsItem>
+            <UIDescriptionsItem label="Finished At">{run.finishedAt ?? '—'}</UIDescriptionsItem>
             {run.result?.summary && (
-              <UIDescriptions.Item label="Summary">{run.result.summary}</UIDescriptions.Item>
+              <UIDescriptionsItem label="Summary">{run.result.summary}</UIDescriptionsItem>
             )}
           </UIDescriptions>
         )}
@@ -150,7 +150,7 @@ export function WorkflowRunPage() {
           {run.result.error && (
             <UIAlert
               style={{ marginTop: 16 }}
-              type="error"
+              variant="error"
               message={run.result.error.message}
               description={
                 run.result.error.details ? JSON.stringify(run.result.error.details, null, 2) : undefined
@@ -164,8 +164,8 @@ export function WorkflowRunPage() {
       {run && (
         <KBSection>
           <Title level={4}>Logs</Title>
-          {!isConnected && <UIAlert type="info" message="Connecting to log stream..." showIcon />}
-          {logError && <UIAlert type="error" message="Log stream error" description={logError.message} />}
+          {!isConnected && <UIAlert variant="info" message="Connecting to log stream..." showIcon />}
+          {logError && <UIAlert variant="error" message="Log stream error" description={logError.message} />}
           <UIList
             bordered
             size="small"
@@ -189,10 +189,10 @@ export function WorkflowRunPage() {
         <KBSection>
           <Title level={4}>Presenter Events</Title>
           {!presenterConnected && (
-            <UIAlert type="info" message="Connecting to presenter event stream..." showIcon />
+            <UIAlert variant="info" message="Connecting to presenter event stream..." showIcon />
           )}
           {presenterError && (
-            <UIAlert type="error" message="Presenter event stream error" description={presenterError.message} />
+            <UIAlert variant="error" message="Presenter event stream error" description={presenterError.message} />
           )}
           <UIList
             bordered

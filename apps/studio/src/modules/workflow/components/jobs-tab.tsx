@@ -145,7 +145,7 @@ export function JobsTab() {
               placeholder="All statuses"
               allowClear
               value={filters.status}
-              onChange={(status) => setFilters({ ...filters, status })}
+              onChange={(status) => setFilters({ ...filters, status: status as typeof filters.status })}
               options={[
                 { label: 'Pending', value: 'pending' },
                 { label: 'Running', value: 'running' },
@@ -163,7 +163,8 @@ export function JobsTab() {
               allowClear
               showSearch
               value={filters.type}
-              onChange={(type) => setFilters({ ...filters, type })}
+              onChange={(type) => setFilters({ ...filters, type: type as string | undefined })}
+              options={[]}
             />
           </UICol>
           <UICol span={8}>
@@ -171,7 +172,7 @@ export function JobsTab() {
             <UISelect
               style={{ width: '100%', marginTop: 8 }}
               value={filters.limit || 50}
-              onChange={(limit) => setFilters({ ...filters, limit })}
+              onChange={(limit) => setFilters({ ...filters, limit: limit as number })}
               options={[
                 { label: '25', value: 25 },
                 { label: '50', value: 50 },
@@ -191,9 +192,6 @@ export function JobsTab() {
           rowKey="id"
           pagination={{
             pageSize: filters.limit || 50,
-            showTotal: (total) => (
-              <UITypographyText className="typo-caption">Total {total} jobs</UITypographyText>
-            ),
           }}
         />
       </UICard>
