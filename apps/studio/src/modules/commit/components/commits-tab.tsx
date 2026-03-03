@@ -106,7 +106,7 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
       width: 700,
       content: (
         <div>
-          <UIAlert message={msg} type="error" showIcon style={{ marginBottom: 16 }} />
+          <UIAlert message={msg} variant="error" showIcon style={{ marginBottom: 16 }} />
           <Text strong>Detected {secrets.length} potential secret(s):</Text>
           <div style={{ maxHeight: 400, overflow: 'auto', marginTop: 8, marginBottom: 16 }}>
             {secrets.map((secret, idx) => (
@@ -123,7 +123,7 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
           <UIAlert
             message="What to do?"
             description="1. Remove real secrets and use environment variables. 2. If false positives, check 'Allow secrets' and try again."
-            type="info"
+            variant="info"
             showIcon
           />
         </div>
@@ -276,7 +276,7 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
               {planStatus === 'ready' && (
                 selectedCount > 0 ? (
                   <UIButton
-                    type="primary"
+                    variant="primary"
                     size="small"
                     onClick={() => handleApply([...selectedCommitIds])}
                     loading={applyMutation.isPending}
@@ -286,7 +286,7 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
                   </UIButton>
                 ) : (
                   <UIButton
-                    type="primary"
+                    variant="primary"
                     size="small"
                     onClick={() => handleApply()}
                     loading={applyMutation.isPending}
@@ -349,7 +349,7 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
         <UIAlert
           message="Apply Failed"
           description={applyMutation.data.result.errors.map((e, i) => <div key={i}>{e}</div>)}
-          type="error"
+          variant="error"
           showIcon
           closable
           style={{ marginBottom: 16 }}
@@ -378,15 +378,16 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
               </Text>
             )}
             <UISpace direction="vertical" align="center">
-              <UICheckbox
-                checked={allowSecrets}
-                onChange={(e) => setAllowSecrets(e.target.checked)}
-                style={{ marginBottom: 8 }}
-              >
-                <Text type="secondary" style={{ fontSize: 13 }}>Allow secrets</Text>
-              </UICheckbox>
+              <div style={{ marginBottom: 8 }}>
+                <UICheckbox
+                  checked={allowSecrets}
+                  onChange={(checked) => setAllowSecrets(checked)}
+                >
+                  <Text type="secondary" style={{ fontSize: 13 }}>Allow secrets</Text>
+                </UICheckbox>
+              </div>
               <UIButton
-                type="primary"
+                variant="primary"
                 icon={<UIIcon name="ThunderboltOutlined" />}
                 onClick={handleGenerateClick}
                 loading={generateMutation.isPending}
@@ -413,17 +414,17 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: isExpanded ? 16 : 0 }}>
                   {/* Checkbox for selective apply (only in ready state) */}
                   {planStatus === 'ready' && (
-                    <UICheckbox
-                      checked={isSelected}
-                      onChange={() => toggleCommitSelection(commitId)}
-                      onClick={(e) => e.stopPropagation()}
-                    />
+                    <span onClick={(e) => e.stopPropagation()}>
+                      <UICheckbox
+                        checked={isSelected}
+                        onChange={() => toggleCommitSelection(commitId)}
+                      />
+                    </span>
                   )}
 
                   {/* Expand toggle */}
                   <UIIcon name="RightOutlined"
-                    rotate={isExpanded ? 90 : 0}
-                    style={{ fontSize: 11, cursor: 'pointer', color: '#8c8c8c' }}
+                    style={{ fontSize: 11, cursor: 'pointer', color: '#8c8c8c', transform: isExpanded ? 'rotate(90deg)' : undefined }}
                     onClick={() => toggleExpandCommit(commitId)}
                   />
 
@@ -443,21 +444,21 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
                         <UIInput
                           size="small"
                           value={editMessage}
-                          onChange={(e) => setEditMessage(e.target.value)}
+                          onChange={(value) => setEditMessage(value)}
                           onPressEnter={() => handleSaveEdit(commitId)}
                           autoFocus
                           style={{ flex: 1 }}
                         />
                         <UIButton
                           size="small"
-                          type="text"
+                          variant="text"
                           icon={<UIIcon name="CheckOutlined" />}
                           onClick={() => handleSaveEdit(commitId)}
                           loading={patchMutation.isPending}
                         />
                         <UIButton
                           size="small"
-                          type="text"
+                          variant="text"
                           icon={<UIIcon name="CloseOutlined" />}
                           onClick={handleCancelEdit}
                         />
@@ -515,7 +516,7 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
                       }}
                     >
                       <UIButton
-                        type="text"
+                        variant="text"
                         size="small"
                         icon={<UIIcon name="MoreOutlined" />}
                         onClick={(e) => e.stopPropagation()}
@@ -570,7 +571,7 @@ export function CommitsTab({ selectedScope }: CommitsTabProps) {
                             )}
                           </Text>
                         }
-                        type="info"
+                        variant="info"
                         style={{ marginTop: 16 }}
                       />
                     )}

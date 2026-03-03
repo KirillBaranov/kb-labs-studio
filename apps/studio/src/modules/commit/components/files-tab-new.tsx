@@ -45,7 +45,7 @@ function FileDiffViewer({ scope, file }: { scope: string; file: string }) {
   if (isLoading) {
     return (
       <div style={{ padding: 16 }}>
-        <UISkeleton active paragraph={{ rows: 8 }} />
+        <UISkeleton active lines={8} />
       </div>
     );
   }
@@ -126,10 +126,10 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
   }
 
   if (gitStatusLoading) {
-    return <UICard><UISkeleton active paragraph={{ rows: 5 }} /></UICard>;
+    return <UICard><UISkeleton active lines={5} /></UICard>;
   }
 
-  const files: FileEntry[] = (gitStatusData?.rows || []) as FileEntry[];
+  const files: FileEntry[] = (gitStatusData?.summaries || []) as FileEntry[];
 
   if (files.length === 0) {
     return (
@@ -206,7 +206,7 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
         <UIAlert
           message="AI Summary"
           description={overallSummary}
-          type="info"
+          variant="info"
           closable
           onClose={() => setOverallSummary(null)}
           style={{ marginBottom: 16, whiteSpace: 'pre-wrap' }}
@@ -234,8 +234,7 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
               onClick={() => toggleGroup(group.key)}
             >
               <UIIcon name="RightOutlined"
-                rotate={isCollapsed ? 0 : 90}
-                style={{ fontSize: 10, color: '#8c8c8c' }}
+                style={{ fontSize: 10, color: '#8c8c8c', transform: isCollapsed ? undefined : 'rotate(90deg)' }}
               />
               {group.icon}
               <Text strong>{group.label}</Text>
@@ -269,8 +268,7 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
                         onClick={() => toggleFile(file.path)}
                       >
                         <UIIcon name="RightOutlined"
-                          rotate={isExpanded ? 90 : 0}
-                          style={{ fontSize: 10, color: '#8c8c8c' }}
+                          style={{ fontSize: 10, color: '#8c8c8c', transform: isExpanded ? 'rotate(90deg)' : undefined }}
                         />
                         <UIIcon name="FileOutlined" style={{ fontSize: 13, color: '#8c8c8c' }} />
                         <Text
@@ -286,7 +284,7 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
                           onClick={e => e.stopPropagation()}
                         >
                           <UIButton
-                            type="text"
+                            variant="text"
                             size="small"
                             icon={<UIIcon name="CopyOutlined" />}
                             onClick={() => {
@@ -295,7 +293,7 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
                             }}
                           />
                           <UIButton
-                            type="text"
+                            variant="text"
                             size="small"
                             icon={<UIIcon name="RobotOutlined" />}
                             onClick={() => handleSummarizeFile(file.path)}
@@ -311,7 +309,7 @@ export function FilesTabNew({ selectedScope }: FilesTabNewProps) {
                             <UIAlert
                               message="AI Summary"
                               description={fileSummary}
-                              type="success"
+                              variant="success"
                               closable
                               onClose={() => {
                                 setFileSummaries(prev => {
