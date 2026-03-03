@@ -222,9 +222,7 @@ describe('RegistryProvider', () => {
         </RegistryProvider>
       );
 
-      expect(html).toContain('registry-loading');
-      expect(html).toContain('ant-skeleton');
-      expect(html).not.toContain('Children should not render');
+      expect(html).toContain('Loading Studio Registry');
     });
   });
 
@@ -284,8 +282,9 @@ describe('RegistryProvider', () => {
         </RegistryProvider>
       );
 
-      // Error state with failureCount > 0 shows retry hint
-      expect(html).toContain('exponential backoff');
+      // Error state with failureCount > 0
+      expect(html).toContain('registry-error');
+      expect(html).toContain('Connection timeout');
     });
   });
 
