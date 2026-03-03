@@ -101,9 +101,15 @@ importers:
       '@kb-labs/quality-contracts':
         specifier: link:../../../kb-labs-quality-plugin/packages/quality-contracts
         version: link:../../../kb-labs-quality-plugin/packages/quality-contracts
+      '@kb-labs/release-manager-contracts':
+        specifier: link:../../../kb-labs-release-manager/packages/release-manager-contracts
+        version: link:../../../kb-labs-release-manager/packages/release-manager-contracts
       '@kb-labs/rest-api-contracts':
-        specifier: link:../../../kb-labs-rest-api/packages/rest-api-contracts
-        version: link:../../../kb-labs-rest-api/packages/rest-api-contracts
+        specifier: ^1.0.0
+        version: 1.0.0
+      '@kb-labs/studio-contracts':
+        specifier: link:../../packages/studio-contracts
+        version: link:../../packages/studio-contracts
       '@kb-labs/studio-data-client':
         specifier: link:../../packages/studio-data-client
         version: link:../../packages/studio-data-client
@@ -113,6 +119,9 @@ importers:
       '@kb-labs/studio-ui-kit':
         specifier: link:../../packages/studio-ui-kit
         version: link:../../packages/studio-ui-kit
+      '@kb-labs/workflow-contracts':
+        specifier: link:../../../kb-labs-workflow/packages/workflow-contracts
+        version: link:../../../kb-labs-workflow/packages/workflow-contracts
       '@tanstack/react-query':
         specifier: ^5.62.23
         version: 5.90.5(react@18.3.1)
@@ -248,11 +257,11 @@ importers:
         specifier: link:../../../kb-labs-commit-plugin/packages/commit-contracts
         version: link:../../../kb-labs-commit-plugin/packages/commit-contracts
       '@kb-labs/core-platform':
-        specifier: link:../../../kb-labs-core/packages/core-platform
-        version: link:../../../kb-labs-core/packages/core-platform
+        specifier: ^1.2.0
+        version: 1.2.0
       '@kb-labs/plugin-contracts':
-        specifier: link:../../../kb-labs-plugin/packages/plugin-contracts
-        version: link:../../../kb-labs-plugin/packages/plugin-contracts
+        specifier: ^1.0.0
+        version: 1.0.0
       '@kb-labs/qa-contracts':
         specifier: link:../../../kb-labs-qa-plugin/packages/qa-contracts
         version: link:../../../kb-labs-qa-plugin/packages/qa-contracts
@@ -263,8 +272,8 @@ importers:
         specifier: link:../../../kb-labs-release-manager/packages/release-manager-contracts
         version: link:../../../kb-labs-release-manager/packages/release-manager-contracts
       '@kb-labs/rest-api-contracts':
-        specifier: link:../../../kb-labs-rest-api/packages/rest-api-contracts
-        version: link:../../../kb-labs-rest-api/packages/rest-api-contracts
+        specifier: ^1.0.0
+        version: 1.0.0
       '@tanstack/react-query':
         specifier: ^5.0.0
         version: 5.90.5(react@18.3.1)
@@ -1136,6 +1145,10 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
+  '@kb-labs/core-platform@1.2.0':
+    resolution: {integrity: sha512-JGxtWFQ6ZYewiB7xIue3L8ciu2CRMoOfIxHHPl7FtbXI9R9BH/i/dTPRc0WvsJNCo88ft5D9u2GGfnuOmv/eEQ==}
+    engines: {node: '>=20.0.0', pnpm: '>=9.0.0'}
+
   '@kb-labs/devkit@file:../kb-labs-devkit':
     resolution: {directory: ../kb-labs-devkit, type: directory}
     engines: {node: '>=20.0.0', pnpm: '>=9.11.0'}
@@ -1163,6 +1176,14 @@ packages:
         optional: true
       react:
         optional: true
+
+  '@kb-labs/plugin-contracts@1.0.0':
+    resolution: {integrity: sha512-Q1NW3tvjUBjsxzEo4Wt3QQaKFwtqP639nrXooTNz1QAhMF9GtIZDRz5RisTcELsM4nAfZL8OlF9PhoJCWDxdLw==}
+    engines: {node: '>=20.0.0', pnpm: '>=9.0.0'}
+
+  '@kb-labs/rest-api-contracts@1.0.0':
+    resolution: {integrity: sha512-gcB5GWutmHF7xop6Zt6MEO1IoJXNuOtzn645lI5lU3nh6iI60YIJx4ps0yT7YA8vCoMB4U1jrrZXoeoy9tIMtQ==}
+    engines: {node: '>=20.0.0', pnpm: '>=9.0.0'}
 
   '@naoak/workerize-transferable@0.1.0':
     resolution: {integrity: sha512-fDLfuP71IPNP5+zSfxFb52OHgtjZvauRJWbVnpzQ7G7BjcbLjTny0OW1d3ZO806XKpLWNKmeeW3MhE0sy8iwYQ==}
@@ -5329,6 +5350,10 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  '@kb-labs/core-platform@1.2.0':
+    dependencies:
+      ulid: 2.4.0
+
   '@kb-labs/devkit@file:../kb-labs-devkit(xx66owwstzarzwopyivriac534)':
     dependencies:
       '@playwright/test': 1.56.1
@@ -5354,6 +5379,16 @@ snapshots:
       - eslint-import-resolver-webpack
       - eslint-plugin-import-x
       - supports-color
+
+  '@kb-labs/plugin-contracts@1.0.0':
+    dependencies:
+      '@kb-labs/core-platform': link:../../../kb-labs-core/packages/core-platform
+      '@kb-labs/studio-contracts': link:../../../kb-labs-studio/packages/studio-contracts
+
+  '@kb-labs/rest-api-contracts@1.0.0':
+    dependencies:
+      '@kb-labs/studio-contracts': link:../../../kb-labs-studio/packages/studio-contracts
+      zod: 3.25.76
 
   '@naoak/workerize-transferable@0.1.0(workerize-loader@2.0.2(webpack@5.102.1(esbuild@0.25.11)))':
     dependencies:
