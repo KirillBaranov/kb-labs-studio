@@ -10,5 +10,5 @@ export * from './UIErrorState';
 export * from './UISkeleton';
 export * from './UISpin';
 export * from './UIResult';
-export * from './useUIMessage';
-export * from './useUINotification';
+export * from './useUiMessage';
+export * from './useUiNotification';

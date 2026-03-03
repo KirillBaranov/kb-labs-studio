@@ -68,7 +68,7 @@ export interface UISelectProps extends Omit<AntSelectProps, 'options' | 'onChang
  * ```
  */
 export function UISelect({
-  options,
+  options = [],
   value,
   defaultValue,
   placeholder,

@@ -27,6 +27,8 @@ export interface UIAlertProps {
   onClose?: () => void;
   /** Action button */
   action?: React.ReactNode;
+  /** Custom icon */
+  icon?: React.ReactNode;
   /** Additional CSS class */
   className?: string;
   /** Additional styles */
@@ -65,6 +67,7 @@ export function UIAlert({
   closable,
   onClose,
   action,
+  icon,
   className,
   style,
 }: UIAlertProps) {
@@ -77,6 +80,7 @@ export function UIAlert({
       closable={closable}
       onClose={onClose}
       action={action}
+      icon={icon}
       className={className}
       style={style}
     />

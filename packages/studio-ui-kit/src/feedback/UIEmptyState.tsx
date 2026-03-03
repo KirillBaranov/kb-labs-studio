@@ -23,12 +23,16 @@ export interface UIEmptyStateProps {
   description?: string;
   /** Action button */
   action?: React.ReactNode;
+  /** Children rendered below description/action (alias for action) */
+  children?: React.ReactNode;
   /** Use default Ant Design empty image */
   useDefaultImage?: boolean;
   /** Additional CSS class */
   className?: string;
   /** Additional styles */
   style?: React.CSSProperties;
+  /** Ant Design image prop (e.g. Empty.PRESENTED_IMAGE_SIMPLE) */
+  image?: React.ReactNode;
 }
 
 /**
@@ -56,20 +60,25 @@ export function UIEmptyState({
   title,
   description,
   action,
+  children,
   useDefaultImage,
+  image,
   className,
   style: customStyle,
 }: UIEmptyStateProps) {
   const { token } = useToken();
 
-  if (useDefaultImage) {
+  const content = children ?? action;
+
+  if (useDefaultImage || image !== undefined) {
     return (
       <AntEmpty
         description={description}
+        image={image}
         className={className}
         style={customStyle}
       >
-        {action}
+        {content}
       </AntEmpty>
     );
   }
@@ -101,8 +110,11 @@ export function UIEmptyState({
           </UIText>
         )}
 
-        {action && <UIBox mt={2}>{action}</UIBox>}
+        {content && <UIBox mt={2}>{content}</UIBox>}
       </UIFlex>
     </UIBox>
   );
 }
+
+UIEmptyState.PRESENTED_IMAGE_SIMPLE = AntEmpty.PRESENTED_IMAGE_SIMPLE;
+UIEmptyState.PRESENTED_IMAGE_DEFAULT = AntEmpty.PRESENTED_IMAGE_DEFAULT;

@@ -28,6 +28,8 @@ export interface TextProps {
   as?: 'span' | 'p' | 'div' | 'label';
   /** Additional CSS class */
   className?: string;
+  /** Additional inline styles (overrides token-based color/size) */
+  style?: React.CSSProperties;
 }
 
 /**

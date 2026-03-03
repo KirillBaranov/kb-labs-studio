@@ -15,7 +15,7 @@ const { useToken } = theme;
 
 export interface UICardProps extends Omit<AntCardProps, 'title'> {
   /** Card title */
-  title?: string;
+  title?: React.ReactNode;
   /** Subtitle (below title) */
   subtitle?: string;
   /** Extra content (top-right corner) */
@@ -69,7 +69,10 @@ export function UICard({
   // Custom title with subtitle
   const cardTitle = (title || subtitle) ? (
     <UIBox>
-      {title && <UIText size="lg" weight="semibold" as="div">{title}</UIText>}
+      {title && (typeof title === 'string'
+        ? <UIText size="lg" weight="semibold" as="div">{title}</UIText>
+        : title
+      )}
       {subtitle && (
         <UIText size="sm" color="secondary" as="div" style={{ marginTop: token.marginXXS }}>
           {subtitle}
@@ -88,7 +91,7 @@ export function UICard({
       loading={loading}
       {...rest}
     >
-      <UIBox>{children}</UIBox>
+      {children}
       {footer && (
         <UIBox mt={3} pt={3} style={{ borderTop: `1px solid ${token.colorBorder}` }}>
           {footer}
