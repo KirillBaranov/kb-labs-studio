@@ -4,7 +4,6 @@
  */
 
 import * as React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { UITabs, UISelect } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useScopes } from '@kb-labs/studio-data-client';
@@ -13,25 +12,17 @@ import { FilesTabNew } from '../components/files-tab-new';
 import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
 export function CommitPage() {
-  const params = useParams<{ tab?: string }>();
-  const navigate = useNavigate();
   const sources = useDataSources();
   const [selectedScope, setSelectedScope] = React.useState<string>('');
-
-  const activeTab = params.tab || 'commits';
 
   const { data: scopesData, isLoading: scopesLoading } = useScopes(sources.commit);
 
   // Auto-select first scope
   React.useEffect(() => {
     if (scopesData?.scopes && scopesData.scopes.length > 0 && !selectedScope) {
-      setSelectedScope(scopesData.scopes[0].id);
+      setSelectedScope(scopesData.scopes[0]!.id);
     }
   }, [scopesData, selectedScope]);
-
-  const handleTabChange = (key: string) => {
-    navigate(`/commit/${key}`);
-  };
 
   const tabItems = [
     {
@@ -56,7 +47,7 @@ export function CommitPage() {
             style={{ width: 300 }}
             placeholder="Select scope"
             value={selectedScope}
-            onChange={setSelectedScope}
+            onChange={(v) => setSelectedScope(v as string)}
             loading={scopesLoading}
             showSearch
             options={scopesData?.scopes?.map((s) => ({
@@ -69,9 +60,8 @@ export function CommitPage() {
       />
 
       <UITabs
-        activeKey={activeTab}
-        onChange={handleTabChange}
         items={tabItems}
+        syncUrl={{ mode: 'path', basePath: '/commit' }}
         size="large"
         style={{ marginTop: 24 }}
       />

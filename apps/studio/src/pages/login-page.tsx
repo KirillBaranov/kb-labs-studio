@@ -106,41 +106,20 @@ export function LoginPage() {
             </UITypographyText>
             <UISelect
               value={selectedRole}
-              onChange={setSelectedRole}
+              onChange={(v) => setSelectedRole(v as UserRole)}
               style={{ width: '100%' }}
               size="large"
               options={[
                 {
-                  label: (
-                    <UISpace>
-                      <UIIcon name="UserOutlined" />
-                      <span>
-                        <strong>Viewer</strong> — Просмотр данных
-                      </span>
-                    </UISpace>
-                  ) as unknown as string, // JSX label - UISelect wraps antd Select which supports ReactNode
+                  label: 'Viewer — Просмотр данных',
                   value: 'viewer',
                 },
                 {
-                  label: (
-                    <UISpace>
-                      <UIIcon name="UserOutlined" />
-                      <span>
-                        <strong>Operator</strong> — Управление системой
-                      </span>
-                    </UISpace>
-                  ) as unknown as string, // JSX label - UISelect wraps antd Select which supports ReactNode
+                  label: 'Operator — Управление системой',
                   value: 'operator',
                 },
                 {
-                  label: (
-                    <UISpace>
-                      <UIIcon name="UserOutlined" />
-                      <span>
-                        <strong>Admin</strong> — Полный доступ
-                      </span>
-                    </UISpace>
-                  ) as unknown as string, // JSX label - UISelect wraps antd Select which supports ReactNode
+                  label: 'Admin — Полный доступ',
                   value: 'admin',
                 },
               ]}
