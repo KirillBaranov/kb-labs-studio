@@ -1,254 +1,306 @@
-# KB Labs Studio (@kb-labs/studio)
+# Standard Configuration Templates
 
-> **Unified web dashboard for observing and managing the KB Labs ecosystem.** React-based web application that provides observability and management capabilities for the KB Labs ecosystem.
+This directory contains canonical configuration templates for all `@kb-labs` packages.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Node.js](https://img.shields.io/badge/Node.js-18.18.0+-green.svg)](https://nodejs.org/)
-[![pnpm](https://img.shields.io/badge/pnpm-9.0.0+-orange.svg)](https://pnpm.io/)
+## 📋 Available Templates
 
-## 🎯 Vision
+### Core Configs (All Packages)
 
-KB Labs Studio is a React-based web application that provides observability and management capabilities for the KB Labs ecosystem, including audit, release management, devlink, mind, and analytics. This project serves as the central dashboard for the **@kb-labs** ecosystem and enables unified monitoring and management across all products.
+| File | Purpose | Required | Customizable |
+|------|---------|----------|--------------|
+| **eslint.config.js** | Linting rules | ✅ Yes | ⚠️ Minimal |
+| **tsconfig.json** | TypeScript IDE config | ✅ Yes | ❌ No |
+| **tsconfig.build.json** | TypeScript build config | ✅ Yes | ❌ No |
 
-The project solves the problem of fragmented observability across multiple KB Labs tools by providing a unified dashboard for monitoring and managing the entire ecosystem. Instead of switching between different CLI tools and separate interfaces, developers can use Studio to observe KPIs, audit results, release status, dependency graphs, knowledge freshness, and analytics in one place.
+### Tsup Configs (Choose ONE based on package type)
 
-This project is part of the **@kb-labs** ecosystem and integrates seamlessly with REST API, API Contracts, UI, and all other KB Labs tools.
+| Template | Package Type | Use Cases |
+|----------|--------------|-----------|
+| **tsup.config.ts** | 📦 **Library** (default) | Most packages, importable libraries |
+| **tsup.config.bin.ts** | 🔧 **Binary** | Standalone executables, CLI bins |
+| **tsup.config.cli.ts** | ⌨️ **CLI** | CLI packages with commands |
+| **tsup.config.dual.ts** | 📦🔧 **Library + Binary** | Packages with both API and bin |
 
-## 🚀 Quick Start
+### Package.json Examples
 
-### Installation
+| Template | Purpose |
+|----------|---------|
+| **package.json.lib** | Library package example |
+| **package.json.bin** | Binary package example |
+
+## 🎯 Philosophy
+
+**Convention over Configuration**
+
+All `@kb-labs` packages MUST use these exact templates with minimal customization. This ensures:
+
+- ✅ Consistent build output across all packages
+- ✅ Predictable dependency resolution
+- ✅ Unified linting standards
+- ✅ Easy maintenance and upgrades
+
+## 📦 Usage
+
+### For New Packages
+
+#### Step 1: Choose Package Type
+
+**Library Package** (most common):
+```bash
+cp kb-labs-devkit/templates/configs/tsup.config.ts your-package/
+cp kb-labs-devkit/templates/configs/eslint.config.js your-package/
+cp kb-labs-devkit/templates/configs/tsconfig*.json your-package/
+cp kb-labs-devkit/templates/configs/package.json.lib your-package/package.json
+```
+
+**Binary Package** (standalone executables):
+```bash
+cp kb-labs-devkit/templates/configs/tsup.config.bin.ts your-package/tsup.config.ts
+cp kb-labs-devkit/templates/configs/eslint.config.js your-package/
+cp kb-labs-devkit/templates/configs/tsconfig*.json your-package/
+cp kb-labs-devkit/templates/configs/package.json.bin your-package/package.json
+```
+
+**CLI Package** (command handlers):
+```bash
+cp kb-labs-devkit/templates/configs/tsup.config.cli.ts your-package/tsup.config.ts
+cp kb-labs-devkit/templates/configs/eslint.config.js your-package/
+cp kb-labs-devkit/templates/configs/tsconfig*.json your-package/
+cp kb-labs-devkit/templates/configs/package.json.lib your-package/package.json
+```
+
+**Dual Package** (library + binary):
+```bash
+cp kb-labs-devkit/templates/configs/tsup.config.dual.ts your-package/tsup.config.ts
+cp kb-labs-devkit/templates/configs/eslint.config.js your-package/
+cp kb-labs-devkit/templates/configs/tsconfig*.json your-package/
+cp kb-labs-devkit/templates/configs/package.json.lib your-package/package.json
+# Then add "bin" field to package.json
+```
+
+#### Step 2: Customize Package Name
+```bash
+# Edit package.json and update name, description
+```
+
+### For Existing Packages
 
 ```bash
-# Clone repository
-git clone https://github.com/kirill-baranov/kb-labs-studio.git
-cd kb-labs-studio
+# Check for drift
+npx kb-devkit-check-configs
 
-# Install dependencies
-pnpm install
+# Auto-fix drift
+npx kb-devkit-check-configs --fix
 ```
 
-### Development
+## 🔧 Customization Rules
+
+### tsup.config.ts
+
+**Allowed customizations:**
+
+```typescript
+export default defineConfig({
+  ...nodePreset,
+  tsconfig: 'tsconfig.build.json', // ✅ Always required
+
+  // ✅ OK: Multiple entry points
+  entry: ['src/index.ts', 'src/cli.ts'],
+
+  // ✅ OK: Extra external deps (if really needed)
+  external: ['special-native-module'],
+
+  dts: true, // ✅ Always required
+});
+```
+
+**NOT allowed:**
+
+```typescript
+// ❌ WRONG: Don't override preset settings
+export default defineConfig({
+  format: ['esm'],        // Already in preset!
+  target: 'es2022',       // Already in preset!
+  sourcemap: true,        // Already in preset!
+  // ...
+});
+
+// ❌ WRONG: Don't disable types
+dts: false,
+
+// ❌ WRONG: Don't duplicate external deps
+external: [
+  '@kb-labs/core',  // Already in preset!
+  '@kb-labs/cli',   // Already in preset!
+],
+```
+
+### eslint.config.js
+
+**Allowed customizations:**
+
+```javascript
+export default [
+  ...nodePreset,
+  {
+    // ✅ OK: Project-specific ignores only
+    ignores: ['**/*.generated.ts']
+  }
+];
+```
+
+**NOT allowed:**
+
+```javascript
+// ❌ WRONG: Don't duplicate preset ignores
+export default [
+  ...nodePreset,
+  {
+    ignores: [
+      '**/dist/**',        // Already in preset!
+      '**/node_modules/**', // Already in preset!
+    ]
+  }
+];
+```
+
+### tsconfig.json & tsconfig.build.json
+
+**NOT customizable!**
+
+These files MUST remain identical to templates. All TypeScript configuration is standardized in DevKit presets.
+
+```json
+// ❌ WRONG: Don't override extends
+{
+  "extends": "./my-custom-base.json"
+}
+
+// ❌ WRONG: Don't add compilerOptions
+{
+  "extends": "@kb-labs/devkit/tsconfig/node.json",
+  "compilerOptions": {
+    "strict": false  // Don't override preset!
+  }
+}
+```
+
+## 🔍 Drift Detection
+
+DevKit automatically detects configuration drift:
 
 ```bash
-# Start development server
-pnpm dev
+# Check all packages
+npx kb-devkit-check-configs
 
-# Studio will be available at http://localhost:3000
+# Check specific package
+npx kb-devkit-check-configs --package=@kb-labs/core
+
+# Auto-fix (creates backup)
+npx kb-devkit-check-configs --fix
+
+# CI mode (fail on drift)
+npx kb-devkit-check-configs --ci
 ```
 
-### Building
+### Drift Detection Rules
 
-```bash
-# Build all packages
-pnpm build
+| Issue | Severity | Auto-fix |
+|-------|----------|----------|
+| Missing `dts: true` | 🔴 Error | ✅ Yes |
+| Using `dts: false` | 🔴 Error | ✅ Yes |
+| Not using `nodePreset` | 🔴 Error | ⚠️ Manual |
+| Duplicate `external` | 🟡 Warning | ✅ Yes |
+| Duplicate `ignores` | 🟡 Warning | ✅ Yes |
+| Missing templates | 🔴 Error | ✅ Yes |
+| Modified templates | 🔴 Error | ⚠️ Manual |
 
-# Run tests
-pnpm test
+## 📚 Examples
 
-# Lint code
-pnpm lint
+### ✅ Good Example (Minimal Package)
+
+```typescript
+// tsup.config.ts
+import { defineConfig } from 'tsup';
+import nodePreset from '@kb-labs/devkit/tsup/node.js';
+
+export default defineConfig({
+  ...nodePreset,
+  tsconfig: 'tsconfig.build.json',
+  entry: ['src/index.ts'],
+  dts: true,
+});
 ```
 
-### Running Locally with Mocks
+### ✅ Good Example (CLI Package with Multiple Entries)
 
-By default, Studio runs with mock data sources. No backend required for development.
+```typescript
+// tsup.config.ts
+import { defineConfig } from 'tsup';
+import nodePreset from '@kb-labs/devkit/tsup/node.js';
 
-To switch to HTTP sources:
-
-```bash
-VITE_DATA_SOURCE_MODE=http \
-VITE_API_BASE_URL=http://localhost:5050/api/v1 \
-VITE_EVENTS_BASE_URL=http://localhost:5050/api/v1 \
-pnpm dev
+export default defineConfig({
+  ...nodePreset,
+  tsconfig: 'tsconfig.build.json',
+  entry: [
+    'src/index.ts',
+    'src/cli/index.ts',
+    'src/cli/commands/build.ts',
+    'src/cli/commands/test.ts',
+  ],
+  dts: true,
+});
 ```
 
-## ✨ Features
+### ❌ Bad Example (Over-configured)
 
-- **Dashboard**: KPIs overview, activity charts, and recent activity
-- **Audit**: Package audit results and reports
-- **Release**: Package release preview and execution
-- **DevLink**: Dependency graph and cycle detection (coming soon)
-- **Mind**: Knowledge freshness verification (coming soon)
-- **Analytics**: Event metrics and performance charts (coming soon)
-- **Settings**: Configuration and data source management
-- **SSE-aware registry**: Auto-retry registry feed with configurable base URL/path and optional access token via query string (`VITE_EVENTS_AUTH_TOKEN`).
-- **Theme System**: Light/Dark/Auto theme switching with CSS variables
-- **Data Visualization**: Interactive charts with drill-down capabilities
+```typescript
+// tsup.config.ts
+import { defineConfig } from 'tsup';
 
-## 📁 Repository Structure
-
-```
-kb-labs-studio/
-├── apps/                    # Applications
-│   └── studio/              # Main React SPA application
-├── packages/                # Core packages
-│   ├── ui-core/             # Design tokens and themes (framework-agnostic)
-│   ├── ui-react/            # Shared React components (future kb-labs-ui)
-│   └── data-client/         # API SDK with versioned contracts and mocks
-├── docs/                    # Documentation
-│   └── adr/                 # Architecture Decision Records
-└── scripts/                 # Utility scripts
+// ❌ Not using preset!
+export default defineConfig({
+  format: ['esm'],
+  target: 'es2022',
+  sourcemap: true,
+  clean: true,
+  dts: true,
+  entry: ['src/index.ts'],
+  external: [/^@kb-labs\/.*/],  // Manual external
+});
 ```
 
-### Directory Descriptions
+## 🚀 Migration Guide
 
-- **`apps/studio/`** - Main React SPA application with dashboard, audit, release, and settings modules
-- **`packages/ui-core/`** - Framework-agnostic design tokens and themes
-- **`packages/ui-react/`** - Shared React component library with KB-prefixed wrappers around Ant Design
-- **`packages/data-client/`** - API SDK with versioned contracts, mocks, and TanStack Query hooks
-- **`docs/`** - Documentation including ADRs and guides
+### From Custom Config to Standard Template
 
-## 📦 Packages
+1. **Backup your current config**
+   ```bash
+   cp tsup.config.ts tsup.config.ts.backup
+   ```
 
-| Package | Description |
-|---------|-------------|
-| [@kb-labs/ui-core](./packages/ui-core/) | Design tokens and themes (framework-agnostic) |
-| [@kb-labs/ui-react](./packages/ui-react/) | Shared React component library (KB-prefixed wrappers) |
-| [@kb-labs/data-client](./packages/data-client/) | API SDK with versioned contracts and mocks |
+2. **Copy standard template**
+   ```bash
+   cp kb-labs-devkit/templates/configs/tsup.config.ts .
+   ```
 
-### Package Details
+3. **Migrate customizations** (only if needed)
+   - Compare your backup with template
+   - Extract only truly necessary customizations
+   - Add them with comments explaining why
 
-**@kb-labs/ui-core** provides the design system foundation:
-- Design tokens (colors, spacing, typography, radius, shadows)
-- Theme system (light/dark) with CSS variable generator
-- Framework-agnostic design system
+4. **Test build**
+   ```bash
+   pnpm run build
+   ```
 
-**@kb-labs/ui-react** provides shared React components:
-- KB-prefixed components wrapping Ant Design React
-- Generic business components (StatCard, EmptyState, Charts)
-- Layout components (KBPageLayout, KBHeader, KBSidebar, KBContent)
-- Chart components (KBLineChart, KBColumnChart, KBAreaChart, KBPieChart, KBBarChart)
-- Theme integration via CSS variables and Ant Design tokens
+5. **Verify types**
+   ```bash
+   npx kb-devkit-check-types
+   ```
 
-**@kb-labs/data-client** provides the data layer:
-- TypeScript interfaces + Zod schemas (v1.0)
-- Audit, Release, System data source interfaces
-- Deterministic mock implementations with fixtures
-- TanStack Query hooks for data fetching
-- Factory for switching between mock and HTTP modes
+## 🔗 Related
 
-## 🛠️ Available Scripts
-
-| Script | Description |
-|--------|-------------|
-| `pnpm dev` | Start development server |
-| `pnpm build` | Build all packages |
-| `pnpm test` | Run all tests |
-| `pnpm test:coverage` | Run tests with coverage reporting |
-| `pnpm lint` | Lint all code |
-| `pnpm lint:fix` | Fix linting issues |
-| `pnpm format` | Format code with Prettier |
-| `pnpm type-check` | TypeScript type checking |
-| `pnpm check` | Run lint, type-check, and tests |
-| `pnpm ci` | Full CI pipeline (clean, build, check) |
-| `pnpm clean` | Clean build artifacts |
-| `pnpm clean:all` | Clean all node_modules and build artifacts |
-
-## 🏗️ Architecture
-
-### Tech Stack
-
-- **React 18** + **TypeScript** + **Vite**
-- **TanStack Query** for data fetching and caching
-- **Ant Design React 5** via custom wrappers (@kb-labs/ui-react)
-- **@ant-design/charts** for data visualization
-- **CSS Variables** with design tokens from ui-core (framework-agnostic)
-- **React Router v6** for navigation
-- **Vitest** + **Testing Library** for testing
-
-### Data Layer
-
-- **Versioned contracts (v1.0)** with Zod validation
-- **Mock-first approach**: Deterministic fixtures, easy swap to real API
-- **Factory pattern**: Switch between mock and HTTP data sources
-- **Centralized query keys**: Predictable TanStack Query cache invalidation
-
-### Component Organization
-
-- **`packages/ui-react/`**: Generic, reusable components (KBPageLayout, KBCard, KBButton, KBChart, StatCard)
-- **`apps/studio/src/components/`**: Studio-specific components (RunBadge, HealthIndicator, EmptyState)
-- **`apps/studio/src/modules/`**: Feature modules with pages and components
-- **Component separation**: Generic vs domain-specific based on future extraction to kb-labs-ui
-
-### Configuration
-
-#### Environment Variables
-
-- `VITE_DATA_SOURCE_MODE`: `mock` (default) or `http`
-- `VITE_API_BASE_URL`: Base URL for HTTP data sources (REST API)
-- `VITE_EVENTS_BASE_URL`: Base URL for SSE events (defaults to `VITE_API_BASE_URL`)
-- `VITE_EVENTS_REGISTRY_PATH`: Path for registry SSE stream (default `/events/registry`)
-- `VITE_EVENTS_AUTH_TOKEN`: Optional access token appended to SSE URL as `access_token=<token>`
-- `VITE_EVENTS_HEADERS`: JSON object of additional headers for SSE (if terminating proxy injects them upstream)
-
-#### Studio Config
-
-Located in `apps/studio/src/config/studio.config.ts`:
-- Data source mode
-- API base URL
-- Feature flags (enableDevlink, enableMind, enableAnalytics)
-- SSE configuration (base URL, registry path, retry delays, custom headers/token)
-
-## 📋 Development Policies
-
-- **Code Style**: ESLint + Prettier, TypeScript strict mode
-- **Testing**: Vitest + Testing Library with comprehensive test coverage
-- **Versioning**: SemVer with automated releases through Changesets
-- **Architecture**: Document decisions in ADRs (see `docs/adr/`)
-- **UI Components**: KB-prefixed wrappers around Ant Design for consistency
-- **Data Layer**: Mock-first development with deterministic fixtures
-
-## 🔧 Requirements
-
-- **Node.js**: >= 20.0.0
-- **pnpm**: >= 9.11.0
-
-## 📚 Documentation
-
-- [Documentation Standard](./docs/DOCUMENTATION.md) - Full documentation guidelines
-- [Contributing Guide](./CONTRIBUTING.md) - How to contribute
-- [Architecture Decisions](./docs/adr/) - ADRs for this project
-
-**Guides:**
-- [ADR-0018: Ant Design Migration](./docs/adr/0018-ant-design-migration.md) - UI library migration details
-
-## 🔗 Related Packages
-
-### Dependencies
-
-- [@kb-labs/api-contracts](https://github.com/KirillBaranov/kb-labs-api-contracts) - API contracts and schemas
-- [@kb-labs/rest-api](https://github.com/KirillBaranov/kb-labs-rest-api) - REST API backend
-
-### Used By
-
-- All KB Labs ecosystem users (web dashboard)
-
-### Ecosystem
-
-- [KB Labs](https://github.com/KirillBaranov/kb-labs) - Main ecosystem repository
-
-## 🤝 Contributing
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for development guidelines and contribution process.
-
-## 📄 License
-
-MIT © KB Labs
-
----
-
-**See [CONTRIBUTING.md](./CONTRIBUTING.md) for development guidelines and contribution process.**
-
-## License
-
-KB Public License v1.1 - see [LICENSE](LICENSE) for details.
-
-This is open source software with some restrictions on:
-- Offering as a hosted service (SaaS/PaaS)
-- Creating competing platform products
-
-For commercial licensing inquiries: contact@kblabs.dev
-
-**User Guides:**
-- [English Guide](../LICENSE-GUIDE.en.md)
-- [Русское руководство](../LICENSE-GUIDE.ru.md)
+- [DevKit README](../../README.md)
+- [DevKit Usage Guide](../../USAGE_GUIDE.md)
+- [ADR-0009: Unified Build Convention](../../docs/adr/0009-unified-build-convention.md)
