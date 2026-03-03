@@ -110,41 +110,20 @@ export function LoginPage() {
             </UIText>
             <UISelect
               value={selectedRole}
-              onChange={setSelectedRole}
+              onChange={(v) => setSelectedRole(v as UserRole)}
               style={{ width: '100%' }}
               size="large"
               options={[
                 {
-                  label: (
-                    <UISpace>
-                      <UIIcon name="UserOutlined" />
-                      <span>
-                        <strong>Viewer</strong> — Просмотр данных
-                      </span>
-                    </UISpace>
-                  ),
+                  label: 'Viewer — Просмотр данных',
                   value: 'viewer',
                 },
                 {
-                  label: (
-                    <UISpace>
-                      <UIIcon name="UserOutlined" />
-                      <span>
-                        <strong>Operator</strong> — Управление системой
-                      </span>
-                    </UISpace>
-                  ),
+                  label: 'Operator — Управление системой',
                   value: 'operator',
                 },
                 {
-                  label: (
-                    <UISpace>
-                      <UIIcon name="UserOutlined" />
-                      <span>
-                        <strong>Admin</strong> — Полный доступ
-                      </span>
-                    </UISpace>
-                  ),
+                  label: 'Admin — Полный доступ',
                   value: 'admin',
                 },
               ]}
@@ -154,7 +133,7 @@ export function LoginPage() {
           {/* Login Buttons */}
           <UISpace direction="vertical" size="middle" style={{ width: '100%' }}>
             <UIButton
-              type="primary"
+              variant="primary"
               size="large"
               block
               icon={<UIIcon name="RocketOutlined" />}

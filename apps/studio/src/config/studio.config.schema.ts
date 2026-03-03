@@ -27,24 +27,6 @@ const FeaturesSchema = z.object({
 });
 
 /**
- * Headers configuration schema
- */
-const HeadersSchema = z.object({
-  allowedPrefixes: z.array(z.string().min(1)),
-  allowAuthorization: z.boolean(),
-});
-
-/**
- * Header notices configuration schema
- */
-const HeaderNoticesSchema = z.object({
-  enabled: z.boolean(),
-  defaultExpanded: z.boolean(),
-  showProvided: z.boolean(),
-  collapsible: z.boolean(),
-});
-
-/**
  * Events configuration schema
  */
 const EventsSchema = z.object({
@@ -63,8 +45,6 @@ export const StudioConfigSchema = z.object({
   dataSourceMode: DataSourceModeSchema,
   apiBaseUrl: z.string().min(1, 'apiBaseUrl is required'),
   features: FeaturesSchema,
-  headers: HeadersSchema,
-  headerNotices: HeaderNoticesSchema,
   events: EventsSchema,
 });
 

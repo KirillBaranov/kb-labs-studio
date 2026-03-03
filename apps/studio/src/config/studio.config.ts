@@ -17,23 +17,6 @@
  */
 import { validateStudioConfig } from './studio.config.schema';
 
-function parseBooleanEnv(value: string | undefined, defaultValue: boolean): boolean {
-  if (value === undefined) {
-    return defaultValue;
-  }
-  return ['1', 'true', 'yes', 'on'].includes(value.toLowerCase());
-}
-
-function parseHeaderPrefixes(value: string | undefined, fallback: string[]): string[] {
-  if (!value) {
-    return fallback;
-  }
-  return value
-    .split(',')
-    .map(prefix => prefix.trim().toLowerCase())
-    .filter(prefix => prefix.length > 0);
-}
-
 function resolveUrl(base: string, path: string): string {
   if (!path) {
     return base;
@@ -80,16 +63,6 @@ const rawConfig = {
     enableAnalytics: false,
     sse: true,
     analytics: true,
-  },
-  headers: {
-    allowedPrefixes: parseHeaderPrefixes(import.meta.env.VITE_FORWARD_HEADER_PREFIXES, ['x-']),
-    allowAuthorization: parseBooleanEnv(import.meta.env.VITE_FORWARD_AUTH_HEADER, false),
-  },
-  headerNotices: {
-    enabled: parseBooleanEnv(import.meta.env.VITE_STUDIO_HEADERS_NOTICE ?? undefined, true),
-    defaultExpanded: parseBooleanEnv(import.meta.env.VITE_STUDIO_HEADERS_NOTICE_EXPANDED ?? undefined, false),
-    showProvided: parseBooleanEnv(import.meta.env.VITE_STUDIO_HEADERS_NOTICE_SHOW_PROVIDED ?? undefined, true),
-    collapsible: parseBooleanEnv(import.meta.env.VITE_STUDIO_HEADERS_NOTICE_COLLAPSIBLE ?? undefined, true),
   },
   events: {
     baseUrl: eventsBaseUrlEnv,
