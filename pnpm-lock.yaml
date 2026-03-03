@@ -102,8 +102,8 @@ importers:
         specifier: link:../../../kb-labs-quality-plugin/packages/quality-contracts
         version: link:../../../kb-labs-quality-plugin/packages/quality-contracts
       '@kb-labs/rest-api-contracts':
-        specifier: ^1.0.0
-        version: 1.0.0
+        specifier: link:../../../kb-labs-rest-api/packages/rest-api-contracts
+        version: link:../../../kb-labs-rest-api/packages/rest-api-contracts
       '@kb-labs/studio-data-client':
         specifier: link:../../packages/studio-data-client
         version: link:../../packages/studio-data-client
@@ -248,11 +248,11 @@ importers:
         specifier: link:../../../kb-labs-commit-plugin/packages/commit-contracts
         version: link:../../../kb-labs-commit-plugin/packages/commit-contracts
       '@kb-labs/core-platform':
-        specifier: ^1.0.0
-        version: 1.0.0
+        specifier: link:../../../kb-labs-core/packages/core-platform
+        version: link:../../../kb-labs-core/packages/core-platform
       '@kb-labs/plugin-contracts':
-        specifier: ^1.0.0
-        version: 1.0.0
+        specifier: link:../../../kb-labs-plugin/packages/plugin-contracts
+        version: link:../../../kb-labs-plugin/packages/plugin-contracts
       '@kb-labs/qa-contracts':
         specifier: link:../../../kb-labs-qa-plugin/packages/qa-contracts
         version: link:../../../kb-labs-qa-plugin/packages/qa-contracts
@@ -263,8 +263,8 @@ importers:
         specifier: link:../../../kb-labs-release-manager/packages/release-manager-contracts
         version: link:../../../kb-labs-release-manager/packages/release-manager-contracts
       '@kb-labs/rest-api-contracts':
-        specifier: ^1.0.0
-        version: 1.0.0
+        specifier: link:../../../kb-labs-rest-api/packages/rest-api-contracts
+        version: link:../../../kb-labs-rest-api/packages/rest-api-contracts
       '@tanstack/react-query':
         specifier: ^5.0.0
         version: 5.90.5(react@18.3.1)
@@ -381,6 +381,9 @@ importers:
       jsdom:
         specifier: ^24.1.0
         version: 24.1.3
+      react-router-dom:
+        specifier: ^7.0.0
+        version: 7.9.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       rimraf:
         specifier: ^6.0.1
         version: 6.1.0
@@ -390,73 +393,6 @@ importers:
       tsx:
         specifier: ^4.21.0
         version: 4.21.0
-      typescript:
-        specifier: ^5.6.3
-        version: 5.9.3
-      vitest:
-        specifier: ^3.2.4
-        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.10.4)(jiti@2.6.1)(jsdom@24.1.3)(terser@5.44.0)(tsx@4.21.0)(yaml@2.8.2)
-
-  packages/studio-ui-react:
-    dependencies:
-      '@ant-design/charts':
-        specifier: ^2.6.6
-        version: 2.6.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(workerize-loader@2.0.2(webpack@5.102.1(esbuild@0.25.11)))
-      '@ant-design/icons':
-        specifier: ^5.4.0
-        version: 5.6.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@kb-labs/studio-ui-kit':
-        specifier: workspace:*
-        version: link:../studio-ui-kit
-      '@types/react-grid-layout':
-        specifier: ^1.3.6
-        version: 1.3.6
-      antd:
-        specifier: ^5.21.0
-        version: 5.28.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      lucide-react:
-        specifier: ^0.468.0
-        version: 0.468.0(react@18.3.1)
-      react-dom:
-        specifier: ^18.3.1
-        version: 18.3.1(react@18.3.1)
-      react-grid-layout:
-        specifier: ^2.1.0
-        version: 2.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react-resizable:
-        specifier: ^3.0.5
-        version: 3.0.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-    devDependencies:
-      '@kb-labs/devkit':
-        specifier: link:../../../kb-labs-devkit
-        version: link:../../../kb-labs-devkit
-      '@testing-library/react':
-        specifier: ^16.1.0
-        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.26))(@types/react@18.3.26)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@types/node':
-        specifier: ^24.3.3
-        version: 24.10.4
-      '@types/react':
-        specifier: ^18.3.8
-        version: 18.3.26
-      '@types/react-dom':
-        specifier: ^18.3.0
-        version: 18.3.7(@types/react@18.3.26)
-      eslint:
-        specifier: ^9
-        version: 9.39.0(jiti@2.6.1)
-      react:
-        specifier: ^18.3.1
-        version: 18.3.1
-      rimraf:
-        specifier: ^6.0.1
-        version: 6.1.0
-      tsup:
-        specifier: ^8.5.0
-        version: 8.5.0(jiti@2.6.1)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       typescript:
         specifier: ^5.6.3
         version: 5.9.3
@@ -1200,10 +1136,6 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@kb-labs/core-platform@1.0.0':
-    resolution: {integrity: sha512-eAFoFXq5Y6v8LnxH2Rlz6ulq1/KvzCCsouujpyxocVNLCqslmGvRDd+RelF7vGfttHBXZrYpcjQ7rfVZqhn7Ag==}
-    engines: {node: '>=20.0.0', pnpm: '>=9.0.0'}
-
   '@kb-labs/devkit@file:../kb-labs-devkit':
     resolution: {directory: ../kb-labs-devkit, type: directory}
     engines: {node: '>=20.0.0', pnpm: '>=9.11.0'}
@@ -1231,14 +1163,6 @@ packages:
         optional: true
       react:
         optional: true
-
-  '@kb-labs/plugin-contracts@1.0.0':
-    resolution: {integrity: sha512-Q1NW3tvjUBjsxzEo4Wt3QQaKFwtqP639nrXooTNz1QAhMF9GtIZDRz5RisTcELsM4nAfZL8OlF9PhoJCWDxdLw==}
-    engines: {node: '>=20.0.0', pnpm: '>=9.0.0'}
-
-  '@kb-labs/rest-api-contracts@1.0.0':
-    resolution: {integrity: sha512-gcB5GWutmHF7xop6Zt6MEO1IoJXNuOtzn645lI5lU3nh6iI60YIJx4ps0yT7YA8vCoMB4U1jrrZXoeoy9tIMtQ==}
-    engines: {node: '>=20.0.0', pnpm: '>=9.0.0'}
 
   '@naoak/workerize-transferable@0.1.0':
     resolution: {integrity: sha512-fDLfuP71IPNP5+zSfxFb52OHgtjZvauRJWbVnpzQ7G7BjcbLjTny0OW1d3ZO806XKpLWNKmeeW3MhE0sy8iwYQ==}
@@ -5405,10 +5329,6 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@kb-labs/core-platform@1.0.0':
-    dependencies:
-      ulid: 2.4.0
-
   '@kb-labs/devkit@file:../kb-labs-devkit(xx66owwstzarzwopyivriac534)':
     dependencies:
       '@playwright/test': 1.56.1
@@ -5434,16 +5354,6 @@ snapshots:
       - eslint-import-resolver-webpack
       - eslint-plugin-import-x
       - supports-color
-
-  '@kb-labs/plugin-contracts@1.0.0':
-    dependencies:
-      '@kb-labs/core-platform': link:../../../kb-labs-core/packages/core-platform
-      '@kb-labs/studio-contracts': link:../../../kb-labs-studio/packages/studio-contracts
-
-  '@kb-labs/rest-api-contracts@1.0.0':
-    dependencies:
-      '@kb-labs/studio-contracts': link:../../../kb-labs-studio/packages/studio-contracts
-      zod: 3.25.76
 
   '@naoak/workerize-transferable@0.1.0(workerize-loader@2.0.2(webpack@5.102.1(esbuild@0.25.11)))':
     dependencies:
