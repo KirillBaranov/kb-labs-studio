@@ -7,8 +7,8 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   
   // Extract API base URL from env or use default
-  const apiBaseUrl = env.VITE_API_BASE_URL || 'http://localhost:5050/api/v1';
-  const proxyTarget = env.VITE_API_PROXY_TARGET || 'http://localhost:5050';
+  const apiBaseUrl = env.VITE_API_BASE_URL || 'http://localhost:4000/api/v1';
+  const proxyTarget = env.VITE_API_PROXY_TARGET || 'http://localhost:4000';
   
   return {
     plugins: [react()],
