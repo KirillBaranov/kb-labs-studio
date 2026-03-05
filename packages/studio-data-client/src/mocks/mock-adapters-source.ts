@@ -21,6 +21,9 @@ export class MockAdaptersSource implements AdaptersDataSource {
       totalRequests: 1247,
       totalTokens: 3_456_789,
       totalCost: 12.45,
+      totalCacheReadTokens: 0,
+      totalBillableTokens: 3_456_789,
+      totalCacheSavingsUsd: 0,
       byModel: {
         'gpt-4': {
           requests: 234,
@@ -32,6 +35,9 @@ export class MockAdaptersSource implements AdaptersDataSource {
           tokensPerRequest: 295,
           errorRate: 0.5,
           avgDurationMs: 2345,
+          cacheReadTokens: 0,
+          billableTokens: 69_134,
+          cacheSavingsUsd: 0,
         },
         'gpt-3.5-turbo': {
           requests: 789,
@@ -43,6 +49,9 @@ export class MockAdaptersSource implements AdaptersDataSource {
           tokensPerRequest: 454,
           errorRate: 0,
           avgDurationMs: 876,
+          cacheReadTokens: 0,
+          billableTokens: 358_023,
+          cacheSavingsUsd: 0,
         },
         'claude-3-sonnet': {
           requests: 224,
@@ -54,6 +63,9 @@ export class MockAdaptersSource implements AdaptersDataSource {
           tokensPerRequest: 3582,
           errorRate: 1.2,
           avgDurationMs: 1567,
+          cacheReadTokens: 0,
+          billableTokens: 802_457,
+          cacheSavingsUsd: 0,
         },
       },
       errors: 12,

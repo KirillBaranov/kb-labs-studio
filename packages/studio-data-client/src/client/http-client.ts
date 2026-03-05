@@ -11,12 +11,13 @@ export class HttpClient {
   private errorInterceptors: ErrorInterceptor[] = [];
   private baseUrl: string;
 
-  constructor(baseUrl: string = '') {
+  constructor(baseUrl: string = '', token?: string) {
     this.baseUrl = baseUrl;
     this.client = axios.create({
       baseURL: baseUrl,
       headers: {
         'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
     });
 

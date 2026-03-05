@@ -51,6 +51,8 @@ import { HttpClient } from './client/http-client';
 export interface DataSourcesConfig {
   mode: 'mock' | 'http';
   baseUrl?: string;
+  /** Bearer token forwarded to Gateway on every request */
+  token?: string;
 }
 
 export interface DataSources {
@@ -95,7 +97,7 @@ export function createDataSources(config: DataSourcesConfig): DataSources {
   }
 
   const baseUrl = config.baseUrl || '';
-  const client = new HttpClient(baseUrl);
+  const client = new HttpClient(baseUrl, config.token);
 
   return {
     audit: new HttpAuditSource(client),

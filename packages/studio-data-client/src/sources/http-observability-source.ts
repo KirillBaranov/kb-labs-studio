@@ -99,8 +99,7 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
     onEvent: (event: SystemEvent) => void,
     onError: (error: Error) => void
   ): () => void {
-    const baseUrl = this.client.getBaseUrl() || 'http://localhost:5050';
-    const eventSource = new EventSource(`${baseUrl}/events/registry`);
+    const eventSource = new EventSource(`${this.client.getBaseUrl()}/events/registry`);
 
     eventSource.addEventListener('registry', (e) => {
       try {
@@ -164,8 +163,6 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
     onError: (error: Error) => void,
     filters?: LogQuery
   ): () => void {
-    const baseUrl = this.client.getBaseUrl() || 'http://localhost:5050';
-
     // Build query string from filters
     const params = new URLSearchParams();
     if (filters?.level) {params.append('level', filters.level);}
@@ -174,9 +171,10 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
     if (filters?.tenantId) {params.append('tenantId', filters.tenantId);}
 
     const queryString = params.toString();
+    const streamBase = this.client.getBaseUrl();
     const url = queryString
-      ? `${baseUrl}/logs/stream?${queryString}`
-      : `${baseUrl}/logs/stream`;
+      ? `${streamBase}/logs/stream?${queryString}`
+      : `${streamBase}/logs/stream`;
 
     const eventSource = new EventSource(url);
 
