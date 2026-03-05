@@ -65,13 +65,14 @@ export interface UseWorkflowLogsOptions {
   follow?: boolean
   idleTimeoutMs?: number
   enabled?: boolean
+  baseUrl?: string
 }
 
 export function useWorkflowLogs(
   runId: string | null,
   options: UseWorkflowLogsOptions = {},
 ) {
-  const { follow = true, idleTimeoutMs, enabled = true } = options
+  const { follow = true, idleTimeoutMs, enabled = true, baseUrl = '' } = options
   const [events, setEvents] = useState<WorkflowLogEvent[]>([])
   const [error, setError] = useState<Error | null>(null)
   const [isConnected, setIsConnected] = useState(false)
@@ -83,14 +84,6 @@ export function useWorkflowLogs(
 
     setEvents([])
     setError(null)
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    const baseUrl =
-      (window as any).__KB_LABS_API_BASE_URL__ ||
-      (typeof import.meta !== 'undefined' ? (import.meta as any).env?.VITE_API_BASE_URL : undefined) ||
-      'http://localhost:5050/api/v1'
 
     const params = new URLSearchParams()
     if (follow) {
@@ -141,13 +134,14 @@ export interface UseWorkflowEventsOptions {
   pollIntervalMs?: number
   cursor?: string | null
   enabled?: boolean
+  baseUrl?: string
 }
 
 export function useWorkflowEvents(
   runId: string | null,
   options: UseWorkflowEventsOptions = {},
 ) {
-  const { follow = true, pollIntervalMs, cursor, enabled = true } = options
+  const { follow = true, pollIntervalMs, cursor, enabled = true, baseUrl = '' } = options
   const [events, setEvents] = useState<WorkflowPresenterEvent[]>([])
   const [error, setError] = useState<Error | null>(null)
   const [isConnected, setIsConnected] = useState(false)
@@ -159,14 +153,6 @@ export function useWorkflowEvents(
 
     setEvents([])
     setError(null)
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    const baseUrl =
-      (window as any).__KB_LABS_API_BASE_URL__ ||
-      (typeof import.meta !== 'undefined' ? (import.meta as any).env?.VITE_API_BASE_URL : undefined) ||
-      'http://localhost:5050/api/v1'
 
     const params = new URLSearchParams()
     if (follow) {

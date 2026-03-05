@@ -1,4 +1,4 @@
-import { KBPageContainer, KBPageHeader, KBSection } from '@/components/ui';
+import { KBPageContainer, KBPageHeader, KBSection } from '../../../components/ui';
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import {
@@ -6,7 +6,7 @@ import {
   UITitle, UIAlert, UIList,
 } from '@kb-labs/studio-ui-kit'
 import type { UITableColumn } from '@kb-labs/studio-ui-kit'
-import { useDataSources } from '@/providers/data-sources-provider'
+import { useDataSources } from '../../../providers/data-sources-provider'
 import {
   useWorkflowRun,
   useWorkflowLogs,
@@ -14,7 +14,8 @@ import {
   useCancelWorkflowRun,
 } from '@kb-labs/studio-data-client'
 import type { WorkflowRun, JobRun, WorkflowPresenterEvent } from '@kb-labs/studio-data-client'
-import { WorkflowStatusBadge } from '@/components/workflow-status-badge'
+import { WorkflowStatusBadge } from '../../../components/workflow-status-badge'
+import { studioConfig } from '@/config/studio.config'
 
 const Text = UITypographyText
 const Paragraph = UITypographyParagraph
@@ -26,12 +27,12 @@ export function WorkflowRunPage() {
   const sources = useDataSources()
   const { data: run, isLoading, error, refetch } = useWorkflowRun(runId, sources.workflow)
   const cancelMutation = useCancelWorkflowRun(sources.workflow)
-  const { events, error: logError, isConnected } = useWorkflowLogs(runId, { follow: true })
+  const { events, error: logError, isConnected } = useWorkflowLogs(runId, { follow: true, baseUrl: studioConfig.apiBaseUrl })
   const {
     events: presenterEvents,
     error: presenterError,
     isConnected: presenterConnected,
-  } = useWorkflowEvents(runId, { follow: true })
+  } = useWorkflowEvents(runId, { follow: true, baseUrl: studioConfig.apiBaseUrl })
 
   const jobColumns = useMemo<UITableColumn<JobRun>[]>(
     () => [
