@@ -1,10 +1,10 @@
-import { useDataSources } from '@/providers/data-sources-provider';
+import { useDataSources } from '../providers/data-sources-provider';
 import { useHealthStatus, useReadyStatus } from '@kb-labs/studio-data-client';
 import { studioConfig } from '@/config/studio.config';
 import { UIAlert } from '@kb-labs/studio-ui-kit';
 import { RefreshCw } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useRegistry } from '@/providers/registry-provider';
+import { useRegistry } from '../providers/registry-provider';
 
 /**
  * Health banner component showing REST API status with fallback to mock mode
@@ -83,10 +83,7 @@ export function HealthBanner() {
     ? 'REST API degraded mode'
     : 'Using mock mode';
 
-  const apiUrl = studioConfig.apiBaseUrl;
-  const apiDisplayUrl = apiUrl.startsWith('http') 
-    ? apiUrl 
-    : `http://localhost:5050${apiUrl}`;
+  const apiDisplayUrl = studioConfig.apiBaseUrl;
 
   const statusDescription = isDown
     ? `REST API is not ready at ${apiDisplayUrl}. Reason: ${readyReason ?? 'unknown'}.`
@@ -156,4 +153,3 @@ export function HealthBanner() {
     />
   );
 }
-

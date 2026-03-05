@@ -44,6 +44,8 @@ const EventsSchema = z.object({
 export const StudioConfigSchema = z.object({
   dataSourceMode: DataSourceModeSchema,
   apiBaseUrl: z.string().min(1, 'apiBaseUrl is required'),
+  /** Bearer token sent to Gateway on every request. Optional — omit when connecting directly to REST API. */
+  gatewayToken: z.string().optional(),
   features: FeaturesSchema,
   events: EventsSchema,
 });

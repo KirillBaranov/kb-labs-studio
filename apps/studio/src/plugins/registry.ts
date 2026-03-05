@@ -17,14 +17,19 @@ const registryLogger = createStudioLogger('registry-loader');
  * Server handles all manifest parsing, version detection, and registry generation.
  */
 export async function loadRegistry(
-  apiBaseUrl: string = '/api/v1'
+  apiBaseUrl: string = '/api/v1',
+  token?: string,
 ): Promise<StudioRegistry> {
   const registryUrl = `${apiBaseUrl}/studio/registry`;
 
   try {
     registryLogger.info('Fetching Studio registry', { registryUrl });
 
-    const response = await fetch(registryUrl);
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    const response = await fetch(registryUrl, { headers });
     if (!response.ok) {
       throw new Error(`Failed to fetch registry: ${response.status} ${response.statusText}`);
     }

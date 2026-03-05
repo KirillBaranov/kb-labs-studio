@@ -31,6 +31,7 @@ function resolveUrl(base: string, path: string): string {
 }
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
+const gatewayTokenEnv = import.meta.env.VITE_GATEWAY_TOKEN as string | undefined;
 const eventsBaseUrlEnv = import.meta.env.VITE_EVENTS_BASE_URL || apiBaseUrl;
 const registryEventsPath = import.meta.env.VITE_EVENTS_REGISTRY_PATH || '/events/registry';
 const eventsAuthTokenEnv = import.meta.env.VITE_EVENTS_AUTH_TOKEN;
@@ -57,6 +58,7 @@ function parseHeaders(value: string | undefined): Record<string, string> | undef
 const rawConfig = {
   dataSourceMode: (import.meta.env.VITE_DATA_SOURCE_MODE || 'http') as 'mock' | 'http',
   apiBaseUrl,
+  gatewayToken: gatewayTokenEnv,
   features: {
     enableDevlink: false,
     enableMind: false,
@@ -69,7 +71,9 @@ const rawConfig = {
     registryPath: registryEventsPath,
     registryUrl: resolveUrl(eventsBaseUrlEnv, registryEventsPath),
     retryDelays: [250, 1_000, 2_000, 5_000],
-    token: eventsAuthTokenEnv,
+    // VITE_EVENTS_AUTH_TOKEN takes precedence; fall back to gateway token so
+    // a single VITE_GATEWAY_TOKEN covers both REST and SSE connections.
+    token: eventsAuthTokenEnv ?? gatewayTokenEnv,
     headers: parseHeaders(eventsHeadersEnv),
   },
 };
