@@ -15,9 +15,10 @@ import {
   UIAccordion,
   UIDescriptions,
   UIDescriptionsItem,
-  UITooltip,
   UIMessage,
   UIModal,
+  UIInput,
+  UISegmented,
   UIInputTextArea,
   UIDivider,
   UISpin,
@@ -30,7 +31,7 @@ import { useDataSources } from '../../../providers/data-sources-provider';
 import type { LogRecord, LogSummarizeResponse } from '@kb-labs/studio-data-client';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { KBPageContainer, KBPageHeader } from '@/components/ui';
+import { KBPageContainer, KBPageHeader } from '../../../components/ui';
 
 
 /**
@@ -62,55 +63,6 @@ const QUESTION_TEMPLATES = [
  */
 function formatTime(timestamp: string): string {
   return new Date(timestamp).toLocaleTimeString();
-}
-
-/**
- * Format timestamp to full datetime
- */
-function formatDateTime(timestamp: string): string {
-  return new Date(timestamp).toLocaleString();
-}
-
-/**
- * Get log level icon
- */
-function getLevelIcon(level: LogRecord['level']) {
-  switch (level) {
-    case 'trace':
-    case 'debug':
-      return <UIIcon name="BugOutlined" style={{ color: '#8c8c8c' }} />;
-    case 'info':
-      return <UIIcon name="InfoCircleOutlined" style={{ color: '#1890ff' }} />;
-    case 'warn':
-      return <UIIcon name="WarningOutlined" style={{ color: '#faad14' }} />;
-    case 'error':
-      return <UIIcon name="CloseCircleOutlined" style={{ color: '#ff4d4f' }} />;
-  }
-}
-
-/**
- * Get log level tag color
- */
-function getLevelColor(level: LogRecord['level']): string {
-  switch (level) {
-    case 'trace':
-    case 'debug':
-      return 'default';
-    case 'info':
-      return 'blue';
-    case 'warn':
-      return 'orange';
-    case 'error':
-      return 'red';
-  }
-}
-
-/**
- * Copy text to clipboard
- */
-function copyToClipboard(text: string, label: string) {
-  navigator.clipboard.writeText(text);
-  UIMessage.success(`${label} copied to clipboard`);
 }
 
 /**
@@ -181,6 +133,17 @@ function calculateLogStats(logs: LogRecord[]) {
 export function LogsPage() {
   const sources = useDataSources();
   const { logs: streamLogs, isConnected, error, clearLogs } = useLogStream(sources.observability);
+  const [viewMode, setViewMode] = useState<'live' | 'history'>('live');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [historyRefreshToken, setHistoryRefreshToken] = useState(0);
+  const [historyPage, setHistoryPage] = useState(1);
+  const [historyPageSize, setHistoryPageSize] = useState(50);
+  const [historyLogs, setHistoryLogs] = useState<LogRecord[]>([]);
+  const [historyTotal, setHistoryTotal] = useState(0);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState<Error | null>(null);
+  const [historySource, setHistorySource] = useState<string | undefined>(undefined);
+  const [historyStats, setHistoryStats] = useState<any>(null);
 
   // Pause/Resume state
   const [isPaused, setIsPaused] = useState(false);
@@ -192,9 +155,6 @@ export function LogsPage() {
       setFrozenLogs(streamLogs);
     }
   }, [streamLogs, isPaused]);
-
-  // Use frozen logs when paused, stream logs when not
-  const logs = isPaused ? frozenLogs : streamLogs;
 
   // Filters
   const [levelFilter, setLevelFilter] = useState<string | null>(null);
@@ -216,43 +176,140 @@ export function LogsPage() {
   const [summarizing, setSummarizing] = useState(false);
   const [summaryResult, setSummaryResult] = useState<LogSummarizeResponse['data'] | null>(null);
 
+  useEffect(() => {
+    if (viewMode !== 'history') {return;}
+    setHistoryPage(1);
+  }, [viewMode, levelFilter, pluginFilter, timeRange, customTimeRange, searchQuery]);
+
+  // Query logs history from backend with server-side filtering/pagination/search
+  useEffect(() => {
+    if (viewMode !== 'history') {return;}
+
+    let cancelled = false;
+
+    const fetchHistory = async () => {
+      setHistoryLoading(true);
+      setHistoryError(null);
+
+      try {
+        const query: any = {
+          limit: historyPageSize,
+          offset: (historyPage - 1) * historyPageSize,
+        };
+
+        if (levelFilter) {
+          query.level = levelFilter;
+        }
+        if (pluginFilter) {
+          query.plugin = pluginFilter;
+        }
+        if (searchQuery.trim()) {
+          query.search = searchQuery.trim();
+        }
+
+        if (timeRange !== 'custom') {
+          const rangeMinutes = TIME_RANGES[timeRange as keyof typeof TIME_RANGES]?.minutes || 15;
+          query.from = dayjs().subtract(rangeMinutes, 'minutes').toISOString();
+          query.to = dayjs().toISOString();
+        } else if (customTimeRange) {
+          query.from = customTimeRange[0].toISOString();
+          query.to = customTimeRange[1].toISOString();
+        }
+
+        const result: any = await sources.observability.queryLogs(query);
+        const data = result?.logs ? result : result?.data ?? {};
+
+        if (cancelled) {return;}
+
+        const logs = Array.isArray(data.logs) ? data.logs : [];
+        setHistoryLogs(logs);
+        setHistoryTotal(typeof data.total === 'number' ? data.total : logs.length);
+        setHistorySource(typeof data.source === 'string' ? data.source : undefined);
+        setHistoryStats(data.stats ?? null);
+      } catch (err: any) {
+        if (cancelled) {return;}
+        setHistoryError(err instanceof Error ? err : new Error(String(err)));
+        setHistoryLogs([]);
+        setHistoryTotal(0);
+      } finally {
+        if (!cancelled) {
+          setHistoryLoading(false);
+        }
+      }
+    };
+
+    void fetchHistory();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    viewMode,
+    historyPage,
+    historyPageSize,
+    levelFilter,
+    pluginFilter,
+    timeRange,
+    customTimeRange,
+    searchQuery,
+    historyRefreshToken,
+    sources.observability,
+  ]);
+
   // Calculate filtered logs
+  const logs = viewMode === 'history' ? historyLogs : (isPaused ? frozenLogs : streamLogs);
+
   const filteredLogs = useMemo(() => {
     let filtered = [...logs];
 
-    // Apply level filter
-    if (levelFilter) {
-      filtered = filtered.filter((log) => log.level === levelFilter);
-    }
+    // In history mode level/plugin/time/search are applied on backend.
+    // In live mode apply all filters client-side.
+    if (viewMode !== 'history') {
+      if (levelFilter) {
+        filtered = filtered.filter((log) => log.level === levelFilter);
+      }
 
-    // Apply plugin filter
-    if (pluginFilter) {
-      filtered = filtered.filter((log) => log.plugin === pluginFilter);
-    }
+      if (pluginFilter) {
+        filtered = filtered.filter((log) => log.plugin === pluginFilter);
+      }
 
-    // Apply time range filter
-    if (timeRange !== 'custom') {
-      const rangeMinutes = TIME_RANGES[timeRange as keyof typeof TIME_RANGES]?.minutes || 15;
-      const cutoff = Date.now() - rangeMinutes * 60 * 1000;
-      filtered = filtered.filter((log) => new Date(log.time).getTime() >= cutoff);
-    } else if (customTimeRange) {
-      const [start, end] = customTimeRange;
-      filtered = filtered.filter((log) => {
-        const logTime = dayjs(log.time);
-        return logTime.isAfter(start) && logTime.isBefore(end);
-      });
+      if (timeRange !== 'custom') {
+        const rangeMinutes = TIME_RANGES[timeRange as keyof typeof TIME_RANGES]?.minutes || 15;
+        const cutoff = Date.now() - rangeMinutes * 60 * 1000;
+        filtered = filtered.filter((log) => new Date(log.time).getTime() >= cutoff);
+      } else if (customTimeRange) {
+        const [start, end] = customTimeRange;
+        filtered = filtered.filter((log) => {
+          const logTime = dayjs(log.time);
+          return logTime.isAfter(start) && logTime.isBefore(end);
+        });
+      }
+
+      if (searchQuery.trim()) {
+        const query = searchQuery.trim().toLowerCase();
+        filtered = filtered.filter((log) => {
+          const haystack = [
+            String(log.msg ?? ''),
+            String(log.plugin ?? ''),
+            String(log.trace ?? (log as any).traceId ?? ''),
+            String(log.executionId ?? ''),
+            JSON.stringify(log.meta ?? {}),
+          ].join(' ').toLowerCase();
+          return haystack.includes(query);
+        });
+      }
     }
 
     return filtered;
-  }, [logs, levelFilter, pluginFilter, timeRange, customTimeRange]);
+  }, [logs, viewMode, levelFilter, pluginFilter, timeRange, customTimeRange, searchQuery]);
 
   // Calculate statistics (for AI summarization)
   const stats = useMemo(() => calculateLogStats(filteredLogs), [filteredLogs]);
 
   // Get unique plugins for filter dropdown
   const uniquePlugins = useMemo(() => {
-    return Array.from(new Set(logs.map((log) => log.plugin).filter(Boolean)));
-  }, [logs]);
+    return Array.from(new Set([...streamLogs, ...historyLogs].map((log) => log.plugin).filter(Boolean)));
+  }, [streamLogs, historyLogs]);
 
   // Group logs if needed
   const groupedLogs = useMemo(() => {
@@ -281,7 +338,7 @@ export function LogsPage() {
     let jsonString: string;
     try {
       jsonString = JSON.stringify(logData, null, 2);
-    } catch (err) {
+    } catch {
       // Fallback if JSON.stringify fails (circular refs, etc.)
       jsonString = JSON.stringify(
         {
@@ -425,7 +482,7 @@ export function LogsPage() {
       />
 
       {/* Connection Status */}
-      {!isConnected && !error && (
+      {!isConnected && !error && viewMode === 'live' && (
         <UIAlert
           message="Connecting to log stream..."
           variant="info"
@@ -435,7 +492,7 @@ export function LogsPage() {
         />
       )}
 
-      {error && (
+      {error && viewMode === 'live' && (
         <UIAlert
           message="Connection failed"
           description={error.message + ' - Make sure REST API is running on localhost:5050'}
@@ -445,13 +502,37 @@ export function LogsPage() {
         />
       )}
 
-      {isConnected && (
+      {isConnected && viewMode === 'live' && (
         <UIAlert
           message="Connected to log stream"
           variant="success"
           showIcon
           icon={<UIIcon name="CheckCircleOutlined" />}
           style={{ marginBottom: 24 }}
+        />
+      )}
+
+      {viewMode === 'history' && historyError && (
+        <UIAlert
+          message="Failed to load historical logs"
+          description={historyError.message}
+          variant="error"
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
+      )}
+
+      {viewMode === 'history' && (
+        <UIAlert
+          message={`Historical logs: ${historyTotal} total`}
+          description={
+            historySource
+              ? `Source: ${historySource}${historyStats?.persistence ? `, persisted logs: ${historyStats.persistence.totalLogs}` : ''}`
+              : 'Showing stored logs with server-side filtering and search'
+          }
+          variant="info"
+          showIcon
+          style={{ marginBottom: 16 }}
         />
       )}
 
@@ -463,9 +544,47 @@ export function LogsPage() {
           items={[
             {
               key: 'filters',
-              label: `Filters & Statistics (${filteredLogs.length} logs)`,
+              label: `Filters & Statistics (${
+                viewMode === 'history'
+                  ? `${filteredLogs.length}/${historyTotal}`
+                  : filteredLogs.length
+              } logs)`,
               children: (
                 <>
+                  <UIRow gutter={[16, 16]} style={{ marginBottom: 12 }}>
+                    <UICol span={6}>
+                      <UISpace direction="vertical" style={{ width: '100%' }}>
+                        <UITypographyText type="secondary" style={{ fontSize: 12 }}>
+                          Mode
+                        </UITypographyText>
+                        <UISegmented
+                          value={viewMode}
+                          onChange={(value) => setViewMode(value as 'live' | 'history')}
+                          options={[
+                            { label: 'Live', value: 'live' },
+                            { label: 'History', value: 'history' },
+                          ]}
+                        />
+                      </UISpace>
+                    </UICol>
+
+                    <UICol span={18}>
+                      <UISpace direction="vertical" style={{ width: '100%' }}>
+                        <UITypographyText type="secondary" style={{ fontSize: 12 }}>
+                          <UIIcon name="SearchOutlined" /> Search
+                        </UITypographyText>
+                        <UIInput
+                          value={searchQuery}
+                          onChange={(value: string) => setSearchQuery(value)}
+                          placeholder={viewMode === 'history'
+                            ? 'Search in history by message'
+                            : 'Search in live list'}
+                          allowClear
+                        />
+                      </UISpace>
+                    </UICol>
+                  </UIRow>
+
                   <UIRow gutter={[16, 16]}>
                     <UICol span={6}>
                       <UISpace direction="vertical" style={{ width: '100%' }}>
@@ -636,30 +755,59 @@ export function LogsPage() {
       <UICard
         title={
           <UISpace>
-            <span>{groupBy === 'none' ? 'Recent Logs' : `Logs grouped by ${groupBy}`}</span>
-            <UIBadge count={filteredLogs.length} showZero style={{ backgroundColor: '#52c41a' }} />
+            <span>{
+              groupBy === 'none'
+                ? (viewMode === 'history' ? 'Historical Logs' : 'Recent Logs')
+                : `Logs grouped by ${groupBy}`
+            }</span>
+            <UIBadge
+              count={viewMode === 'history' ? historyTotal : filteredLogs.length}
+              showZero
+              style={{ backgroundColor: '#52c41a' }}
+            />
           </UISpace>
         }
         extra={
           <UISpace>
-            <UIButton
-              size="small"
-              icon={isPaused ? <UIIcon name="SyncOutlined" /> : <UIIcon name="ClockCircleOutlined" />}
-              onClick={() => setIsPaused(!isPaused)}
-              variant={isPaused ? 'primary' : 'default'}
-            >
-              {isPaused ? 'Resume' : 'Pause'}
-            </UIButton>
-            <UIButton size="small" onClick={clearLogs}>
-              Clear
-            </UIButton>
+            {viewMode === 'live' ? (
+              <>
+                <UIButton
+                  size="small"
+                  icon={isPaused ? <UIIcon name="SyncOutlined" /> : <UIIcon name="ClockCircleOutlined" />}
+                  onClick={() => setIsPaused(!isPaused)}
+                  variant={isPaused ? 'primary' : 'default'}
+                >
+                  {isPaused ? 'Resume' : 'Pause'}
+                </UIButton>
+                <UIButton size="small" onClick={clearLogs}>
+                  Clear
+                </UIButton>
+              </>
+            ) : (
+              <UIButton
+                size="small"
+                icon={<UIIcon name="ReloadOutlined" />}
+                loading={historyLoading}
+                onClick={() => setHistoryRefreshToken((v) => v + 1)}
+              >
+                Refresh
+              </UIButton>
+            )}
           </UISpace>
         }
       >
-        {filteredLogs.length === 0 ? (
+        {viewMode === 'history' && historyLoading ? (
+          <div style={{ textAlign: 'center', padding: '40px 0' }}>
+            <UISpin tip="Loading historical logs..." />
+          </div>
+        ) : filteredLogs.length === 0 ? (
           <UIAlert
             message="No logs match current filters"
-            description="Adjust filters or wait for new logs to arrive"
+            description={
+              viewMode === 'history'
+                ? 'Adjust filters or search query for historical data'
+                : 'Adjust filters or wait for new logs to arrive'
+            }
             variant="info"
             showIcon
           />
@@ -671,11 +819,29 @@ export function LogsPage() {
                 <UIList.Item style={{ padding: '8px 0' }}>{renderLogItem(log, index)}</UIList.Item>
               )}
               pagination={
-                filteredLogs.length > 50
+                viewMode === 'history'
+                  ? {
+                      current: historyPage,
+                      total: historyTotal,
+                      pageSize: historyPageSize,
+                      showSizeChanger: true,
+                      pageSizeOptions: ['25', '50', '100', '200'],
+                      showTotal: (total: number, range: [number, number]) =>
+                        `Showing ${range[0]}-${range[1]} of ${total} logs`,
+                      onChange: (page: number, pageSize: number) => {
+                        if (pageSize !== historyPageSize) {
+                          setHistoryPageSize(pageSize);
+                          setHistoryPage(1);
+                        } else {
+                          setHistoryPage(page);
+                        }
+                      },
+                    }
+                  : filteredLogs.length > 50
                   ? {
                       pageSize: 50,
                       showSizeChanger: true,
-                      showTotal: (total) => `Total ${total} logs`,
+                      showTotal: (total: number) => `Total ${total} logs`,
                       pageSizeOptions: ['25', '50', '100', '200'],
                     }
                   : false

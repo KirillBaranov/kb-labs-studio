@@ -8,6 +8,7 @@ export function DataSourcesProvider({ children }: { children: ReactNode }) {
   const sources = createDataSources({
     mode: studioConfig.dataSourceMode,
     baseUrl: studioConfig.apiBaseUrl,
+    token: studioConfig.gatewayToken,
   });
 
   return <DataSourcesContext.Provider value={sources}>{children}</DataSourcesContext.Provider>;

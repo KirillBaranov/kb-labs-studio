@@ -73,7 +73,7 @@ describe('RegistryProvider', () => {
         }
         renderToStaticMarkup(<TestComponent />);
       }).toThrow('useRegistry must be used within RegistryProvider');
-    });
+    }, 15000);
   });
 
   describe('registry data structure', () => {

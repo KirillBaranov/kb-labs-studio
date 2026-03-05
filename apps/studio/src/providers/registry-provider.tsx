@@ -143,7 +143,7 @@ export function RegistryProvider({
     failureCount,
   } = useQuery({
     queryKey: [...REGISTRY_QUERY_KEY, apiBaseUrl],
-    queryFn: () => loadRegistry(apiBaseUrl),
+    queryFn: () => loadRegistry(apiBaseUrl, studioConfig.gatewayToken),
     staleTime: 5_000,
     gcTime: 60_000,
     retry: (failureCount, _error) => computeRetryDelay(failureCount) !== false,
