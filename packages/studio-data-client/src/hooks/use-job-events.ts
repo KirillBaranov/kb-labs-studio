@@ -34,6 +34,7 @@ export interface JobEvent {
 export interface UseJobEventsOptions {
   enabled?: boolean;
   pollInterval?: number; // Polling interval in ms (fallback mode)
+  baseUrl?: string;
   onEvent?: (event: JobEvent) => void;
   onError?: (error: Error) => void;
   onComplete?: () => void;
@@ -59,6 +60,7 @@ export function useJobEvents(
   const {
     enabled = true,
     pollInterval = 1000,
+    baseUrl = '',
     onEvent,
     onError,
     onComplete,
@@ -95,14 +97,7 @@ export function useJobEvents(
       return;
     }
 
-    // Get API base URL from window or use default
-    // In Studio, this is set via studioConfig.apiBaseUrl
-    // For standalone usage, can be set via global or env
-    // baseUrl already contains /api/v1, so we use relative paths
-    const apiBaseUrl = (typeof window !== 'undefined' && (window as any).__KB_LABS_API_BASE_URL__) 
-      || import.meta.env.VITE_API_BASE_URL 
-      || 'http://localhost:5050/api/v1';
-    const eventsUrl = `${apiBaseUrl}/jobs/${jobId}/events`;
+    const eventsUrl = `${baseUrl}/jobs/${jobId}/events`;
 
     // Try SSE first
     if (useSSERef.current) {
@@ -143,7 +138,7 @@ export function useJobEvents(
           // Start polling fallback
           const poll = async () => {
             try {
-              const response = await fetch(`${apiBaseUrl}/jobs/${jobId}`);
+              const response = await fetch(`${baseUrl}/jobs/${jobId}`);
               if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
               }
@@ -209,15 +204,9 @@ export function useJobEvents(
 
     // Polling fallback (if SSE not available or disabled)
     if (!useSSERef.current && !pollingRef.current) {
-      // Get API base URL (same as above)
-      // baseUrl already contains /api/v1, so we use full URL
-      const apiBaseUrl = (typeof window !== 'undefined' && (window as any).__KB_LABS_API_BASE_URL__) 
-        || import.meta.env.VITE_API_BASE_URL 
-        || 'http://localhost:5050/api/v1';
-      
       const poll = async () => {
         try {
-          const response = await fetch(`${apiBaseUrl}/jobs/${jobId}`);
+          const response = await fetch(`${baseUrl}/jobs/${jobId}`);
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
           }

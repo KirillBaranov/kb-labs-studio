@@ -18,7 +18,7 @@ import {
   UIIcon,
 } from '@kb-labs/studio-ui-kit';
 import type { DataNode } from 'antd/es/tree';
-import { useDataSources } from '@/providers/data-sources-provider';
+import { useDataSources } from '../../../providers/data-sources-provider';
 import type { RoutesResponse, RouteInfo } from '@kb-labs/studio-data-client';
 
 const METHOD_COLORS: Record<string, string> = {
@@ -99,9 +99,7 @@ function treeNodeToAntdNode(
 
     // Create route entries for this node
     const routeNodes: DataNode[] = child.routes.map((route) => {
-      const fullUrl = route.url.startsWith('/api')
-        ? `http://localhost:5050${route.url}`
-        : `${baseUrl}${route.url}`;
+      const fullUrl = `${baseUrl}${route.url}`;
 
       return {
         key: `${route.method}-${route.url}`,
