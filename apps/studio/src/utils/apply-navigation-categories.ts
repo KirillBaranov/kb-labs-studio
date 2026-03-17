@@ -4,7 +4,7 @@
  */
 
 import type { NavigationCategory } from '../providers/settings-provider';
-import { NavigationItem } from '@/components/ui';
+import type { NavigationItem } from '@/components/ui';
 
 const PROTECTED_KEYS = new Set(['settings']);
 

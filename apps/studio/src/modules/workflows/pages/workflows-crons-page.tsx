@@ -1,6 +1,6 @@
 /**
- * @module @kb-labs/studio-app/modules/workflow/components/crons-tab
- * Cron jobs list view with schedule and status
+ * @module @kb-labs/studio-app/modules/workflows/pages/workflows-crons-page
+ * Cron jobs list - standalone page
  */
 
 import * as React from 'react';
@@ -16,8 +16,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useDataSources } from '@/providers/data-sources-provider';
 import type { CronInfo } from '@kb-labs/workflow-contracts';
 import { UICard } from '@kb-labs/studio-ui-kit';
+import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
-export function CronsTab() {
+export function WorkflowsCronsPage() {
   const sources = useDataSources();
 
   const { data: cronsData, isLoading } = useQuery({
@@ -26,7 +27,7 @@ export function CronsTab() {
   });
 
   const formatDate = (date?: Date | string) => {
-    if (!date) {return '—';}
+    if (!date) {return '-';}
     return new Date(date).toLocaleString();
   };
 
@@ -98,7 +99,7 @@ export function CronsTab() {
             <UITypographyText className="typo-caption">{formatDate(date)}</UITypographyText>
           </UISpace>
         ) : (
-          <UITypographyText className="typo-caption text-tertiary">—</UITypographyText>
+          <UITypographyText className="typo-caption text-tertiary">-</UITypographyText>
         )
       ),
     },
@@ -110,7 +111,7 @@ export function CronsTab() {
         pluginId ? (
           <UITag color="blue">{pluginId}</UITag>
         ) : (
-          <UITypographyText className="typo-caption text-tertiary">—</UITypographyText>
+          <UITypographyText className="typo-caption text-tertiary">-</UITypographyText>
         )
       ),
     },
@@ -120,8 +121,19 @@ export function CronsTab() {
   const disabledCount = cronsData?.crons?.filter((c) => !c.enabled).length || 0;
 
   return (
-    <UISpace direction="vertical" className="gap-section" style={{ width: '100%' }}>
-      <UICard>
+    <KBPageContainer>
+      <KBPageHeader
+        title="Cron Jobs"
+        description="Scheduled recurring tasks"
+        icon={<UIIcon name="ClockCircleOutlined" />}
+        breadcrumbItems={[
+          { title: 'Home', href: '/' },
+          { title: 'Workflows', href: '/workflows' },
+          { title: 'Crons' },
+        ]}
+      />
+
+      <UICard style={{ marginBottom: 'var(--spacing-section)' }}>
         <UISpace className="gap-section">
           <div>
             <UITypographyText className="typo-label text-secondary">Total Cron Jobs</UITypographyText>
@@ -150,11 +162,9 @@ export function CronsTab() {
           columns={columns}
           loading={isLoading}
           rowKey="id"
-          pagination={{
-            pageSize: 20,
-          }}
+          pagination={{ pageSize: 20 }}
         />
       </UICard>
-    </UISpace>
+    </KBPageContainer>
   );
 }

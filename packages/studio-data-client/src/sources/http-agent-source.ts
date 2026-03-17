@@ -57,11 +57,11 @@ export class HttpAgentSource implements AgentDataSource {
   }
 
   getEventsUrl(sessionId: string): string {
-    // HTTP base is http://host/api/v1, WS endpoint lives at ws://host/v1/ws/...
-    // Strip /api segment so the path becomes /v1/ws/...
+    // WS lives under the same /api/v1 prefix as HTTP, so gateway proxies both.
+    // baseUrl = "http://host/api/v1" → wsBase = "ws://host/api/v1"
     const baseUrl = this.client.getBaseUrl();
     const wsProtocol = baseUrl.startsWith('https') ? 'wss' : 'ws';
-    const wsBase = baseUrl.replace(/^https?/, wsProtocol).replace(/\/api(?=\/|$)/, '');
+    const wsBase = baseUrl.replace(/^https?/, wsProtocol);
     return `${wsBase}/ws/plugins/agents/session/${sessionId}`;
   }
 

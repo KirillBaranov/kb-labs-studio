@@ -7,7 +7,7 @@ import type { RouteObject } from 'react-router-dom';
 import { ReleasePage } from '../pages/release-page';
 import { ErrorBoundary } from '../../../components/error-boundary';
 import { renderIcon } from '../../../routes/helpers';
-import { NavigationItem } from '@/components/ui';
+import type { NavigationItem } from '@/components/ui';
 
 // Route paths
 const PATHS = {

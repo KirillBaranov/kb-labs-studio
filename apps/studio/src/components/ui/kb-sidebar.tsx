@@ -111,23 +111,20 @@ export function KBSidebar({
     if (!currentPath) {return [];}
 
     const findKeys = (path: string, navItems: NavigationItem[]): string[] => {
+      // First pass: exact matches and children (highest priority)
       for (const item of navItems) {
-        // Exact match - always select this item
         if (item.path === path) {
           return [item.key || item.path || `item-${Math.random()}`];
         }
-
-        // Check children first
         if (item.children && item.children.length > 0) {
           const childKeys = findKeys(path, item.children);
           if (childKeys.length > 0) {
-            // Found match in children - return only child key (don't select parent)
             return childKeys;
           }
         }
-
-        // Parent without children: check if current path starts with parent path
-        // This handles cases like /workflow parent matching /workflow/jobs child route
+      }
+      // Second pass: prefix matches (fallback for unregistered sub-routes)
+      for (const item of navItems) {
         if (item.path && !item.children?.length && path.startsWith(item.path + '/')) {
           return [item.key || item.path || `item-${Math.random()}`];
         }

@@ -70,6 +70,8 @@ export function AgentsPage() {
   const [task, setTask] = useState('');
   const [currentRunId, setCurrentRunId] = useState<string | null>(null);
   const [runStatus, setRunStatus] = useState<RunStatus>('idle');
+  // Optimistic user turns — shown immediately on send, replaced by server turns when they arrive
+  const [optimisticUserTurns, setOptimisticUserTurns] = useState<Turn[]>([]);
   const [responseMode, setResponseMode] = useState<AgentResponseMode>('auto');
   const [tier, setTier] = useState<'small' | 'medium' | 'large'>('medium');
   const [enableEscalation, setEnableEscalation] = useState(true);
@@ -110,6 +112,10 @@ export function AgentsPage() {
       void sessionTurnsQuery.refetch();
       console.log('[AgentsPage] Run completed:', summary);
     },
+    onTurnsChanged: () => {
+      // Once server turns arrive, drop optimistic ones (server is source of truth)
+      setOptimisticUserTurns([]);
+    },
     onError: (error) => {
       console.error('[AgentsPage] WebSocket error:', error);
       UIMessage.error(`Connection error: ${error.message}`);
@@ -123,6 +129,7 @@ export function AgentsPage() {
     setSearchParams({ session: sessionId }, { replace: true });
     setCurrentRunId(null);
     setRunStatus('idle');
+    setOptimisticUserTurns([]);
     ws.clearTurns();
   }, [ws, setSearchParams]);
 
@@ -132,6 +139,7 @@ export function AgentsPage() {
     setSearchParams({}, { replace: true });
     setCurrentRunId(null);
     setRunStatus('idle');
+    setOptimisticUserTurns([]);
     ws.clearTurns();
   }, [ws, setSearchParams]);
 
@@ -142,6 +150,19 @@ export function AgentsPage() {
     const userMessage = task.trim();
     setTask('');
     setRunStatus('running');
+
+    // Optimistically show user message immediately — replaced by server turn when WS arrives
+    const optimisticTurn: Turn = {
+      id: `optimistic-user-${Date.now()}`,
+      type: 'user',
+      sequence: 9999,
+      startedAt: new Date().toISOString(),
+      completedAt: new Date().toISOString(),
+      status: 'completed',
+      steps: [{ type: 'text', id: 'opt-1', timestamp: new Date().toISOString(), content: userMessage, role: 'user' }],
+      metadata: { agentId: 'user' },
+    };
+    setOptimisticUserTurns((prev) => [...prev, optimisticTurn]);
 
     try {
       const response = await startRunMutation.mutateAsync({
@@ -162,6 +183,7 @@ export function AgentsPage() {
 
       setCurrentRunId(response.runId);
     } catch (error) {
+      setOptimisticUserTurns((prev) => prev.filter((t) => t.id !== optimisticTurn.id));
       setRunStatus('failed');
       UIMessage.error(`Failed to start: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -209,15 +231,29 @@ export function AgentsPage() {
     const restTurns = sessionTurnsQuery.data?.turns ?? [];
     const wsTurns = ws.turns;
 
+    // Base merge: REST + WS (WS wins on conflict)
+    const merged = new Map<string, Turn>();
     if (wsTurns.length === 0) {
-      // No WS data yet -- show REST history only
-      return [...restTurns].sort(compareTurns);
+      for (const t of restTurns) {merged.set(t.id, t);}
+    } else {
+      for (const t of restTurns) {merged.set(t.id, t);}
+      for (const t of wsTurns) {merged.set(t.id, t);}
     }
 
-    // Merge: REST as base, WS wins (more up-to-date during active run)
-    const merged = new Map<string, Turn>();
-    for (const t of restTurns) {merged.set(t.id, t);}
-    for (const t of wsTurns) {merged.set(t.id, t);}
+    // Add optimistic user turns that don't have a matching real user turn yet.
+    // A real turn "matches" when a server user turn with the same text exists.
+    const serverUserTexts = new Set(
+      [...merged.values()]
+        .filter((t) => t.type === 'user')
+        .flatMap((t) => t.steps.filter((s) => s.type === 'text').map((s) => s.content?.trim()))
+        .filter(Boolean)
+    );
+    for (const t of optimisticUserTurns) {
+      const text = t.steps.find((s) => s.type === 'text')?.content?.trim();
+      if (text && !serverUserTexts.has(text)) {
+        merged.set(t.id, t);
+      }
+    }
 
     return [...merged.values()].sort(compareTurns);
   })();
@@ -232,8 +268,15 @@ export function AgentsPage() {
       return turns;
     }
 
+    // Don't show loader if the last assistant turn (after the last user turn) is already completed
     const lastUserTurn = [...turns].reverse().find((t) => t.type === 'user');
     if (!lastUserTurn) {
+      return turns;
+    }
+    const hasCompletedAssistantAfterUser = turns.some(
+      (t) => t.type === 'assistant' && t.status === 'completed' && t.sequence > lastUserTurn.sequence
+    );
+    if (hasCompletedAssistantAfterUser) {
       return turns;
     }
 

@@ -11,8 +11,13 @@ import { NotFoundPage } from './pages/not-found-page';
 import { LoginPage } from './pages/login-page';
 import { PluginPage } from './routes/plugin-page';
 import { SettingsPage } from './modules/settings/pages/settings-page';
-import { WorkflowsListPage } from './modules/workflows/pages/workflows-list-page';
+import { WorkflowsDashboardPage } from './modules/workflows/pages/workflows-dashboard-page';
+import { WorkflowsRunsPage } from './modules/workflows/pages/workflows-runs-page';
 import { WorkflowRunPage } from './modules/workflows/pages/workflow-run-page';
+import { WorkflowsDefinitionsPage } from './modules/workflows/pages/workflows-definitions-page';
+import { WorkflowDefinitionPage } from './modules/workflows/pages/workflow-definition-page';
+import { WorkflowsJobsPage } from './modules/workflows/pages/workflows-jobs-page';
+import { WorkflowsCronsPage } from './modules/workflows/pages/workflows-crons-page';
 import { DashboardPage } from './modules/dashboard/pages/dashboard-page';
 import { AIInsightsPage } from './modules/dashboard/pages/ai-insights-page';
 import { DashboardLayout } from './modules/dashboard/layouts/dashboard-layout';
@@ -40,7 +45,7 @@ import { QualityPage } from './modules/quality/pages/quality-page';
 import { QADashboardPage } from './modules/qa/pages/qa-page';
 import { PluginsPage } from './modules/plugins/pages/plugins-page';
 import { PluginDetailPage } from './modules/plugins/pages/plugin-detail-page';
-import { WorkflowPage } from './modules/workflow/pages/workflow-page';
+// Workflow pages - unified module
 import { PageTransition } from './components/page-transition';
 import { createStudioLogger } from './utils/logger';
 import { ErrorBoundary } from './components/error-boundary';
@@ -150,10 +155,42 @@ function LayoutContent() {
         ],
       },
       {
-        key: 'workflow',
-        label: 'Workflow',
+        key: 'workflows',
+        label: 'Workflows',
         icon: renderPluginIcon('ThunderboltOutlined'),
-        path: '/workflow',
+        path: '/workflows',
+        children: [
+          {
+            key: 'workflows-dashboard',
+            label: 'Dashboard',
+            path: '/workflows',
+            icon: renderPluginIcon('DashboardOutlined'),
+          },
+          {
+            key: 'workflows-runs',
+            label: 'Runs',
+            path: '/workflows/runs',
+            icon: renderPluginIcon('PlayCircleOutlined'),
+          },
+          {
+            key: 'workflows-definitions',
+            label: 'Definitions',
+            path: '/workflows/definitions',
+            icon: renderPluginIcon('AppstoreOutlined'),
+          },
+          {
+            key: 'workflows-jobs',
+            label: 'Jobs',
+            path: '/workflows/jobs',
+            icon: renderPluginIcon('UnorderedListOutlined'),
+          },
+          {
+            key: 'workflows-crons',
+            label: 'Crons',
+            path: '/workflows/crons',
+            icon: renderPluginIcon('ClockCircleOutlined'),
+          },
+        ],
       },
       {
         key: 'plugins',
@@ -483,22 +520,37 @@ export const router = createBrowserRouter([
       },
       {
         path: '/workflows',
-        element: <WorkflowsListPage />,
+        element: <WorkflowsDashboardPage />,
         errorElement: <ErrorBoundary />,
       },
       {
-        path: '/workflows/:runId',
+        path: '/workflows/runs',
+        element: <WorkflowsRunsPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/workflows/runs/:runId',
         element: <WorkflowRunPage />,
         errorElement: <ErrorBoundary />,
       },
       {
-        path: '/workflow',
-        element: <WorkflowPage />,
+        path: '/workflows/definitions',
+        element: <WorkflowsDefinitionsPage />,
         errorElement: <ErrorBoundary />,
       },
       {
-        path: '/workflow/:tab',
-        element: <WorkflowPage />,
+        path: '/workflows/definitions/:workflowId',
+        element: <WorkflowDefinitionPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/workflows/jobs',
+        element: <WorkflowsJobsPage />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/workflows/crons',
+        element: <WorkflowsCronsPage />,
         errorElement: <ErrorBoundary />,
       },
       {

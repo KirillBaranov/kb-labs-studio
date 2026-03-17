@@ -4,7 +4,7 @@
  */
 
 import type { RouteObject } from 'react-router-dom';
-import { NavigationItem } from '@/components/ui';
+import type { NavigationItem } from '@/components/ui';
 
 /**
  * Module routes configuration

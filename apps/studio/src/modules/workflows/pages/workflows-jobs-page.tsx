@@ -1,6 +1,6 @@
 /**
- * @module @kb-labs/studio-app/modules/workflow/components/jobs-tab
- * Background jobs list view with filters and status
+ * @module @kb-labs/studio-app/modules/workflows/pages/workflows-jobs-page
+ * Background jobs list - standalone page
  */
 
 import * as React from 'react';
@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useDataSources } from '@/providers/data-sources-provider';
 import type { JobStatusInfo, JobListFilter } from '@kb-labs/workflow-contracts';
 import { UICard } from '@kb-labs/studio-ui-kit';
+import { KBPageContainer, KBPageHeader } from '@/components/ui';
 
 const STATUS_COLORS: Record<string, string> = {
   pending: 'default',
@@ -27,7 +28,7 @@ const STATUS_COLORS: Record<string, string> = {
   cancelled: 'warning',
 };
 
-export function JobsTab() {
+export function WorkflowsJobsPage() {
   const sources = useDataSources();
   const [filters, setFilters] = React.useState<JobListFilter>({ limit: 50 });
 
@@ -37,12 +38,12 @@ export function JobsTab() {
   });
 
   const formatDate = (date?: Date | string) => {
-    if (!date) {return '—';}
+    if (!date) {return '-';}
     return new Date(date).toLocaleString();
   };
 
   const formatDuration = (start?: Date | string, end?: Date | string) => {
-    if (!start) {return '—';}
+    if (!start) {return '-';}
     const startMs = new Date(start).getTime();
     const endMs = end ? new Date(end).getTime() : Date.now();
     const durationMs = endMs - startMs;
@@ -59,22 +60,25 @@ export function JobsTab() {
       title: 'Job ID',
       dataIndex: 'id',
       key: 'id',
+      width: 180,
       render: (id: string) => (
-        <UITypographyText className="typo-caption" code>{id.slice(0, 12)}...</UITypographyText>
+        <UITypographyText className="typo-caption" code ellipsis={{ tooltip: id }} style={{ whiteSpace: 'nowrap' }}>{id.slice(0, 16)}...</UITypographyText>
       ),
     },
     {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
+      width: 260,
       render: (type: string) => (
-        <UITypographyText className="typo-body">{type}</UITypographyText>
+        <UITypographyText className="typo-body" ellipsis={{ tooltip: type }} style={{ display: 'block' }}>{type}</UITypographyText>
       ),
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      width: 130,
       render: (status: string, record: JobStatusInfo) => (
         <UISpace direction="vertical" className="gap-tight">
           <UITag color={STATUS_COLORS[status] || 'default'}>
@@ -82,8 +86,7 @@ export function JobsTab() {
           </UITag>
           {record.progress !== undefined && status === 'running' && (
             <UITypographyText className="typo-caption text-secondary">
-              {record.progress}%
-              {record.progressMessage && ` - ${record.progressMessage}`}
+              {record.progress}%{record.progressMessage && ` · ${record.progressMessage}`}
             </UITypographyText>
           )}
         </UISpace>
@@ -93,16 +96,15 @@ export function JobsTab() {
       title: 'Created',
       dataIndex: 'createdAt',
       key: 'createdAt',
+      width: 220,
       render: (date: Date | string | undefined) => (
-        <UISpace className="gap-tight">
-          <UIIcon name="ClockCircleOutlined" className="text-secondary" />
-          <UITypographyText className="typo-caption">{formatDate(date)}</UITypographyText>
-        </UISpace>
+        <UITypographyText className="typo-caption" style={{ whiteSpace: 'nowrap' }}>{formatDate(date)}</UITypographyText>
       ),
     },
     {
       title: 'Duration',
       key: 'duration',
+      width: 100,
       render: (_: unknown, record: JobStatusInfo) => (
         <UITypographyText className="typo-caption">
           {formatDuration(record.startedAt, record.finishedAt)}
@@ -112,6 +114,7 @@ export function JobsTab() {
     {
       title: 'Attempts',
       key: 'attempts',
+      width: 90,
       render: (_: unknown, record: JobStatusInfo) => (
         <UITypographyText className="typo-caption">
           {record.attempt || 0} / {record.maxRetries || 3}
@@ -122,21 +125,33 @@ export function JobsTab() {
       title: 'Error',
       dataIndex: 'error',
       key: 'error',
+      width: 260,
       render: (error?: string) => (
         error ? (
-          <UITypographyText className="typo-caption text-error" ellipsis={{ tooltip: error }}>
+          <UITypographyText className="typo-caption text-error" ellipsis={{ tooltip: error }} style={{ display: 'block' }}>
             {error}
           </UITypographyText>
         ) : (
-          <UITypographyText className="typo-caption text-tertiary">—</UITypographyText>
+          <UITypographyText className="typo-caption text-tertiary">-</UITypographyText>
         )
       ),
     },
   ];
 
   return (
-    <UISpace direction="vertical" className="gap-section" style={{ width: '100%' }}>
-      <UICard>
+    <KBPageContainer>
+      <KBPageHeader
+        title="Background Jobs"
+        description="Monitor background job execution and status"
+        icon={<UIIcon name="UnorderedListOutlined" />}
+        breadcrumbItems={[
+          { title: 'Home', href: '/' },
+          { title: 'Workflows', href: '/workflows' },
+          { title: 'Jobs' },
+        ]}
+      />
+
+      <UICard style={{ marginBottom: 'var(--spacing-section)' }}>
         <UIRow gutter={16}>
           <UICol span={8}>
             <UITypographyText className="typo-label">Filter by Status</UITypographyText>
@@ -190,11 +205,10 @@ export function JobsTab() {
           columns={columns}
           loading={isLoading}
           rowKey="id"
-          pagination={{
-            pageSize: filters.limit || 50,
-          }}
+          scroll={{ x: 1240 }}
+          pagination={{ pageSize: 20 }}
         />
       </UICard>
-    </UISpace>
+    </KBPageContainer>
   );
 }

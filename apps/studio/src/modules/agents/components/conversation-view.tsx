@@ -202,17 +202,13 @@ function FileChangesBlock({ sessionId, runId, fileChanges, source }: FileChanges
                 onClick={handleApprove}
                 disabled={approve.isPending || rollback.isPending}
                 title="Approve all changes"
-              >
-                Approve
-              </button>
+              >✓</button>
               <button
                 className="cv-changes-btn cv-changes-btn--rollback"
                 onClick={handleRollback}
                 disabled={rollback.isPending || approve.isPending}
                 title="Rollback all changes"
-              >
-                Rollback
-              </button>
+              >✕</button>
             </div>
           )}
         </div>
@@ -297,22 +293,21 @@ function FileChangeRow({ change, sessionId, source, onDismiss }: FileChangeRowPr
             {change.linesRemoved ? <span className="cv-change-rem"> -{change.linesRemoved}</span> : null}
           </span>
         )}
-        <span className="cv-change-toggle">{open ? 'collapse' : 'expand'}</span>
-        {/* Per-file actions */}
         <span className="cv-change-row-actions" onClick={(e) => e.stopPropagation()}>
           <button
             className="cv-changes-btn cv-changes-btn--approve cv-changes-btn--sm"
             onClick={handleApprove}
             disabled={approve.isPending || rollback.isPending}
             title="Approve"
-          >Approve</button>
+          >✓</button>
           <button
             className="cv-changes-btn cv-changes-btn--rollback cv-changes-btn--sm"
             onClick={handleRollback}
             disabled={rollback.isPending || approve.isPending}
             title="Rollback"
-          >Rollback</button>
+          >✕</button>
         </span>
+        <span className="cv-change-toggle">{open ? '▲' : '▼'}</span>
       </button>
       {open && (
         <div className="cv-change-diff">
@@ -451,38 +446,41 @@ function ToolDetails({
     return <DiffView diff={step.metadata!.diff!} />;
   }
   if (hasOutput) {
-    return <pre className="cv-tool-output">{formatOutput(step.output)}</pre>;
+    const isFailed = step.status === 'done' && step.success === false;
+    return <pre className={`cv-tool-output${isFailed ? ' cv-tool-output--error' : ''}`}>{formatOutput(step.output)}</pre>;
   }
   return null;
 }
 
 function ToolRow({ step, isStreaming }: { step: import('@kb-labs/agent-contracts').ToolUseStep; isStreaming: boolean }) {
   const [open, setOpen] = React.useState(false);
+
   const isPending = step.status === 'pending';
-  const isDone = step.status === 'done';
-  const isError = step.status === 'error';
-  const hasOutput = isDone && step.output !== undefined && step.output !== null;
-  const hasDiff = isDone && !!step.metadata?.diff;
-  const toolLowerCheck = step.toolName.toLowerCase();
-  const isWriteTool = toolLowerCheck.includes('write') || toolLowerCheck.includes('patch') || toolLowerCheck.includes('edit');
-  const hasWriteContent = isWriteTool && isDone && !!(
-    (step.input as Record<string, unknown> | null | undefined)?.content ??
-    (step.input as Record<string, unknown> | null | undefined)?.new_content
-  );
-  const canExpand = hasOutput || hasDiff || hasWriteContent;
+  const isDone   = step.status === 'done';
+  const isError  = step.status === 'error';
+  const isFailed = isDone && step.success === false;
+
+  const meta          = getToolMeta(step);
+  const hasDiff       = isDone && !!step.metadata?.diff;
+  const hasOutput     = isDone && step.output != null;
+  const input         = step.input as Record<string, unknown> | null | undefined;
+  const isWriteTool   = /write|patch|edit/i.test(step.toolName);
+  const hasWriteInput = isWriteTool && isDone && !!(input?.content ?? input?.new_content);
+  const canExpand     = hasOutput || hasDiff || hasWriteInput || isError;
 
   const dotClass = isPending
-    ? isStreaming ? 'cv-step-dot--pulse' : 'cv-step-dot--tool'
-    : isDone ? 'cv-step-dot--result-ok'
-    : 'cv-step-dot--result-err';
+    ? (isStreaming ? 'cv-step-dot--pulse' : 'cv-step-dot--tool')
+    : (isDone && !isFailed ? 'cv-step-dot--result-ok' : 'cv-step-dot--result-err');
 
-  const meta = getToolMeta(step);
+  const m = step.metadata;
+  const todoList = (isDone && m?.uiHint === 'todo' && m.structured != null)
+    ? (m.structured as Record<string, unknown>).todoList as TodoListData | undefined
+    : undefined;
 
   return (
     <div className="cv-step cv-step--tool">
       <div className={`cv-step-dot ${dotClass}`} />
       <div className="cv-step-body">
-        {/* Header row: name + meta + toggle */}
         <button
           className={`cv-tool-header${canExpand ? ' cv-tool-header--clickable' : ''}`}
           onClick={() => canExpand && setOpen((v) => !v)}
@@ -490,26 +488,23 @@ function ToolRow({ step, isStreaming }: { step: import('@kb-labs/agent-contracts
         >
           <span className="cv-tool-name">{formatToolName(step.toolName)}</span>
           {meta.badge && <span className="cv-tool-badge">{meta.badge}</span>}
-          {/* Rich metadata badges */}
-          {isDone && step.metadata?.resultCount !== undefined && (
-            <span className="cv-tool-badge">{step.metadata.resultCount} results</span>
+          {isDone && m?.resultCount !== undefined && (
+            <span className="cv-tool-badge">{m.resultCount} results</span>
           )}
-          {isDone && step.metadata?.confidence !== undefined && (
-            <span className="cv-tool-badge">{Math.round(step.metadata.confidence * 100)}%</span>
+          {isDone && m?.confidence !== undefined && (
+            <span className="cv-tool-badge">{Math.round(m.confidence * 100)}%</span>
           )}
-          {isDone && step.metadata?.exitCode !== undefined && step.metadata.exitCode !== 0 && (
-            <span className="cv-tool-badge cv-tool-badge--err">exit {step.metadata.exitCode}</span>
+          {isDone && m?.exitCode !== undefined && m.exitCode !== 0 && (
+            <span className="cv-tool-badge cv-tool-badge--err">exit {m.exitCode}</span>
           )}
-          {/* Line stats for patch/edit -- show +/- even without stored diff */}
-          {isDone && (step.metadata?.linesAdded !== undefined || step.metadata?.linesRemoved !== undefined) && (
+          {isDone && (m?.linesAdded !== undefined || m?.linesRemoved !== undefined) && (
             <span className="cv-tool-badge cv-tool-badge--diff">
-              {step.metadata.linesAdded !== undefined && step.metadata.linesAdded > 0 ? `+${step.metadata.linesAdded}` : ''}
-              {step.metadata.linesRemoved !== undefined && step.metadata.linesRemoved > 0 ? ` -${step.metadata.linesRemoved}` : ''}
+              {m?.linesAdded   != null && m.linesAdded   > 0 ? `+${m.linesAdded}`   : ''}
+              {m?.linesRemoved != null && m.linesRemoved > 0 ? ` -${m.linesRemoved}` : ''}
             </span>
           )}
-          {/* Line count for write tools (total lines written) */}
-          {isDone && (step.metadata as any)?.lines !== undefined && step.metadata?.linesAdded === undefined && (
-            <span className="cv-tool-badge">{(step.metadata as any).lines} lines</span>
+          {isDone && (m as any)?.lines !== undefined && m?.linesAdded === undefined && (
+            <span className="cv-tool-badge">{(m as any).lines} lines</span>
           )}
           {!isPending && step.durationMs !== undefined && (
             <span className="cv-step-duration">{step.durationMs}ms</span>
@@ -519,28 +514,23 @@ function ToolRow({ step, isStreaming }: { step: import('@kb-labs/agent-contracts
           )}
         </button>
 
-        {/* Why / what the agent is doing */}
         {meta.summary && (
           <p className="cv-tool-summary">
-            {meta.filePath ? (
-              <CopyPath path={meta.filePath} label={meta.summary} />
-            ) : (
-              meta.summary
-            )}
+            {meta.filePath
+              ? <CopyPath path={meta.filePath} label={meta.summary} />
+              : meta.summary}
           </p>
         )}
 
-        {/* Todo inline checklist -- rendered from backend snapshot */}
-        {isDone && step.metadata?.uiHint === 'todo' && step.metadata.structured && (
-          <TodoView todoList={step.metadata.structured.todoList as TodoListData} />
-        )}
+        {todoList != null && <TodoView todoList={todoList} />}
 
-        {/* Error */}
         {isError && step.error && (
           <p className="cv-step-error-text">{step.error}</p>
         )}
+        {isFailed && !open && step.output != null && (
+          <p className="cv-step-error-text">{String(step.output)}</p>
+        )}
 
-        {/* Expandable details */}
         {open && (
           <div className="cv-tool-details">
             <ToolDetails step={step} hasDiff={hasDiff} hasOutput={hasOutput} />
@@ -566,10 +556,10 @@ interface TodoListData {
 }
 
 const TODO_STATUS_ICON: Record<string, string> = {
-  'completed': 'done',
-  'in-progress': 'active',
-  'blocked': 'blocked',
-  'pending': 'pending',
+  'completed': '✓',
+  'in-progress': '●',
+  'blocked': '✕',
+  'pending': '○',
 };
 
 /** Renders a todo checklist from backend snapshot */

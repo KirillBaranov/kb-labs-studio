@@ -64,6 +64,7 @@ export interface WorkflowInfo {
   pluginId?: string;
   status?: 'active' | 'inactive';
   tags?: string[];
+  inputs?: Record<string, { type: 'string' | 'number' | 'boolean'; description?: string; required?: boolean; default?: unknown }>;
 }
 
 export interface WorkflowListResponse {
@@ -165,12 +166,37 @@ export interface WorkflowRunHistoryResponse {
   total: number;
 }
 
+export interface PendingApproval {
+  jobId: string;
+  stepId: string;
+  stepName: string;
+  specId?: string;
+  context: Record<string, unknown>;
+  waitingSince?: string;
+}
+
+export interface PendingApprovalsResponse {
+  runId: string;
+  pending: PendingApproval[];
+}
+
+export interface ResolveApprovalParams {
+  runId: string;
+  jobId: string;
+  stepId: string;
+  action: 'approve' | 'reject';
+  comment?: string;
+  data?: Record<string, unknown>;
+}
+
 export interface WorkflowDataSource {
   // ✅ Existing methods
   listRuns(filters?: WorkflowRunsFilters): Promise<WorkflowRunsListResponse>;
   getRun(runId: string): Promise<WorkflowRun | null>;
   cancelRun(runId: string): Promise<WorkflowRun>;
   runWorkflow?(params: WorkflowRunParams): Promise<WorkflowRun>;
+  getPendingApprovals?(runId: string): Promise<PendingApprovalsResponse>;
+  resolveApproval?(params: ResolveApprovalParams): Promise<{ resolved: boolean }>;
   listEvents?(
     runId: string,
     options?: { cursor?: string | null; limit?: number },
@@ -180,7 +206,7 @@ export interface WorkflowDataSource {
   getStats(): Promise<DashboardStatsResponse>;
   listWorkflows(filters?: { limit?: number }): Promise<WorkflowListResponse>;
   getWorkflow(workflowId: string): Promise<WorkflowInfo | null>;
-  runWorkflowById(workflowId: string, input?: Record<string, string>): Promise<{ runId: string; status: string }>;
+  runWorkflowById(workflowId: string, input?: Record<string, unknown>): Promise<{ runId: string; status: string }>;
   listJobs(filters?: JobListFilter): Promise<JobListResponse>;
   getJob(jobId: string): Promise<JobStatusInfo | null>;
   getJobSteps(jobId: string): Promise<JobStepsResponse>;
@@ -193,4 +219,5 @@ export interface WorkflowDataSource {
     workflowId: string,
     filters?: { limit?: number; offset?: number; status?: string },
   ): Promise<WorkflowRunHistoryResponse>;
+  cancelWorkflowRun(runId: string): Promise<{ cancelled: boolean; runId: string }>;
 }

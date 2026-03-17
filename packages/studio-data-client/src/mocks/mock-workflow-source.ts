@@ -190,7 +190,7 @@ export class MockWorkflowSource implements WorkflowDataSource {
 
   async runWorkflowById(
     workflowId: string,
-    _input?: Record<string, string>,
+    _input?: Record<string, unknown>,
   ): Promise<{ runId: string; status: string }> {
     const runId = ulid();
     console.log(`[MockWorkflowSource] Running workflow ${workflowId}, run ID: ${runId}`);
@@ -374,6 +374,10 @@ export class MockWorkflowSource implements WorkflowDataSource {
         },
       ],
     };
+  }
+
+  async cancelWorkflowRun(runId: string): Promise<{ cancelled: boolean; runId: string }> {
+    return { cancelled: true, runId };
   }
 
   async getWorkflowRuns(

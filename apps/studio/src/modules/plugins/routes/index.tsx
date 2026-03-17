@@ -9,7 +9,7 @@ import { PluginDetailPage } from '../pages/plugin-detail-page';
 import { PluginPage } from '../pages/plugin-page';
 import { ErrorBoundary } from '../../../components/error-boundary';
 import { renderIcon } from '../../../routes/helpers';
-import { NavigationItem } from '@/components/ui';
+import type { NavigationItem } from '@/components/ui';
 
 // Route paths
 const PATHS = {

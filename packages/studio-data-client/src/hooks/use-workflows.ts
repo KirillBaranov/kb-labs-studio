@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { qk } from '../query-keys'
-import type { WorkflowDataSource, WorkflowRunsFilters, WorkflowRunParams } from '../sources/workflow-source'
+import type { WorkflowDataSource, WorkflowRunsFilters, WorkflowRunParams, ResolveApprovalParams } from '../sources/workflow-source'
 import type { WorkflowLogEvent, WorkflowPresenterEvent } from '../contracts/workflows'
 
 export function useWorkflowRuns(
@@ -61,6 +61,21 @@ export function useRunWorkflow(source: WorkflowDataSource) {
   })
 }
 
+export function useResolveApproval(source: WorkflowDataSource) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (params: ResolveApprovalParams) => {
+      if (!source.resolveApproval) {
+        throw new Error('Workflow source does not support approvals')
+      }
+      return source.resolveApproval(params)
+    },
+    onSuccess: (_data, variables) => {
+      void queryClient.invalidateQueries({ queryKey: qk.workflows.run(variables.runId) })
+    },
+  })
+}
+
 export interface UseWorkflowLogsOptions {
   follow?: boolean
   idleTimeoutMs?: number
@@ -79,6 +94,8 @@ export function useWorkflowLogs(
 
   useEffect(() => {
     if (!runId || !enabled) {
+      setIsConnected(false)
+      setError(null)
       return
     }
 
@@ -106,6 +123,10 @@ export function useWorkflowLogs(
     }
 
     eventSource.addEventListener('workflow.log', handleMessage)
+    eventSource.addEventListener('workflow.done', () => {
+      setIsConnected(false)
+      eventSource.close()
+    })
     eventSource.onopen = () => {
       setIsConnected(true)
       setError(null)

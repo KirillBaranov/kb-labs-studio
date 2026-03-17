@@ -14,6 +14,8 @@ import type {
   JobLogsResponse,
   CronListResponse,
   WorkflowRunHistoryResponse,
+  PendingApprovalsResponse,
+  ResolveApprovalParams,
 } from './workflow-source'
 import type {
   WorkflowRun,
@@ -43,12 +45,14 @@ export class HttpWorkflowSource implements WorkflowDataSource {
 
   async listRuns(filters?: WorkflowRunsFilters): Promise<WorkflowRunsListResponse> {
     const query = buildQuery(filters)
-    return this.client.fetch<WorkflowRunsListResponse>(`/workflows/runs${query}`)
+    return this.client.fetch<WorkflowRunsListResponse>(`/plugins/workflow/runs${query}`)
   }
 
   async getRun(runId: string): Promise<WorkflowRun | null> {
     try {
-      const response = await this.client.fetch<{ run: WorkflowRun }>(`/workflows/runs/${runId}`)
+      const response = await this.client.fetch<{ run: WorkflowRun }>(
+        `/plugins/workflow/runs/${encodeURIComponent(runId)}`,
+      )
       return response.run
     } catch (error) {
       if (error instanceof KBError && error.status === 404) {
@@ -59,25 +63,28 @@ export class HttpWorkflowSource implements WorkflowDataSource {
   }
 
   async cancelRun(runId: string): Promise<WorkflowRun> {
-    const response = await this.client.fetch<{ run: WorkflowRun }>(
-      `/workflows/runs/${runId}/cancel`,
-      {
-        method: 'POST',
-      },
+    await this.client.fetch<{ cancelled: boolean; runId: string }>(
+      `/plugins/workflow/workflows/runs/${encodeURIComponent(runId)}/cancel`,
+      { method: 'POST' },
     )
-    return response.run
+    // Fetch the updated run after cancel
+    const run = await this.getRun(runId)
+    if (!run) {
+      return { id: runId, status: 'cancelled' } as WorkflowRun
+    }
+    return run
   }
 
   async runWorkflow(params: WorkflowRunParams): Promise<WorkflowRun> {
-    const response = await this.client.fetch<{ run: WorkflowRun }>(`/workflows/run`, {
-      method: 'POST',
-      data: {
-        inlineSpec: params.spec,
-        idempotency: params.idempotencyKey,
-        concurrency: params.concurrencyGroup ? { group: params.concurrencyGroup } : undefined,
-        metadata: params.metadata,
+    const response = await this.client.fetch<{ run: WorkflowRun }>(
+      `/plugins/workflow/workflows/${encodeURIComponent(params.spec.name)}/run`,
+      {
+        method: 'POST',
+        data: {
+          input: params.metadata,
+        },
       },
-    })
+    )
     return response.run
   }
 
@@ -117,7 +124,7 @@ export class HttpWorkflowSource implements WorkflowDataSource {
 
   async getWorkflow(workflowId: string): Promise<WorkflowInfo | null> {
     try {
-      return this.client.fetch<WorkflowInfo>(
+      return await this.client.fetch<WorkflowInfo>(
         `/plugins/workflow/workflows/${encodeURIComponent(workflowId)}`,
       )
     } catch (error) {
@@ -130,7 +137,7 @@ export class HttpWorkflowSource implements WorkflowDataSource {
 
   async runWorkflowById(
     workflowId: string,
-    input?: Record<string, string>,
+    input?: Record<string, unknown>,
   ): Promise<{ runId: string; status: string }> {
     return this.client.fetch<{ runId: string; status: string }>(
       `/plugins/workflow/workflows/${encodeURIComponent(workflowId)}/run`,
@@ -163,7 +170,7 @@ export class HttpWorkflowSource implements WorkflowDataSource {
 
   async getJob(jobId: string): Promise<JobStatusInfo | null> {
     try {
-      return this.client.fetch<JobStatusInfo>(
+      return await this.client.fetch<JobStatusInfo>(
         `/plugins/workflow/jobs/${encodeURIComponent(jobId)}`,
       )
     } catch (error) {
@@ -202,6 +209,30 @@ export class HttpWorkflowSource implements WorkflowDataSource {
 
   async listCronJobs(): Promise<CronListResponse> {
     return this.client.fetch<CronListResponse>('/plugins/workflow/cron')
+  }
+
+  async getPendingApprovals(runId: string): Promise<PendingApprovalsResponse> {
+    return this.client.fetch<PendingApprovalsResponse>(
+      `/plugins/workflow/runs/${encodeURIComponent(runId)}/pending-approvals`,
+    )
+  }
+
+  async resolveApproval(params: ResolveApprovalParams): Promise<{ resolved: boolean }> {
+    const { runId, ...body } = params
+    return this.client.fetch<{ resolved: boolean }>(
+      `/plugins/workflow/runs/${encodeURIComponent(runId)}/approve`,
+      {
+        method: 'POST',
+        data: body,
+      },
+    )
+  }
+
+  async cancelWorkflowRun(runId: string): Promise<{ cancelled: boolean; runId: string }> {
+    return this.client.fetch<{ cancelled: boolean; runId: string }>(
+      `/plugins/workflow/workflows/runs/${encodeURIComponent(runId)}/cancel`,
+      { method: 'POST' },
+    )
   }
 
   async getWorkflowRuns(

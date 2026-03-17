@@ -113,7 +113,7 @@ export class MockAgentSource implements AgentDataSource {
     return {
       runId,
       sessionId,
-      eventsUrl: `ws://localhost:5050/ws/plugins/agents/session/${sessionId}`,
+      eventsPath: `/v1/ws/plugins/agents/session/${sessionId}`,
       status: 'started',
       startedAt,
     };
@@ -201,7 +201,7 @@ export class MockAgentSource implements AgentDataSource {
   }
 
   getEventsUrl(sessionId: string): string {
-    return `ws://localhost:5050/ws/plugins/agents/session/${sessionId}`;
+    return `ws://localhost:5050/api/v1/ws/plugins/agents/session/${sessionId}`;
   }
 
   // ═══════════════════════════════════════════════════════════════════════

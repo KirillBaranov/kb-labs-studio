@@ -14,7 +14,7 @@ import { IncidentsPage } from '../pages/incidents-page';
 import { IncidentDetailPage } from '../pages/incident-detail-page';
 import { ErrorBoundary } from '../../../components/error-boundary';
 import { renderIcon } from '../../../routes/helpers';
-import { NavigationItem } from '@/components/ui';
+import type { NavigationItem } from '@/components/ui';
 
 // Route paths
 const PATHS = {

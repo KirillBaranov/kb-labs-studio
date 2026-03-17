@@ -1,9 +1,9 @@
-export type WorkflowStatus = 'queued' | 'running' | 'success' | 'failed' | 'cancelled' | 'skipped';
+export type WorkflowStatus = 'queued' | 'running' | 'success' | 'failed' | 'cancelled' | 'skipped' | 'waiting_approval';
 
 export interface StepRun {
   id: string;
   jobId: string;
-  stepName: string;
+  name: string;
   status: WorkflowStatus;
   queuedAt: string;
   startedAt?: string;
@@ -13,6 +13,7 @@ export interface StepRun {
   inputs?: Record<string, unknown>;
   outputs?: Record<string, unknown>;
   error?: Record<string, unknown> | null;
+  spec?: { name: string; uses?: string; with?: Record<string, unknown> };
 }
 
 export interface JobRun {
@@ -30,6 +31,7 @@ export interface JobRun {
   timeoutMs?: number;
   artifacts: Record<string, unknown>;
   steps: StepRun[];
+  error?: Record<string, unknown> | null;
 }
 
 export interface WorkflowTrigger {

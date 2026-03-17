@@ -258,6 +258,12 @@
   border-color: #333;
 }
 
+.cv-tool-output--error {
+  background: var(--color-error-bg, #FEF2F2);
+  color: var(--color-error, #DC2626);
+  border-color: var(--color-error-border, #FECACA);
+}
+
 /* Copyable file path link in tool summary */
 .cv-copy-path {
   all: unset;
@@ -381,12 +387,16 @@
 /* ── Todo view ──────────────────────────────────────────────────── */
 .cv-todo {
   margin-top: 6px;
+  background: var(--bg-tertiary, #F3F4F6);
+  border-radius: 6px;
+  padding: 8px 10px;
 }
 
 .cv-todo-progress {
   font-size: 11px;
   color: var(--text-tertiary, #9CA3AF);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  font-weight: 500;
 }
 
 .cv-todo-list {
@@ -395,38 +405,50 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .cv-todo-item {
   display: flex;
-  align-items: baseline;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
   font-size: 13px;
-  line-height: 1.4;
+  line-height: 1.5;
+  padding: 2px 0;
 }
 
 .cv-todo-icon {
-  font-size: 11px;
+  font-size: 12px;
   flex-shrink: 0;
-  width: 12px;
+  width: 14px;
   text-align: center;
+  line-height: 1;
+}
+
+.cv-todo-desc {
+  flex: 1;
+  min-width: 0;
 }
 
 .cv-todo-item--pending     { color: var(--text-secondary, #6B7280); }
 .cv-todo-item--in-progress { color: var(--text-primary, #111827); font-weight: 500; }
-.cv-todo-item--completed   { color: var(--text-tertiary, #9CA3AF); text-decoration: line-through; }
+.cv-todo-item--completed   { color: var(--text-tertiary, #9CA3AF); }
+.cv-todo-item--completed .cv-todo-desc { text-decoration: line-through; }
 .cv-todo-item--blocked     { color: var(--error, #DC2626); }
 
 .cv-todo-item--completed .cv-todo-icon   { color: var(--success, #16A34A); }
 .cv-todo-item--in-progress .cv-todo-icon { color: var(--link, #2563EB); }
+.cv-todo-item--pending .cv-todo-icon     { color: var(--text-tertiary, #9CA3AF); }
+.cv-todo-item--blocked .cv-todo-icon     { color: var(--error, #DC2626); }
 
 .cv-todo-priority {
   font-size: 10px;
   color: var(--text-tertiary, #9CA3AF);
-  background: var(--bg-tertiary, #F3F4F6);
+  background: var(--bg-secondary, #fff);
   border-radius: 3px;
-  padding: 0 4px;
+  padding: 1px 5px;
+  flex-shrink: 0;
+  font-weight: 500;
 }
 
 /* ── File Changes Block ─────────────────────────────────────────── */
@@ -468,12 +490,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
+  min-width: 24px;
   height: 22px;
+  padding: 0 6px;
   border-radius: 5px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   transition: background 0.12s, opacity 0.12s;
+  white-space: nowrap;
 }
 
 .cv-changes-btn:disabled {
@@ -500,9 +524,11 @@
 }
 
 .cv-changes-btn--sm {
-  width: 18px;
+  min-width: 18px;
   height: 18px;
+  padding: 0 4px;
   font-size: 11px;
+  border-radius: 4px;
 }
 
 .cv-changes-list {
@@ -571,17 +597,26 @@
 .cv-change-add { color: var(--success, #16A34A); }
 .cv-change-rem { color: var(--error, #DC2626); }
 
-.cv-change-toggle {
-  font-size: 9px;
-  color: var(--text-tertiary, #9CA3AF);
-  flex-shrink: 0;
-}
-
 .cv-change-row-actions {
   display: flex;
   gap: 3px;
   flex-shrink: 0;
   margin-left: auto;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.cv-change-main:hover .cv-change-row-actions {
+  opacity: 1;
+}
+
+.cv-change-toggle {
+  font-size: 8px;
+  color: var(--text-tertiary, #9CA3AF);
+  flex-shrink: 0;
+  width: 12px;
+  text-align: center;
+  line-height: 1;
 }
 
 .cv-change-diff {
