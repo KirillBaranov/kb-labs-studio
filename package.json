@@ -62,7 +62,7 @@
     ]
   },
   "devDependencies": {
-    "@kb-labs/devkit": "workspace:*",
+    "@kb-labs/devkit": "link:../../infra/kb-labs-devkit",
     "@playwright/test": "^1.49.0",
     "@testing-library/react": "^16.1.0",
     "@testing-library/jest-dom": "^6.6.0",
