@@ -1,7 +1,6 @@
 {
   "name": "@kb-labs/studio-ui-core",
   "version": "0.1.0",
-  "private": true,
   "description": "KB Labs design system foundation — design tokens, themes, CSS variables (framework-agnostic)",
   "type": "module",
   "main": "./dist/index.js",

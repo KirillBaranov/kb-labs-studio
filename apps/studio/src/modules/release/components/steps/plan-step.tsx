@@ -263,6 +263,7 @@ export function PlanStep({ selectedScope, selectedScopePath, onPlanReady }: Plan
         <UIAccordion
           size="small"
           style={{ marginBottom: 16 }}
+          defaultActiveKey={['timeline']}
           items={[
             {
               key: 'timeline',

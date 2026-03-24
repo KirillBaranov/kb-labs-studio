@@ -78,9 +78,12 @@ export function ChangelogStep({ selectedScope, onChangelogReady }: ChangelogStep
       });
       setMarkdown(result.markdown);
       setHasUnsavedChanges(true);
-      const tokensInfo = result.tokensUsed ? ` (${result.tokensUsed} tokens)` : '';
-      const method = useLLM ? 'AI-powered' : 'Simple';
-      UIMessage.success(`${method} changelog generated${tokensInfo}`);
+      const parts: string[] = [];
+      if (result.commitsCount) {parts.push(`${result.commitsCount} commits`);}
+      if (result.tokensUsed) {parts.push(`${result.tokensUsed} tokens`);}
+      const method = result.usedLLM ? 'AI-enhanced' : useLLM ? 'Template' : 'Simple';
+      const details = parts.length > 0 ? ` (${parts.join(', ')})` : '';
+      UIMessage.success(`${method} changelog generated${details}`);
     } catch (error) {
       UIMessage.error(`Failed to generate changelog: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }

@@ -83,7 +83,7 @@ interface LogLine {
 }
 
 // Strip ANSI escape codes from text
-// eslint-disable-next-line no-control-regex
+ 
 const ANSI_RE = /\x1b\[[0-9;]*[A-Za-z]|\x1b\].*?\x07/g
 function stripAnsi(s: string): string { return s.replace(ANSI_RE, '') }
 

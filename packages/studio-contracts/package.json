@@ -1,7 +1,6 @@
 {
   "name": "@kb-labs/studio-contracts",
   "version": "0.1.0",
-  "private": true,
   "description": "Type-safe contracts for KB Labs Studio widget system",
   "type": "module",
   "main": "./dist/index.js",

@@ -274,12 +274,25 @@ export function ReleaseStep({ selectedScope, onReleaseComplete }: ReleaseStepPro
                     {check.optional && <UITag>optional</UITag>}
                   </UISpace>
                   {check.error && (
-                    <>
-                      <br />
-                      <UITypographyText type="danger" style={{ fontSize: 12 }}>
+                    <div style={{ marginTop: 4 }}>
+                      <pre
+                        style={{
+                          margin: 0,
+                          padding: '8px 12px',
+                          fontSize: 11,
+                          lineHeight: 1.5,
+                          color: '#cf1322',
+                          background: '#fff1f0',
+                          borderRadius: 4,
+                          maxHeight: 200,
+                          overflow: 'auto',
+                          whiteSpace: 'pre-wrap',
+                          wordBreak: 'break-all',
+                        }}
+                      >
                         {check.error}
-                      </UITypographyText>
-                    </>
+                      </pre>
+                    </div>
                   )}
                 </div>
               </UISpace>
