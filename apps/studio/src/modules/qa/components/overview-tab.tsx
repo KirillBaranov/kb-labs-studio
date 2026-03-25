@@ -61,11 +61,16 @@ export function OverviewTab() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [selectedCheck, setSelectedCheck] = React.useState<{ type: string; label: string } | null>(null);
 
-  // Run QA options (which checks to include)
-  const [runBuild, setRunBuild] = React.useState(true);
-  const [runLint, setRunLint] = React.useState(true);
-  const [runTypes, setRunTypes] = React.useState(true);
-  const [runTests, setRunTests] = React.useState(true);
+  // Run QA options — set of check IDs to SKIP (empty = run all)
+  const [skippedChecks, setSkippedChecks] = React.useState<Set<string>>(new Set());
+
+  const toggleCheck = (id: string, enabled: boolean) => {
+    setSkippedChecks(prev => {
+      const next = new Set(prev);
+      if (enabled) { next.delete(id); } else { next.add(id); }
+      return next;
+    });
+  };
 
   const handleCheckClick = (checkType: string, label: string) => {
     setSelectedCheck({ type: checkType, label });
@@ -75,10 +80,7 @@ export function OverviewTab() {
   const handleRunQA = () => {
     void UIMessage.loading('Running QA checks...', 0);
     runQA({
-      skipBuild: !runBuild,
-      skipLint: !runLint,
-      skipTypes: !runTypes,
-      skipTests: !runTests,
+      skipChecks: skippedChecks.size > 0 ? [...skippedChecks] : undefined,
     }, {
       onSuccess: (data) => {
         UIMessage.destroy();
@@ -138,18 +140,16 @@ export function OverviewTab() {
             title="Checks to run"
             content={
               <UISpace direction="vertical">
-                <UICheckbox checked={runBuild} onChange={(checked) => setRunBuild(checked)}>
-                  <UIIcon name="BuildOutlined" /> Build
-                </UICheckbox>
-                <UICheckbox checked={runLint} onChange={(checked) => setRunLint(checked)}>
-                  <UIIcon name="FileSearchOutlined" /> Lint
-                </UICheckbox>
-                <UICheckbox checked={runTypes} onChange={(checked) => setRunTypes(checked)}>
-                  <UIIcon name="FileTextOutlined" /> Type Check
-                </UICheckbox>
-                <UICheckbox checked={runTests} onChange={(checked) => setRunTests(checked)}>
-                  <UIIcon name="ExperimentOutlined" /> Tests
-                </UICheckbox>
+                {(summary ? Object.keys(summary.checks) : ['build', 'lint', 'typeCheck', 'test']).map((id) => (
+                  <UICheckbox
+                    key={id}
+                    checked={!skippedChecks.has(id)}
+                    onChange={(checked) => toggleCheck(id, checked)}
+                  >
+                    {CHECK_ICONS[id] ?? <UIIcon name="CheckCircleOutlined" />}{' '}
+                    {id.charAt(0).toUpperCase() + id.slice(1).replace(/([A-Z])/g, ' $1')}
+                  </UICheckbox>
+                ))}
               </UISpace>
             }
           >

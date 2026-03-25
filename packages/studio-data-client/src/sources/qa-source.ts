@@ -58,10 +58,7 @@ export interface QABaselineResponse {
  * Options for running QA checks from Studio.
  */
 export interface QARunOptions {
-  skipBuild?: boolean;
-  skipLint?: boolean;
-  skipTypes?: boolean;
-  skipTests?: boolean;
+  skipChecks?: string[];
   saveToHistory?: boolean;
 }
 
