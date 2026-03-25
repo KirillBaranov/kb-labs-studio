@@ -140,14 +140,13 @@ export function OverviewTab() {
             title="Checks to run"
             content={
               <UISpace direction="vertical">
-                {(summary ? Object.keys(summary.checks) : ['build', 'lint', 'typeCheck', 'test']).map((id) => (
+                {(summary?.checks ?? []).map(c => (
                   <UICheckbox
-                    key={id}
-                    checked={!skippedChecks.has(id)}
-                    onChange={(checked) => toggleCheck(id, checked)}
+                    key={c.checkType}
+                    checked={!skippedChecks.has(c.checkType)}
+                    onChange={(checked) => toggleCheck(c.checkType, checked)}
                   >
-                    {CHECK_ICONS[id] ?? <UIIcon name="CheckCircleOutlined" />}{' '}
-                    {id.charAt(0).toUpperCase() + id.slice(1).replace(/([A-Z])/g, ' $1')}
+                    {CHECK_ICONS[c.checkType] ?? <UIIcon name="CheckCircleOutlined" />}{' '}{c.label}
                   </UICheckbox>
                 ))}
               </UISpace>
