@@ -7,20 +7,7 @@ import * as React from 'react';
 import { UIAlert, UICard, UITag, UISpin, UISpace, UIEmptyState, UIIcon } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useQARegressions } from '@kb-labs/studio-data-client';
-
-const CHECK_ICONS: Record<string, React.ReactNode> = {
-  build: <UIIcon name="BuildOutlined" />,
-  lint: <UIIcon name="FileSearchOutlined" />,
-  typeCheck: <UIIcon name="FileTextOutlined" />,
-  test: <UIIcon name="ExperimentOutlined" />,
-};
-
-const CHECK_LABELS: Record<string, string> = {
-  build: 'Build',
-  lint: 'Lint',
-  typeCheck: 'Type Check',
-  test: 'Tests',
-};
+import { getCheckIcon, formatCheckLabel } from '../utils/check-display';
 
 export function RegressionsTab() {
   const sources = useDataSources();
@@ -77,8 +64,8 @@ export function RegressionsTab() {
           key={idx}
           title={
             <UISpace>
-              {CHECK_ICONS[reg.checkType]}
-              <span>{CHECK_LABELS[reg.checkType] ?? reg.checkType}</span>
+              {getCheckIcon(reg.checkType)}
+              <span>{formatCheckLabel(reg.checkType)}</span>
               <UITag color="error">+{reg.delta} new failure{reg.delta > 1 ? 's' : ''}</UITag>
             </UISpace>
           }

@@ -21,13 +21,7 @@ import {
 } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useQABaselineDiff, useQAUpdateBaseline } from '@kb-labs/studio-data-client';
-
-const CHECK_LABELS: Record<string, string> = {
-  build: 'Build',
-  lint: 'Lint',
-  typeCheck: 'Types',
-  test: 'Tests',
-};
+import { formatCheckLabel } from '../utils/check-display';
 
 export function BaselineDiffCard() {
   const sources = useDataSources();
@@ -129,7 +123,7 @@ export function BaselineDiffCard() {
         {Object.entries(diffData.diff).map(([ct, d]) => (
           <UICol xs={24} sm={12} lg={6} key={ct}>
             <UICard size="small" style={{ textAlign: 'center' }}>
-              <UITypographyText strong>{CHECK_LABELS[ct] ?? ct}</UITypographyText>
+              <UITypographyText strong>{formatCheckLabel(ct)}</UITypographyText>
               <div style={{ marginTop: 8 }}>
                 <UIStatistic
                   value={Math.abs(d.delta)}

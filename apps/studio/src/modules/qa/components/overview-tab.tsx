@@ -26,13 +26,7 @@ import { useQASummary, useQARun } from '@kb-labs/studio-data-client';
 import { CheckDetailDrawer } from './check-detail-drawer';
 import { BaselineDiffCard } from './baseline-diff-card';
 import { ErrorGroupsPanel } from './error-groups-panel';
-
-const CHECK_ICONS: Record<string, React.ReactNode> = {
-  build: <UIIcon name="BuildOutlined" />,
-  lint: <UIIcon name="FileSearchOutlined" />,
-  typeCheck: <UIIcon name="FileTextOutlined" />,
-  test: <UIIcon name="ExperimentOutlined" />,
-};
+import { getCheckIcon } from '../utils/check-display';
 
 function getPassRate(passed: number, total: number, skipped: number = 0): number {
   if (total === 0) {return 100;}
@@ -146,7 +140,7 @@ export function OverviewTab() {
                     checked={!skippedChecks.has(c.checkType)}
                     onChange={(checked) => toggleCheck(c.checkType, checked)}
                   >
-                    {CHECK_ICONS[c.checkType] ?? <UIIcon name="CheckCircleOutlined" />}{' '}{c.label}
+                    {getCheckIcon(c.checkType)}{' '}{c.label}
                   </UICheckbox>
                 ))}
               </UISpace>
@@ -213,7 +207,7 @@ export function OverviewTab() {
                 </div>
                 <div style={{ textAlign: 'center', marginBottom: 8 }}>
                   <UISpace>
-                    {CHECK_ICONS[check.checkType]}
+                    {getCheckIcon(check.checkType)}
                     <span style={{ fontWeight: 600, fontSize: 16 }}>{check.label}</span>
                   </UISpace>
                 </div>

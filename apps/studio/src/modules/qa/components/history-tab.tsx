@@ -9,16 +9,10 @@ import type { UITableColumn } from '@kb-labs/studio-ui-kit';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useQAHistory } from '@kb-labs/studio-data-client';
 import type { HistoryEntry } from '@kb-labs/qa-contracts';
-
-const CHECK_LABELS: Record<string, string> = {
-  build: 'Build',
-  lint: 'Lint',
-  typeCheck: 'Types',
-  test: 'Tests',
-};
+import { formatCheckLabel } from '../utils/check-display';
 
 function renderCheckColumn(entry: HistoryEntry, checkType: string) {
-  const s = entry.summary[checkType as keyof typeof entry.summary];
+  const s = entry.summary[checkType];
   if (!s) {return '-';}
   const hasFailed = s.failed > 0;
   return (
@@ -96,8 +90,8 @@ export function HistoryTab() {
         </UISpace>
       ),
     },
-    ...(['build', 'lint', 'typeCheck', 'test'] as const).map((ct) => ({
-      title: CHECK_LABELS[ct] ?? ct,
+    ...(data.entries[0] ? Object.keys(data.entries[0].summary) : []).map((ct) => ({
+      title: formatCheckLabel(ct),
       key: ct,
       width: 90,
       align: 'center' as const,
@@ -115,12 +109,12 @@ export function HistoryTab() {
       expandable={{
         expandedRowRender: (record) => (
           <div style={{ padding: '8px 16px' }}>
-            {(['build', 'lint', 'typeCheck', 'test'] as const).map((ct) => {
+            {Object.keys(record.failedPackages).map((ct) => {
               const failed = record.failedPackages[ct];
               if (!failed || failed.length === 0) {return null;}
               return (
                 <div key={ct} style={{ marginBottom: 12 }}>
-                  <strong>{CHECK_LABELS[ct]} failures ({failed.length}):</strong>
+                  <strong>{formatCheckLabel(ct)} failures ({failed.length}):</strong>
                   <div style={{ marginTop: 4, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                     {failed.map((pkg) => (
                       <UITag key={pkg} color="error" style={{ fontSize: 11 }}>

@@ -23,20 +23,7 @@ import {
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useQAEnrichedTrends } from '@kb-labs/studio-data-client';
 import type { EnrichedTrendResult, TrendChangelogEntry } from '@kb-labs/qa-contracts';
-
-const CHECK_ICONS: Record<string, React.ReactNode> = {
-  build: <UIIcon name="BuildOutlined" />,
-  lint: <UIIcon name="FileSearchOutlined" />,
-  typeCheck: <UIIcon name="FileTextOutlined" />,
-  test: <UIIcon name="ExperimentOutlined" />,
-};
-
-const CHECK_LABELS: Record<string, string> = {
-  build: 'Build',
-  lint: 'Lint',
-  typeCheck: 'Type Check',
-  test: 'Tests',
-};
+import { getCheckIcon, formatCheckLabel } from '../utils/check-display';
 
 function getTrendColor(trend: string): string {
   switch (trend) {
@@ -79,7 +66,7 @@ function buildChartData(trends: EnrichedTrendResult[]) {
   const rows: Array<{ date: string; value: number; category: string }> = [];
 
   for (const trend of trends) {
-    const label = CHECK_LABELS[trend.checkType] ?? trend.checkType;
+    const label = trend.label ?? formatCheckLabel(trend.checkType);
     for (const point of trend.timeSeries) {
       rows.push({
         date: formatTimestamp(point.timestamp), // "MM-DD HH:mm" — readable and unique per measurement
@@ -194,9 +181,9 @@ export function TrendsTab() {
               <UIRow align="middle" gutter={16}>
                 <UICol flex="auto">
                   <UISpace>
-                    {CHECK_ICONS[trend.checkType]}
+                    {getCheckIcon(trend.checkType)}
                     <span style={{ fontWeight: 600, fontSize: 16 }}>
-                      {CHECK_LABELS[trend.checkType] ?? trend.checkType}
+                      {trend.label ?? formatCheckLabel(trend.checkType)}
                     </span>
                     {getTrendTag(trend.trend)}
                   </UISpace>
@@ -273,7 +260,7 @@ export function TrendsTab() {
                   {group.changes.map(({ checkType, entry }) => (
                     <div key={checkType} style={{ marginBottom: 4 }}>
                       <span style={{ fontWeight: 500 }}>
-                        {CHECK_LABELS[checkType] ?? checkType}:
+                        {formatCheckLabel(checkType)}:
                       </span>
                       {entry.newFailures.length > 0 && (
                         <span style={{ marginLeft: 8 }}>

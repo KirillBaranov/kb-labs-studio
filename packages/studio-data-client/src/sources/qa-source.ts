@@ -23,6 +23,7 @@ export interface QASummaryResponse {
   checks: Array<{
     checkType: string;
     label: string;
+    icon?: string;
     passed: number;
     failed: number;
     skipped: number;
