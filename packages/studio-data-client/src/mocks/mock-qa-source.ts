@@ -78,15 +78,19 @@ const MOCK_HISTORY: HistoryEntry[] = [
 export class MockQASource implements QADataSource {
   async getSummary(): Promise<QASummaryResponse> {
     const latest = MOCK_HISTORY[0]!;
+    const build = latest.summary.build!;
+    const lint = latest.summary.lint!;
+    const typeCheck = latest.summary.typeCheck!;
+    const test = latest.summary.test!;
     return {
       status: latest.status,
       lastRunAt: latest.timestamp,
       git: latest.git,
       checks: [
-        { checkType: 'build', label: 'Build', ...latest.summary.build, total: latest.summary.build.passed + latest.summary.build.failed + latest.summary.build.skipped },
-        { checkType: 'lint', label: 'Lint', ...latest.summary.lint, total: latest.summary.lint.passed + latest.summary.lint.failed + latest.summary.lint.skipped },
-        { checkType: 'typeCheck', label: 'Type Check', ...latest.summary.typeCheck, total: latest.summary.typeCheck.passed + latest.summary.typeCheck.failed + latest.summary.typeCheck.skipped },
-        { checkType: 'test', label: 'Tests', ...latest.summary.test, total: latest.summary.test.passed + latest.summary.test.failed + latest.summary.test.skipped },
+        { checkType: 'build', label: 'Build', ...build, total: build.passed + build.failed + build.skipped },
+        { checkType: 'lint', label: 'Lint', ...lint, total: lint.passed + lint.failed + lint.skipped },
+        { checkType: 'typeCheck', label: 'Type Check', ...typeCheck, total: typeCheck.passed + typeCheck.failed + typeCheck.skipped },
+        { checkType: 'test', label: 'Tests', ...test, total: test.passed + test.failed + test.skipped },
       ],
       hasBaseline: true,
       baselineTimestamp: '2026-02-20T10:00:00Z',
@@ -122,22 +126,25 @@ export class MockQASource implements QADataSource {
     const last = entries[0]!;
 
     const buildEnriched = (ct: 'build' | 'lint' | 'typeCheck' | 'test'): EnrichedTrendResult => {
-      const timeSeries = entries.map((e) => ({
-        timestamp: e.timestamp,
-        gitCommit: e.git.commit,
-        gitBranch: e.git.branch,
-        gitMessage: e.git.message,
-        passed: e.summary[ct].passed,
-        failed: e.summary[ct].failed,
-        skipped: e.summary[ct].skipped,
-      })).reverse();
+      const timeSeries = entries.map((e) => {
+        const s = e.summary[ct]!;
+        return {
+          timestamp: e.timestamp,
+          gitCommit: e.git.commit,
+          gitBranch: e.git.branch,
+          gitMessage: e.git.message,
+          passed: s.passed,
+          failed: s.failed,
+          skipped: s.skipped,
+        };
+      }).reverse();
 
       const changelog = [];
       for (let i = 1; i < entries.length; i++) {
         const prev = entries[i]!;
         const curr = entries[i - 1]!;
-        const prevSet = new Set(prev.failedPackages[ct]);
-        const currFailed = curr.failedPackages[ct];
+        const prevSet = new Set(prev.failedPackages[ct] ?? []);
+        const currFailed = curr.failedPackages[ct] ?? [];
         const currSet = new Set(currFailed);
         const newFailures = currFailed.filter((p) => !prevSet.has(p));
         const fixed = [...prevSet].filter((p) => !currSet.has(p));
@@ -153,8 +160,8 @@ export class MockQASource implements QADataSource {
         }
       }
 
-      const previous = first.summary[ct].failed;
-      const current = last.summary[ct].failed;
+      const previous = first.summary[ct]!.failed;
+      const current = last.summary[ct]!.failed;
       const delta = current - previous;
 
       return {
@@ -324,10 +331,10 @@ export class MockQASource implements QADataSource {
         timestamp: h.timestamp,
         git: h.git,
         checks: {
-          build: h.failedPackages.build.includes(packageName) ? 'failed' as const : 'passed' as const,
-          lint: h.failedPackages.lint.includes(packageName) ? 'failed' as const : 'passed' as const,
-          typeCheck: h.failedPackages.typeCheck.includes(packageName) ? 'failed' as const : 'passed' as const,
-          test: h.failedPackages.test.includes(packageName) ? 'failed' as const : 'passed' as const,
+          build: (h.failedPackages.build ?? []).includes(packageName) ? 'failed' as const : 'passed' as const,
+          lint: (h.failedPackages.lint ?? []).includes(packageName) ? 'failed' as const : 'passed' as const,
+          typeCheck: (h.failedPackages.typeCheck ?? []).includes(packageName) ? 'failed' as const : 'passed' as const,
+          test: (h.failedPackages.test ?? []).includes(packageName) ? 'failed' as const : 'passed' as const,
         },
       })),
       flakyScore: 0.15,
