@@ -321,17 +321,29 @@ function LayoutContent() {
 
     // Add plugin navigation items
     for (const model of pluginNavModel) {
-      items.push({
-        key: `plugin-${model.pluginId}`,
-        label: model.displayName,
-        icon: renderPluginIcon(model.icon),
-        children: model.routes.map(route => ({
-          key: route.key,
-          label: route.label,
+      if (model.routes.length === 1) {
+        // Single page plugin — flat nav item (no submenu)
+        const route = model.routes[0]!;
+        items.push({
+          key: `plugin-${model.pluginId}`,
+          label: model.displayName,
+          icon: renderPluginIcon(model.icon),
           path: route.path,
-          icon: renderPluginIcon(route.icon),
-        })),
-      });
+        });
+      } else if (model.routes.length > 1) {
+        // Multi-page plugin — group with children
+        items.push({
+          key: `plugin-${model.pluginId}`,
+          label: model.displayName,
+          icon: renderPluginIcon(model.icon),
+          children: model.routes.map(route => ({
+            key: route.key,
+            label: route.label,
+            path: route.path,
+            icon: renderPluginIcon(route.icon),
+          })),
+        });
+      }
     }
 
     // Add settings at the bottom
@@ -673,19 +685,29 @@ function buildPluginNavModel(registry: import('@kb-labs/studio-federation').Stud
     const group = groups.get(plugin.pluginId)!;
 
     for (const menu of plugin.menus) {
-      if (!menu.parentId) continue;
-
       // Resolve target: menu.target is a page ID, find the page's route
       const targetPage = plugin.pages.find(p => p.id === menu.target);
       const path = targetPage?.route ?? `/p/${menu.target}`;
 
-      group.routes.push({
-        key: menu.id,
-        label: menu.label,
-        path,
-        icon: menu.icon,
-        order: menu.order,
-      });
+      if (!menu.parentId) {
+        // Top-level menu — set as the group's direct path
+        group.routes.push({
+          key: menu.id,
+          label: menu.label,
+          path,
+          icon: menu.icon,
+          order: menu.order,
+        });
+      } else {
+        // Child menu — nested under parent
+        group.routes.push({
+          key: menu.id,
+          label: menu.label,
+          path,
+          icon: menu.icon,
+          order: menu.order,
+        });
+      }
     }
   }
 
