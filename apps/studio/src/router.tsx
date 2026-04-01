@@ -36,8 +36,6 @@ import { AnalyticsVectorStorePage } from './modules/analytics/pages/analytics-ve
 import { AnalyticsCachePage } from './modules/analytics/pages/analytics-cache-page';
 import { AnalyticsStoragePage } from './modules/analytics/pages/analytics-storage-page';
 import { AgentsPage } from './modules/agents/pages/agents-page';
-// TODO: TEMPORARY - Remove after commit plugin UI is polished
-import { CommitPage } from './modules/commit/pages/commit-page';
 import { ReleasePage } from './modules/release/pages/release-page';
 import { QualityPage } from './modules/quality/pages/quality-page';
 import { QADashboardPage } from './modules/qa/pages/qa-page';
@@ -190,13 +188,6 @@ function LayoutContent() {
         label: 'Agents',
         icon: renderPluginIcon('RobotOutlined'),
         path: '/agents',
-      },
-      // TODO: TEMPORARY - Remove after commit plugin UI is polished
-      {
-        key: 'commit',
-        label: 'Commit',
-        icon: renderPluginIcon('GitlabOutlined'),
-        path: '/commit',
       },
       {
         key: 'quality',
@@ -623,17 +614,6 @@ export const router = createBrowserRouter([
       {
         path: '/observability/incidents/:id',
         element: <IncidentDetailPage />,
-        errorElement: <ErrorBoundary />,
-      },
-      // TODO: TEMPORARY - Remove after commit plugin UI is polished
-      {
-        path: '/commit',
-        element: <CommitPage />,
-        errorElement: <ErrorBoundary />,
-      },
-      {
-        path: '/commit/:tab',
-        element: <CommitPage />,
         errorElement: <ErrorBoundary />,
       },
       {
