@@ -5,12 +5,12 @@
 
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
-import { useRegistry } from '../../../providers/registry-provider';
+import { useRegistryV2 } from '../../../providers/registry-v2-provider';
 import { PageHeader } from '../../../components/page-header';
 
 export function PluginPage(): React.ReactElement {
   const { pluginId: urlPluginId, widgetName } = useParams<{ pluginId: string; widgetName: string }>();
-  const { registry, loading, error } = useRegistry();
+  const { registry, loading, error } = useRegistryV2();
 
   if (loading) {
     return <div>Loading registry...</div>;

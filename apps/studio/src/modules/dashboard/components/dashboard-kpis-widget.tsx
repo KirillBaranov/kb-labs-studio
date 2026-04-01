@@ -1,10 +1,11 @@
 import { UICard, UIBadge, UIRow, UICol } from '@kb-labs/studio-ui-kit';
 import { HolderOutlined } from '@ant-design/icons';
-import { useRegistry } from '../../../providers/registry-provider';
+import { useRegistryV2 } from '../../../providers/registry-v2-provider';
 import { KBStatCard } from '@/components/ui';
 
 export function DashboardKpisWidget() {
-  const { health, registry } = useRegistry();
+  const { registry } = useRegistryV2();
+  const health = null; // TODO: health status via separate endpoint
 
   const totalPlugins = registry.plugins?.length ?? 0;
   const pluginsMounted = health?.pluginsMounted ?? 0;

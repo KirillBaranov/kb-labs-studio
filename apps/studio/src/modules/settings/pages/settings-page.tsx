@@ -14,7 +14,7 @@ import {
 import { useDataSources } from '@/providers/data-sources-provider';
 import { useHealthStatus } from '@kb-labs/studio-data-client';
 import { HealthIndicator } from '@/components/health-indicator';
-import { useRegistry } from '@/providers/registry-provider';
+import { useRegistryV2 } from '@/providers/registry-v2-provider';
 import { formatTimestamp } from '@/utils/format-date';
 import { AppearanceSettings } from '../components/appearance-settings';
 import { DataPrivacySettings } from '../components/data-privacy-settings';
@@ -30,7 +30,9 @@ import { KBListItem, KBPageContainer, KBPageHeader, KBSection } from '@/componen
 export function SettingsPage() {
   const sources = useDataSources();
   const { data, isLoading } = useHealthStatus(sources.system);
-  const { registryMeta, refresh } = useRegistry();
+  const { registry } = useRegistryV2();
+  const registryMeta = { generatedAt: registry.generatedAt, rev: null, partial: false, stale: false };
+  const refresh = async () => {}; // TODO: queryClient.invalidateQueries
   const [invalidating, setInvalidating] = React.useState(false);
 
   const handleInvalidateCache = async () => {

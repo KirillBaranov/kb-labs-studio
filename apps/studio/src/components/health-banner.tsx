@@ -4,14 +4,16 @@ import { studioConfig } from '@/config/studio.config';
 import { UIAlert } from '@kb-labs/studio-ui-kit';
 import { RefreshCw } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useRegistry } from '../providers/registry-provider';
+import { useRegistryV2 } from '../providers/registry-v2-provider';
+import type { HealthStatus } from '@kb-labs/studio-data-client';
 
 /**
  * Health banner component showing REST API status with fallback to mock mode
  */
 export function HealthBanner() {
   const sources = useDataSources();
-  const { health: sseHealth } = useRegistry();
+  const _registry = useRegistryV2();
+  const sseHealth = null; // TODO: health via separate endpoint
   const { data: healthRaw, error, refetch } = useHealthStatus(sources.system);
   const { data: ready } = useReadyStatus(sources.system);
   const [showDetails, setShowDetails] = useState(false);
@@ -31,11 +33,7 @@ export function HealthBanner() {
   }, [sseHealth, refetch]);
 
   const healthSnapshot = (healthRaw as Record<string, unknown> | undefined)?.snapshot as
-    | {
-        status?: string;
-        components?: Array<{ id: string; lastError?: string }>;
-        meta?: Record<string, unknown>;
-      }
+    | HealthStatus['snapshot']
     | undefined;
 
   const fallbackStatus =
@@ -45,14 +43,16 @@ export function HealthBanner() {
   const readyReason = !readyStatus
     ? sseHealth?.reason ?? ready?.reason
     : undefined;
-  const impactedComponents =
-    Array.isArray(healthSnapshot?.components)
-      ? healthSnapshot.components.filter((component) => Boolean(component.lastError))
-      : [];
+  const impactedComponents = (healthSnapshot?.checks ?? [])
+    .filter((check) => check.status !== 'ok')
+    .map((check) => ({
+      id: check.id,
+      lastError: check.message ?? 'unknown issue',
+    }));
 
   const pluginMetrics = useMemo(() => {
-    const readiness = (healthSnapshot?.meta as { readiness?: Record<string, unknown> } | undefined)?.readiness;
-    const pluginMounts = (readiness as { pluginMounts?: Record<string, unknown> } | undefined)?.pluginMounts;
+    const meta = healthSnapshot?.meta as Record<string, unknown> | undefined;
+    const pluginMounts = meta?.pluginMounts as Record<string, unknown> | undefined;
     const succeeded =
       pluginMounts && typeof pluginMounts === 'object' && typeof pluginMounts.succeeded === 'number'
         ? (pluginMounts.succeeded as number)
@@ -67,7 +67,9 @@ export function HealthBanner() {
     return { succeeded: succeeded ?? 0, failed: failed ?? 0 };
   }, [healthSnapshot]);
 
-  const isDegraded = healthStatus === 'degraded' && readyStatus;
+  const isDegraded =
+    (healthStatus === 'degraded' || healthSnapshot?.state === 'partial_observability')
+    && readyStatus;
   const isDown = !!error || !readyStatus;
   const isMockMode =
     studioConfig.dataSourceMode === 'mock' ||
@@ -122,7 +124,7 @@ export function HealthBanner() {
               {showDetails && (
                 <ul style={{ marginTop: 8, marginLeft: 20 }}>
                   {impactedComponents.map(component => (
-                    <li key={component.id}>
+                  <li key={component.id}>
                       {component.id}: {component.lastError ?? 'unknown issue'}
                     </li>
                   ))}

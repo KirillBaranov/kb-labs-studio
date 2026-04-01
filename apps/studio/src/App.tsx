@@ -4,11 +4,9 @@ import { RouterProvider } from 'react-router-dom';
 import { KBConfigProvider } from '@/components/ui/kb-config-provider';
 import { DataSourcesProvider } from './providers/data-sources-provider';
 import { AuthProvider } from './providers/auth-provider';
-import { RegistryProvider } from './providers/registry-provider';
+import { RegistryV2Provider } from './providers/registry-v2-provider';
 import { SettingsProvider } from './providers/settings-provider';
 import { router } from './router';
-// Ant Design 5.x styles are optional - components use CSS-in-JS
-// If needed, uncomment: import 'antd/dist/reset.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,10 +24,10 @@ export function App() {
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
             <DataSourcesProvider>
-              <RegistryProvider apiBaseUrl={import.meta.env.VITE_API_BASE_URL || '/api/v1'}>
+              <RegistryV2Provider apiBaseUrl={import.meta.env.VITE_API_BASE_URL || '/api/v1'}>
                 <RouterProvider router={router} />
                 <ReactQueryDevtools initialIsOpen={false} />
-              </RegistryProvider>
+              </RegistryV2Provider>
             </DataSourcesProvider>
           </QueryClientProvider>
         </AuthProvider>

@@ -6,7 +6,7 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UIMessage } from '@kb-labs/studio-ui-kit';
-import { useRegistry } from './registry-provider';
+import { useQueryClient } from '@tanstack/react-query';
 import { useDataSources } from './data-sources-provider';
 import { useSettings } from './settings-provider';
 import { getCommands, saveRecentCommand, getRecentCommands, type Command } from '@/utils/commands';
@@ -31,7 +31,11 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
   const [isOpen, setIsOpen] = React.useState(false);
   const navigate = useNavigate();
   const { settings, updateSettings } = useSettings();
-  const { refresh } = useRegistry();
+  const queryClient = useQueryClient();
+  const refresh = React.useCallback(
+    () => queryClient.invalidateQueries({ queryKey: ['studio-registry-v2'] }),
+    [queryClient],
+  );
   const sources = useDataSources();
 
   // Commands configuration

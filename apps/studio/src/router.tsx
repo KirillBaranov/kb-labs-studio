@@ -1,15 +1,14 @@
 import * as React from 'react';
 import { createBrowserRouter, Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import type { StudioRegistry } from '@kb-labs/rest-api-contracts';
 import { useAuth } from './providers/auth-provider';
-import { useRegistry } from './providers/registry-provider';
+import { useRegistryV2 } from './providers/registry-v2-provider';
 import { CommandPaletteProvider, useCommandPalette } from './providers/command-palette-provider';
 import { useNotifications } from '@kb-labs/studio-data-client';
 import { useDataSources } from './providers/data-sources-provider';
 import { HealthBanner } from './components/health-banner';
 import { NotFoundPage } from './pages/not-found-page';
 import { LoginPage } from './pages/login-page';
-import { PluginPage } from './routes/plugin-page';
+import { PluginPageV2 } from './routes/plugin-page-v2';
 import { SettingsPage } from './modules/settings/pages/settings-page';
 import { WorkflowsDashboardPage } from './modules/workflows/pages/workflows-dashboard-page';
 import { WorkflowsRunsPage } from './modules/workflows/pages/workflows-runs-page';
@@ -21,7 +20,6 @@ import { WorkflowsCronsPage } from './modules/workflows/pages/workflows-crons-pa
 import { DashboardPage } from './modules/dashboard/pages/dashboard-page';
 import { AIInsightsPage } from './modules/dashboard/pages/ai-insights-page';
 import { DashboardLayout } from './modules/dashboard/layouts/dashboard-layout';
-import { GalleryPage } from './pages/gallery-page';
 import { StateBrokerPage } from './modules/observability/pages/state-broker-page';
 import { DevKitPage } from './modules/observability/pages/devkit-page';
 import { PrometheusMetricsPage } from './modules/observability/pages/prometheus-metrics-page';
@@ -89,7 +87,7 @@ function LayoutContent() {
   const auth = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const { registry, loading, error, retrying, hasData, refresh, registryMeta, health } = useRegistry();
+  const { registry, loading, error } = useRegistryV2();
   const commandPalette = useCommandPalette();
   const sources = useDataSources();
   const { settings } = useSettings();
@@ -106,31 +104,20 @@ function LayoutContent() {
 
   const handleLogout = React.useCallback(() => {
     logger.info('User logout initiated');
-    // Clear user role
     localStorage.removeItem('studio-user-role');
-    // Redirect to login
     navigate('/login');
   }, [logger, navigate]);
 
-  const [pluginNavModel, setPluginNavModel] = React.useState<PluginNavModel[]>([]);
+  const hasData = registry.plugins.length > 0;
 
-  React.useEffect(() => {
-    if (!hasData) {
-      setPluginNavModel(prev => (prev.length > 0 ? [] : prev));
-      return;
-    }
-
-    const nextModel = buildPluginNavModel(registry);
-    setPluginNavModel(prev => (arePluginModelsEqual(prev, nextModel) ? prev : nextModel));
+  // Build plugin nav from V2 registry menus
+  const pluginNavModel = React.useMemo<PluginNavModel[]>(() => {
+    if (!hasData) return [];
+    return buildPluginNavModel(registry);
   }, [registry, hasData]);
 
   const sidebarSkeleton = loading && !hasData;
   const sidebarError = !!error && !hasData;
-  const sidebarWarning = hasData && !sidebarError && !sidebarSkeleton && (
-    registryMeta.partial ||
-    registryMeta.stale ||
-    (health?.pluginsFailed ?? 0) > 0
-  );
 
   // Build flat navigation items (before category grouping)
   const flatNavigationItems = React.useMemo<NavigationItem[]>(() => {
@@ -499,13 +486,8 @@ export const router = createBrowserRouter([
         errorElement: <ErrorBoundary />,
       },
       {
-        path: '/gallery',
-        element: <GalleryPage />,
-        errorElement: <ErrorBoundary />,
-      },
-      {
         path: '/plugins/:pluginId/:widgetName',
-        element: <PluginPage />,
+        element: <PluginPageV2 />,
         errorElement: <ErrorBoundary />,
       },
       {
@@ -687,100 +669,59 @@ export const router = createBrowserRouter([
     ],
   },
   {
+    // Catch-all for V2 plugin pages (Module Federation remotes).
+    // If no static route matched, check the V2 registry.
+    // PluginPageV2 resolves the route against registry or shows 404.
+    path: '/p/*',
+    element: <PluginPageV2 />,
+    errorElement: <ErrorBoundary />,
+  },
+  {
     path: '*',
     element: <NotFoundPage />,
   },
 ]);
 
-function buildPluginNavModel(registry: StudioRegistry & { menus?: any[] }): PluginNavModel[] {
+function buildPluginNavModel(registry: import('@kb-labs/studio-federation').StudioRegistryV2): PluginNavModel[] {
   const groups = new Map<string, PluginNavModel>();
 
-  // Use nested structure since menus don't have pluginId after flatten
-  // Iterate through plugins to preserve plugin metadata
-  for (const plugin of registry.plugins ?? []) {
-    if (!plugin.menus || plugin.menus.length === 0) {
-      continue;
-    }
+  for (const plugin of registry.plugins) {
+    if (!plugin.menus || plugin.menus.length === 0) continue;
 
-    const pluginId = plugin.pluginId;
-
-    // Find parent menu (menu without parentId) to get display name and icon
     const parentMenu = plugin.menus.find(m => !m.parentId);
 
-    if (!groups.has(pluginId)) {
-      groups.set(pluginId, {
-        pluginId,
-        displayName: parentMenu?.label ?? plugin.displayName ?? pluginId,
+    if (!groups.has(plugin.pluginId)) {
+      groups.set(plugin.pluginId, {
+        pluginId: plugin.pluginId,
+        displayName: parentMenu?.label ?? plugin.displayName ?? plugin.pluginId,
         icon: parentMenu?.icon,
         routes: [],
       });
     }
 
-    const group = groups.get(pluginId)!;
+    const group = groups.get(plugin.pluginId)!;
 
-    // Only add child menus (with parentId) to routes
-    // Parent menus without parentId are represented by the plugin group itself
-    for (const menuEntry of plugin.menus) {
-      if (!menuEntry.parentId) {
-        // This is a parent menu - skip it, the plugin group represents it
-        continue;
-      }
+    for (const menu of plugin.menus) {
+      if (!menu.parentId) continue;
+
+      // Resolve target: menu.target is a page ID, find the page's route
+      const targetPage = plugin.pages.find(p => p.id === menu.target);
+      const path = targetPage?.route ?? `/p/${menu.target}`;
 
       group.routes.push({
-        key: menuEntry.id,
-        label: menuEntry.label,
-        path: menuEntry.target,
-        icon: menuEntry.icon, // Use icon from menu manifest
-        order: menuEntry.order,
+        key: menu.id,
+        label: menu.label,
+        path,
+        icon: menu.icon,
+        order: menu.order,
       });
     }
   }
 
   for (const group of groups.values()) {
-    group.routes.sort((a, b) => {
-      if (a.order !== undefined && b.order !== undefined && a.order !== b.order) {
-        return a.order - b.order;
-      }
-      if (a.order !== undefined) {
-        return -1;
-      }
-      if (b.order !== undefined) {
-        return 1;
-      }
-      return a.label.localeCompare(b.label);
-    });
+    group.routes.sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
   }
 
   return Array.from(groups.values()).sort((a, b) => a.displayName.localeCompare(b.displayName));
-}
-
-function arePluginModelsEqual(a: PluginNavModel[], b: PluginNavModel[]): boolean {
-  if (a.length !== b.length) {
-    return false;
-  }
-  for (let i = 0; i < a.length; i++) {
-    const left = a[i];
-    const right = b[i];
-    if (!left || !right) {
-      return false;
-    }
-    if (left.pluginId !== right.pluginId || left.displayName !== right.displayName || left.icon !== right.icon) {
-      return false;
-    }
-    if (left.routes.length !== right.routes.length) {
-      return false;
-    }
-    for (let j = 0; j < left.routes.length; j++) {
-      const lr = left.routes[j];
-      const rr = right.routes[j];
-      if (!lr || !rr) {
-        return false;
-      }
-      if (lr.key !== rr.key || lr.label !== rr.label || lr.path !== rr.path || lr.order !== rr.order) {
-        return false;
-      }
-    }
-  }
-  return true;
 }
 
