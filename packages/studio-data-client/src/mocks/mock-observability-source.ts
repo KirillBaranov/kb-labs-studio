@@ -24,7 +24,6 @@ import type {
   IncidentsListResponse,
   IncidentDetailResponse,
   IncidentAnalysisResponse,
-  SystemMetricsData,
 } from '../contracts/observability';
 
 function delay(ms: number): Promise<void> {
@@ -87,48 +86,6 @@ export class MockObservabilitySource implements ObservabilityDataSource {
       },
       packages: 91,
       avgTypeCoverage: 91.1,
-    };
-  }
-
-  async getSystemMetrics(): Promise<SystemMetricsData> {
-    await delay(150);
-
-    const now = Date.now();
-
-    return {
-      instances: [
-        {
-          instanceId: 'kb-api-instance-1',
-          timestamp: now - 5000, // 5 seconds ago
-          cpu: {
-            user: 1234567,
-            system: 567890,
-            percentage: 45.2,
-          },
-          memory: {
-            rss: 134217728, // 128MB
-            heapTotal: 67108864, // 64MB
-            heapUsed: 50331648, // 48MB
-            external: 2097152, // 2MB
-            arrayBuffers: 1048576, // 1MB
-            rssPercentage: 12.5,
-            heapPercentage: 75.0,
-          },
-          uptime: 3600, // 1 hour
-          loadAvg: [1.2, 1.5, 1.8],
-          totalMemory: 1073741824, // 1GB
-          freeMemory: 536870912, // 512MB
-        },
-      ],
-      summary: {
-        totalInstances: 1,
-        activeInstances: 1,
-        staleInstances: 0,
-        deadInstances: 0,
-        avgCpu: 45.2,
-        avgMemory: 12.5,
-        avgHeap: 75.0,
-      },
     };
   }
 

@@ -7,7 +7,7 @@ import type { HttpClient } from '../client/http-client';
 import type { AuditDataSource } from './audit-source';
 import type { ActionResult } from '../contracts/common';
 import type { HealthStatus } from '../contracts/system';
-import type { SystemHealthSnapshot } from '@kb-labs/rest-api-contracts';
+import type { ServiceObservabilityHealth } from '@kb-labs/core-contracts';
 
 /**
  * HTTP implementation of AuditDataSource
@@ -37,18 +37,28 @@ export class HttpAuditSource implements AuditDataSource {
   }
 
   async getHealth(): Promise<HealthStatus> {
-    const snapshot = await this.client.fetch<SystemHealthSnapshot>('/health');
-    
+    const snapshot = await this.client.fetch<ServiceObservabilityHealth>('/observability/health');
+
     return {
       ok: snapshot.status === 'healthy',
-      timestamp: snapshot.ts,
-      sources: [{
-        name: 'audit',
-        ok: snapshot.status === 'healthy',
-        error: snapshot.status === 'degraded' ? 'system_degraded' : undefined,
-      }],
+      timestamp: snapshot.observedAt,
+      sources: snapshot.checks.length > 0
+        ? snapshot.checks.map((check: ServiceObservabilityHealth['checks'][number]) => ({
+          name: check.id,
+          ok: check.status === 'ok',
+          latency: check.latencyMs,
+          error: check.status === 'warn'
+            ? 'system_degraded'
+            : check.status === 'error'
+              ? check.message ?? 'system_error'
+              : undefined,
+        }))
+        : [{
+          name: 'audit',
+          ok: snapshot.status === 'healthy',
+          error: snapshot.status === 'degraded' ? 'system_degraded' : undefined,
+        }],
       snapshot,
     };
   }
 }
-

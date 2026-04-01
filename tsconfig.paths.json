@@ -15,6 +15,12 @@
       "@kb-labs/commit-contracts/*": [
         "../../plugins/kb-labs-commit-plugin/packages/commit-contracts/src/*"
       ],
+      "@kb-labs/core-contracts": [
+        "../kb-labs-core/packages/core-contracts/src/index.ts"
+      ],
+      "@kb-labs/core-contracts/*": [
+        "../kb-labs-core/packages/core-contracts/src/*"
+      ],
       "@kb-labs/core-platform": [
         "../kb-labs-core/packages/core-platform/src/index.ts"
       ],
@@ -51,17 +57,29 @@
       "@kb-labs/rest-api-contracts/*": [
         "../kb-labs-rest-api/packages/rest-api-contracts/src/*"
       ],
-      "@kb-labs/studio-contracts": [
-        "packages/studio-contracts/src/index.ts"
-      ],
-      "@kb-labs/studio-contracts/*": [
-        "packages/studio-contracts/src/*"
-      ],
       "@kb-labs/studio-data-client": [
         "packages/studio-data-client/src/index.ts"
       ],
       "@kb-labs/studio-data-client/*": [
         "packages/studio-data-client/src/*"
+      ],
+      "@kb-labs/studio-event-bus": [
+        "packages/studio-event-bus/src/index.ts"
+      ],
+      "@kb-labs/studio-event-bus/*": [
+        "packages/studio-event-bus/src/*"
+      ],
+      "@kb-labs/studio-federation": [
+        "packages/studio-federation/src/index.ts"
+      ],
+      "@kb-labs/studio-federation/*": [
+        "packages/studio-federation/src/*"
+      ],
+      "@kb-labs/studio-hooks": [
+        "packages/studio-hooks/src/index.ts"
+      ],
+      "@kb-labs/studio-hooks/*": [
+        "packages/studio-hooks/src/*"
       ],
       "@kb-labs/studio-ui-core": [
         "packages/studio-ui-core/src/index.ts"

@@ -7,7 +7,6 @@ COPY apps/studio/package.json ./apps/studio/
 COPY packages/studio-ui-core/package.json ./packages/studio-ui-core/
 COPY packages/studio-ui-kit/package.json ./packages/studio-ui-kit/
 COPY packages/studio-data-client/package.json ./packages/studio-data-client/
-COPY packages/studio-contracts/package.json ./packages/studio-contracts/
 
 RUN corepack enable pnpm && pnpm install --frozen-lockfile
 

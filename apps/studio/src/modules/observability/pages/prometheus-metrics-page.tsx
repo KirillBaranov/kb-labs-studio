@@ -68,7 +68,7 @@ function getStatusCodeColor(code: number): string {
 /**
  * Prometheus Metrics Observability Page
  *
- * Shows real-time metrics from REST API /metrics/json endpoint:
+ * Shows real-time metrics parsed from the canonical REST API /metrics endpoint:
  * - Request counts and error rates
  * - Latency percentiles (p50, p95, p99)
  * - Per-plugin and per-tenant breakdown

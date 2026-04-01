@@ -18,7 +18,6 @@ import type {
   IncidentsListResponse,
   IncidentDetailResponse,
   IncidentAnalysisResponse,
-  SystemMetricsData,
 } from '../contracts/observability';
 
 /**
@@ -34,11 +33,6 @@ export interface ObservabilityDataSource {
    * Get DevKit health snapshot
    */
   getDevKitHealth(): Promise<DevKitHealth>;
-
-  /**
-   * Get system resource metrics (CPU, memory, uptime) from all REST API instances
-   */
-  getSystemMetrics(): Promise<SystemMetricsData>;
 
   /**
    * Get Prometheus metrics from REST API

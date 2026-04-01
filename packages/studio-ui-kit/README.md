@@ -46,8 +46,8 @@ function MyComponent() {
 
 ## 📊 Component Stats
 
-- **Total Components:** 48
-- **With Tests:** 4/48 (8%)
+- **Total Components:** 49
+- **With Tests:** 4/49 (8%)
 
 **By Category:**
 
@@ -59,7 +59,7 @@ function MyComponent() {
 - Composite: 2
 - Feedback: 6
 - Overlay: 5
-- Content: 2
+- Content: 3
 
 ## 📚 Component Reference
 
@@ -171,6 +171,7 @@ Content display components
 
 | Component | Description | Tests |
 |-----------|-------------|-------|
+| **UIDiffViewer** | UIDiffViewer | ❌ |
 | **UIJsonViewer** | UIJsonViewer component - JSON content viewer | ❌ |
 | **UIMarkdownViewer** | UIMarkdownViewer component - Markdown content viewer | ❌ |
 

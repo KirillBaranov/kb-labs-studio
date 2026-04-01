@@ -1,29 +1,12 @@
-import { useEffect, useState } from 'react';
 import { UICard } from '@kb-labs/studio-ui-kit';
 import { HolderOutlined } from '@ant-design/icons';
 import { Column } from '@ant-design/plots';
-import { type MetricsSnapshot } from '../../../api/metrics';
+import { usePrometheusMetrics } from '@kb-labs/studio-data-client';
 import { useDataSources } from '../../../providers/data-sources-provider';
 
 export function DashboardLatencyPercentilesWidget() {
-  const { metrics: metricsSource } = useDataSources();
-  const [metrics, setMetrics] = useState<MetricsSnapshot | null>(null);
-
-  useEffect(() => {
-    const loadMetrics = async () => {
-      try {
-        const data = await metricsSource.getMetrics();
-        setMetrics(data);
-      } catch (err) {
-        console.error('Failed to load metrics:', err);
-      }
-    };
-
-    loadMetrics();
-    const interval = setInterval(loadMetrics, 10000); // Refresh every 10s (less frequent)
-
-    return () => clearInterval(interval);
-  }, [metricsSource]);
+  const sources = useDataSources();
+  const { data: metrics } = usePrometheusMetrics(sources.observability);
 
   const min = metrics?.latency?.min ?? 0;
   const average = metrics?.latency?.average ?? 0;

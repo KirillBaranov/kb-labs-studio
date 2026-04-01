@@ -51,7 +51,7 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '/api/v1'),
         },
-        // Plugin widget bundles — proxy to Gateway which serves from node_modules
+        // Plugin widget bundles — proxy to Gateway (public upstream, no auth)
         '/plugins': {
           target: proxyTarget,
           changeOrigin: true,

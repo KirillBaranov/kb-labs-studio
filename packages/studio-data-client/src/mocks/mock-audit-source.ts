@@ -1,6 +1,7 @@
 import type { AuditDataSource } from '../sources/audit-source';
 import type { ActionResult } from '../contracts/common';
 import type { HealthStatus } from '../contracts/system';
+import type { ServiceObservabilityHealth } from '@kb-labs/core-contracts';
 import auditSummaryFixture from './fixtures/audit-summary.json';
 import auditPackageFixture from './fixtures/audit-package-report.json';
 
@@ -35,13 +36,28 @@ export class MockAuditSource implements AuditDataSource {
 
   async getHealth(): Promise<HealthStatus> {
     await delay(100);
+    const snapshot: ServiceObservabilityHealth = {
+      schema: 'kb.observability/1',
+      contractVersion: '1.0',
+      serviceId: 'rest',
+      instanceId: 'mock-rest',
+      observedAt: new Date().toISOString(),
+      status: 'healthy',
+      uptimeSec: 3600,
+      metricsEndpoint: '/api/v1/metrics',
+      logsSource: 'rest',
+      capabilities: ['httpMetrics', 'eventLoopMetrics', 'operationMetrics', 'logCorrelation'],
+      checks: [{ id: 'audit', status: 'ok', message: 'Audit backend available' }],
+      state: 'active',
+    };
+
     return {
       ok: true,
       timestamp: new Date().toISOString(),
       sources: [
         { name: 'audit', ok: true, latency: 100 },
       ],
+      snapshot,
     };
   }
 }
-

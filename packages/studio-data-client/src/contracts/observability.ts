@@ -74,66 +74,6 @@ export interface DevKitHealth {
 }
 
 /**
- * System metrics from a single REST API instance
- */
-export interface SystemMetricsInstance {
-  /** Instance identifier (hostname) */
-  instanceId: string;
-
-  /** Timestamp when metrics were collected */
-  timestamp: number;
-
-  /** CPU usage */
-  cpu: {
-    user: number;
-    system: number;
-    percentage: number;
-  };
-
-  /** Memory usage */
-  memory: {
-    rss: number;
-    heapTotal: number;
-    heapUsed: number;
-    external: number;
-    arrayBuffers: number;
-    rssPercentage: number;
-    heapPercentage: number;
-  };
-
-  /** Process uptime (seconds) */
-  uptime: number;
-
-  /** System load average (1, 5, 15 minutes) */
-  loadAvg: [number, number, number];
-
-  /** Total system memory (bytes) */
-  totalMemory: number;
-
-  /** Free system memory (bytes) */
-  freeMemory: number;
-}
-
-/**
- * System metrics response with summary
- */
-export interface SystemMetricsData {
-  /** Metrics from all instances */
-  instances: SystemMetricsInstance[];
-
-  /** Summary statistics */
-  summary: {
-    totalInstances: number;
-    activeInstances: number;
-    staleInstances: number;
-    deadInstances: number;
-    avgCpu: number;
-    avgMemory: number;
-    avgHeap: number;
-  };
-}
-
-/**
  * Prometheus metrics from REST API
  */
 export interface PrometheusMetrics {

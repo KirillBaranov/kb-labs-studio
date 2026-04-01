@@ -1,37 +1,18 @@
-import { useEffect, useState } from 'react';
 import { UICard, UIRow, UICol } from '@kb-labs/studio-ui-kit';
 import { HolderOutlined } from '@ant-design/icons';
-import { type MetricsSnapshot } from '../../../api/metrics';
+import { usePrometheusMetrics } from '@kb-labs/studio-data-client';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { KBStatCard } from '@/components/ui';
 
 export function DashboardMetricsWidget() {
-  const { metrics: metricsSource } = useDataSources();
-  const [metrics, setMetrics] = useState<MetricsSnapshot | null>(null);
-
-  useEffect(() => {
-    const loadMetrics = async () => {
-      try {
-        const data = await metricsSource.getMetrics();
-        setMetrics(data);
-      } catch (err) {
-        console.error('Failed to load metrics:', err);
-      }
-    };
-
-    loadMetrics();
-    const interval = setInterval(loadMetrics, 10000); // Refresh every 10s
-
-    return () => clearInterval(interval);
-  }, [metricsSource]);
+  const sources = useDataSources();
+  const { data: metrics } = usePrometheusMetrics(sources.observability);
 
   const totalRequests = metrics?.requests?.total ?? 0;
-  const totalErrors = metrics?.errors?.total ?? 0;
+  const totalErrors = (metrics?.requests?.clientErrors ?? 0) + (metrics?.requests?.serverErrors ?? 0);
   const errorRate = totalRequests > 0 ? (totalErrors / totalRequests) * 100 : 0;
   const avgLatency = metrics?.latency?.average ?? 0;
-  const p50 = metrics?.latency?.p50 ?? 0;
   const p95 = metrics?.latency?.p95 ?? 0;
-  const p99 = metrics?.latency?.p99 ?? 0;
   const uptime = metrics?.uptime?.seconds ?? 0;
 
   const formatUptime = (seconds: number): string => {

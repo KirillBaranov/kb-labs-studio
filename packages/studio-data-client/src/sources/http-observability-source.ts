@@ -26,8 +26,8 @@ import type {
   IncidentsListResponse,
   IncidentDetailResponse,
   IncidentAnalysisResponse,
-  SystemMetricsData,
 } from '../contracts/observability';
+import { parsePrometheusMetrics } from './prometheus-metrics-parser';
 
 /**
  * HTTP implementation of ObservabilityDataSource
@@ -65,26 +65,14 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
     }
   }
 
-  async getSystemMetrics(): Promise<SystemMetricsData> {
-    try {
-      return await this.client.fetch<SystemMetricsData>(
-        '/observability/system-metrics'
-      );
-    } catch (error) {
-      throw new KBError(
-        'SYSTEM_METRICS_FETCH_FAILED',
-        'Failed to fetch system metrics',
-        500,
-        error
-      );
-    }
-  }
-
   async getPrometheusMetrics(): Promise<PrometheusMetrics> {
     try {
-      return await this.client.fetch<PrometheusMetrics>(
-        '/metrics/json'
+      const payload = await this.client.fetch<string>(
+        '/metrics',
+        { responseType: 'text' }
       );
+
+      return parsePrometheusMetrics(payload);
     } catch (error) {
       throw new KBError(
         'PROMETHEUS_METRICS_FETCH_FAILED',

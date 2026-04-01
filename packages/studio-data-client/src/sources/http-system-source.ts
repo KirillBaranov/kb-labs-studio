@@ -7,7 +7,6 @@ import type { HttpClient } from '../client/http-client';
 import { KBError } from '../errors/kb-error';
 import type { SystemDataSource, RoutesResponse } from './system-source';
 import type {
-  SystemHealthSnapshot,
   ReadyResponse,
   NotReadyResponse,
   SystemInfoPayload,
@@ -17,6 +16,7 @@ import type {
   CapabilitiesResponse,
   ConfigResponse,
 } from '@kb-labs/rest-api-contracts';
+import type { ServiceObservabilityHealth } from '@kb-labs/core-contracts';
 import type { HealthStatus } from '../contracts/system';
 
 /**
@@ -26,18 +26,30 @@ export class HttpSystemSource implements SystemDataSource {
   constructor(private client: HttpClient) {}
 
   async getHealth(): Promise<HealthStatus> {
-    const snapshot = await this.client.fetch<SystemHealthSnapshot>('/health');
+    const snapshot = await this.client.fetch<ServiceObservabilityHealth>('/observability/health');
+    const degraded = snapshot.status === 'degraded' || snapshot.state === 'partial_observability';
 
     return {
       ok: snapshot.status === 'healthy',
-      timestamp: snapshot.ts,
-      sources: [
-        {
-          name: 'system',
-          ok: snapshot.status === 'healthy',
-          error: snapshot.status === 'degraded' ? 'system_degraded' : undefined,
-        },
-      ],
+      timestamp: snapshot.observedAt,
+      sources: snapshot.checks.length > 0
+        ? snapshot.checks.map((check: ServiceObservabilityHealth['checks'][number]) => ({
+          name: check.id,
+          ok: check.status === 'ok',
+          latency: check.latencyMs,
+          error: check.status === 'warn'
+            ? 'system_degraded'
+            : check.status === 'error'
+              ? check.message ?? 'system_error'
+              : undefined,
+        }))
+        : [
+          {
+            name: 'system',
+            ok: snapshot.status === 'healthy',
+            error: degraded ? 'system_degraded' : undefined,
+          },
+        ],
       snapshot,
     };
   }
@@ -101,4 +113,3 @@ export class HttpSystemSource implements SystemDataSource {
     return this.client.getBaseUrl();
   }
 }
-

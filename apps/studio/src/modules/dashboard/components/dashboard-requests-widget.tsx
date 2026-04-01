@@ -1,41 +1,20 @@
-import { useEffect, useState } from 'react';
 import { HolderOutlined } from '@ant-design/icons';
 import { UILineChart } from '@kb-labs/studio-ui-kit';
-import { type MetricsSnapshot } from '../../../api/metrics';
+import { useHealthStatus } from '@kb-labs/studio-data-client';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { UISpin } from '@kb-labs/studio-ui-kit';
 import { UICard } from '@kb-labs/studio-ui-kit';
 
 export function DashboardRequestsWidget() {
-  const { metrics: metricsSource } = useDataSources();
-  const [metrics, setMetrics] = useState<MetricsSnapshot | null>(null);
-  const [loading, setLoading] = useState(true);
+  const sources = useDataSources();
+  const { data: health, isLoading: loading } = useHealthStatus(sources.system);
 
-  useEffect(() => {
-    const loadMetrics = async () => {
-      try {
-        const data = await metricsSource.getMetrics();
-        setMetrics(data);
-      } catch (err) {
-        console.error('Failed to load metrics:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadMetrics();
-    const interval = setInterval(loadMetrics, 10000); // Refresh every 10s
-
-    return () => clearInterval(interval);
-  }, [metricsSource]);
-
-  // Transform histogram data to chart format
-  const chartData = metrics?.latency?.histogram
-    ?.slice(0, 10) // Top 10 routes
-    ?.map(item => ({
-      route: item.route.replace(/^[A-Z]+\s/, ''), // Remove HTTP method
-      requests: item.count,
-    })) ?? [];
+  const chartData = (health?.snapshot?.topOperations ?? [])
+    .slice(0, 10)
+    .map((item) => ({
+      route: item.operation.replace(/^http\./, ''),
+      requests: item.count ?? 0,
+    }));
 
   const config = {
     data: chartData,
@@ -65,7 +44,7 @@ export function DashboardRequestsWidget() {
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <HolderOutlined className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-tertiary)' }} />
-          <span>Top Routes</span>
+          <span>Top Operations</span>
           {loading && <UISpin size="small" />}
         </div>
       }
@@ -75,7 +54,7 @@ export function DashboardRequestsWidget() {
         <UILineChart {...config} />
       ) : (
         <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-tertiary)' }}>
-          No request data available
+          No operation data available
         </div>
       )}
     </UICard>
