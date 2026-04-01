@@ -400,14 +400,14 @@ function LayoutContent() {
             leftItems={
               <>
                 <StatusBarPresets.ApiConnection
-                  connected={health?.ready ?? false}
+                  connected={hasData}
                   onClick={() => navigate('/observability/system-events')}
                 />
-                {health?.pluginsMounted !== undefined && (
+                {hasData && (
                   <StatusBarItem
-                    label={`${health.pluginsMounted} plugin${health.pluginsMounted === 1 ? '' : 's'}`}
-                    tooltip={`${health.pluginsMounted} plugins mounted${health.pluginsFailed ? `, ${health.pluginsFailed} failed` : ''}`}
-                    status={health.pluginsFailed ? 'warning' : 'success'}
+                    label={`${registry.plugins.length} plugin${registry.plugins.length === 1 ? '' : 's'}`}
+                    tooltip={`${registry.plugins.length} plugins registered`}
+                    status="success"
                     onClick={() => navigate('/settings')}
                     clickable
                   />

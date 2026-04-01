@@ -37,7 +37,12 @@ async function fetchRegistryV2(apiBaseUrl: string, token?: string): Promise<Stud
   if (!res.ok) {
     throw new Error(`Failed to fetch studio registry: ${res.status} ${res.statusText}`);
   }
-  return res.json() as Promise<StudioRegistryV2>;
+  const json = await res.json() as { ok?: boolean; data?: StudioRegistryV2 } | StudioRegistryV2;
+  // REST API wraps response in { ok, data, meta } envelope
+  if ('data' in json && json.data) {
+    return json.data as StudioRegistryV2;
+  }
+  return json as StudioRegistryV2;
 }
 
 export function RegistryV2Provider({
