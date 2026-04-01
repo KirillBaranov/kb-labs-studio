@@ -114,8 +114,6 @@ function LayoutContent() {
     return buildPluginNavModel(registry);
   }, [registry, hasData]);
 
-  const sidebarSkeleton = loading && !hasData;
-  const sidebarError = !!error && !hasData;
 
   // Build flat navigation items (before category grouping)
   const flatNavigationItems = React.useMemo<NavigationItem[]>(() => {
@@ -410,13 +408,6 @@ function LayoutContent() {
                     status="success"
                     onClick={() => navigate('/settings')}
                     clickable
-                  />
-                )}
-                {registryMeta.rev !== null && (
-                  <StatusBarItem
-                    label={`Registry #${registryMeta.rev}`}
-                    tooltip={`Registry revision ${registryMeta.rev}${registryMeta.stale ? ' (stale)' : ''}${registryMeta.partial ? ' (partial)' : ''}`}
-                    status={registryMeta.stale || registryMeta.partial ? 'warning' : undefined}
                   />
                 )}
               </>
