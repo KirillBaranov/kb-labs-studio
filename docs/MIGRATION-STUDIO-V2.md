@@ -31,7 +31,7 @@
 - `studio-federation` — PageContainer, PageErrorBoundary, widget-loader, initFederation
 - `studio-plugin-tools` — `kbStudioRemote()` Vite plugin for building MF remotes
 - `@kb-labs/sdk/studio` — re-export barrel
-- `commit-pages` — pilot MF remote plugin
+- `commit-studio` — pilot MF remote plugin
 - `registry-v2-provider.tsx` — V2 registry provider + MF init
 - `plugin-page-v2.tsx` — dynamic MF page resolver
 
@@ -55,11 +55,11 @@ These modules in `apps/studio/src/modules/` are still hardcoded inside Studio. E
 
 | Module | Target Plugin | Priority |
 |--------|--------------|----------|
-| `modules/commit/` | `plugins/kb-labs-commit-plugin/packages/commit-pages/` | High (pilot ready) |
-| `modules/quality/` | `plugins/kb-labs-quality-plugin/packages/quality-pages/` | Medium |
-| `modules/qa/` | `plugins/kb-labs-qa-plugin/packages/qa-pages/` | Medium |
-| `modules/release/` | `plugins/kb-labs-release-manager/packages/release-pages/` | Medium |
-| `modules/agents/` | `plugins/kb-labs-agents/packages/agents-pages/` | Low |
+| `modules/commit/` | `plugins/kb-labs-commit-plugin/packages/commit-studio/` | High (pilot ready) |
+| `modules/quality/` | `plugins/kb-labs-quality-plugin/packages/quality-studio/` | Medium |
+| `modules/qa/` | `plugins/kb-labs-qa-plugin/packages/qa-studio/` | Medium |
+| `modules/release/` | `plugins/kb-labs-release-manager/packages/release-studio/` | Medium |
+| `modules/agents/` | `plugins/kb-labs-agents/packages/agents-studio/` | Low |
 
 **Core modules that stay in Studio (not plugins):**
 - `modules/dashboard/` — core Studio dashboard
@@ -92,7 +92,7 @@ GET /plugins/:scope/:name/widgets/*
 ### Step 1: Create pages package in the plugin
 
 ```bash
-mkdir -p plugins/kb-labs-{plugin}/packages/{plugin}-pages/src/pages
+mkdir -p plugins/kb-labs-{plugin}/packages/{plugin}-studio/src/pages
 ```
 
 Create `package.json`, `tsconfig.json`, `vite.config.ts`. Use `kbStudioRemote()` from `@kb-labs/studio-plugin-tools`.
@@ -163,7 +163,7 @@ studio: {
 
 ```bash
 # Build the plugin pages
-cd plugins/kb-labs-{plugin}/packages/{plugin}-pages
+cd plugins/kb-labs-{plugin}/packages/{plugin}-studio
 pnpm build
 
 # Or dev mode
