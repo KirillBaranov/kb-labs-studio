@@ -44,17 +44,19 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3000,
       open: false,
-      // Only set up proxy if using relative URL (/api)
-      // If using full URL (default), the client connects directly to REST API
-      ...(apiBaseUrl.startsWith('/') && {
-        proxy: {
-          '/api': {
-            target: proxyTarget,
-            changeOrigin: true,
-            rewrite: (path) => path.replace(/^\/api/, '/api/v1'),
-          },
+      proxy: {
+        // REST API proxy
+        '/api': {
+          target: proxyTarget,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, '/api/v1'),
         },
-      }),
+        // Plugin widget bundles — proxy to Gateway which serves from node_modules
+        '/plugins': {
+          target: proxyTarget,
+          changeOrigin: true,
+        },
+      },
     },
     preview: {
       port: 3000,

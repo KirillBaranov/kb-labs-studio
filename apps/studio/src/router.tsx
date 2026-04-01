@@ -649,15 +649,13 @@ export const router = createBrowserRouter([
         element: <ReleasePage view="history" />,
         errorElement: <ErrorBoundary />,
       },
+      {
+        // V2 plugin pages (Module Federation remotes) — inside layout
+        path: '/p/*',
+        element: <PluginPageV2 />,
+        errorElement: <ErrorBoundary />,
+      },
     ],
-  },
-  {
-    // Catch-all for V2 plugin pages (Module Federation remotes).
-    // If no static route matched, check the V2 registry.
-    // PluginPageV2 resolves the route against registry or shows 404.
-    path: '/p/*',
-    element: <PluginPageV2 />,
-    errorElement: <ErrorBoundary />,
   },
   {
     path: '*',
