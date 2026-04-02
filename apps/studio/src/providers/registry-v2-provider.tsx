@@ -7,7 +7,6 @@
 import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { initFederation, type StudioRegistryV2, type StudioPluginEntryV2 } from '@kb-labs/studio-federation';
-import { EventBusProvider } from '@kb-labs/studio-event-bus';
 import { studioConfig } from '../config/studio.config';
 
 interface RegistryV2ContextValue {
@@ -82,9 +81,7 @@ export function RegistryV2Provider({
 
   return (
     <RegistryV2Context.Provider value={value}>
-      <EventBusProvider>
-        {children}
-      </EventBusProvider>
+      {children}
     </RegistryV2Context.Provider>
   );
 }
