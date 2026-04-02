@@ -13,6 +13,16 @@ import { UIText } from '../primitives/UIText';
 
 const { useToken } = theme;
 
+export type UICardVariant = 'default' | 'success' | 'warning' | 'error' | 'info';
+
+const variantTokens: Record<UICardVariant, { tint: string; accent: string; border: string }> = {
+  default:  { tint: 'transparent',               accent: 'transparent',  border: 'var(--border-primary, #e8eaed)' },
+  success:  { tint: 'rgba(82,196,26,0.07)',       accent: '#52c41a',      border: 'rgba(82,196,26,0.25)' },
+  warning:  { tint: 'rgba(250,173,20,0.08)',      accent: '#faad14',      border: 'rgba(250,173,20,0.30)' },
+  error:    { tint: 'rgba(255,77,79,0.07)',       accent: '#ff4d4f',      border: 'rgba(255,77,79,0.25)' },
+  info:     { tint: 'rgba(12,102,255,0.07)',      accent: '#0c66ff',      border: 'rgba(12,102,255,0.20)' },
+};
+
 export interface UICardProps extends Omit<AntCardProps, 'title'> {
   /** Card title */
   title?: React.ReactNode;
@@ -32,6 +42,8 @@ export interface UICardProps extends Omit<AntCardProps, 'title'> {
   hoverable?: boolean;
   /** Loading state */
   loading?: boolean;
+  /** Status variant — adds colored top border + tinted background */
+  status?: UICardVariant;
 }
 
 /**
@@ -62,9 +74,11 @@ export function UICard({
   bordered = true,
   hoverable = false,
   loading = false,
+  status = 'default',
   ...rest
 }: UICardProps) {
   const { token } = useToken();
+  const vt = variantTokens[status];
 
   // Custom title with subtitle
   const cardTitle = (title || subtitle) ? (
@@ -90,6 +104,16 @@ export function UICard({
       hoverable={hoverable}
       loading={loading}
       {...rest}
+      style={{
+        boxShadow: hoverable ? '0 4px 16px rgba(0,0,0,0.08)' : '0 1px 3px rgba(0,0,0,0.06)',
+        transition: 'box-shadow 200ms ease, transform 200ms ease',
+        backgroundColor: status !== 'default' ? vt.tint : undefined,
+        borderColor: vt.border,
+        borderTopColor: status !== 'default' ? vt.accent : vt.border,
+        borderTopWidth: status !== 'default' ? 3 : 1,
+        overflow: 'hidden',
+        ...rest.style,
+      }}
     >
       {children}
       {footer && (

@@ -34,3 +34,6 @@ export * from './overlay';
 
 // Content
 export * from './content';
+
+// Data contracts (REST response shapes for UIKit components)
+export * from './data-contracts';

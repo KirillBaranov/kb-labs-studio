@@ -18,6 +18,12 @@ export interface UIPageProps {
   children: React.ReactNode;
   /** Max width mode */
   width?: UIPageWidth;
+  /**
+   * Page variant:
+   * - 'default' — transparent background, cards float on grey (dashboard, lists)
+   * - 'document' — white card wrapping all content (settings, detail pages)
+   */
+  variant?: 'default' | 'document';
   /** Additional CSS class */
   className?: string;
   /** Additional styles */
@@ -46,23 +52,30 @@ export interface UIPageProps {
 export function UIPage({
   children,
   width = 'default',
+  variant = 'default',
   className,
   style: customStyle,
 }: UIPageProps) {
   const { token } = useToken();
 
   const maxWidthMap: Record<UIPageWidth, string> = {
-    default: '1280px',  // Standard desktop width
-    wide: '1600px',     // Wide screens
-    full: '100%',       // No constraint
+    default: '1280px',
+    wide: '1600px',
+    full: '100%',
   };
+
+  const isDocument = variant === 'document';
 
   const style: React.CSSProperties = {
     maxWidth: maxWidthMap[width],
     margin: '0 auto',
     padding: token.padding,
-    backgroundColor: token.colorBgContainer,
-    minHeight: '100vh',
+    ...(isDocument && {
+      backgroundColor: token.colorBgContainer,
+      borderRadius: token.borderRadiusLG,
+      boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+    }),
+    minHeight: isDocument ? undefined : '100%',
     ...customStyle,
   };
 

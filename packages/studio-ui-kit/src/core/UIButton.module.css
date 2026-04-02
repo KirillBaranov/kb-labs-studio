@@ -69,6 +69,22 @@
 }
 
 /*
+ * Primary button — subtle lift effect
+ */
+.uiButton.ant-btn-primary {
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.uiButton.ant-btn-primary:hover:not(:disabled):not(.ant-btn-disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(12, 102, 255, 0.3);
+}
+
+.uiButton.ant-btn-primary:active:not(:disabled):not(.ant-btn-disabled) {
+  transform: translateY(0);
+}
+
+/*
  * RTL (Right-to-Left) support
  */
 [dir='rtl'] .uiButton .ant-btn-icon {

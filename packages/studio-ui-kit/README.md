@@ -46,8 +46,8 @@ function MyComponent() {
 
 ## 📊 Component Stats
 
-- **Total Components:** 49
-- **With Tests:** 4/49 (8%)
+- **Total Components:** 51
+- **With Tests:** 4/51 (8%)
 
 **By Category:**
 
@@ -56,7 +56,7 @@ function MyComponent() {
 - Layout: 4
 - Form: 10
 - Navigation: 7
-- Composite: 2
+- Composite: 4
 - Feedback: 6
 - Overlay: 5
 - Content: 3
@@ -139,6 +139,8 @@ Complex composed components
 |-----------|-------------|-------|
 | **UIHeader** | UIHeader component - Page header with title, subtitle, and breadcrumbs | ✅ |
 | **UIPage** | UIPage component - Page container with padding and max-width | ❌ |
+| **UIPageHeader** | UIPageHeader component - Standard page header | ❌ |
+| **UIPageSection** | UIPageSection component - Section within a page | ❌ |
 
 ### Feedback
 

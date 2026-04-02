@@ -6,3 +6,5 @@
 
 export * from './UIPage';
 export * from './UIHeader';
+export * from './UIPageHeader';
+export * from './UIPageSection';
