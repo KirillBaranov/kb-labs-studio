@@ -5,5 +5,5 @@ export default defineConfig({
   format: ['esm'],
   dts: true,
   clean: true,
-  external: ['vite', '@module-federation/vite'],
+  external: ['@rspack/core', '@module-federation/enhanced'],
 });

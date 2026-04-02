@@ -1,11 +1,28 @@
-import { federation } from '@module-federation/vite';
-import type { PluginOption } from 'vite';
+/**
+ * @kb-labs/studio-plugin-tools
+ *
+ * Build tooling for plugin Studio pages (Module Federation remotes).
+ * Uses Rspack with @module-federation/enhanced for native MF support.
+ *
+ * @example
+ * ```typescript
+ * // rspack.studio.config.ts
+ * const { createStudioRemoteConfig } = require('@kb-labs/studio-plugin-tools');
+ *
+ * module.exports = createStudioRemoteConfig({
+ *   name: 'commitPlugin',
+ *   exposes: {
+ *     './CommitOverview': './src/studio/pages/CommitOverview.tsx',
+ *   },
+ * });
+ * ```
+ */
 
 /**
  * Shared dependencies that match the Studio host.
- * These are loaded once by the host — remotes reuse them.
+ * Loaded once by the host — remotes reuse them via MF shared scope.
  */
-const STUDIO_SHARED_DEPS = {
+export const STUDIO_SHARED_DEPS: Record<string, { singleton: boolean; requiredVersion: string }> = {
   react: { singleton: true, requiredVersion: '^18.3.0' },
   'react-dom': { singleton: true, requiredVersion: '^18.3.0' },
   'react-router-dom': { singleton: true, requiredVersion: '^7.0.0' },
@@ -17,49 +34,79 @@ const STUDIO_SHARED_DEPS = {
   '@kb-labs/studio-event-bus': { singleton: true, requiredVersion: '^0.1.0' },
   '@kb-labs/studio-ui-kit': { singleton: true, requiredVersion: '^0.1.0' },
   '@kb-labs/studio-ui-core': { singleton: true, requiredVersion: '^0.1.0' },
-} as const;
+};
 
 export interface KbStudioRemoteOptions {
   /** Module Federation remote name (must match manifest remoteName) */
   name: string;
-  /** Exposed modules: { './PageName': './src/pages/PageName.tsx' } */
+  /** Exposed modules: { './PageName': './src/studio/pages/PageName.tsx' } */
   exposes: Record<string, string>;
   /** Override or extend shared deps */
   shared?: Record<string, { singleton?: boolean; requiredVersion?: string }>;
   /** Remote entry filename (default: 'remoteEntry.js') */
   filename?: string;
+  /** Output directory (default: 'dist/widgets') */
+  outputDir?: string;
 }
 
 /**
- * Vite plugin that configures a plugin as a Module Federation remote
- * compatible with the Studio host.
+ * Create a complete Rspack config for building a plugin as an MF remote.
  *
- * @example
- * ```typescript
- * // vite.config.ts
- * import { kbStudioRemote } from '@kb-labs/studio-plugin-tools';
- *
- * export default defineConfig({
- *   plugins: [
- *     react(),
- *     kbStudioRemote({
- *       name: 'commitPlugin',
- *       exposes: {
- *         './CommitOverview': './src/pages/CommitOverview.tsx',
- *       },
- *     }),
- *   ],
- * });
- * ```
+ * Returns a full rspack config object — use as default export in rspack.config.mjs.
+ * Uses dynamic import internally to avoid CJS/ESM issues.
  */
-export function kbStudioRemote(options: KbStudioRemoteOptions): PluginOption {
-  return federation({
-    name: options.name,
-    filename: options.filename ?? 'remoteEntry.js',
-    exposes: options.exposes,
-    shared: {
-      ...STUDIO_SHARED_DEPS,
-      ...options.shared,
+export async function createStudioRemoteConfig(options: KbStudioRemoteOptions): Promise<Record<string, unknown>> {
+  const { ModuleFederationPlugin } = await import('@module-federation/enhanced/rspack');
+  const path = await import('path');
+  const { createRequire } = await import('module');
+  const require = createRequire(import.meta.url);
+
+  const outputDir = options.outputDir ?? 'dist/widgets';
+
+  return {
+    entry: {},
+    output: {
+      path: path.resolve(process.cwd(), outputDir),
+      publicPath: 'auto',
+      clean: true,
     },
-  });
+    resolve: {
+      extensions: ['.tsx', '.ts', '.jsx', '.js'],
+    },
+    module: {
+      rules: [
+        {
+          test: /\.tsx?$/,
+          exclude: /node_modules/,
+          use: {
+            loader: 'builtin:swc-loader',
+            options: {
+              jsc: {
+                parser: { syntax: 'typescript', tsx: true },
+                transform: { react: { runtime: 'automatic' } },
+              },
+            },
+          },
+        },
+        {
+          test: /\.css$/,
+          use: [require.resolve('style-loader'), require.resolve('css-loader')],
+        },
+      ],
+    },
+    plugins: [
+      new ModuleFederationPlugin({
+        name: options.name,
+        filename: options.filename ?? 'remoteEntry.js',
+        exposes: options.exposes,
+        shared: {
+          ...STUDIO_SHARED_DEPS,
+          ...options.shared,
+        },
+      }),
+    ],
+    optimization: {
+      minimize: true,
+    },
+  };
 }
