@@ -86,7 +86,8 @@ export function KBHeader({
         height: 64,
         backgroundColor: 'var(--bg-secondary)',
         color: 'var(--text-primary)',
-        borderBottom: '1px solid var(--border-primary)',
+        borderBottom: 'none',
+        boxShadow: '0 1px 0 var(--border-primary), 0 2px 8px rgba(0,0,0,0.04)',
       }}
     >
       {LinkComponent ? (

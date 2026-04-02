@@ -29,8 +29,8 @@ export function KBSidebar({
   items,
   collapsed: controlledCollapsed,
   onCollapse,
-  width = 200,
-  collapsedWidth = 80,
+  width = 220,
+  collapsedWidth = 64,
   currentPath,
   onNavigate,
 }: KBSidebarProps) {
@@ -167,8 +167,9 @@ export function KBSidebar({
         left: 0,
         top: 64,
         bottom: 0,
-        backgroundColor: 'var(--bg-secondary)',
-        borderRight: '1px solid var(--border-primary)',
+        backgroundColor: 'var(--bg-sidebar)',
+        borderRight: 'none',
+        boxShadow: '1px 0 0 var(--border-primary), 2px 0 8px rgba(0,0,0,0.03)',
       }}
       theme="light" // Prevent Ant Design from applying dark theme styles
     >
@@ -197,7 +198,7 @@ export function KBSidebar({
             onNavigate(path);
           }
         }}
-        style={{ height: '100%', borderRight: 0 }}
+        style={{ height: '100%', borderRight: 0, padding: '4px 8px' }}
       />
     </AntSider>
   );
