@@ -5,7 +5,7 @@ import { KBStatCard } from '@/components/ui';
 
 export function DashboardKpisWidget() {
   const { registry } = useRegistryV2();
-  const health = null; // TODO: health status via separate endpoint
+  const health = null as { pluginsMounted: number; pluginsFailed: number; ready: boolean; redisHealthy: boolean; redisEnabled: boolean } | null; // TODO: health status via separate endpoint
 
   const totalPlugins = registry.plugins?.length ?? 0;
   const pluginsMounted = health?.pluginsMounted ?? 0;

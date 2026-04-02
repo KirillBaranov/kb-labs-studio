@@ -1,5 +1,6 @@
 import React from 'react';
 import { UICard } from '@kb-labs/studio-ui-kit';
+import type { UICardVariant as UICardStatus } from '@kb-labs/studio-ui-kit';
 import './HeroMetricCard.css';
 
 export type MetricStatus = 'healthy' | 'warning' | 'critical' | 'live' | 'default';
@@ -28,13 +29,12 @@ const statusColors: Record<MetricStatus, string> = {
   default: 'var(--text-secondary)',
 };
 
-// Use theme background colors instead of hardcoded white
-const statusBgColors: Record<MetricStatus, string> = {
-  healthy: 'var(--bg-secondary)',
-  warning: 'var(--bg-secondary)',
-  critical: 'var(--bg-secondary)',
-  live: 'var(--bg-secondary)',
-  default: 'var(--bg-secondary)',
+const statusToVariant: Record<MetricStatus, UICardStatus> = {
+  healthy: 'success',
+  warning: 'warning',
+  critical: 'error',
+  live: 'info',
+  default: 'default',
 };
 
 export function HeroMetricCard({
@@ -49,19 +49,14 @@ export function HeroMetricCard({
   icon,
 }: HeroMetricCardProps) {
   const mainColor = statusColors[status];
-  const bgColor = statusBgColors[status];
 
   return (
     <UICard
       className={`hero-metric-card ${onClick ? 'clickable' : ''} ${pulsing ? 'pulsing' : ''}`}
-      style={{
-        backgroundColor: bgColor,
-        border: '1px solid var(--border-primary)',
-        borderRadius: 8,
-        cursor: onClick ? 'pointer' : 'default',
-      }}
+      status={statusToVariant[status]}
       onClick={onClick}
       bodyStyle={{ padding: '20px' }}
+      style={{ cursor: onClick ? 'pointer' : 'default' }}
     >
       <div className="hero-metric-header">
         {icon && <div className="hero-metric-icon">{icon}</div>}

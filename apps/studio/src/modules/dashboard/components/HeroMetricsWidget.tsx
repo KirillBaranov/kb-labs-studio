@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { UIRow, UICol } from '@kb-labs/studio-ui-kit';
 import { useNavigate } from 'react-router-dom';
 import {
-  ThunderboltOutlined,
   RiseOutlined,
   ApiOutlined,
   ClockCircleOutlined,
@@ -12,8 +11,6 @@ import { useDataSources } from '../../../providers/data-sources-provider';
 import {
   usePrometheusMetrics,
   useStateBrokerStats,
-  useQualityHealth,
-  useQualityStale,
 } from '@kb-labs/studio-data-client';
 
 interface MetricsHistoryPoint {
@@ -27,8 +24,6 @@ export function HeroMetricsWidget() {
   const navigate = useNavigate();
 
   // Data hooks with auto-refresh
-  const quality = useQualityHealth(sources.quality, false);
-  const stale = useQualityStale(sources.quality, false);
   const metrics = usePrometheusMetrics(sources.observability);
   const stateBroker = useStateBrokerStats(sources.observability);
 
@@ -100,40 +95,20 @@ export function HeroMetricsWidget() {
   const requestsTrend = calculateTrend(requestsSparkline);
 
   // Metric values
-  const healthScore = quality.data?.score ?? 0;
-  const healthGrade = quality.data?.grade ?? 'F';
-  const staleCount = stale.data?.totalStale ?? 0;
   const currentUptime = calculateUptime(metrics.data);
   const totalRequests = metrics.data?.requests?.total ?? 0;
   const runtimeSeconds = metrics.data?.uptime?.seconds ?? 0;
 
-  // Determine health status
-  const getHealthStatus = () => {
-    if (healthScore >= 80) {return 'healthy';}
-    if (healthScore >= 60) {return 'warning';}
-    return 'critical';
-  };
-
+  // Determine uptime status
   const getUptimeStatus = () => {
-    if (currentUptime >= 99.9) {return 'healthy';}
-    if (currentUptime >= 99) {return 'warning';}
+    if (currentUptime >= 99) {return 'healthy';}
+    if (currentUptime >= 95) {return 'warning';}
     return 'critical';
   };
 
   return (
     <UIRow gutter={[16, 16]}>
-      <UICol xs={24} sm={12} lg={6}>
-        <HeroMetricCard
-          title="Code Quality"
-          value={`${healthScore}/100`}
-          subtitle={staleCount > 0 ? `Stale: ${staleCount} pkg` : `Grade ${healthGrade}`}
-          status={getHealthStatus()}
-          icon={<ThunderboltOutlined />}
-          onClick={() => navigate('/quality')}
-        />
-      </UICol>
-
-      <UICol xs={24} sm={12} lg={6}>
+      <UICol xs={24} sm={12} lg={8}>
         <HeroMetricCard
           title="Uptime"
           value={`${currentUptime.toFixed(2)}%`}
@@ -144,7 +119,7 @@ export function HeroMetricsWidget() {
         />
       </UICol>
 
-      <UICol xs={24} sm={12} lg={6}>
+      <UICol xs={24} sm={12} lg={8}>
         <HeroMetricCard
           title="Total Requests"
           value={totalRequests.toLocaleString()}
@@ -156,7 +131,7 @@ export function HeroMetricsWidget() {
         />
       </UICol>
 
-      <UICol xs={24} sm={12} lg={6}>
+      <UICol xs={24} sm={12} lg={8}>
         <HeroMetricCard
           title="Runtime"
           value={formatUptime(runtimeSeconds)}

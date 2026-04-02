@@ -18,8 +18,8 @@ export function KBStatCard({ label, value, variant = 'default' }: KBStatCardProp
   return (
     <UICard>
       <div>
-        <div style={{ fontSize: 12, color: '#666', marginBottom: 8 }}>{label}</div>
-        <div style={{ fontSize: 24, fontWeight: 600, color: variantColors[variant]?.value || 'inherit' }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>{label}</div>
+        <div style={{ fontSize: 28, fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.02em', fontFamily: 'var(--font-heading)', color: variantColors[variant]?.value || 'var(--text-primary)' }}>
           {value}
         </div>
       </div>
