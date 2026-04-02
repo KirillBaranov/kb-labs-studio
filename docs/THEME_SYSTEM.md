@@ -1,6 +1,6 @@
 # Theme System Architecture
 
-## Current Architecture (2026-01-28)
+## Current Architecture (2026-04-02)
 
 ### 1. CSS Variables Layer (`apps/studio/src/styles/variables.css`)
 **Source of truth** для всех цветов. Определяет design tokens через CSS custom properties.
@@ -8,20 +8,37 @@
 ```css
 :root {
   /* Light theme */
-  --bg-primary: #F9FAFB;
+  --bg-primary: #EEF0F3;   /* page background (updated 2026-04) */
+  --bg-secondary: #FFFFFF;
+  --bg-sidebar: #FFFFFF;   /* sidebar bg (added 2026-04) */
   --text-primary: #111827;
   --border-primary: #E5E7EB;
-  /* ... */
+  --link: #0c66ff;          /* primary blue accent (added 2026-04) */
+  --font-body: 'Inter', system-ui, sans-serif;     /* added 2026-04 */
+  --font-heading: 'Plus Jakarta Sans', sans-serif; /* added 2026-04 */
 }
 
 .dark {
   /* Dark theme overrides */
   --bg-primary: #0D0D0F;
+  --bg-sidebar: #1A1A1C;   /* dark sidebar */
   --text-primary: #F5F5F7;
   --border-primary: #3F3F46;
-  /* ... */
 }
 ```
+
+**Ключевые токены (2026-04):**
+
+| Токен | Назначение |
+|-------|------------|
+| `--bg-primary` | Фон страницы (`#EEF0F3`) |
+| `--bg-secondary` | Фон карточек и контейнеров (`#FFFFFF`) |
+| `--bg-sidebar` | Фон сайдбара (отдельный от bg-primary!) |
+| `--link` | Синий акцент (`#0c66ff`) |
+| `--font-body` | Inter — основной шрифт |
+| `--font-heading` | Plus Jakarta Sans — заголовки и числа |
+
+**Важно:** `--bg-sidebar` отличается от `--bg-primary` намеренно — это визуальное разделение сайдбара и контента страницы.
 
 **Преимущества:**
 - ✅ Single source of truth
@@ -31,7 +48,24 @@
 
 ---
 
-### 2. Theme Adapter Layer (`packages/studio-ui-react/src/lib/theme-adapter.ts`)
+### 1a. Typography Layer (`index.html` + `src/styles/base.css`)
+
+Шрифты загружаются через Google Fonts в `index.html`:
+```html
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+```
+
+`base.css` применяет шрифты глобально:
+```css
+body { font-family: var(--font-body); }
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
+```
+
+Компоненты используют `fontFamily: 'var(--font-heading)'` для числовых значений (KPI, цены, метрики).
+
+---
+
+### 2. Theme Adapter Layer (`apps/studio/src/components/ui/theme-adapter.ts`)
 Мост между CSS variables и Ant Design theme system.
 
 **Функции:**
@@ -124,8 +158,10 @@ function ThemeToggle() {
 
 ---
 
-### 4. Global Styles Layer (`apps/studio/src/styles/theme.css`)
+### 4. Global Styles Layer (`apps/studio/src/styles/antd-overrides.css` + `base.css`)
 Глобальные стили и Ant Design фиксы.
+
+> **Note (2026-04):** `theme.css` удалён. Функции разделены на `base.css` (базовый reset) и `antd-overrides.css` (Ant Design normalization).
 
 **Содержит:**
 - Базовые элементы (body, headings, links)
@@ -489,6 +525,6 @@ function applyThemePreset(presetId: string) {
 
 ---
 
-**Last Updated:** 2026-01-28
-**Theme System Version:** 1.0
+**Last Updated:** 2026-04-02
+**Theme System Version:** 1.1
 **Status:** Production Ready ✅

@@ -1,9 +1,9 @@
 # ADR-0010: UI Packages Separation
 
 **Date:** 2025-11-01
-**Status:** Accepted
+**Status:** Superseded by [ADR-0024](./0024-uikit-page-layout-system.md)
 **Deciders:** KB Labs Team
-**Last Reviewed:** 2025-11-03
+**Last Reviewed:** 2026-04-02
 **Tags:** [architecture, ui/ux]
 
 ## Context

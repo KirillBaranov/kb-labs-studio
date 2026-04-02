@@ -1,10 +1,12 @@
 # ADR-0015: MVP Module Scope
 
 **Date:** 2025-11-01
-**Status:** Accepted
+**Status:** Superseded by [ADR-0022](./0022-studio-widget-system-v2.md)
 **Deciders:** KB Labs Team
-**Last Reviewed:** 2025-11-03
+**Last Reviewed:** 2026-04-02
 **Tags:** [process, architecture]
+
+> **Note (2026-04-02):** The hardcoded-modules approach described here is superseded by the Module Federation plugin system (ADR-0022). Modules (agents, qa, quality, release) are no longer part of the Studio core bundle — they ship as standalone plugins served via MF remotes.
 
 ## Context
 
