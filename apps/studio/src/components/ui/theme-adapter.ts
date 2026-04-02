@@ -16,16 +16,16 @@ export function getAntDesignTokens(theme: 'light' | 'dark' | 'auto' = 'light'): 
   
   return {
     // ============ Primary Colors ============
-    colorPrimary: 'var(--link, #2563EB)',
-    colorPrimaryHover: 'var(--link-hover, #1E40AF)',
-    colorPrimaryActive: 'var(--link-hover, #1E40AF)',
-    colorPrimaryBg: 'var(--accent-subtle, #DBEAFE)', // Light primary background
-    colorPrimaryBgHover: 'var(--accent-subtle, #DBEAFE)',
-    colorPrimaryBorder: 'var(--link, #2563EB)',
-    colorPrimaryBorderHover: 'var(--link-hover, #1E40AF)',
-    colorPrimaryText: 'var(--link, #2563EB)',
-    colorPrimaryTextHover: 'var(--link-hover, #1E40AF)',
-    colorPrimaryTextActive: 'var(--link-hover, #1E40AF)',
+    colorPrimary: 'var(--link, #0c66ff)',
+    colorPrimaryHover: 'var(--link-hover, #0050cc)',
+    colorPrimaryActive: 'var(--link-hover, #0050cc)',
+    colorPrimaryBg: 'var(--accent-subtle, #dbeafe)', // Light primary background
+    colorPrimaryBgHover: 'var(--accent-subtle, #dbeafe)',
+    colorPrimaryBorder: 'var(--link, #0c66ff)',
+    colorPrimaryBorderHover: 'var(--link-hover, #0050cc)',
+    colorPrimaryText: 'var(--link, #0c66ff)',
+    colorPrimaryTextHover: 'var(--link-hover, #0050cc)',
+    colorPrimaryTextActive: 'var(--link-hover, #0050cc)',
 
     // ============ Success Colors ============
     colorSuccess: 'var(--success, #16A34A)',
@@ -120,22 +120,25 @@ export function getAntDesignTokens(theme: 'light' | 'dark' | 'auto' = 'light'): 
     colorWhite: '#FFFFFF', // Always white
 
     // ============ Shadow ============
-    boxShadow: 'var(--shadow, rgba(0, 0, 0, 0.05))',
-    boxShadowSecondary: 'var(--shadow, rgba(0, 0, 0, 0.05))',
-    boxShadowTertiary: 'var(--shadow, rgba(0, 0, 0, 0.05))',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)',
+    boxShadowSecondary: '0 4px 12px rgba(0,0,0,0.08)',
+    boxShadowTertiary: '0 8px 24px rgba(0,0,0,0.08)',
 
     // ============ Border Radius ============
-    borderRadius: 6,
-    borderRadiusLG: 8,
-    borderRadiusSM: 4,
-    borderRadiusXS: 2,
-    borderRadiusOuter: 4,
+    borderRadius: 8,
+    borderRadiusLG: 12,
+    borderRadiusSM: 6,
+    borderRadiusXS: 4,
+    borderRadiusOuter: 6,
 
     // ============ Control Heights ============
     controlHeight: 36,
     controlHeightLG: 40,
     controlHeightSM: 28,
     controlHeightXS: 22,
+
+    // ============ Font Family ============
+    fontFamily: "var(--font-body, 'Inter', 'Segoe UI', sans-serif)",
 
     // ============ Font Sizes ============
     fontSize: 14,
@@ -177,24 +180,24 @@ export function getAntDesignTokens(theme: 'light' | 'dark' | 'auto' = 'light'): 
     motionEaseOut: 'cubic-bezier(0.215, 0.61, 0.355, 1)',
 
     // ============ Link ============
-    colorLink: 'var(--link, #2563EB)',
-    colorLinkHover: 'var(--link-hover, #1E40AF)',
-    colorLinkActive: 'var(--link-hover, #1E40AF)',
+    colorLink: 'var(--link, #0c66ff)',
+    colorLinkHover: 'var(--link-hover, #0050cc)',
+    colorLinkActive: 'var(--link-hover, #0050cc)',
 
     // ============ Icons & Highlights ============
     colorIcon: 'var(--text-secondary, #6B7280)', // NEW: Icon color
     colorIconHover: 'var(--text-primary, #111827)', // NEW: Icon hover
-    colorHighlight: 'var(--link, #2563EB)', // NEW: Highlight color
+    colorHighlight: 'var(--link, #0c66ff)', // NEW: Highlight color
 
     // ============ Control States (Inputs, Buttons, etc.) ============
-    controlOutline: 'rgba(91, 87, 214, 0.2)', // NEW: Input outline on focus
+    controlOutline: 'rgba(12, 102, 255, 0.15)', // NEW: Input outline on focus
     controlOutlineWidth: 2, // NEW: Outline width
     controlInteractiveSize: 16, // NEW: Interactive hit area size
     controlItemBgHover: 'var(--bg-hover, #F3F4F6)', // NEW: Item hover bg
-    controlItemBgActive: 'var(--accent-subtle, #DBEAFE)', // NEW: Item active bg
-    controlItemBgActiveHover: 'var(--accent-subtle, #DBEAFE)', // NEW: Item active hover
+    controlItemBgActive: 'var(--accent-subtle, #dbeafe)', // NEW: Item active bg
+    controlItemBgActiveHover: 'var(--accent-subtle, #dbeafe)', // NEW: Item active hover
     controlItemBgActiveDisabled: 'var(--bg-tertiary, #F3F4F6)', // NEW: Disabled active bg
-    controlTmpOutline: 'rgba(91, 87, 214, 0.1)', // NEW: Temporary outline
+    controlTmpOutline: 'rgba(12, 102, 255, 0.08)', // NEW: Temporary outline
 
     // ============ Screen Sizes (for responsive) ============
     screenXS: 480,
@@ -321,7 +324,7 @@ export function getAntDesignComponents(): ThemeConfig['components'] {
       colorPrimaryHover: 'var(--link-hover)',
       colorPrimaryActive: 'var(--link-hover)',
       primaryColor: 'var(--text-inverse)',
-      primaryShadow: '0 2px 0 rgba(91, 87, 214, 0.1)',
+      primaryShadow: '0 2px 0 rgba(12, 102, 255, 0.15)',
 
       // ============ Default button (filled style) ============
       defaultBg: 'var(--bg-secondary)',
@@ -388,7 +391,7 @@ export function getAntDesignComponents(): ThemeConfig['components'] {
       // Interactive states (IMPORTANT for focus feedback)
       hoverBorderColor: 'var(--border-secondary)',
       activeBorderColor: 'var(--link)',
-      activeShadow: '0 0 0 2px rgba(91, 87, 214, 0.1)', // NEW: Focus shadow
+      activeShadow: '0 0 0 3px rgba(12, 102, 255, 0.12)', // NEW: Focus shadow
       errorActiveShadow: '0 0 0 2px rgba(220, 38, 38, 0.1)', // NEW: Error focus shadow
       warningActiveShadow: '0 0 0 2px rgba(245, 158, 11, 0.1)', // NEW: Warning focus shadow
 
@@ -454,7 +457,7 @@ export function getAntDesignComponents(): ThemeConfig['components'] {
       // ============ Base colors ============
       colorText: 'var(--text-primary)',
       colorTextSecondary: 'var(--text-secondary)', // NEW: Secondary text in menu items
-      colorBgContainer: 'var(--bg-secondary)', // Menu background
+      colorBgContainer: 'var(--bg-sidebar)', // Menu background
       colorBorder: 'var(--border-primary)', // NEW: Border color
       colorSplit: 'var(--border-primary)', // NEW: Divider color
 
@@ -494,8 +497,15 @@ export function getAntDesignComponents(): ThemeConfig['components'] {
       colorIconHover: 'var(--text-primary)', // NEW: Icon hover
 
       // ============ Group title ============
-      groupTitleColor: 'var(--text-secondary)', // NEW: Group title color
-      groupTitleFontSize: 12, // NEW: Group title font size
+      groupTitleColor: 'var(--text-tertiary)',
+      groupTitleFontSize: 11,
+
+      // ============ Item border radius ============
+      itemBorderRadius: 8,
+      subMenuItemBorderRadius: 6,
+
+      // ============ Padding ============
+      itemPaddingInline: 12,
     },
     Tabs: {
       // Base colors

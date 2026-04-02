@@ -1,13 +1,12 @@
-/* This file is auto-generated - do not edit manually */
-/* Run: pnpm generate-theme */
-/* Updated to KB Labs UI Color Kit */
+/* KB Labs UI Color Kit */
 
 :root {
   /* Backgrounds */
-  --bg-primary: #F9FAFB;
+  --bg-primary: #EEF0F3;
   --bg-secondary: #FFFFFF;
   --bg-tertiary: #F3F4F6;
   --bg-hover: #F3F4F6;        /* Same as tertiary for hover state */
+  --bg-sidebar: #FFFFFF;
 
   /* Text */
   --text-primary: #111827;
@@ -19,10 +18,14 @@
   --border-primary: #E5E7EB;
   --border-secondary: #D4D4D4;
 
+  /* Typography */
+  --font-body: 'Inter', 'Segoe UI', sans-serif;
+  --font-heading: 'Plus Jakarta Sans', 'Inter', sans-serif;
+
   /* Interactive */
-  --link: #5b57d6;
-  --link-hover: #4338ca;
-  --accent-subtle: #ddd6fe;
+  --link: #0c66ff;
+  --link-hover: #0050cc;
+  --accent-subtle: #dbeafe;
 
   /* Status */
   --success: #16A34A;
@@ -45,6 +48,7 @@
   --bg-secondary: #1A1A1C;
   --bg-tertiary: #27272A;
   --bg-hover: #2E2E32;        /* Lighter hover state for tables/cards */
+  --bg-sidebar: #1A1A1C;
 
   /* Text */
   --text-primary: #F5F5F7;
@@ -57,9 +61,9 @@
   --border-secondary: #52525B;
 
   /* Interactive */
-  --link: #a78bfa;            /* Brighter purple for better contrast */
-  --link-hover: #c4b5fd;      /* Even lighter on hover */
-  --accent-subtle: #4c1d9533; /* 20% opacity purple overlay */
+  --link: #60a5fa;
+  --link-hover: #93c5fd;
+  --accent-subtle: rgba(12, 102, 255, 0.15);
 
   /* Status */
   --success: #22C55E;
