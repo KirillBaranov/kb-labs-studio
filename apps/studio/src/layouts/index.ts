@@ -3,10 +3,10 @@
  * Layout components
  */
 
-export { DashboardGrid } from './DashboardGrid';
-export type { DashboardGridProps } from './DashboardGrid';
+export { DashboardGrid } from './dashboard-grid';
+export type { DashboardGridProps } from './dashboard-grid';
 
-export { TwoPane } from './TwoPane';
-export type { TwoPaneProps } from './TwoPane';
+export { TwoPane } from './two-pane';
+export type { TwoPaneProps } from './two-pane';
 
 

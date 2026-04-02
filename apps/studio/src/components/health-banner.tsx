@@ -13,7 +13,7 @@ import type { HealthStatus } from '@kb-labs/studio-data-client';
 export function HealthBanner() {
   const sources = useDataSources();
   const _registry = useRegistryV2();
-  const sseHealth = null; // TODO: health via separate endpoint
+  const sseHealth = null as { status: string; ts?: string; ready: boolean; reason?: string } | null; // TODO: health via separate endpoint
   const { data: healthRaw, error, refetch } = useHealthStatus(sources.system);
   const { data: ready } = useReadyStatus(sources.system);
   const [showDetails, setShowDetails] = useState(false);

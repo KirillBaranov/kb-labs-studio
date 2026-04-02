@@ -27,7 +27,7 @@ import {
 } from '@ant-design/icons';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import { usePrometheusMetrics, useIncidents } from '@kb-labs/studio-data-client';
-import { MarkdownViewer } from '../../../components/markdown/markdown-viewer';
+import { UIMarkdownViewer } from '@kb-labs/studio-ui-kit';
 
 interface Message {
   id: string;
@@ -278,9 +278,7 @@ export function AIInsightsPage() {
                             <UITypographyText type="secondary">Analyzing...</UITypographyText>
                           </UISpace>
                         ) : msg.role === 'assistant' ? (
-                          <MarkdownViewer className="ai-insights-markdown">
-                            {msg.content}
-                          </MarkdownViewer>
+                          <UIMarkdownViewer content={msg.content} className="ai-insights-markdown" />
                         ) : (
                           <UITypographyParagraph
                             style={{

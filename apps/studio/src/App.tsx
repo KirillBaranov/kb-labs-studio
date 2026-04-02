@@ -6,7 +6,9 @@ import { DataSourcesProvider } from './providers/data-sources-provider';
 import { AuthProvider } from './providers/auth-provider';
 import { RegistryV2Provider } from './providers/registry-v2-provider';
 import { SettingsProvider } from './providers/settings-provider';
+import { EventBusProvider } from '@kb-labs/studio-event-bus';
 import { router } from './router';
+import { studioConfig } from './config/studio.config';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,9 +26,11 @@ export function App() {
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
             <DataSourcesProvider>
-              <RegistryV2Provider apiBaseUrl={import.meta.env.VITE_API_BASE_URL || '/api/v1'}>
-                <RouterProvider router={router} />
-                <ReactQueryDevtools initialIsOpen={false} />
+              <RegistryV2Provider apiBaseUrl={studioConfig.apiBaseUrl}>
+                <EventBusProvider>
+                  <RouterProvider router={router} />
+                  <ReactQueryDevtools initialIsOpen={false} />
+                </EventBusProvider>
               </RegistryV2Provider>
             </DataSourcesProvider>
           </QueryClientProvider>

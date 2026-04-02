@@ -1,21 +1,19 @@
 /**
  * Studio configuration
  *
- * Configuration can be set via environment variables:
- * - VITE_API_BASE_URL: Backend API base URL
- *   - Use '/api' to use Vite proxy (default, requires VITE_API_PROXY_TARGET)
- *   - Use full URL like 'http://localhost:5173/api/v1' for direct connection
- * - VITE_DATA_SOURCE_MODE: 'mock' | 'http' (default: 'http')
- * - VITE_API_PROXY_TARGET: Target URL for Vite proxy (default: 'http://localhost:5050')
+ * Environment variables:
+ * - KB_API_BASE_URL: API base URL (default: '/api/v1' — proxied through rspack devServer to Gateway :4000, which routes /api/v1/* to REST API :5050)
+ * - KB_GATEWAY_TOKEN: Bearer token for Gateway auth (dev: 'dev-studio-token')
+ * - KB_DATA_SOURCE_MODE: 'mock' | 'http' (default: 'http')
+ * - KB_EVENTS_BASE_URL: SSE base URL (default: same as KB_API_BASE_URL)
+ * - KB_EVENTS_REGISTRY_PATH: SSE registry path (default: '/events/registry')
+ * - KB_EVENTS_AUTH_TOKEN: SSE auth token (default: same as KB_GATEWAY_TOKEN)
+ * - KB_EVENTS_HEADERS: SSE extra headers as JSON string
  *
- * Environment files (in order of precedence):
- * - .env.local (highest priority, git-ignored)
- * - .env.development / .env.production
- * - .env (lowest priority)
- *
- * 🎯 TYPE SAFETY: Configuration is now validated at runtime with Zod
+ * All traffic flows through Gateway (:4000). rspack devServer proxies /api and /plugins to Gateway.
  */
 import { validateStudioConfig } from './studio.config.schema';
+import { getStudioEnv } from './env';
 
 function resolveUrl(base: string, path: string): string {
   if (!path) {
@@ -30,12 +28,13 @@ function resolveUrl(base: string, path: string): string {
   return `${base.replace(/\/$/, '')}/${path}`;
 }
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
-const gatewayTokenEnv = import.meta.env.VITE_GATEWAY_TOKEN as string | undefined;
-const eventsBaseUrlEnv = import.meta.env.VITE_EVENTS_BASE_URL || apiBaseUrl;
-const registryEventsPath = import.meta.env.VITE_EVENTS_REGISTRY_PATH || '/events/registry';
-const eventsAuthTokenEnv = import.meta.env.VITE_EVENTS_AUTH_TOKEN;
-const eventsHeadersEnv = import.meta.env.VITE_EVENTS_HEADERS;
+const env = getStudioEnv();
+const apiBaseUrl = env.KB_API_BASE_URL || '/api/v1';
+const gatewayTokenEnv = env.KB_GATEWAY_TOKEN;
+const eventsBaseUrlEnv = env.KB_EVENTS_BASE_URL || apiBaseUrl;
+const registryEventsPath = env.KB_EVENTS_REGISTRY_PATH || '/events/registry';
+const eventsAuthTokenEnv = env.KB_EVENTS_AUTH_TOKEN;
+const eventsHeadersEnv = env.KB_EVENTS_HEADERS;
 
 function parseHeaders(value: string | undefined): Record<string, string> | undefined {
   if (!value) {
@@ -56,7 +55,7 @@ function parseHeaders(value: string | undefined): Record<string, string> | undef
 
 // Raw configuration object (before validation)
 const rawConfig = {
-  dataSourceMode: (import.meta.env.VITE_DATA_SOURCE_MODE || 'http') as 'mock' | 'http',
+  dataSourceMode: (env.KB_DATA_SOURCE_MODE || 'http') as 'mock' | 'http',
   apiBaseUrl,
   gatewayToken: gatewayTokenEnv,
   features: {
@@ -71,8 +70,8 @@ const rawConfig = {
     registryPath: registryEventsPath,
     registryUrl: resolveUrl(eventsBaseUrlEnv, registryEventsPath),
     retryDelays: [250, 1_000, 2_000, 5_000],
-    // VITE_EVENTS_AUTH_TOKEN takes precedence; fall back to gateway token so
-    // a single VITE_GATEWAY_TOKEN covers both REST and SSE connections.
+    // KB_EVENTS_AUTH_TOKEN takes precedence; fall back to gateway token so
+    // a single KB_GATEWAY_TOKEN covers both REST and SSE connections.
     token: eventsAuthTokenEnv ?? gatewayTokenEnv,
     headers: parseHeaders(eventsHeadersEnv),
   },

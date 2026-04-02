@@ -4,9 +4,9 @@
   "description": "KB Labs Studio application",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
+    "dev": "rspack serve",
+    "build": "rspack build",
+    "preview": "rspack serve --mode production",
     "clean": "rimraf dist",
     "type-check": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
@@ -26,6 +26,7 @@
     "@kb-labs/studio-hooks": "link:../../packages/studio-hooks",
     "@kb-labs/studio-event-bus": "link:../../packages/studio-event-bus",
     "@kb-labs/studio-ui-core": "link:../../packages/studio-ui-core",
+    "@kb-labs/studio-plugin-tools": "link:../../packages/studio-plugin-tools",
     "@kb-labs/studio-ui-kit": "link:../../packages/studio-ui-kit",
     "@kb-labs/workflow-contracts": "link:../../../kb-labs-workflow/packages/workflow-contracts",
     "@ant-design/charts": "^2.6.6",
@@ -53,8 +54,10 @@
     "@types/node": "^22.10.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
-    "@module-federation/vite": "^1.13.0",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@rspack/cli": "^1.7.0",
+    "@rspack/core": "^1.7.0",
+    "@rspack/plugin-react-refresh": "^1.6.0",
+    "@module-federation/enhanced": "^0.8.0",
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "jiti": "^2.6.1",
@@ -62,7 +65,7 @@
     "rimraf": "^6",
     "tailwindcss": "^3.4.17",
     "typescript": "^5",
-    "vite": "^6.0.7",
+    "postcss-loader": "^8.1.0",
     "vitest": "^3.2.4"
   }
 }
