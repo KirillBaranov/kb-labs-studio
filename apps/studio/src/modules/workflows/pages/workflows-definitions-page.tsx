@@ -19,7 +19,7 @@ import { useDataSources } from '@/providers/data-sources-provider';
 import type { WorkflowInfo } from '@kb-labs/studio-data-client';
 import { UICard } from '@kb-labs/studio-ui-kit';
 import { RunWorkflowModal } from '../components/run-workflow-modal';
-import { KBPageContainer, KBPageHeader } from '@/components/ui';
+import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
 
 export function WorkflowsDefinitionsPage() {
   const sources = useDataSources();
@@ -166,9 +166,9 @@ export function WorkflowsDefinitionsPage() {
   ];
 
   return (
-    <KBPageContainer>
+    <UIPage width="full">
       {contextHolder}
-      <KBPageHeader
+      <UIPageHeader
         title="Workflow Definitions"
         description="All registered workflow definitions"
         icon={<UIIcon name="AppstoreOutlined" />}
@@ -203,6 +203,6 @@ export function WorkflowsDefinitionsPage() {
           runWorkflowMutation.mutate({ workflowId, input });
         }}
       />
-    </KBPageContainer>
+    </UIPage>
   );
 }

@@ -20,7 +20,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { ActiveRunsPanel } from '../components/active-runs-panel';
 import { RunWorkflowModal } from '../components/run-workflow-modal';
-import { KBPageContainer, KBPageHeader } from '@/components/ui';
+import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
 import type { DashboardStatsResponse } from '@kb-labs/workflow-contracts';
 
 const STATUS_ICONS: Record<string, React.ReactNode> = {
@@ -167,8 +167,8 @@ export function WorkflowsDashboardPage() {
   };
 
   return (
-    <KBPageContainer>
-      <KBPageHeader
+    <UIPage width="full">
+      <UIPageHeader
         title="Workflows"
         description="Monitor workflows, jobs, and scheduled tasks"
         icon={<UIIcon name="ThunderboltOutlined" />}
@@ -274,6 +274,6 @@ export function WorkflowsDashboardPage() {
           runWorkflowMutation.mutate({ workflowId, input });
         }}
       />
-    </KBPageContainer>
+    </UIPage>
   );
 }

@@ -11,7 +11,7 @@ import {
 import { useStateBrokerStats } from '@kb-labs/studio-data-client';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import type { NamespaceStats } from '@kb-labs/studio-data-client';
-import { KBPageContainer, KBPageHeader } from '@/components/ui';
+import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
 
 /**
  * Format uptime in milliseconds to human-readable string
@@ -51,8 +51,8 @@ export function StateBrokerPage() {
 
   if (isError) {
     return (
-      <KBPageContainer>
-        <KBPageHeader
+      <UIPage>
+        <UIPageHeader
           title="State Broker"
           description="In-memory cache statistics"
         />
@@ -63,21 +63,21 @@ export function StateBrokerPage() {
           showIcon
           style={{ marginBottom: 24 }}
         />
-      </KBPageContainer>
+      </UIPage>
     );
   }
 
   if (isLoading || !data) {
     return (
-      <KBPageContainer>
-        <KBPageHeader
+      <UIPage>
+        <UIPageHeader
           title="State Broker"
           description="In-memory cache statistics"
         />
         <div style={{ padding: '24px 0', textAlign: 'center' }}>
           Loading...
         </div>
-      </KBPageContainer>
+      </UIPage>
     );
   }
 
@@ -85,8 +85,8 @@ export function StateBrokerPage() {
   const missRatePercent = Math.round(data.missRate * 100);
 
   return (
-    <KBPageContainer>
-      <KBPageHeader
+    <UIPage width="full">
+      <UIPageHeader
         title="State Broker"
         description="In-memory cache statistics - Auto-refresh every 5s"
       />
@@ -224,6 +224,6 @@ export function StateBrokerPage() {
           size="small"
         />
       </UICard>
-    </KBPageContainer>
+    </UIPage>
   );
 }

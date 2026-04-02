@@ -14,7 +14,7 @@ import {
 import { usePrometheusMetrics } from '@kb-labs/studio-data-client';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import type { PluginMetrics, TenantMetrics } from '@kb-labs/studio-data-client';
-import { KBPageContainer, KBPageHeader } from '@/components/ui';
+import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
 
 /**
  * Format uptime duration to human-readable string
@@ -81,8 +81,8 @@ export function PrometheusMetricsPage() {
 
   if (isError) {
     return (
-      <KBPageContainer>
-        <KBPageHeader
+      <UIPage>
+        <UIPageHeader
           title="Prometheus Metrics"
           description="REST API performance and health metrics"
         />
@@ -93,21 +93,21 @@ export function PrometheusMetricsPage() {
           showIcon
           style={{ marginBottom: 24 }}
         />
-      </KBPageContainer>
+      </UIPage>
     );
   }
 
   if (isLoading || !data) {
     return (
-      <KBPageContainer>
-        <KBPageHeader
+      <UIPage>
+        <UIPageHeader
           title="Prometheus Metrics"
           description="REST API performance and health metrics"
         />
         <div style={{ padding: '24px 0', textAlign: 'center' }}>
           Loading...
         </div>
-      </KBPageContainer>
+      </UIPage>
     );
   }
 
@@ -120,8 +120,8 @@ export function PrometheusMetricsPage() {
     : 0;
 
   return (
-    <KBPageContainer>
-      <KBPageHeader
+    <UIPage width="full">
+      <UIPageHeader
         title="Prometheus Metrics"
         description="REST API performance metrics - Auto-refresh every 10s"
       />
@@ -481,6 +481,6 @@ export function PrometheusMetricsPage() {
           </UICard>
         </UICol>
       </UIRow>
-    </KBPageContainer>
+    </UIPage>
   );
 }

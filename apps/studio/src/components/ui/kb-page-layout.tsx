@@ -44,7 +44,7 @@ export function KBPageLayout({
         <KBSidebar {...sidebarProps} collapsed={collapsed} onCollapse={setCollapsed} />
         <AntLayout
           style={{
-            marginLeft: collapsed ? sidebarProps.collapsedWidth || 80 : sidebarProps.width || 200,
+            marginLeft: collapsed ? sidebarProps.collapsedWidth || 64 : sidebarProps.width || 220,
             transition: 'margin-left 0.2s',
             minHeight: 'calc(100vh - 64px)',
             paddingBottom: statusBar ? 28 : 0, // Add padding for status bar

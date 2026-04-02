@@ -18,7 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useDataSources } from '@/providers/data-sources-provider';
 import type { JobStatusInfo, JobListFilter } from '@kb-labs/workflow-contracts';
 import { UICard } from '@kb-labs/studio-ui-kit';
-import { KBPageContainer, KBPageHeader } from '@/components/ui';
+import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
 
 const STATUS_COLORS: Record<string, string> = {
   pending: 'default',
@@ -139,8 +139,8 @@ export function WorkflowsJobsPage() {
   ];
 
   return (
-    <KBPageContainer>
-      <KBPageHeader
+    <UIPage width="full">
+      <UIPageHeader
         title="Background Jobs"
         description="Monitor background job execution and status"
         icon={<UIIcon name="UnorderedListOutlined" />}
@@ -209,6 +209,6 @@ export function WorkflowsJobsPage() {
           pagination={{ pageSize: 20 }}
         />
       </UICard>
-    </KBPageContainer>
+    </UIPage>
   );
 }

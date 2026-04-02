@@ -25,13 +25,14 @@ import { RoleSwitcher } from '@/components/role-switcher';
 import { ApiRoutesViewer } from '../components/api-routes-viewer';
 import { NavigationSettings } from '../components/navigation-settings';
 import { UICard, UISkeleton, UIStack } from '@kb-labs/studio-ui-kit';
-import { KBListItem, KBPageContainer, KBPageHeader, KBSection } from '@/components/ui';
+import { KBListItem } from '@/components/ui';
+import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
 
 export function SettingsPage() {
   const sources = useDataSources();
   const { data, isLoading } = useHealthStatus(sources.system);
   const { registry } = useRegistryV2();
-  const registryMeta = { generatedAt: registry.generatedAt, rev: null, partial: false, stale: false };
+  const registryMeta = { generatedAt: registry.generatedAt, rev: null, partial: false, stale: false, expiresAt: undefined as string | undefined, ttlMs: undefined as number | undefined, checksum: undefined as string | undefined };
   const refresh = async () => {}; // TODO: queryClient.invalidateQueries
   const [invalidating, setInvalidating] = React.useState(false);
 
@@ -66,11 +67,11 @@ export function SettingsPage() {
       label: 'Appearance',
       icon: <UIIcon name="BgColorsOutlined" />,
       children: (
-        <KBSection>
+        <UIPageSection>
           <UICard>
             <AppearanceSettings />
           </UICard>
-        </KBSection>
+        </UIPageSection>
       ),
     },
     {
@@ -78,11 +79,11 @@ export function SettingsPage() {
       label: 'Navigation',
       icon: <UIIcon name="MenuOutlined" />,
       children: (
-        <KBSection>
+        <UIPageSection>
           <UICard>
             <NavigationSettings />
           </UICard>
-        </KBSection>
+        </UIPageSection>
       ),
     },
     {
@@ -90,11 +91,11 @@ export function SettingsPage() {
       label: 'Notifications',
       icon: <UIIcon name="BellOutlined" />,
       children: (
-        <KBSection>
+        <UIPageSection>
           <UICard>
             <NotificationsSettings />
           </UICard>
-        </KBSection>
+        </UIPageSection>
       ),
     },
     {
@@ -102,11 +103,11 @@ export function SettingsPage() {
       label: 'Data & Privacy',
       icon: <UIIcon name="LockOutlined" />,
       children: (
-        <KBSection>
+        <UIPageSection>
           <UICard>
             <DataPrivacySettings />
           </UICard>
-        </KBSection>
+        </UIPageSection>
       ),
     },
     {
@@ -115,7 +116,7 @@ export function SettingsPage() {
       icon: <UIIcon name="DatabaseOutlined" />,
       children: (
         <>
-          <KBSection>
+          <UIPageSection>
             <UICard title="Data Sources Health">
               {isLoading ? (
                 <UIStack>
@@ -144,9 +145,9 @@ export function SettingsPage() {
                 <p>No health data available</p>
               )}
             </UICard>
-          </KBSection>
+          </UIPageSection>
 
-          <KBSection>
+          <UIPageSection>
             <UICard title="Registry Status">
               <UISpace direction="vertical" style={{ width: '100%' }}>
                 <div>
@@ -180,7 +181,7 @@ export function SettingsPage() {
                 )}
               </UISpace>
             </UICard>
-          </KBSection>
+          </UIPageSection>
         </>
       ),
     },
@@ -189,11 +190,11 @@ export function SettingsPage() {
       label: 'Configuration',
       icon: <UIIcon name="SettingOutlined" />,
       children: (
-        <KBSection>
+        <UIPageSection>
           <UICard>
             <ConfigurationSettings />
           </UICard>
-        </KBSection>
+        </UIPageSection>
       ),
     },
     {
@@ -201,11 +202,11 @@ export function SettingsPage() {
       label: 'Experimental',
       icon: <UIIcon name="ExperimentOutlined" />,
       children: (
-        <KBSection>
+        <UIPageSection>
           <UICard>
             <ExperimentalSettings />
           </UICard>
-        </KBSection>
+        </UIPageSection>
       ),
     },
     {
@@ -213,11 +214,11 @@ export function SettingsPage() {
       label: 'Authentication',
       icon: <UIIcon name="UserOutlined" />,
       children: (
-        <KBSection>
+        <UIPageSection>
           <UICard>
             <RoleSwitcher />
           </UICard>
-        </KBSection>
+        </UIPageSection>
       ),
     },
     {
@@ -226,7 +227,7 @@ export function SettingsPage() {
       icon: <UIIcon name="ToolOutlined" />,
       children: (
         <>
-          <KBSection>
+          <UIPageSection>
             <UICard title="Development Tools">
               <UISpace direction="vertical" style={{ width: '100%' }} size="large">
                 <div>
@@ -264,21 +265,21 @@ export function SettingsPage() {
                 </div>
               </UISpace>
             </UICard>
-          </KBSection>
+          </UIPageSection>
 
-          <KBSection>
+          <UIPageSection>
             <UICard>
               <ApiRoutesViewer />
             </UICard>
-          </KBSection>
+          </UIPageSection>
         </>
       ),
     },
   ];
 
   return (
-    <KBPageContainer>
-      <KBPageHeader
+    <UIPage variant="document">
+      <UIPageHeader
         title="Settings"
         description="Configure your preferences, manage data, and customize your experience"
       />
@@ -289,6 +290,6 @@ export function SettingsPage() {
         size="large"
         style={{ marginTop: 24 }}
       />
-    </KBPageContainer>
+    </UIPage>
   );
 }

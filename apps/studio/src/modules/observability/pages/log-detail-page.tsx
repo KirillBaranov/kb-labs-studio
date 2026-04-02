@@ -24,7 +24,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import type { LogRecord } from '@kb-labs/studio-data-client';
-import { KBPageContainer, KBPageHeader } from '@/components/ui';
+import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
 
 /**
  * Format timestamp to full datetime with milliseconds
@@ -163,18 +163,18 @@ export function LogDetailPage() {
 
   if (loading) {
     return (
-      <KBPageContainer>
+      <UIPage>
         <div style={{ textAlign: 'center', padding: '100px 0' }}>
           <UISpin size="large" tip="Loading log details..." />
         </div>
-      </KBPageContainer>
+      </UIPage>
     );
   }
 
   if (error || !log) {
     return (
-      <KBPageContainer>
-        <KBPageHeader
+      <UIPage>
+        <UIPageHeader
           title="Log Not Found"
           description="The requested log could not be found"
           onBack={() => navigate('/observability/logs')}
@@ -185,7 +185,7 @@ export function LogDetailPage() {
           variant="error"
           showIcon
         />
-      </KBPageContainer>
+      </UIPage>
     );
   }
 
@@ -212,8 +212,8 @@ export function LogDetailPage() {
   delete metadataFields['sessionId'];
 
   return (
-    <KBPageContainer>
-      <KBPageHeader
+    <UIPage>
+      <UIPageHeader
         title="Log Details"
         description={`Viewing log from ${formatRelativeTime(log.time)}`}
         onBack={() => navigate('/observability/logs')}
@@ -507,6 +507,6 @@ export function LogDetailPage() {
           {JSON.stringify(log, null, 2)}
         </UITypographyParagraph>
       </UICard>
-    </KBPageContainer>
+    </UIPage>
   );
 }

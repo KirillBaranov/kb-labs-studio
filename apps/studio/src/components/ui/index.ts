@@ -24,9 +24,6 @@ export { KBDiffViewer, type KBDiffViewerProps } from './kb-diff-viewer';
 export { KBLineChart, KBColumnChart, KBAreaChart, KBPieChart, KBBarChart } from './kb-chart';
 
 // Page & Section Components
-export { KBPageContainer, type KBPageContainerProps } from './kb-page-container';
-export { KBPageHeader, type KBPageHeaderProps, type BreadcrumbItem } from './kb-page-header';
-export { KBSection, type KBSectionProps } from './kb-section';
 export { KBDataList, KBListItem, type KBDataListProps, type KBListItemProps } from './kb-list';
 export { KBStatCard, type KBStatCardProps } from './kb-stat-card';
 export { KBStatGrid, type KBStatGridProps } from './kb-stat-grid';

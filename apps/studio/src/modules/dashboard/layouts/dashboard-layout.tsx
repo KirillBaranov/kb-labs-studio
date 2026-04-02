@@ -1,16 +1,16 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { KBPageContainer, KBPageHeader } from '@/components/ui';
+import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
 
 export function DashboardLayout() {
   return (
-    <KBPageContainer>
-      <KBPageHeader
+    <UIPage width="full">
+      <UIPageHeader
         title="Intelligence Dashboard"
         description="Real-time platform observability and performance analytics"
       />
 
       <Outlet />
-    </KBPageContainer>
+    </UIPage>
   );
 }

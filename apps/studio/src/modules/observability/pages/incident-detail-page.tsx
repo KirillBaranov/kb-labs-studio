@@ -37,7 +37,7 @@ import type {
 import { useDataSources } from '../../../providers/data-sources-provider';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { KBPageContainer, KBPageHeader } from '@/components/ui';
+import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
 
 dayjs.extend(relativeTime);
 
@@ -160,32 +160,32 @@ export function IncidentDetailPage() {
 
   if (incidentLoading) {
     return (
-      <KBPageContainer>
+      <UIPage>
         <div style={{ textAlign: 'center', padding: '100px 0' }}>
           <UISpin size="large" />
         </div>
-      </KBPageContainer>
+      </UIPage>
     );
   }
 
   if (incidentError || !incident) {
     return (
-      <KBPageContainer>
+      <UIPage>
         <UIAlert
           message="Failed to load incident"
           description={(incidentError as Error)?.message ?? 'Incident not found'}
           variant="error"
           showIcon
         />
-      </KBPageContainer>
+      </UIPage>
     );
   }
 
   const severityConfig = getSeverityConfig(incident.severity);
 
   return (
-    <KBPageContainer>
-      <KBPageHeader
+    <UIPage>
+      <UIPageHeader
         title={incident.title}
         description={`Incident ID: ${incident.id}`}
         extra={[
@@ -568,6 +568,6 @@ export function IncidentDetailPage() {
           />
         </UISpace>
       </UIModal>
-    </KBPageContainer>
+    </UIPage>
   );
 }

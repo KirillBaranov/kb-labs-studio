@@ -21,7 +21,7 @@ import {
 } from '@kb-labs/studio-ui-kit';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDataSources } from '@/providers/data-sources-provider';
-import { KBPageContainer, KBPageHeader } from '@/components/ui';
+import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
 import type { WorkflowRunInfo } from '@kb-labs/workflow-contracts';
 import { RunWorkflowModal } from '../components/run-workflow-modal';
 
@@ -181,31 +181,31 @@ export function WorkflowDefinitionPage() {
 
   if (workflowLoading) {
     return (
-      <KBPageContainer>
+      <UIPage>
         <div style={{ textAlign: 'center', padding: '80px 0' }}>
           <UISpin size="large" />
         </div>
-      </KBPageContainer>
+      </UIPage>
     );
   }
 
   if (!workflow) {
     return (
-      <KBPageContainer>
+      <UIPage>
         <UIEmptyState
           description={`Workflow "${workflowId}" not found`}
           action={
             <UIButton onClick={() => navigate('/workflows/definitions')}>Back to Definitions</UIButton>
           }
         />
-      </KBPageContainer>
+      </UIPage>
     );
   }
 
   return (
-    <KBPageContainer>
+    <UIPage>
       {contextHolder}
-      <KBPageHeader
+      <UIPageHeader
         title={workflow.name}
         description={workflow.description}
         icon={<UIIcon name="ThunderboltOutlined" />}
@@ -306,6 +306,6 @@ export function WorkflowDefinitionPage() {
         onClose={() => setRunModalOpen(false)}
         onRun={(_workflowId, input) => runWorkflowMutation.mutate(input)}
       />
-    </KBPageContainer>
+    </UIPage>
   );
 }

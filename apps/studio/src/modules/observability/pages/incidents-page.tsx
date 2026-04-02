@@ -27,7 +27,7 @@ import type {
 import { useDataSources } from '../../../providers/data-sources-provider';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { KBPageContainer, KBPageHeader } from '@/components/ui';
+import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
 
 dayjs.extend(relativeTime);
 
@@ -233,8 +233,8 @@ export function IncidentsPage() {
   ];
 
   return (
-    <KBPageContainer>
-      <KBPageHeader
+    <UIPage width="full">
+      <UIPageHeader
         title="Incidents"
         description="System incident history with AI-powered analysis"
         extra={[
@@ -366,6 +366,6 @@ export function IncidentsPage() {
           }}
         />
       </UICard>
-    </KBPageContainer>
+    </UIPage>
   );
 }

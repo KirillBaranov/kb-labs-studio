@@ -19,7 +19,7 @@ import { useDataSources } from '@/providers/data-sources-provider';
 import { useWorkflowRuns } from '@kb-labs/studio-data-client';
 import type { WorkflowRun } from '@kb-labs/studio-data-client';
 import { WorkflowStatusBadge } from '@/components/workflow-status-badge';
-import { KBPageContainer, KBPageHeader } from '@/components/ui';
+import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
 import { UICard } from '@kb-labs/studio-ui-kit';
 
 export function WorkflowsRunsPage() {
@@ -110,8 +110,8 @@ export function WorkflowsRunsPage() {
   );
 
   return (
-    <KBPageContainer>
-      <KBPageHeader
+    <UIPage width="full">
+      <UIPageHeader
         title="Workflow Runs"
         description="All workflow executions"
         icon={<UIIcon name="PlayCircleOutlined" />}
@@ -177,6 +177,6 @@ export function WorkflowsRunsPage() {
           })}
         />
       </UICard>
-    </KBPageContainer>
+    </UIPage>
   );
 }

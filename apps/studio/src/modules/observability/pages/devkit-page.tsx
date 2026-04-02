@@ -11,7 +11,7 @@ import {
 } from '@kb-labs/studio-ui-kit';
 import { useDevKitHealth } from '@kb-labs/studio-data-client';
 import { useDataSources } from '../../../providers/data-sources-provider';
-import { KBPageContainer, KBPageHeader } from '@/components/ui';
+import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
 
 /**
  * Get color for health grade
@@ -85,8 +85,8 @@ export function DevKitPage() {
 
   if (isError) {
     return (
-      <KBPageContainer>
-        <KBPageHeader
+      <UIPage>
+        <UIPageHeader
           title="DevKit Health"
           description="Monorepo health and quality metrics"
         />
@@ -97,29 +97,29 @@ export function DevKitPage() {
           showIcon
           style={{ marginBottom: 24 }}
         />
-      </KBPageContainer>
+      </UIPage>
     );
   }
 
   if (isLoading || !data) {
     return (
-      <KBPageContainer>
-        <KBPageHeader
+      <UIPage>
+        <UIPageHeader
           title="DevKit Health"
           description="Monorepo health and quality metrics"
         />
         <div style={{ padding: '24px 0', textAlign: 'center' }}>
           Loading DevKit health check... (this may take up to 30 seconds)
         </div>
-      </KBPageContainer>
+      </UIPage>
     );
   }
 
   const totalIssues = Object.values(data.issues).reduce((sum: number, count) => sum + (count ?? 0), 0);
 
   return (
-    <KBPageContainer>
-      <KBPageHeader
+    <UIPage width="full">
+      <UIPageHeader
         title="DevKit Health"
         description="Monorepo health and quality metrics - Cached for 1 minute"
       />
@@ -258,6 +258,6 @@ export function DevKitPage() {
           size="small"
         />
       </UICard>
-    </KBPageContainer>
+    </UIPage>
   );
 }

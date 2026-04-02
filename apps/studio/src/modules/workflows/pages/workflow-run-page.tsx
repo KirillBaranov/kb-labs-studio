@@ -3,7 +3,7 @@
  * Workflow run detail page with live SSE logs, jobs/steps accordion, and approval modal
  */
 
-import { KBPageContainer, KBPageHeader, KBSection } from '@/components/ui'
+import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit'
 import { useMemo, useState, useEffect, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
@@ -529,8 +529,8 @@ export function WorkflowRunPage() {
   const shortRunId = runId ? `${runId.slice(0, 12)}...` : ''
 
   return (
-    <KBPageContainer>
-      <KBPageHeader
+    <UIPage>
+      <UIPageHeader
         title={`Workflow Run ${runId ?? ''}`}
         description="Detailed status of the workflow execution"
         breadcrumbItems={[
@@ -569,10 +569,10 @@ export function WorkflowRunPage() {
         />
       )}
 
-      {isLoading && <KBSection><Text>Loading workflow run...</Text></KBSection>}
-      {!isLoading && !run && !error && <KBSection><Text>Workflow run not found.</Text></KBSection>}
+      {isLoading && <UIPageSection><Text>Loading workflow run...</Text></UIPageSection>}
+      {!isLoading && !run && !error && <UIPageSection><Text>Workflow run not found.</Text></UIPageSection>}
       {run && (
-        <KBSection>
+        <UIPageSection>
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -613,11 +613,11 @@ export function WorkflowRunPage() {
               </span>
             )}
           </div>
-        </KBSection>
+        </UIPageSection>
       )}
 
       {run && (
-        <KBSection>
+        <UIPageSection>
           {/* View toggle */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
             <Title level={4} style={{ margin: 0 }}>Execution</Title>
@@ -660,11 +660,11 @@ export function WorkflowRunPage() {
               onApprove={(step) => setApprovalStep(step)}
             />
           )}
-        </KBSection>
+        </UIPageSection>
       )}
 
       {run?.result && (
-        <KBSection>
+        <UIPageSection>
           <Title level={4}>Result Metrics</Title>
           {run.result.metrics ? (
             <UIList
@@ -695,7 +695,7 @@ export function WorkflowRunPage() {
               showIcon
             />
           )}
-        </KBSection>
+        </UIPageSection>
       )}
 
       <ApprovalModal
@@ -707,6 +707,6 @@ export function WorkflowRunPage() {
         isLoading={resolveApproval.isPending}
         error={resolveApproval.error instanceof Error ? resolveApproval.error : null}
       />
-    </KBPageContainer>
+    </UIPage>
   )
 }

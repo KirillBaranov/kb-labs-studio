@@ -1,11 +1,11 @@
 import { EmptyState } from '@/components/empty-state';
 import { BarChart3 } from 'lucide-react';
-import { KBPageContainer, KBPageHeader } from '@/components/ui';
+import { UIPage, UIPageHeader } from '@kb-labs/studio-ui-kit';
 
 export function AnalyticsPage() {
   return (
-    <KBPageContainer>
-      <KBPageHeader 
+    <UIPage width="full">
+      <UIPageHeader 
         title="Analytics"
         description="Event metrics and performance charts"
       />
@@ -14,7 +14,7 @@ export function AnalyticsPage() {
         title="Coming Soon"
         description="Event metrics and performance charts will appear here."
       />
-    </KBPageContainer>
+    </UIPage>
   );
 }
 

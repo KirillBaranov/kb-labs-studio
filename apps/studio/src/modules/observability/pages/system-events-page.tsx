@@ -12,7 +12,7 @@ import {
 import { useSystemEvents } from '@kb-labs/studio-data-client';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import type { SystemEvent, RegistryEvent, HealthEvent } from '@kb-labs/studio-data-client';
-import { KBPageContainer, KBPageHeader } from '@/components/ui';
+import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
 
 /**
  * Format timestamp to time string
@@ -38,8 +38,8 @@ export function SystemEventsPage() {
   const latestRegistry = events.find((e) => e.type === 'registry') as RegistryEvent | undefined;
 
   return (
-    <KBPageContainer>
-      <KBPageHeader
+    <UIPage width="full">
+      <UIPageHeader
         title="System Events"
         description="Real-time system event stream - Auto-updates via Server-Sent Events"
       />
@@ -250,6 +250,6 @@ export function SystemEventsPage() {
           />
         )}
       </UICard>
-    </KBPageContainer>
+    </UIPage>
   );
 }

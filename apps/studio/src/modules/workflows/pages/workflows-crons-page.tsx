@@ -16,7 +16,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useDataSources } from '@/providers/data-sources-provider';
 import type { CronInfo } from '@kb-labs/workflow-contracts';
 import { UICard } from '@kb-labs/studio-ui-kit';
-import { KBPageContainer, KBPageHeader } from '@/components/ui';
+import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
 
 export function WorkflowsCronsPage() {
   const sources = useDataSources();
@@ -121,8 +121,8 @@ export function WorkflowsCronsPage() {
   const disabledCount = cronsData?.crons?.filter((c) => !c.enabled).length || 0;
 
   return (
-    <KBPageContainer>
-      <KBPageHeader
+    <UIPage width="full">
+      <UIPageHeader
         title="Cron Jobs"
         description="Scheduled recurring tasks"
         icon={<UIIcon name="ClockCircleOutlined" />}
@@ -165,6 +165,6 @@ export function WorkflowsCronsPage() {
           pagination={{ pageSize: 20 }}
         />
       </UICard>
-    </KBPageContainer>
+    </UIPage>
   );
 }

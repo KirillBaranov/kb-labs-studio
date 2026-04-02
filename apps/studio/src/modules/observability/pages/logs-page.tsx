@@ -31,7 +31,7 @@ import { useDataSources } from '../../../providers/data-sources-provider';
 import type { LogRecord, LogSummarizeResponse } from '@kb-labs/studio-data-client';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { KBPageContainer, KBPageHeader } from '../../../components/ui';
+import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
 
 
 /**
@@ -475,8 +475,8 @@ export function LogsPage() {
   };
 
   return (
-    <KBPageContainer>
-      <KBPageHeader
+    <UIPage width="full">
+      <UIPageHeader
         title="Live Logs"
         description="Real-time application logs with AI-ready filtering and grouping"
       />
@@ -1123,6 +1123,6 @@ export function LogsPage() {
           )}
         </UISpace>
       </UIModal>
-    </KBPageContainer>
+    </UIPage>
   );
 }
