@@ -23,7 +23,7 @@ import {
   UIIcon,
 } from '@kb-labs/studio-ui-kit';
 import type { PluginAskResponse } from '@kb-labs/studio-data-client';
-import { MarkdownViewer } from '../../../components/markdown/markdown-viewer';
+import { UIMarkdownViewer } from '@kb-labs/studio-ui-kit';
 
 interface PluginAIAssistantModalProps {
   open: boolean;
@@ -236,9 +236,7 @@ export function PluginAIAssistantModal({
                       marginBottom: 8,
                     }}
                   >
-                    <MarkdownViewer className="plugin-assistant-markdown">
-                      {item.answer}
-                    </MarkdownViewer>
+                    <UIMarkdownViewer content={item.answer} className="plugin-assistant-markdown" />
                   </div>
 
                   {/* Metadata */}

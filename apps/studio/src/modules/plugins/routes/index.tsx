@@ -4,18 +4,16 @@
  */
 
 import type { RouteObject } from 'react-router-dom';
-import { PluginsPage } from '../pages/plugins-page';
+import { PluginsPage } from '../pages/marketplace-page';
 import { PluginDetailPage } from '../pages/plugin-detail-page';
-import { PluginPage } from '../pages/plugin-page';
 import { ErrorBoundary } from '../../../components/error-boundary';
 import { renderIcon } from '../../../routes/helpers';
 import type { NavigationItem } from '@/components/ui';
 
 // Route paths
 const PATHS = {
-  ROOT: '/plugins',
-  DETAIL: '/plugins/:pluginId',
-  WIDGET: '/plugins/:pluginId/:widgetName',
+  ROOT: '/marketplace',
+  DETAIL: '/marketplace/:pluginId',
 } as const;
 
 // Route keys
@@ -37,11 +35,6 @@ export const pluginsRoutes: RouteObject[] = [
     element: <PluginDetailPage />,
     errorElement: <ErrorBoundary />,
   },
-  {
-    path: PATHS.WIDGET,
-    element: <PluginPage />,
-    errorElement: <ErrorBoundary />,
-  },
 ];
 
 /**
@@ -49,7 +42,7 @@ export const pluginsRoutes: RouteObject[] = [
  */
 export const pluginsNavigation: NavigationItem = {
   key: KEYS.MODULE,
-  label: 'Plugins',
+  label: 'Marketplace',
   icon: renderIcon('AppstoreOutlined'),
   path: PATHS.ROOT,
 };

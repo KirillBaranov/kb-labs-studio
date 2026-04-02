@@ -21,7 +21,7 @@ import { useDataSources } from '@/providers/data-sources-provider';
 import type { PluginManifestEntry } from '@kb-labs/studio-data-client';
 import type { UITableColumn } from '@kb-labs/studio-ui-kit';
 import { PluginAIAssistantModal } from '../components/plugin-ai-assistant-modal';
-import { KBPageContainer, KBPageHeader } from '@/components/ui';
+import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
 
 // Helper to safely render schema objects
 function renderSchema(schema: any): string {
@@ -67,25 +67,25 @@ export function PluginDetailPage() {
 
   if (loading) {
     return (
-      <KBPageContainer>
+      <UIPage>
         <div style={{ textAlign: 'center', padding: '80px 0' }}>
           <UISpin size="large" />
         </div>
-      </KBPageContainer>
+      </UIPage>
     );
   }
 
   if (!plugin) {
     return (
-      <KBPageContainer>
-        <KBPageHeader title="Plugin Not Found" />
+      <UIPage>
+        <UIPageHeader title="Plugin Not Found" />
         <UIEmptyState description="Plugin not found in registry" />
         <div style={{ textAlign: 'center', marginTop: 24 }}>
-          <UIButton variant="primary" onClick={() => navigate('/plugins')}>
+          <UIButton variant="primary" onClick={() => navigate('/marketplace')}>
             Back to Plugins
           </UIButton>
         </div>
-      </KBPageContainer>
+      </UIPage>
     );
   }
 
@@ -388,11 +388,11 @@ export function PluginDetailPage() {
   };
 
   return (
-    <KBPageContainer>
+    <UIPage>
       <UISpace style={{ marginBottom: 24, width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
         <UIButton
           icon={<UIIcon name="ArrowLeftOutlined" />}
-          onClick={() => navigate('/plugins')}
+          onClick={() => navigate('/marketplace')}
           variant="text"
         >
           Back to Plugins
@@ -415,7 +415,7 @@ export function PluginDetailPage() {
         pluginName={display?.name || manifest.id}
         onAsk={handleAskAI}
       />
-    </KBPageContainer>
+    </UIPage>
   );
 }
 
