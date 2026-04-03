@@ -14,6 +14,15 @@ interface JobResponseData {
   error?: string;
 }
 
+const TERMINAL_STATUSES = new Set(['completed', 'failed', 'cancelled']);
+
+function statusToEventType(status: string): JobEventType {
+  if (status === 'completed') { return 'job.finished'; }
+  if (status === 'failed') { return 'job.failed'; }
+  if (status === 'running') { return 'job.started'; }
+  return 'job.queued';
+}
+
 /**
  * Job event structure
  */
@@ -150,9 +159,7 @@ export function useJobEvents(
               const lastEvent = events[events.length - 1];
               if (!lastEvent || lastEvent.data?.status !== currentStatus) {
                 const event: JobEvent = {
-                  type: currentStatus === 'completed' ? 'job.finished' : 
-                        currentStatus === 'failed' ? 'job.failed' : 
-                        currentStatus === 'running' ? 'job.started' : 'job.queued',
+                  type: statusToEventType(currentStatus),
                   jobId,
                   timestamp: new Date().toISOString(),
                   data: {
@@ -165,7 +172,7 @@ export function useJobEvents(
                 setEvents((prev) => [...prev, event]);
                 onEvent?.(event);
 
-                if (currentStatus === 'completed' || currentStatus === 'failed' || currentStatus === 'cancelled') {
+                if (TERMINAL_STATUSES.has(currentStatus)) {
                   if (pollingRef.current) {
                     clearInterval(pollingRef.current);
                     pollingRef.current = null;
@@ -219,9 +226,7 @@ export function useJobEvents(
             const lastEvent = prev[prev.length - 1];
             if (!lastEvent || lastEvent.data?.status !== currentStatus) {
               const event: JobEvent = {
-                type: currentStatus === 'completed' ? 'job.finished' : 
-                      currentStatus === 'failed' ? 'job.failed' : 
-                      currentStatus === 'running' ? 'job.started' : 'job.queued',
+                type: statusToEventType(currentStatus),
                 jobId,
                 timestamp: new Date().toISOString(),
                 data: {

@@ -354,24 +354,8 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
 
   async listIncidents(query?: IncidentQuery): Promise<IncidentsListResponse> {
     try {
-      const params = new URLSearchParams();
-
-      if (query) {
-        if (query.limit !== undefined) {params.append('limit', query.limit.toString());}
-        if (query.severity) {
-          const severities = Array.isArray(query.severity) ? query.severity : [query.severity];
-          severities.forEach(s => params.append('severity', s));
-        }
-        if (query.type) {
-          const types = Array.isArray(query.type) ? query.type : [query.type];
-          types.forEach(t => params.append('type', t));
-        }
-        if (query.from !== undefined) {params.append('from', query.from.toString());}
-        if (query.to !== undefined) {params.append('to', query.to.toString());}
-        if (query.includeResolved !== undefined) {params.append('includeResolved', query.includeResolved.toString());}
-      }
-
-      const url = `/observability/incidents${params.toString() ? `?${params.toString()}` : ''}`;
+      const params = buildIncidentQueryParams(query);
+      const url = `/observability/incidents${params ? `?${params}` : ''}`;
       const response = await this.client.fetch<{ incidents: Incident[]; summary: any }>(url);
 
       return {
@@ -467,4 +451,22 @@ export class HttpObservabilitySource implements ObservabilityDataSource {
       );
     }
   }
+}
+
+function buildIncidentQueryParams(query?: IncidentQuery): string {
+  if (!query) { return ''; }
+  const params = new URLSearchParams();
+  if (query.limit !== undefined) { params.append('limit', query.limit.toString()); }
+  if (query.severity) {
+    const severities = Array.isArray(query.severity) ? query.severity : [query.severity];
+    severities.forEach(s => params.append('severity', s));
+  }
+  if (query.type) {
+    const types = Array.isArray(query.type) ? query.type : [query.type];
+    types.forEach(t => params.append('type', t));
+  }
+  if (query.from !== undefined) { params.append('from', query.from.toString()); }
+  if (query.to !== undefined) { params.append('to', query.to.toString()); }
+  if (query.includeResolved !== undefined) { params.append('includeResolved', query.includeResolved.toString()); }
+  return params.toString();
 }

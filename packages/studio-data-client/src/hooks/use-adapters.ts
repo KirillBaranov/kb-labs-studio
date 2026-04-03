@@ -6,6 +6,8 @@
 import { useQuery } from '@tanstack/react-query';
 import type { AdaptersDataSource, DateRangeOptions } from '../sources/adapters-source';
 
+const DAILY_STATS = 'daily-stats';
+
 /**
  * Hook to fetch LLM usage statistics
  *
@@ -94,7 +96,7 @@ export function useAdaptersStorageUsage(source: AdaptersDataSource, options?: Da
  */
 export function useAdaptersLLMDailyStats(source: AdaptersDataSource, options?: DateRangeOptions) {
   return useQuery({
-    queryKey: ['adapters', 'llm', 'daily-stats', options?.from, options?.to, options?.models],
+    queryKey: ['adapters', 'llm', DAILY_STATS, options?.from, options?.to, options?.models],
     queryFn: () => source.getLLMDailyStats(options),
     refetchInterval: 60000, // Daily stats change slower
     staleTime: 50000,
@@ -110,7 +112,7 @@ export function useAdaptersLLMDailyStats(source: AdaptersDataSource, options?: D
  */
 export function useAdaptersEmbeddingsDailyStats(source: AdaptersDataSource, options?: DateRangeOptions) {
   return useQuery({
-    queryKey: ['adapters', 'embeddings', 'daily-stats', options?.from, options?.to],
+    queryKey: ['adapters', 'embeddings', DAILY_STATS, options?.from, options?.to],
     queryFn: () => source.getEmbeddingsDailyStats(options),
     refetchInterval: 60000,
     staleTime: 50000,
@@ -126,7 +128,7 @@ export function useAdaptersEmbeddingsDailyStats(source: AdaptersDataSource, opti
  */
 export function useAdaptersVectorStoreDailyStats(source: AdaptersDataSource, options?: DateRangeOptions) {
   return useQuery({
-    queryKey: ['adapters', 'vectorstore', 'daily-stats', options?.from, options?.to],
+    queryKey: ['adapters', 'vectorstore', DAILY_STATS, options?.from, options?.to],
     queryFn: () => source.getVectorStoreDailyStats(options),
     refetchInterval: 60000,
     staleTime: 50000,
@@ -142,7 +144,7 @@ export function useAdaptersVectorStoreDailyStats(source: AdaptersDataSource, opt
  */
 export function useAdaptersCacheDailyStats(source: AdaptersDataSource, options?: DateRangeOptions) {
   return useQuery({
-    queryKey: ['adapters', 'cache', 'daily-stats', options?.from, options?.to],
+    queryKey: ['adapters', 'cache', DAILY_STATS, options?.from, options?.to],
     queryFn: () => source.getCacheDailyStats(options),
     refetchInterval: 30000, // Cache stats change faster
     staleTime: 25000,
@@ -158,7 +160,7 @@ export function useAdaptersCacheDailyStats(source: AdaptersDataSource, options?:
  */
 export function useAdaptersStorageDailyStats(source: AdaptersDataSource, options?: DateRangeOptions) {
   return useQuery({
-    queryKey: ['adapters', 'storage', 'daily-stats', options?.from, options?.to],
+    queryKey: ['adapters', 'storage', DAILY_STATS, options?.from, options?.to],
     queryFn: () => source.getStorageDailyStats(options),
     refetchInterval: 60000,
     staleTime: 50000,
