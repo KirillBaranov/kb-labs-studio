@@ -18,5 +18,3 @@ export function UIRadioGroup(props: UIRadioGroupProps) {
   return <AntRadio.Group {...props} />;
 }
 
-UIRadio.Group = AntRadio.Group;
-UIRadio.Button = AntRadio.Button;
