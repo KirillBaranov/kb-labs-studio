@@ -13,6 +13,7 @@ import { PageTransition } from './components/page-transition';
 import { createStudioLogger } from './utils/logger';
 import { ErrorBoundary } from './components/error-boundary';
 import { useSettings } from './providers/settings-provider';
+import type { StudioRegistryV2 } from '@kb-labs/studio-federation';
 import { NavigationItemsProvider } from './providers/navigation-items-provider';
 import { applyNavigationCategories } from './utils/apply-navigation-categories';
 import { AVAILABLE_ICONS, KBPageLayout, KBStatusBar, type NavigationItem, StatusBarItem, StatusBarPresets } from '@/components/ui';
@@ -70,7 +71,7 @@ function LayoutContent() {
   const auth = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const { registry, loading, error } = useRegistryV2();
+  const { registry, error } = useRegistryV2();
   const commandPalette = useCommandPalette();
   const sources = useDataSources();
   const { settings } = useSettings();
@@ -95,7 +96,7 @@ function LayoutContent() {
 
   // Build plugin nav from V2 registry menus
   const pluginNavModel = React.useMemo<PluginNavModel[]>(() => {
-    if (!hasData) return [];
+    if (!hasData) {return [];}
     return buildPluginNavModel(registry);
   }, [registry, hasData]);
 
@@ -262,11 +263,11 @@ export const router = createBrowserRouter([
   },
 ]);
 
-function buildPluginNavModel(registry: import('@kb-labs/studio-federation').StudioRegistryV2): PluginNavModel[] {
+function buildPluginNavModel(registry: StudioRegistryV2): PluginNavModel[] {
   const groups = new Map<string, PluginNavModel>();
 
   for (const plugin of registry.plugins) {
-    if (!plugin.menus || plugin.menus.length === 0) continue;
+    if (!plugin.menus || plugin.menus.length === 0) {continue;}
 
     const parentMenu = plugin.menus.find(m => !m.parentId);
 

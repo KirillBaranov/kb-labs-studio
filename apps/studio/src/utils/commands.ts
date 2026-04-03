@@ -33,7 +33,7 @@ export interface CommandsConfig {
  * Get all available commands for Command Palette
  */
 export function getCommands(config: CommandsConfig): Command[] {
-  const { navigate, toggleTheme, refreshRegistry, invalidateCache, openQuickSearch } = config;
+  const { toggleTheme, refreshRegistry, invalidateCache, openQuickSearch } = config;
 
   return [
     // ============================================

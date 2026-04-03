@@ -9,7 +9,7 @@ import { UIMessage } from '@kb-labs/studio-ui-kit';
 import { useQueryClient } from '@tanstack/react-query';
 import { useDataSources } from './data-sources-provider';
 import { useSettings } from './settings-provider';
-import { getCommands, saveRecentCommand, getRecentCommands, type Command } from '@/utils/commands';
+import { getCommands, saveRecentCommand, getRecentCommands } from '@/utils/commands';
 import { KBQuickSearch, type SearchableItem } from '@/components/ui';
 
 interface CommandPaletteContextValue {

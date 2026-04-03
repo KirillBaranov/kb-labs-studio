@@ -136,7 +136,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     try {
       const parsed = JSON.parse(jsonString);
       setSettings({ ...DEFAULT_SETTINGS, ...parsed });
-    } catch (error) {
+    } catch {
       throw new Error('Invalid settings file');
     }
   }, []);

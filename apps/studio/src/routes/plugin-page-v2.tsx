@@ -14,7 +14,7 @@ export function PluginPageV2() {
   const location = useLocation();
   const { registry, loading } = useRegistryV2();
 
-  if (loading) return null;
+  if (loading) {return null;}
 
   // Find a page whose route matches the current path
   for (const plugin of registry.plugins) {
@@ -27,6 +27,7 @@ export function PluginPageV2() {
         // TODO: page-level permission check here
         return (
           <PageContainer
+            key={`${plugin.remoteName}::${page.entry}`}
             remoteName={plugin.remoteName}
             entry={page.entry}
             pageId={page.id}

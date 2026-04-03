@@ -6,7 +6,7 @@
 
 import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { initFederation, type StudioRegistryV2, type StudioPluginEntryV2 } from '@kb-labs/studio-federation';
+import { initFederation, type StudioRegistryV2 } from '@kb-labs/studio-federation';
 import { studioConfig } from '../config/studio.config';
 
 interface RegistryV2ContextValue {
@@ -30,7 +30,7 @@ const RegistryV2Context = React.createContext<RegistryV2ContextValue>({
 
 async function fetchRegistryV2(apiBaseUrl: string, token?: string): Promise<StudioRegistryV2> {
   const headers: Record<string, string> = { Accept: 'application/json' };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (token) {headers['Authorization'] = `Bearer ${token}`;}
 
   const res = await fetch(`${apiBaseUrl}/studio/registry`, { headers });
   if (!res.ok) {
