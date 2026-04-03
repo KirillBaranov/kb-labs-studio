@@ -1,5 +1,5 @@
 import { createContext, useContext, type ReactNode } from 'react';
-import { StudioEventBus, eventBus } from './event-bus.js';
+import { type StudioEventBus, eventBus } from './event-bus.js';
 
 const EventBusContext = createContext<StudioEventBus>(eventBus);
 

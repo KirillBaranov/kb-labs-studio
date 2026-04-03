@@ -13,6 +13,7 @@ const MAX_HISTORY = 100;
 export class StudioEventBus {
   private subscriptions = new Map<string, Set<Subscription>>();
   private history: EventRecord[] = [];
+  private devToolsObserver?: (record: EventRecord) => void;
 
   /**
    * Subscribe to an event.
@@ -57,13 +58,15 @@ export class StudioEventBus {
     };
 
     // Record for devtools
-    this.history.push({ event, payload, meta });
+    const record: EventRecord = { event, payload, meta };
+    this.history.push(record);
     if (this.history.length > MAX_HISTORY) {
       this.history.shift();
     }
+    this.devToolsObserver?.(record);
 
     const subs = this.subscriptions.get(event);
-    if (!subs) return;
+    if (!subs) { return; }
 
     for (const sub of subs) {
       try {
@@ -96,6 +99,18 @@ export class StudioEventBus {
    */
   getHistory(): readonly EventRecord[] {
     return this.history;
+  }
+
+  /**
+   * Register a devtools observer that is called on every published event.
+   * Only one observer at a time — intended for @kb-labs/studio-devtools only.
+   */
+  setDevToolsObserver(cb: (record: EventRecord) => void): void {
+    this.devToolsObserver = cb;
+  }
+
+  clearDevToolsObserver(): void {
+    this.devToolsObserver = undefined;
   }
 
   /**
