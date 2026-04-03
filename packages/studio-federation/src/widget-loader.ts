@@ -1,6 +1,18 @@
 import { init, loadRemote } from '@module-federation/runtime';
 import type { StudioPluginEntryV2 } from './types.js';
 import type { ComponentType } from 'react';
+import { devToolsStore, GenericChannel } from '@kb-labs/studio-devtools';
+import type { MFEvent } from '@kb-labs/studio-devtools';
+
+/** MF events channel — registered lazily on first use */
+function getMFChannel(): ReturnType<typeof devToolsStore.getChannel<MFEvent>> {
+  let ch = devToolsStore.getChannel<MFEvent>('mf-events');
+  if (!ch) {
+    ch = new GenericChannel<MFEvent>('mf-events', 'MF Events', 'ApiOutlined');
+    devToolsStore.registerChannel(ch);
+  }
+  return ch;
+}
 
 let initialized = false;
 
@@ -9,7 +21,7 @@ let initialized = false;
  * Called once after registry is fetched.
  */
 export function initFederation(plugins: StudioPluginEntryV2[]): void {
-  if (initialized) return;
+  if (initialized) { return; }
 
   init({
     name: 'studioHost',
@@ -60,14 +72,59 @@ export async function loadPageComponent(
   retryDelay = 1000,
 ): Promise<{ default: ComponentType<unknown> }> {
   const modulePath = `${remoteName}/${exposedModule.replace('./', '')}`;
+  const eventId = `mf-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const startedAt = Date.now();
+  const ch = getMFChannel();
+
+  ch?.push({ id: eventId, remoteName, exposedModule, status: 'loading', startedAt, attempt: 1 });
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const module = await loadRemote<{ default: ComponentType<unknown> }>(modulePath);
-      if (!module) throw new Error('Module resolved to null');
+      if (!module) { throw new Error('Module resolved to null'); }
+
+      if (module.default === undefined) {
+        // Module loaded but has no default export — e.g. `export function X()` instead of `export default`
+        ch?.push({
+          id: eventId,
+          remoteName,
+          exposedModule,
+          status: 'warning',
+          startedAt,
+          durationMs: Date.now() - startedAt,
+          attempt: attempt + 1,
+          isDefaultUndefined: true,
+        });
+        return module;
+      }
+
+      ch?.push({
+        id: eventId,
+        remoteName,
+        exposedModule,
+        status: 'success',
+        startedAt,
+        durationMs: Date.now() - startedAt,
+        attempt: attempt + 1,
+      });
       return module;
     } catch (err) {
       if (attempt === retries) {
+        ch?.push({
+          id: eventId,
+          remoteName,
+          exposedModule,
+          status: 'error',
+          startedAt,
+          durationMs: Date.now() - startedAt,
+          attempt: attempt + 1,
+          error: {
+            message: err instanceof Error ? err.message : String(err),
+            cause: err instanceof Error && err.cause instanceof Error
+              ? err.cause.message
+              : undefined,
+          },
+        });
         throw new PageLoadError(
           `Failed to load page after ${retries + 1} attempts: ${modulePath}`,
           remoteName,
@@ -75,7 +132,15 @@ export async function loadPageComponent(
           err instanceof Error ? err : undefined,
         );
       }
-      await new Promise((r) => setTimeout(r, retryDelay * (attempt + 1)));
+      ch?.push({
+        id: eventId,
+        remoteName,
+        exposedModule,
+        status: 'loading',
+        startedAt,
+        attempt: attempt + 2,
+      });
+      await new Promise<void>((resolve) => { setTimeout(resolve, retryDelay * (attempt + 1)); });
     }
   }
 

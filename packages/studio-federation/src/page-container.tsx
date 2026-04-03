@@ -1,8 +1,9 @@
-import { useState, useEffect, type ComponentType } from 'react';
-import { Spin, Result, Button } from 'antd';
-import { loadPageComponent, PageLoadError } from './widget-loader.js';
+import { useState, useEffect, useCallback, useMemo, type ComponentType } from 'react';
+import { Spin, ConfigProvider } from 'antd';
+import { loadPageComponent, type PageLoadError } from './widget-loader.js';
 import { PageErrorBoundary } from './page-error-boundary.js';
-import { PageContextProvider, type PageContext } from '@kb-labs/studio-hooks';
+import { PluginErrorUI } from './plugin-error-ui.js';
+import { PageContextProvider, type PageContext, getAntDesignTokens, getAntDesignComponents } from '@kb-labs/studio-hooks';
 import { EventBusProvider } from '@kb-labs/studio-event-bus';
 
 export interface PageContainerProps {
@@ -19,10 +20,12 @@ export interface PageContainerProps {
  *
  * Lifecycle:
  * 1. Shows loading spinner
- * 2. Loads remote via Module Federation
- * 3. Wraps in ErrorBoundary → PageContext → EventBus scope
- * 4. On load failure → shows "unavailable" fallback with retry
- * 5. On crash → ErrorBoundary catches, shows retry button
+ * 2. Loads remote via Module Federation (retries built-in)
+ * 3. On load failure → PluginErrorUI (load variant) with retry
+ * 4. On runtime crash → PageErrorBoundary catches → PluginErrorUI (crash variant)
+ *
+ * ConfigProvider is injected here so that plugin pages receive the same
+ * Ant Design theme tokens as the studio host (CSS-variable-based theming).
  */
 export function PageContainer({
   remoteName,
@@ -35,11 +38,18 @@ export function PageContainer({
   const [PageComponent, setPageComponent] = useState<ComponentType<unknown> | null>(null);
   const [loadError, setLoadError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
+  const [retryKey, setRetryKey] = useState(0);
+
+  const themeConfig = useMemo(() => ({
+    token: getAntDesignTokens(),
+    components: getAntDesignComponents(),
+  }), []);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setLoadError(null);
+    setPageComponent(null);
 
     loadPageComponent(remoteName, entry)
       .then((mod) => {
@@ -48,52 +58,56 @@ export function PageContainer({
           setLoading(false);
         }
       })
-      .catch((err) => {
+      .catch((err: Error) => {
         if (!cancelled) {
           setLoadError(err);
           setLoading(false);
         }
       });
 
-    return () => {
-      cancelled = true;
-    };
-  }, [remoteName, entry]);
+    return () => { cancelled = true; };
+  }, [remoteName, entry, retryKey]);
+
+  const handleRetry = useCallback(() => {
+    setRetryKey((k) => k + 1);
+  }, []);
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 300 }}>
-        <Spin size="large" tip={`Loading ${pageId}...`} />
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 320 }}>
+        <Spin size="large" />
       </div>
     );
   }
 
   if (loadError) {
+    const mfError = loadError as PageLoadError;
     return (
-      <Result
-        status="error"
-        title="Page Unavailable"
-        subTitle={`Could not load "${pageId}" from plugin "${pluginId}". The plugin may not be built or the service may be down.`}
-        extra={
-          <Button type="primary" onClick={() => window.location.reload()}>
-            Reload
-          </Button>
-        }
+      <PluginErrorUI
+        type="load"
+        pluginId={pluginId}
+        pageId={pageId}
+        error={loadError}
+        remoteName={mfError.remoteName ?? remoteName}
+        entry={mfError.exposedModule ?? entry}
+        onRetry={handleRetry}
       />
     );
   }
 
-  if (!PageComponent) return null;
+  if (!PageComponent) { return null; }
 
   const pageContext: PageContext = { pageId, pluginId, config, permissions };
 
   return (
-    <PageErrorBoundary pageId={pageId} pluginId={pluginId}>
-      <EventBusProvider>
-        <PageContextProvider value={pageContext}>
-          <PageComponent />
-        </PageContextProvider>
-      </EventBusProvider>
+    <PageErrorBoundary pageId={pageId} pluginId={pluginId} key={retryKey}>
+      <ConfigProvider theme={themeConfig}>
+        <EventBusProvider>
+          <PageContextProvider value={pageContext}>
+            <PageComponent />
+          </PageContextProvider>
+        </EventBusProvider>
+      </ConfigProvider>
     </PageErrorBoundary>
   );
 }

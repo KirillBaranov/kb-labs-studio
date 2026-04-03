@@ -1,5 +1,5 @@
 import { Component, type ReactNode, type ErrorInfo } from 'react';
-import { Result, Button } from 'antd';
+import { PluginErrorUI } from './plugin-error-ui.js';
 
 interface Props {
   pageId: string;
@@ -14,8 +14,8 @@ interface State {
 }
 
 /**
- * Error boundary that isolates plugin page crashes.
- * A crashed page does NOT bring down the entire Studio.
+ * Error boundary that isolates plugin page runtime crashes.
+ * A crashed plugin does NOT bring down the rest of Studio.
  */
 export class PageErrorBoundary extends Component<Props, State> {
   override state: State = { hasError: false, error: null };
@@ -38,21 +38,17 @@ export class PageErrorBoundary extends Component<Props, State> {
   };
 
   override render(): ReactNode {
-    if (this.state.hasError) {
+    if (this.state.hasError && this.state.error) {
       return (
-        <Result
-          status="error"
-          title="Page Crashed"
-          subTitle={`Plugin "${this.props.pluginId}" page "${this.props.pageId}" encountered an error: ${this.state.error?.message ?? 'Unknown error'}`}
-          extra={
-            <Button type="primary" onClick={this.handleRetry}>
-              Retry
-            </Button>
-          }
+        <PluginErrorUI
+          type="crash"
+          pluginId={this.props.pluginId}
+          pageId={this.props.pageId}
+          error={this.state.error}
+          onRetry={this.handleRetry}
         />
       );
     }
-
     return this.props.children;
   }
 }
