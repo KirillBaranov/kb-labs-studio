@@ -148,7 +148,7 @@ export function RunWorkflowModal(props: RunWorkflowModalProps) {
         setFieldValues({});
       }
     }
-  }, [open, activeWorkflow?.id]);
+  }, [open, activeWorkflow?.id, inputs, isMulti]);
 
   // Reset fields when selected workflow changes in multi mode
   React.useEffect(() => {
@@ -166,7 +166,7 @@ export function RunWorkflowModal(props: RunWorkflowModalProps) {
     } else {
       setFieldValues({});
     }
-  }, [selectedId]);
+  }, [selectedId, inputs, isMulti]);
 
   const handleJsonChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
