@@ -66,7 +66,7 @@ export function AnimatedMetricCard({
 
   return (
     <UICard
-      bordered={false}
+      variant="borderless"
       className={`animated-metric-card ${isAnimating ? 'animating' : ''}`}
       style={{
         borderLeft: `4px solid ${color}`,

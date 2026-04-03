@@ -21,7 +21,7 @@ interface MetricsHistoryPoint {
 
 export function HeroMetricsWidget() {
   const sources = useDataSources();
-  const navigate = useNavigate();
+  const _navigate = useNavigate();
 
   // Data hooks with auto-refresh
   const metrics = usePrometheusMetrics(sources.observability);

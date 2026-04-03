@@ -53,7 +53,7 @@ export function DashboardPluginsWidget() {
         </div>
       }
       style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-      bodyStyle={{ flex: 1, padding: '16px', overflow: 'auto' }}
+      styles={{ body: { flex: 1, padding: '16px', overflow: 'auto' } }}
     >
       <UITable
         columns={columns}

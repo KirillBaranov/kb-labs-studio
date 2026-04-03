@@ -160,7 +160,7 @@ export function AIInsightsPage() {
             : m
         )
       );
-    } catch (error) {
+    } catch (_error) {
       setMessages(prev =>
         prev.map(m =>
           m.id === loadingMessage.id

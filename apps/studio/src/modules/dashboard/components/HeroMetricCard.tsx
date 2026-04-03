@@ -55,7 +55,7 @@ export function HeroMetricCard({
       className={`hero-metric-card ${onClick ? 'clickable' : ''} ${pulsing ? 'pulsing' : ''}`}
       status={statusToVariant[status]}
       onClick={onClick}
-      bodyStyle={{ padding: '20px' }}
+      styles={{ body: { padding: '20px' } }}
       style={{ cursor: onClick ? 'pointer' : 'default' }}
     >
       <div className="hero-metric-header">

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { UICard, UIInput, UIInputTextArea, UIButton, UISpace, UITypographyText, UITypographyParagraph, UITitle, UIAvatar, UISpin, UITag } from '@kb-labs/studio-ui-kit';
+import { UIButton, UITypographyText, UITypographyParagraph, UITitle, UIAvatar, UISpin, UITag, UICard, UIInputTextArea } from '@kb-labs/studio-ui-kit';
 import {
   RobotOutlined,
   SendOutlined,

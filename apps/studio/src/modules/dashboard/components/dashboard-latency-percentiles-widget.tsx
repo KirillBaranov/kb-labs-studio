@@ -72,7 +72,7 @@ export function DashboardLatencyPercentilesWidget() {
         </div>
       }
       style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-      bodyStyle={{ flex: 1, padding: '16px', display: 'flex', flexDirection: 'column' }}
+      styles={{ body: { flex: 1, padding: '16px', display: 'flex', flexDirection: 'column' } }}
     >
       {metrics && <Column {...config} />}
       {!metrics && (

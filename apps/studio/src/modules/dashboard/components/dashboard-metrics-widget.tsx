@@ -33,7 +33,7 @@ export function DashboardMetricsWidget() {
         </div>
       }
       style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-      bodyStyle={{ flex: 1, padding: '16px' }}
+      styles={{ body: { flex: 1, padding: '16px' } }}
     >
       <UIRow gutter={[16, 16]} style={{ height: '100%' }}>
         <UICol span={6}>
