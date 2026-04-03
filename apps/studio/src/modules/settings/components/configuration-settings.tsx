@@ -15,8 +15,6 @@ import {
   UIAlert,
   UIAccordion,
   UICard,
-  UIRow,
-  UICol,
   UIDescriptions,
   UIDescriptionsItem,
   UIIcon,
@@ -270,7 +268,7 @@ export function ConfigurationSettings() {
             items={Object.entries(data.adapterOptions).map(([adapterName, options]) => {
               // Find category for this adapter
               const category = categories.find((cat) => cat.adapters.includes(adapterName));
-              const categoryColor = category?.color || 'blue';
+              const _categoryColor = category?.color || 'blue';
 
               const optionsCount = options ? Object.keys(options as object).length : 0;
               return {

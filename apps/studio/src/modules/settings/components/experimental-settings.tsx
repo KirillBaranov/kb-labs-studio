@@ -26,7 +26,7 @@ import {
   type FeatureRisk,
 } from '@/config/feature-flags';
 
-const GROUP_ICONS: Record<FeatureGroup, React.ReactNode> = {
+const _GROUP_ICONS: Record<FeatureGroup, React.ReactNode> = {
   'ui-ux': <UIIcon name="BgColorsOutlined" />,
   performance: <UIIcon name="ThunderboltOutlined" />,
   ai: <UIIcon name="RobotOutlined" />,

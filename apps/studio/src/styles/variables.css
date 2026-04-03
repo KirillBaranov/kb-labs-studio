@@ -2,7 +2,7 @@
 
 :root {
   /* Backgrounds */
-  --bg-primary: #EEF0F3;
+  --bg-primary: #F8F8F8;
   --bg-secondary: #FFFFFF;
   --bg-tertiary: #F3F4F6;
   --bg-hover: #F3F4F6;        /* Same as tertiary for hover state */
@@ -40,6 +40,18 @@
   --shadow: rgba(0, 0, 0, 0.05);
   --shadow-hover: rgba(0, 0, 0, 0.1);     /* Darker on hover */
   --shadow-elevated: rgba(0, 0, 0, 0.08); /* Elevated cards */
+
+  /* Z-index scale */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-header: 300;
+  --z-sidebar: 400;
+  --z-overlay: 500;       /* Modal backdrop */
+  --z-modal: 600;         /* Modal, drawer */
+  --z-popover: 700;       /* Tooltip, popover, select dropdown */
+  --z-toast: 800;         /* Notifications */
+  --z-top: 900;           /* Command palette, spotlight */
 }
 
 .dark {

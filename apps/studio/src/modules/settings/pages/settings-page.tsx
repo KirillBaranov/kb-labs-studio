@@ -23,12 +23,13 @@ import { ExperimentalSettings } from '../components/experimental-settings';
 import { ConfigurationSettings } from '../components/configuration-settings';
 import { RoleSwitcher } from '@/components/role-switcher';
 import { ApiRoutesViewer } from '../components/api-routes-viewer';
+import { useFeatureFlags } from '@/hooks/use-feature-flags';
 import { NavigationSettings } from '../components/navigation-settings';
 import { UICard, UISkeleton, UIStack } from '@kb-labs/studio-ui-kit';
-import { KBListItem } from '@/components/ui';
 import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
 
 export function SettingsPage() {
+  const { isEnabled } = useFeatureFlags();
   const sources = useDataSources();
   const { data, isLoading } = useHealthStatus(sources.system);
   const { registry } = useRegistryV2();
@@ -132,12 +133,12 @@ export function SettingsPage() {
                       ? 'degraded'
                       : 'down';
                     return (
-                      <KBListItem
-                        key={source.name}
-                        title={source.name}
-                        description={source.latency ? `${source.latency}ms` : undefined}
-                        action={<HealthIndicator status={status} />}
-                      />
+                      <UIList.Item key={source.name} extra={<HealthIndicator status={status} />}>
+                        <UIList.Item.Meta
+                          title={source.name}
+                          description={source.latency ? `${source.latency}ms` : undefined}
+                        />
+                      </UIList.Item>
                     );
                   }}
                 />
@@ -272,6 +273,8 @@ export function SettingsPage() {
               <ApiRoutesViewer />
             </UICard>
           </UIPageSection>
+
+          {/* DevToolsPanel is now a global floating panel rendered in App.tsx */}
         </>
       ),
     },

@@ -1,5 +1,46 @@
 /* Ant Design component overrides — theme-aware patches */
 
+/* Z-index overrides — must be above sidebar (--z-sidebar: 400) */
+.ant-modal-root .ant-modal-wrap,
+.ant-modal-root .ant-modal-mask {
+  z-index: var(--z-overlay) !important;
+}
+
+.ant-modal-root .ant-modal {
+  z-index: var(--z-modal) !important;
+}
+
+.ant-drawer-root .ant-drawer {
+  z-index: var(--z-modal) !important;
+}
+
+.ant-select-dropdown,
+.ant-dropdown,
+.ant-popover,
+.ant-tooltip {
+  z-index: var(--z-popover) !important;
+}
+
+.ant-message,
+.ant-notification {
+  z-index: var(--z-toast) !important;
+}
+
+/* Header buttons — consistent vertical alignment */
+.ant-layout-header .ant-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+}
+
+.ant-layout-header .ant-btn .ant-btn-icon {
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
 /* Menu group titles — uppercase label style */
 .ant-menu-item-group-title {
   text-transform: uppercase !important;
@@ -9,6 +50,15 @@
   color: var(--text-tertiary) !important;
   padding-top: 16px !important;
   padding-bottom: 4px !important;
+}
+
+/* Hide group labels when sidebar is collapsed */
+.ant-menu-inline-collapsed .ant-menu-item-group-title {
+  display: none !important;
+}
+
+.ant-menu-inline-collapsed .ant-menu-item-group-list {
+  padding-top: 4px !important;
 }
 
 /* Menu items — pill shape */

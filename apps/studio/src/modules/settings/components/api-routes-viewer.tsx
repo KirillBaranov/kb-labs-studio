@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   UIInput,
   UITag,
@@ -175,7 +175,7 @@ export function ApiRoutesViewer() {
 
   const baseUrl = system.getBaseUrl();
 
-  const fetchRoutes = async () => {
+  const fetchRoutes = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -199,11 +199,11 @@ export function ApiRoutesViewer() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [system]);
 
   useEffect(() => {
     fetchRoutes();
-  }, []);
+  }, [fetchRoutes]);
 
   const handleCopyUrl = (url: string) => {
     navigator.clipboard.writeText(url);

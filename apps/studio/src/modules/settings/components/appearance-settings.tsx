@@ -69,7 +69,7 @@ export function AppearanceSettings() {
               border: theme === 'light' ? '2px solid var(--link)' : '1px solid var(--border-primary)',
               cursor: 'pointer',
             }}
-            bodyStyle={{ padding: 16 }}
+            styles={{ body: { padding: 16 } }}
           >
             <div style={{ textAlign: 'center' }}>
               <Sun size={32} style={{ marginBottom: 8, color: '#F59E0B' }} />
@@ -97,7 +97,7 @@ export function AppearanceSettings() {
               border: theme === 'dark' ? '2px solid var(--link)' : '1px solid var(--border-primary)',
               cursor: 'pointer',
             }}
-            bodyStyle={{ padding: 16 }}
+            styles={{ body: { padding: 16 } }}
           >
             <div style={{ textAlign: 'center' }}>
               <Moon size={32} style={{ marginBottom: 8, color: '#6366F1' }} />
@@ -125,7 +125,7 @@ export function AppearanceSettings() {
               border: theme === 'auto' ? '2px solid var(--link)' : '1px solid var(--border-primary)',
               cursor: 'pointer',
             }}
-            bodyStyle={{ padding: 16 }}
+            styles={{ body: { padding: 16 } }}
           >
             <div style={{ textAlign: 'center' }}>
               <Monitor size={32} style={{ marginBottom: 8, color: '#8B5CF6' }} />
