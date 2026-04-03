@@ -149,6 +149,12 @@ import {
   FlagOutlined,
   TagOutlined,
   BookOutlined,
+  MoreOutlined,
+  EllipsisOutlined,
+  RightOutlined,
+  LeftOutlined,
+  UpOutlined,
+  DownOutlined,
 } from '@ant-design/icons';
 
 /**
@@ -296,6 +302,12 @@ export const AVAILABLE_ICONS: Record<string, React.ComponentType<any>> = {
   FlagOutlined,
   TagOutlined,
   BookOutlined,
+  MoreOutlined,
+  EllipsisOutlined,
+  RightOutlined,
+  LeftOutlined,
+  UpOutlined,
+  DownOutlined,
 };
 
 /**

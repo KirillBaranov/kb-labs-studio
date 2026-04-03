@@ -114,5 +114,5 @@ export default defineConfig({
   builtins: {
     define: envDefines,
   },
-  devtool: isDev ? 'cheap-module-source-map' : 'source-map',
+  devtool: isDev ? 'source-map' : 'source-map',
 });

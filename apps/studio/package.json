@@ -22,6 +22,7 @@
     "@kb-labs/release-manager-contracts": "link:../../../../plugins/kb-labs-release-manager/packages/release-manager-contracts",
     "@kb-labs/rest-api-contracts": "link:../../../kb-labs-rest-api/packages/rest-api-contracts",
     "@kb-labs/studio-data-client": "link:../../packages/studio-data-client",
+    "@kb-labs/studio-devtools": "link:../../packages/studio-devtools",
     "@kb-labs/studio-federation": "link:../../packages/studio-federation",
     "@kb-labs/studio-hooks": "link:../../packages/studio-hooks",
     "@kb-labs/studio-event-bus": "link:../../packages/studio-event-bus",

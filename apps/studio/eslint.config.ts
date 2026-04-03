@@ -4,7 +4,7 @@ import noDirectAntdImport from './eslint-rules/no-direct-antd-import.js';
 export default [
   ...reactPreset,
   {
-    ignores: ['dist/**', 'coverage/**', 'eslint-rules/**']
+    ignores: ['dist/**', 'coverage/**', 'eslint-rules/**', '.__mf__temp/**', '*.mjs']
   },
   {
     files: ['src/**/*.{ts,tsx}'],

@@ -494,21 +494,7 @@ The system has been mostly stable with info-level logs. Two connection timeout e
 
     for (const day of days) {
       for (let hour = 0; hour < 24; hour++) {
-        let value = 0;
-
-        switch (query.metric) {
-          case 'latency':
-            value = 30 + Math.floor(Math.random() * 40) + (hour >= 9 && hour <= 17 ? 10 : 0);
-            break;
-          case 'errors':
-            value = Math.floor(Math.random() * 10);
-            break;
-          case 'requests':
-            value = 50 + Math.floor(Math.random() * 100) + (hour >= 9 && hour <= 17 ? 50 : 0);
-            break;
-        }
-
-        cells.push({ day, hour, value });
+        cells.push({ day, hour, value: mockHeatmapValue(query.metric, hour) });
       }
     }
 
@@ -795,4 +781,12 @@ The system has been mostly stable with info-level logs. Two connection timeout e
       },
     };
   }
+}
+
+function mockHeatmapValue(metric: string, hour: number): number {
+  const isBusinessHour = hour >= 9 && hour <= 17;
+  if (metric === 'latency') { return 30 + Math.floor(Math.random() * 40) + (isBusinessHour ? 10 : 0); }
+  if (metric === 'errors') { return Math.floor(Math.random() * 10); }
+  if (metric === 'requests') { return 50 + Math.floor(Math.random() * 100) + (isBusinessHour ? 50 : 0); }
+  return 0;
 }

@@ -2,7 +2,6 @@ import * as React from 'react';
 import {
   UIButton,
   UISpace,
-  UITypographyText,
   UITypographyParagraph,
   UITitle,
   UIMessage,
