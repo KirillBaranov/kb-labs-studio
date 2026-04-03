@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useRef } from 'react';
-import { useEventBusContext, type EventHandler, type EventMeta } from '@kb-labs/studio-event-bus';
+import { useEventBusContext, type EventHandler } from '@kb-labs/studio-event-bus';
 import { usePageContext } from './page-context.js';
 
 export interface UseEventBusReturn {

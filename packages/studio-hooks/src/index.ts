@@ -9,3 +9,6 @@ export { usePermissions, type UsePermissionsReturn } from './use-permissions.js'
 export { useNavigation, type UseNavigationReturn } from './use-navigation.js';
 export { useNotification, type UseNotificationReturn, type NotificationType } from './use-notification.js';
 export { useTheme, type UseThemeReturn, type SemanticTokens } from './use-theme.js';
+
+// Ant Design theme adapter — for wrapping plugin pages with studio theme
+export { getAntDesignTokens, getAntDesignComponents } from './theme-adapter.js';

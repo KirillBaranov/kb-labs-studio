@@ -1,4 +1,4 @@
-import { useQuery, useMutation, type UseQueryOptions } from '@tanstack/react-query';
+import { useQuery, useMutation, type UseQueryOptions, type MutateOptions } from '@tanstack/react-query';
 
 // ─── useData ────────────────────────────────────────────────────────
 
@@ -62,7 +62,7 @@ export function useData<T = unknown>(
 // ─── useMutateData ──────────────────────────────────────────────────
 
 export interface UseMutateDataReturn<TInput, TOutput> {
-  mutate: (input: TInput) => void;
+  mutate: (input: TInput, options?: MutateOptions<TOutput, Error, TInput>) => void;
   mutateAsync: (input: TInput) => Promise<TOutput>;
   isLoading: boolean;
   isError: boolean;
@@ -113,7 +113,7 @@ function buildUrl(
   endpoint: string,
   params?: Record<string, string | number | boolean>,
 ): string {
-  if (!params || Object.keys(params).length === 0) return endpoint;
+  if (!params || Object.keys(params).length === 0) { return endpoint; }
   const searchParams = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
     if (value !== undefined && value !== null) {
@@ -129,5 +129,10 @@ async function fetchJson(endpoint: string): Promise<unknown> {
   if (!res.ok) {
     throw new Error(`GET ${endpoint} failed: ${res.status} ${res.statusText}`);
   }
-  return res.json();
+  const json = await res.json() as Record<string, unknown>;
+  // Unwrap platform envelope { ok, data, meta }
+  if (json && typeof json === 'object' && 'ok' in json && 'data' in json) {
+    return json.data;
+  }
+  return json;
 }
