@@ -13,4 +13,6 @@ export function UIDescriptions(props: UIDescriptionsProps) {
   return <AntDescriptions {...props} />;
 }
 
-export const UIDescriptionsItem = AntDescriptions.Item;
+export function UIDescriptionsItem(props: React.ComponentProps<typeof AntDescriptions.Item>) {
+  return <AntDescriptions.Item {...props} />;
+}

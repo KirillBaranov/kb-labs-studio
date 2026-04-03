@@ -13,4 +13,6 @@ export function UIUpload(props: UIUploadProps) {
   return <AntUpload {...props} />;
 }
 
-UIUpload.Dragger = AntUpload.Dragger;
+export function UIUploadDragger(props: React.ComponentProps<typeof AntUpload.Dragger>) {
+  return <AntUpload.Dragger {...props} />;
+}

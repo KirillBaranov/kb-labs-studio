@@ -3,7 +3,6 @@
  * Uses design tokens for theming (light/dark compatible).
  */
 
-import { UIBox } from '../primitives';
 import { UITypographyText } from '../primitives';
 
 export interface UIDiffViewerProps {
@@ -22,9 +21,9 @@ export interface UIDiffViewerProps {
 type LineType = 'add' | 'remove' | 'context' | 'header';
 
 function getLineType(line: string): LineType {
-  if (line.startsWith('@@')) return 'header';
-  if (line.startsWith('+')) return 'add';
-  if (line.startsWith('-')) return 'remove';
+  if (line.startsWith('@@')) { return 'header'; }
+  if (line.startsWith('+')) { return 'add'; }
+  if (line.startsWith('-')) { return 'remove'; }
   return 'context';
 }
 

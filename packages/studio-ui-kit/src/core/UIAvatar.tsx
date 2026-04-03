@@ -13,4 +13,6 @@ export function UIAvatar(props: UIAvatarProps) {
   return <AntAvatar {...props} />;
 }
 
-UIAvatar.Group = AntAvatar.Group;
+export function UIAvatarGroup(props: React.ComponentProps<typeof AntAvatar.Group>) {
+  return <AntAvatar.Group {...props} />;
+}

@@ -13,4 +13,6 @@ export function UIStatistic(props: UIStatisticProps) {
   return <AntStatistic {...props} />;
 }
 
-UIStatistic.Countdown = AntStatistic.Countdown;
+export function UIStatisticCountdown(props: React.ComponentProps<typeof AntStatistic.Countdown>) {
+  return <AntStatistic.Countdown {...props} />;
+}

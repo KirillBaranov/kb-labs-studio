@@ -34,19 +34,16 @@ export interface UIButtonProps extends Omit<AntButtonProps, 'type' | 'variant'> 
  * <UIButton variant="text" icon={<X />} /> // Icon-only close button
  * ```
  */
-export function UIButton({
-  variant = 'default',
-  className,
-  ...rest
-}: UIButtonProps) {
-  // Combine our CSS module class with any user-provided className
-  const combinedClassName = [styles.uiButton, className].filter(Boolean).join(' ');
-
-  return (
-    <AntButton
-      type={variant}
-      className={combinedClassName}
-      {...rest}
-    />
-  );
-}
+export const UIButton = React.forwardRef<HTMLButtonElement, UIButtonProps>(
+  function UIButton({ variant = 'default', className, ...rest }, ref) {
+    const combinedClassName = [styles.uiButton, className].filter(Boolean).join(' ');
+    return (
+      <AntButton
+        ref={ref}
+        type={variant}
+        className={combinedClassName}
+        {...rest}
+      />
+    );
+  },
+);

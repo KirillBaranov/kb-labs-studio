@@ -89,4 +89,6 @@ export const useUIForm = AntForm.useForm;
 /**
  * UIFormList - Dynamic form list
  */
-export const UIFormList = AntForm.List;
+export function UIFormList(props: React.ComponentProps<typeof AntForm.List>) {
+  return <AntForm.List {...props} />;
+}

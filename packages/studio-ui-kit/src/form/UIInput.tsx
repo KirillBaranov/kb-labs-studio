@@ -83,14 +83,20 @@ export function UIInput({
 /**
  * UIInputPassword - Password input with toggle visibility
  */
-export const UIInputPassword = AntInput.Password;
+export function UIInputPassword(props: React.ComponentProps<typeof AntInput.Password>) {
+  return <AntInput.Password {...props} />;
+}
 
 /**
  * UIInputTextArea - Multiline text input
  */
-export const UIInputTextArea = AntInput.TextArea;
+export function UIInputTextArea(props: React.ComponentProps<typeof AntInput.TextArea>) {
+  return <AntInput.TextArea {...props} />;
+}
 
 /**
  * UIInputSearch - Search input with search button
  */
-export const UIInputSearch = AntInput.Search;
+export function UIInputSearch(props: React.ComponentProps<typeof AntInput.Search>) {
+  return <AntInput.Search {...props} />;
+}

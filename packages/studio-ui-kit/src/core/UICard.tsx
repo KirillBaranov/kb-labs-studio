@@ -23,7 +23,7 @@ const variantTokens: Record<UICardVariant, { tint: string; accent: string; borde
   info:     { tint: 'rgba(12,102,255,0.07)',      accent: '#0c66ff',      border: 'rgba(12,102,255,0.20)' },
 };
 
-export interface UICardProps extends Omit<AntCardProps, 'title'> {
+export interface UICardProps extends Omit<AntCardProps, 'title' | 'bordered'> {
   /** Card title */
   title?: React.ReactNode;
   /** Subtitle (below title) */
@@ -36,7 +36,7 @@ export interface UICardProps extends Omit<AntCardProps, 'title'> {
   children: React.ReactNode;
   /** Card size */
   size?: 'small' | 'default';
-  /** Show border */
+  /** Show border — false maps to variant="borderless" */
   bordered?: boolean;
   /** Hoverable effect */
   hoverable?: boolean;
@@ -100,7 +100,7 @@ export function UICard({
       title={cardTitle}
       extra={extra}
       size={size}
-      bordered={bordered}
+      variant={bordered ? 'outlined' : 'borderless'}
       hoverable={hoverable}
       loading={loading}
       {...rest}

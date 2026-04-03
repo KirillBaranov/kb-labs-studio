@@ -13,5 +13,10 @@ export function UITree(props: UITreeProps) {
   return <AntTree {...props} />;
 }
 
-UITree.DirectoryTree = AntTree.DirectoryTree;
-UITree.TreeNode = AntTree.TreeNode;
+export function UITreeDirectoryTree(props: React.ComponentProps<typeof AntTree.DirectoryTree>) {
+  return <AntTree.DirectoryTree {...props} />;
+}
+
+export function UITreeNode(props: React.ComponentProps<typeof AntTree.TreeNode>) {
+  return <AntTree.TreeNode {...props} />;
+}

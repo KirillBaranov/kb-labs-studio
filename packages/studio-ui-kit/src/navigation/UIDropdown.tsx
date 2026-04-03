@@ -13,4 +13,6 @@ export function UIDropdown(props: UIDropdownProps) {
   return <AntDropdown {...props} />;
 }
 
-UIDropdown.Button = AntDropdown.Button;
+export function UIDropdownButton(props: React.ComponentProps<typeof AntDropdown.Button>) {
+  return <AntDropdown.Button {...props} />;
+}

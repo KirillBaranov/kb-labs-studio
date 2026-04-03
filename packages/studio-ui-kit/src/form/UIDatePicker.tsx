@@ -120,4 +120,6 @@ export function UITimePicker({
 /**
  * UIRangePicker - Date range picker
  */
-export const UIRangePicker: typeof AntDatePicker.RangePicker = AntDatePicker.RangePicker;
+export function UIRangePicker(props: React.ComponentProps<typeof AntDatePicker.RangePicker>) {
+  return <AntDatePicker.RangePicker {...props} />;
+}

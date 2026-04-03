@@ -13,4 +13,6 @@ export function UISpace(props: UISpaceProps) {
   return <AntSpace {...props} />;
 }
 
-UISpace.Compact = AntSpace.Compact;
+export function UISpaceCompact(props: React.ComponentProps<typeof AntSpace.Compact>) {
+  return <AntSpace.Compact {...props} />;
+}

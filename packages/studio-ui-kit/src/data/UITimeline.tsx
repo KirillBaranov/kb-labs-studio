@@ -13,4 +13,6 @@ export function UITimeline(props: UITimelineProps) {
   return <AntTimeline {...props} />;
 }
 
-export const UITimelineItem = AntTimeline.Item;
+export function UITimelineItem(props: React.ComponentProps<typeof AntTimeline.Item>) {
+  return <AntTimeline.Item {...props} />;
+}

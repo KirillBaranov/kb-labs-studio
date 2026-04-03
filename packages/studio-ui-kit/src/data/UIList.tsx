@@ -13,4 +13,6 @@ export function UIList<T>(props: UIListProps<T>) {
   return <AntList<T> {...props} />;
 }
 
-UIList.Item = AntList.Item;
+export function UIListItem(props: React.ComponentProps<typeof AntList.Item>) {
+  return <AntList.Item {...props} />;
+}

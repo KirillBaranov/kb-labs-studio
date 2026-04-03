@@ -80,22 +80,30 @@ export function UISkeleton({
 /**
  * UISkeletonButton - Button skeleton
  */
-export const UISkeletonButton = AntSkeleton.Button;
+export function UISkeletonButton(props: React.ComponentProps<typeof AntSkeleton.Button>) {
+  return <AntSkeleton.Button {...props} />;
+}
 
 /**
  * UISkeletonInput - Input skeleton
  */
-export const UISkeletonInput = AntSkeleton.Input;
+export function UISkeletonInput(props: React.ComponentProps<typeof AntSkeleton.Input>) {
+  return <AntSkeleton.Input {...props} />;
+}
 
 /**
  * UISkeletonImage - Image skeleton
  */
-export const UISkeletonImage = AntSkeleton.Image;
+export function UISkeletonImage(props: React.ComponentProps<typeof AntSkeleton.Image>) {
+  return <AntSkeleton.Image {...props} />;
+}
 
 /**
  * UISkeletonNode - Custom node skeleton
  */
-export const UISkeletonNode = AntSkeleton.Node;
+export function UISkeletonNode(props: React.ComponentProps<typeof AntSkeleton.Node>) {
+  return <AntSkeleton.Node {...props} />;
+}
 
 export interface UISkeletonTextProps {
   /**
