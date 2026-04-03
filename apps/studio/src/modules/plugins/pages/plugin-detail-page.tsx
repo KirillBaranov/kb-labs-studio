@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   UISpin,
-  UIDescriptions,
   UITag,
   UISpace,
   UITypographyText,
@@ -21,19 +20,7 @@ import { useDataSources } from '@/providers/data-sources-provider';
 import type { PluginManifestEntry } from '@kb-labs/studio-data-client';
 import type { UITableColumn } from '@kb-labs/studio-ui-kit';
 import { PluginAIAssistantModal } from '../components/plugin-ai-assistant-modal';
-import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
-
-// Helper to safely render schema objects
-function renderSchema(schema: any): string {
-  if (!schema) {return '--';}
-  if (typeof schema === 'string') {return schema;}
-  if (typeof schema === 'object') {
-    if ('$ref' in schema) {return schema.$ref;}
-    if ('zod' in schema) {return schema.zod;}
-    return JSON.stringify(schema);
-  }
-  return String(schema);
-}
+import { UIPage, UIPageHeader } from '@kb-labs/studio-ui-kit';
 
 export function PluginDetailPage() {
   const { pluginId: encodedPluginId } = useParams<{ pluginId: string }>();
@@ -47,11 +34,7 @@ export function PluginDetailPage() {
   // Decode plugin ID from URL
   const pluginId = encodedPluginId ? decodeURIComponent(encodedPluginId) : '';
 
-  useEffect(() => {
-    loadPlugin();
-  }, [pluginId, pluginsSource]);
-
-  const loadPlugin = async () => {
+  const loadPlugin = useCallback(async () => {
     try {
       setLoading(true);
       const result = await pluginsSource.getPlugins();
@@ -63,7 +46,11 @@ export function PluginDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [pluginId, pluginsSource]);
+
+  useEffect(() => {
+    loadPlugin();
+  }, [loadPlugin]);
 
   if (loading) {
     return (

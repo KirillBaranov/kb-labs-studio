@@ -44,7 +44,7 @@ export function LoginPage() {
           borderRadius: '16px',
           boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
         }}
-        bodyStyle={{ padding: '3rem' }}
+        styles={{ body: { padding: '3rem' } }}
       >
         <UISpace direction="vertical" size="large" style={{ width: '100%', textAlign: 'center' }}>
           {/* Logo */}

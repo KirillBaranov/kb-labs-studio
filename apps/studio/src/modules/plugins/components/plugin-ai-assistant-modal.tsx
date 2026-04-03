@@ -8,11 +8,10 @@
 import React, { useState } from 'react';
 import {
   UIModal,
-  UIInput, UIInputTextArea,
+  UIInputTextArea,
   UIButton,
   UISpace,
   UITypographyText,
-  UITypographyParagraph,
   UICard,
   UISpin,
   UIAlert,

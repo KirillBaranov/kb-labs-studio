@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   UIInputSearch,
@@ -29,9 +29,7 @@ export function PluginsPage() {
   const [kindFilter, setKindFilter] = useState<KindFilter>('all');
   const [surfaceFilter, setSurfaceFilter] = useState<SurfaceFilter>('all');
 
-  useEffect(() => { loadPlugins(); }, [pluginsSource]);
-
-  const loadPlugins = async () => {
+  const loadPlugins = useCallback(async () => {
     try {
       setLoading(true);
       const result = await pluginsSource.getPlugins();
@@ -41,7 +39,9 @@ export function PluginsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [pluginsSource]);
+
+  useEffect(() => { loadPlugins(); }, [loadPlugins]);
 
   const counts = useMemo(() => ({
     all: plugins.length,
@@ -58,14 +58,14 @@ export function PluginsPage() {
       if (search) {
         const q = search.toLowerCase();
         const text = [m.id, m.display?.name, m.display?.description, ...(m.display?.tags ?? [])].join(' ').toLowerCase();
-        if (!text.includes(q)) return false;
+        if (!text.includes(q)) {return false;}
       }
-      if (surfaceFilter === 'cli' && !(m.cli?.commands?.length > 0)) return false;
-      if (surfaceFilter === 'studio' && !(m.studio?.pages?.length > 0)) return false;
-      if (surfaceFilter === 'rest' && !(m.rest?.routes?.length > 0)) return false;
+      if (surfaceFilter === 'cli' && !((m.cli?.commands?.length ?? 0) > 0)) {return false;}
+      if (surfaceFilter === 'studio' && !((m.studio?.pages?.length ?? 0) > 0)) {return false;}
+      if (surfaceFilter === 'rest' && !((m.rest?.routes?.length ?? 0) > 0)) {return false;}
       return true;
     });
-  }, [plugins, search, kindFilter, surfaceFilter]);
+  }, [plugins, search, surfaceFilter]);
 
   const handleClick = (plugin: PluginManifestEntry) => {
     navigate(`/marketplace/${encodeURIComponent(plugin.pluginId)}`);
@@ -99,7 +99,7 @@ export function PluginsPage() {
         title="Marketplace"
         description={`${counts.all} extension${counts.all !== 1 ? 's' : ''} installed`}
         actions={
-          <UIButton type="primary" icon={<UIIcon name="PlusOutlined" />}>
+          <UIButton variant="primary" icon={<UIIcon name="PlusOutlined" />}>
             Install Extension
           </UIButton>
         }
