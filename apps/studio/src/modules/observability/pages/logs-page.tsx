@@ -31,7 +31,7 @@ import { useDataSources } from '../../../providers/data-sources-provider';
 import type { LogRecord, LogSummarizeResponse } from '@kb-labs/studio-data-client';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
+import { UIPage, UIPageHeader } from '@kb-labs/studio-ui-kit';
 
 
 /**

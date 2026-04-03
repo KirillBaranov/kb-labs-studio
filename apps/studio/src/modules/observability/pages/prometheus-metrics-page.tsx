@@ -14,7 +14,7 @@ import {
 import { usePrometheusMetrics } from '@kb-labs/studio-data-client';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import type { PluginMetrics, TenantMetrics } from '@kb-labs/studio-data-client';
-import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
+import { UIPage, UIPageHeader } from '@kb-labs/studio-ui-kit';
 
 /**
  * Format uptime duration to human-readable string

@@ -14,7 +14,6 @@ import {
   UIButton,
   UISpace,
   UITooltip,
-  UIMessage,
   UIIcon,
 } from '@kb-labs/studio-ui-kit';
 import type {
@@ -27,7 +26,7 @@ import type {
 import { useDataSources } from '../../../providers/data-sources-provider';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
+import { UIPage, UIPageHeader } from '@kb-labs/studio-ui-kit';
 
 dayjs.extend(relativeTime);
 
@@ -237,7 +236,7 @@ export function IncidentsPage() {
       <UIPageHeader
         title="Incidents"
         description="System incident history with AI-powered analysis"
-        extra={[
+        actions={[
           <UIButton
             key="refresh"
             icon={<UIIcon name="ReloadOutlined" />}

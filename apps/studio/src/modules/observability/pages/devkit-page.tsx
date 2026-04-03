@@ -11,7 +11,7 @@ import {
 } from '@kb-labs/studio-ui-kit';
 import { useDevKitHealth } from '@kb-labs/studio-data-client';
 import { useDataSources } from '../../../providers/data-sources-provider';
-import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
+import { UIPage, UIPageHeader } from '@kb-labs/studio-ui-kit';
 
 /**
  * Get color for health grade

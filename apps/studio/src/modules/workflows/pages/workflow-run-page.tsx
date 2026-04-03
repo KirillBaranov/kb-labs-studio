@@ -448,7 +448,7 @@ function JobStepLog({ events, run, onApprove }: JobStepLogProps) {
               items={stepItems}
               defaultActiveKey={defaultStepKeys}
               size="small"
-              bordered={false}
+              variant="borderless"
               ghost
               style={{ background: 'transparent' }}
             />
@@ -533,13 +533,13 @@ export function WorkflowRunPage() {
       <UIPageHeader
         title={`Workflow Run ${runId ?? ''}`}
         description="Detailed status of the workflow execution"
-        breadcrumbItems={[
+        breadcrumbs={[
           { title: 'Home', href: '/' },
           { title: 'Workflows', href: '/workflows' },
           { title: 'Runs', href: '/workflows/runs' },
           { title: shortRunId },
         ]}
-        extra={
+        actions={
           <div style={{ display: 'flex', gap: 8 }}>
             <UIButton onClick={() => refetch()} disabled={isLoading}>
               Refresh

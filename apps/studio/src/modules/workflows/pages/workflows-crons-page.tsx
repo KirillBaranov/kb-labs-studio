@@ -14,9 +14,8 @@ import {
 } from '@kb-labs/studio-ui-kit';
 import { useQuery } from '@tanstack/react-query';
 import { useDataSources } from '@/providers/data-sources-provider';
-import type { CronInfo } from '@kb-labs/workflow-contracts';
 import { UICard } from '@kb-labs/studio-ui-kit';
-import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
+import { UIPage, UIPageHeader } from '@kb-labs/studio-ui-kit';
 
 export function WorkflowsCronsPage() {
   const sources = useDataSources();
@@ -126,7 +125,7 @@ export function WorkflowsCronsPage() {
         title="Cron Jobs"
         description="Scheduled recurring tasks"
         icon={<UIIcon name="ClockCircleOutlined" />}
-        breadcrumbItems={[
+        breadcrumbs={[
           { title: 'Home', href: '/' },
           { title: 'Workflows', href: '/workflows' },
           { title: 'Crons' },

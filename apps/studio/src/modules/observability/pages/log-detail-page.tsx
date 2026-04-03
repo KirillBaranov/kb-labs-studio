@@ -5,17 +5,13 @@ import {
   UITag,
   UITypographyText,
   UITypographyParagraph,
-  UITitle,
   UISpace,
-  UIRow,
-  UICol,
   UIButton,
   UIDescriptions,
   UIDescriptionsItem,
   UITooltip,
   UIMessage,
   UISpin,
-  UIDivider,
   UITimeline,
   UIEmptyState,
   UIIcon,
@@ -24,7 +20,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDataSources } from '../../../providers/data-sources-provider';
 import type { LogRecord } from '@kb-labs/studio-data-client';
-import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
+import { UIPage, UIPageHeader } from '@kb-labs/studio-ui-kit';
 
 /**
  * Format timestamp to full datetime with milliseconds
@@ -217,7 +213,7 @@ export function LogDetailPage() {
         title="Log Details"
         description={`Viewing log from ${formatRelativeTime(log.time)}`}
         onBack={() => navigate('/observability/logs')}
-        extra={[
+        actions={[
           <UIButton
             key="copy-link"
             icon={<UIIcon name="LinkOutlined" />}

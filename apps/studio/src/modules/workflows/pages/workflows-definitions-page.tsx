@@ -19,7 +19,7 @@ import { useDataSources } from '@/providers/data-sources-provider';
 import type { WorkflowInfo } from '@kb-labs/studio-data-client';
 import { UICard } from '@kb-labs/studio-ui-kit';
 import { RunWorkflowModal } from '../components/run-workflow-modal';
-import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
+import { UIPage, UIPageHeader } from '@kb-labs/studio-ui-kit';
 
 export function WorkflowsDefinitionsPage() {
   const sources = useDataSources();
@@ -172,7 +172,7 @@ export function WorkflowsDefinitionsPage() {
         title="Workflow Definitions"
         description="All registered workflow definitions"
         icon={<UIIcon name="AppstoreOutlined" />}
-        breadcrumbItems={[
+        breadcrumbs={[
           { title: 'Home', href: '/' },
           { title: 'Workflows', href: '/workflows' },
           { title: 'Definitions' },

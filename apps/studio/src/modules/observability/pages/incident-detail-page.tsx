@@ -13,8 +13,7 @@ import {
   UITimeline,
   UITimelineItem,
   UIProgress,
-  UIModal,
-  UIInput, UIInputTextArea,
+  UIModal, UIInputTextArea,
   UIMessage,
   UISpin,
   UIDivider,
@@ -27,7 +26,6 @@ import {
   UIIcon,
 } from '@kb-labs/studio-ui-kit';
 import type {
-  Incident,
   IncidentDetailResponse,
   IncidentAnalysisResponse,
   IncidentSeverity,
@@ -37,7 +35,7 @@ import type {
 import { useDataSources } from '../../../providers/data-sources-provider';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
+import { UIPage, UIPageHeader } from '@kb-labs/studio-ui-kit';
 
 dayjs.extend(relativeTime);
 
@@ -188,7 +186,7 @@ export function IncidentDetailPage() {
       <UIPageHeader
         title={incident.title}
         description={`Incident ID: ${incident.id}`}
-        extra={[
+        actions={[
           <UIButton key="back" icon={<UIIcon name="ArrowLeftOutlined" />} onClick={handleGoBack} />,
           !incident.resolvedAt && (
             <UIButton

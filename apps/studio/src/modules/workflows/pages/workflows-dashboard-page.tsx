@@ -20,7 +20,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { useDataSources } from '@/providers/data-sources-provider';
 import { ActiveRunsPanel } from '../components/active-runs-panel';
 import { RunWorkflowModal } from '../components/run-workflow-modal';
-import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
+import { UIPage, UIPageHeader } from '@kb-labs/studio-ui-kit';
 import type { DashboardStatsResponse } from '@kb-labs/workflow-contracts';
 
 const STATUS_ICONS: Record<string, React.ReactNode> = {
@@ -172,8 +172,8 @@ export function WorkflowsDashboardPage() {
         title="Workflows"
         description="Monitor workflows, jobs, and scheduled tasks"
         icon={<UIIcon name="ThunderboltOutlined" />}
-        breadcrumbItems={[{ title: 'Home', href: '/' }, { title: 'Workflows' }]}
-        extra={
+        breadcrumbs={[{ title: 'Home', href: '/' }, { title: 'Workflows' }]}
+        actions={
           <UIButton
             variant="primary"
             icon={<UIIcon name="PlayCircleOutlined" />}

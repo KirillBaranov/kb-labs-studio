@@ -21,7 +21,7 @@ import {
 } from '@kb-labs/studio-ui-kit';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDataSources } from '@/providers/data-sources-provider';
-import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
+import { UIPage, UIPageHeader } from '@kb-labs/studio-ui-kit';
 import type { WorkflowRunInfo } from '@kb-labs/workflow-contracts';
 import { RunWorkflowModal } from '../components/run-workflow-modal';
 
@@ -209,13 +209,13 @@ export function WorkflowDefinitionPage() {
         title={workflow.name}
         description={workflow.description}
         icon={<UIIcon name="ThunderboltOutlined" />}
-        breadcrumbItems={[
+        breadcrumbs={[
           { title: 'Home', href: '/' },
           { title: 'Workflows', href: '/workflows' },
           { title: 'Definitions', href: '/workflows/definitions' },
           { title: workflow.name },
         ]}
-        extra={
+        actions={
           <UIButton
             variant="primary"
             icon={<UIIcon name="PlayCircleOutlined" />}

@@ -11,8 +11,8 @@ import {
 } from '@kb-labs/studio-ui-kit';
 import { useSystemEvents } from '@kb-labs/studio-data-client';
 import { useDataSources } from '../../../providers/data-sources-provider';
-import type { SystemEvent, RegistryEvent, HealthEvent } from '@kb-labs/studio-data-client';
-import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
+import type { RegistryEvent, HealthEvent } from '@kb-labs/studio-data-client';
+import { UIPage, UIPageHeader } from '@kb-labs/studio-ui-kit';
 
 /**
  * Format timestamp to time string
