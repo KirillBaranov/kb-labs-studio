@@ -6,7 +6,7 @@
 import { useCallback, useMemo } from 'react';
 import { useSettings } from '@/providers/settings-provider';
 import type { FeatureId } from '@/config/feature-flags';
-import { FEATURE_FLAGS, isFeatureEnabled as isEnabled, areDependenciesMet } from '@/config/feature-flags';
+import { isFeatureEnabled as isEnabled, areDependenciesMet } from '@/config/feature-flags';
 
 export interface UseFeatureFlagsReturn {
   /** Check if a feature is enabled */
@@ -25,7 +25,7 @@ export interface UseFeatureFlagsReturn {
 
 export function useFeatureFlags(): UseFeatureFlagsReturn {
   const { settings, updateSettings } = useSettings();
-  const enabledFeatures = settings.experimental?.enabledFeatures ?? [];
+  const enabledFeatures = useMemo(() => settings.experimental?.enabledFeatures ?? [], [settings.experimental?.enabledFeatures]);
 
   // Create a preferences map for efficient lookup
   const preferences = useMemo(() => {

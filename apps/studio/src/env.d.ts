@@ -1,3 +1,10 @@
+/// <reference types="vite/client" />
+
+declare module '*.module.css' {
+  const classes: Record<string, string>;
+  export default classes;
+}
+
 interface ImportMetaEnv {
   readonly KB_API_BASE_URL?: string;
   readonly KB_GATEWAY_TOKEN?: string;

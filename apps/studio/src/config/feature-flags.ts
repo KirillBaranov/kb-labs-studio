@@ -16,6 +16,8 @@ export type FeatureId =
   | 'minimap'
   | 'breadcrumb-history'
   | 'floating-action-button'
+  // Developer Tools
+  | 'devtools-panel'
   // Performance Features
   | 'virtual-scrolling'
   | 'lazy-loading'
@@ -198,6 +200,20 @@ export const FEATURE_FLAGS: Record<FeatureId, FeatureFlag> = {
     enabled: false,
     defaultEnabled: false,
     addedAt: '2025-12-31',
+  },
+
+  // Developer Tools
+  'devtools-panel': {
+    id: 'devtools-panel',
+    name: 'DevTools Panel',
+    description: 'Developer debug panel in Settings → Developer tab',
+    details: 'Captures Module Federation loading events (including missing default exports) and EventBus events. Only useful during plugin development.',
+    group: 'performance',
+    status: 'alpha',
+    risk: 'low',
+    enabled: false,
+    defaultEnabled: false,
+    addedAt: '2026-04-02',
   },
 
   // Performance Features
