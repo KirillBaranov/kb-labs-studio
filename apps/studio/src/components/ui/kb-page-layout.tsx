@@ -2,15 +2,14 @@ import * as React from 'react';
 import { Layout as AntLayout } from 'antd';
 import { KBHeader, type KBHeaderProps } from './kb-header';
 import { KBSidebar, type KBSidebarProps, type NavigationItem } from './kb-sidebar';
-import { KBContent, type KBContentProps } from './kb-content';
+
+const { Content: AntContent } = AntLayout;
 
 export interface KBPageLayoutProps {
   headerProps?: KBHeaderProps;
   sidebarProps: Omit<KBSidebarProps, 'collapsed' | 'onCollapse'>;
-  contentProps?: KBContentProps;
   sidebarCollapsed?: boolean;
   onSidebarCollapse?: (collapsed: boolean) => void;
-  /** Custom status bar content (if not provided, no status bar is shown) */
   statusBar?: React.ReactNode;
   children?: React.ReactNode;
 }
@@ -18,7 +17,6 @@ export interface KBPageLayoutProps {
 export function KBPageLayout({
   headerProps,
   sidebarProps,
-  contentProps,
   sidebarCollapsed,
   onSidebarCollapse,
   statusBar,
@@ -37,20 +35,27 @@ export function KBPageLayout({
     [sidebarCollapsed, onSidebarCollapse]
   );
 
+  const sidebarWidth = collapsed ? (sidebarProps.collapsedWidth || 64) : (sidebarProps.width || 220);
+
   return (
     <AntLayout style={{ minHeight: '100vh' }}>
-      <KBHeader {...headerProps} />
+      <KBHeader
+        {...headerProps}
+        sidebarCollapsed={collapsed}
+        onSidebarCollapse={setCollapsed}
+        sidebarWidth={sidebarWidth}
+      />
       <AntLayout style={{ marginTop: 64 }}>
         <KBSidebar {...sidebarProps} collapsed={collapsed} onCollapse={setCollapsed} />
         <AntLayout
           style={{
-            marginLeft: collapsed ? sidebarProps.collapsedWidth || 64 : sidebarProps.width || 220,
+            marginLeft: sidebarWidth,
             transition: 'margin-left 0.2s',
             minHeight: 'calc(100vh - 64px)',
-            paddingBottom: statusBar ? 28 : 0, // Add padding for status bar
+            paddingBottom: statusBar ? 28 : 0,
           }}
         >
-          <KBContent {...contentProps}>{children}</KBContent>
+          <AntContent>{children}</AntContent>
         </AntLayout>
       </AntLayout>
       {statusBar}
@@ -58,5 +63,4 @@ export function KBPageLayout({
   );
 }
 
-export type { KBHeaderProps, KBSidebarProps, KBContentProps, NavigationItem };
-
+export type { KBHeaderProps, KBSidebarProps, NavigationItem };

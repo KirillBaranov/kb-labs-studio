@@ -1,52 +1,39 @@
 /**
  * @module @kb-labs/studio-app/components/widget-error-boundary
- * Error Boundary for widget isolation - prevents one widget error from crashing the entire page
+ * Error Boundary for widget isolation — keeps one widget crash from affecting the rest of the page.
  */
 
 import * as React from 'react';
-import { UIButton, UICard } from '@kb-labs/studio-ui-kit';
+import { Button, Typography, Tag } from 'antd';
+import { AlertTriangle, ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
 import { trackWidgetEvent } from '../utils/analytics';
 
+const { Text } = Typography;
+
 export interface WidgetErrorBoundaryProps {
-  /** Widget ID for tracking */
   widgetId?: string;
-  /** Plugin ID for tracking */
   pluginId?: string;
-  /** Children to render */
   children: React.ReactNode;
-  /** Custom fallback UI */
   fallback?: React.ComponentType<{ error: Error; resetError: () => void }>;
 }
 
-interface WidgetErrorBoundaryState {
+interface State {
   hasError: boolean;
   error: Error | null;
+  detailsOpen: boolean;
 }
 
-/**
- * WidgetErrorBoundary - isolates widget errors and provides fallback UI
- */
-export class WidgetErrorBoundary extends React.Component<
-  WidgetErrorBoundaryProps,
-  WidgetErrorBoundaryState
-> {
+export class WidgetErrorBoundary extends React.Component<WidgetErrorBoundaryProps, State> {
   constructor(props: WidgetErrorBoundaryProps) {
     super(props);
-    this.state = {
-      hasError: false,
-      error: null,
-    };
+    this.state = { hasError: false, error: null, detailsOpen: false };
   }
 
-  static getDerivedStateFromError(error: Error): WidgetErrorBoundaryState {
-    return {
-      hasError: true,
-      error,
-    };
+  static getDerivedStateFromError(error: Error): Partial<State> {
+    return { hasError: true, error };
   }
 
   override componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    // Track error in analytics
     if (this.props.widgetId && this.props.pluginId) {
       trackWidgetEvent('error', {
         widgetId: this.props.widgetId,
@@ -54,71 +41,134 @@ export class WidgetErrorBoundary extends React.Component<
         code: error.message,
       });
     }
-
-    // Log error for debugging
-    console.error('Widget Error Boundary caught an error:', error, errorInfo);
+    console.error('[WidgetErrorBoundary]', error, errorInfo);
   }
 
   resetError = (): void => {
-    this.setState({
-      hasError: false,
-      error: null,
-    });
+    this.setState({ hasError: false, error: null, detailsOpen: false });
+  };
+
+  toggleDetails = (): void => {
+    this.setState((s) => ({ detailsOpen: !s.detailsOpen }));
   };
 
   override render(): React.ReactNode {
-    if (this.state.hasError && this.state.error) {
-      if (this.props.fallback) {
-        const FallbackComponent = this.props.fallback;
-        return <FallbackComponent error={this.state.error} resetError={this.resetError} />;
-      }
-
-      return (
-        <UICard
-          style={{
-            borderColor: 'var(--error)',
-            backgroundColor: 'var(--bg-secondary)',
-            borderWidth: '1px',
-            borderStyle: 'solid',
-          }}
-        >
-          <div style={{ textAlign: 'center', padding: '16px' }}>
-            <div
-              style={{
-                fontSize: '24px',
-                marginBottom: '8px',
-                color: 'var(--error)',
-              }}
-            >
-              ⚠️
-            </div>
-            <h3 style={{ color: 'var(--error)', marginBottom: '8px' }}>
-              Widget Error
-            </h3>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '16px', fontSize: '14px' }}>
-              {this.state.error.message || 'An unexpected error occurred'}
-            </p>
-            {this.props.widgetId && (
-              <p style={{ color: 'var(--text-tertiary)', marginBottom: '16px', fontSize: '12px' }}>
-                Widget: {this.props.widgetId}
-              </p>
-            )}
-            <UIButton
-              variant="primary"
-              onClick={this.resetError}
-              style={{
-                backgroundColor: 'var(--error)',
-                borderColor: 'var(--error)',
-              }}
-            >
-              Retry Widget
-            </UIButton>
-          </div>
-        </UICard>
-      );
+    if (!this.state.hasError || !this.state.error) {
+      return this.props.children;
     }
 
-    return this.props.children;
+    if (this.props.fallback) {
+      const Fallback = this.props.fallback;
+      return <Fallback error={this.state.error} resetError={this.resetError} />;
+    }
+
+    const { error, detailsOpen } = this.state;
+    const { widgetId, pluginId } = this.props;
+
+    return (
+      <div style={{
+        height: '100%',
+        minHeight: 120,
+        border: '1px solid var(--border-primary)',
+        borderRadius: 8,
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '12px 14px',
+        gap: 6,
+        backgroundColor: 'var(--bg-secondary)',
+        overflow: 'hidden',
+      }}>
+        {/* Header row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <AlertTriangle size={14} style={{ color: 'var(--error)', flexShrink: 0 }} />
+          <Text strong style={{ fontSize: 13 }}>Widget error</Text>
+        </div>
+
+        {/* Context */}
+        {(pluginId || widgetId) && (
+          <Text type="secondary" style={{ fontSize: 11, fontFamily: 'monospace' }}>
+            {[pluginId, widgetId].filter(Boolean).join(' › ')}
+          </Text>
+        )}
+
+        {/* Message — truncated */}
+        <Text
+          type="secondary"
+          style={{
+            fontSize: 12,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          }}
+        >
+          {error.message || 'Unknown error'}
+        </Text>
+
+        {/* Actions */}
+        <div style={{ display: 'flex', gap: 6, marginTop: 2 }}>
+          <Button size="small" icon={<RotateCcw size={11} />} onClick={this.resetError}>
+            Retry
+          </Button>
+          <button
+            onClick={this.toggleDetails}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 3,
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              color: 'var(--text-tertiary)',
+              fontSize: 11,
+            }}
+          >
+            {detailsOpen ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+            Details
+          </button>
+        </div>
+
+        {/* Expandable details */}
+        {detailsOpen && (
+          <div style={{
+            marginTop: 4,
+            border: '1px solid var(--border-primary)',
+            borderRadius: 4,
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              padding: '6px 8px',
+              borderBottom: error.stack ? '1px solid var(--border-primary)' : undefined,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}>
+              <Tag color="red" style={{ margin: 0, fontSize: 10 }}>{error.name}</Tag>
+            </div>
+            {error.stack && (
+              <div style={{
+                padding: '6px 8px',
+                maxHeight: 120,
+                overflowY: 'auto',
+                background: 'var(--bg-tertiary)',
+              }}>
+                <pre style={{
+                  margin: 0,
+                  fontFamily: 'monospace',
+                  fontSize: 10,
+                  lineHeight: 1.5,
+                  color: 'var(--text-secondary)',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                }}>
+                  {error.stack}
+                </pre>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
   }
 }
-

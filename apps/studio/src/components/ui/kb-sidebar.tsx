@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { Layout, Menu } from 'antd';
 import type { MenuProps } from 'antd';
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { UIButton } from '@kb-labs/studio-ui-kit';
+import styles from './kb-sidebar.module.css';
 
 const { Sider: AntSider } = Layout;
 
@@ -10,9 +11,9 @@ export interface NavigationItem {
   key: string;
   label: string;
   icon?: React.ReactNode;
-  path?: string; // Optional - parent items with children may not have a path
+  path?: string;
   children?: NavigationItem[];
-  type?: 'group' | 'divider'; // 'group' = non-collapsible section header, 'divider' = horizontal separator
+  type?: 'group' | 'divider';
 }
 
 export interface KBSidebarProps {
@@ -47,15 +48,12 @@ export function KBSidebar({
     [controlledCollapsed, onCollapse]
   );
 
-  // Build a map from key to path for navigation
   const keyToPathMap = React.useMemo(() => {
     const map = new Map<string, string>();
     const buildMap = (navItems: NavigationItem[]) => {
       for (const item of navItems) {
-        // Use item.key as the key (must be consistent with menuItems)
-        const menuKey = item.key;
-        if (item.path && menuKey) {
-          map.set(menuKey, item.path);
+        if (item.path && item.key) {
+          map.set(item.key, item.path);
         }
         if (item.children) {
           buildMap(item.children);
@@ -66,30 +64,26 @@ export function KBSidebar({
     return map;
   }, [items]);
 
-  // Convert navigation items to Ant Design menu items
   const menuItems: MenuProps['items'] = React.useMemo(() => {
     const convertItems = (navItems: NavigationItem[]): MenuProps['items'] => {
       return navItems.map((item) => {
         const hasChildren = item.children && item.children.length > 0;
-        const menuKey = item.key;
 
-        // Handle divider type — renders as horizontal line separator
         if (item.type === 'divider') {
-          return { type: 'divider' as const, key: menuKey };
+          return { type: 'divider' as const, key: item.key };
         }
 
-        // Handle group type — renders as non-collapsible section header
         if (item.type === 'group' && hasChildren) {
           return {
             type: 'group' as const,
-            key: menuKey,
+            key: item.key,
             label: item.label,
             children: convertItems(item.children!),
           };
         }
 
         const menuItem: any = {
-          key: menuKey,
+          key: item.key,
           icon: item.icon,
           label: item.label,
         };
@@ -102,28 +96,22 @@ export function KBSidebar({
       });
     };
 
-    const result = convertItems(items);
-    return result;
+    return convertItems(items);
   }, [items]);
 
-  // Get selected keys based on current path
   const selectedKeys = React.useMemo(() => {
-    if (!currentPath) {return [];}
+    if (!currentPath) { return []; }
 
     const findKeys = (path: string, navItems: NavigationItem[]): string[] => {
-      // First pass: exact matches and children (highest priority)
       for (const item of navItems) {
         if (item.path === path) {
           return [item.key || item.path || `item-${Math.random()}`];
         }
-        if (item.children && item.children.length > 0) {
+        if (item.children?.length) {
           const childKeys = findKeys(path, item.children);
-          if (childKeys.length > 0) {
-            return childKeys;
-          }
+          if (childKeys.length > 0) return childKeys;
         }
       }
-      // Second pass: prefix matches (fallback for unregistered sub-routes)
       for (const item of navItems) {
         if (item.path && !item.children?.length && path.startsWith(item.path + '/')) {
           return [item.key || item.path || `item-${Math.random()}`];
@@ -136,8 +124,8 @@ export function KBSidebar({
   }, [currentPath, items]);
 
   const openKeys = React.useMemo(() => {
-    if (!currentPath) {return [];}
-    
+    if (!currentPath) { return []; }
+
     const findOpenKeys = (path: string, navItems: NavigationItem[]): string[] => {
       for (const item of navItems) {
         if (item.children) {
@@ -153,6 +141,16 @@ export function KBSidebar({
     return findOpenKeys(currentPath, items);
   }, [currentPath, items]);
 
+  const handleMenuClick = (e: { key: string }) => {
+    const path = keyToPathMap.get(e.key);
+    if (path && onNavigate) {
+      onNavigate(path);
+    }
+  };
+
+  const mainItems = menuItems.filter((item: any) => item?.key !== 'settings');
+  const settingsItems = menuItems.filter((item: any) => item?.key === 'settings');
+
   return (
     <AntSider
       collapsible
@@ -160,47 +158,39 @@ export function KBSidebar({
       width={width}
       collapsedWidth={collapsedWidth}
       trigger={null}
-      style={{
-        overflow: 'auto',
-        height: 'calc(100vh - 64px)',
-        position: 'fixed',
-        left: 0,
-        top: 64,
-        bottom: 0,
-        backgroundColor: 'var(--bg-sidebar)',
-        borderRight: 'none',
-        boxShadow: '1px 0 0 var(--border-primary), 2px 0 8px rgba(0,0,0,0.03)',
-      }}
-      theme="light" // Prevent Ant Design from applying dark theme styles
+      className={styles.sider}
+      theme="light"
     >
-      <div style={{ padding: '16px', borderBottom: '1px solid var(--border-primary)' }}>
+      <div className={styles.header}>
         <UIButton
           variant="text"
-          icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          icon={collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
           onClick={() => setCollapsed(!collapsed)}
-          style={{
-            fontSize: 16,
-            width: '100%',
-            height: 32,
-          }}
         />
       </div>
 
-      <Menu
-        mode="inline"
-        selectedKeys={selectedKeys}
-        defaultOpenKeys={openKeys}
-        items={menuItems}
-        onClick={(e) => {
-          const key = e.key as string;
-          const path = keyToPathMap.get(key);
-          if (path && onNavigate) {
-            onNavigate(path);
-          }
-        }}
-        style={{ height: '100%', borderRight: 0, padding: '4px 8px' }}
-      />
+      <div className={styles.scrollArea}>
+        <Menu
+          mode="inline"
+          selectedKeys={selectedKeys}
+          defaultOpenKeys={openKeys}
+          items={mainItems}
+          onClick={handleMenuClick}
+          className={styles.menu}
+        />
+      </div>
+
+      {settingsItems.length > 0 && (
+        <div className={styles.settingsArea}>
+          <Menu
+            mode="inline"
+            selectedKeys={selectedKeys}
+            items={settingsItems}
+            onClick={handleMenuClick}
+            className={styles.menu}
+          />
+        </div>
+      )}
     </AntSider>
   );
 }
-

@@ -5,13 +5,14 @@ import { UIButton } from '@kb-labs/studio-ui-kit';
 import { KBThemeToggle } from './kb-theme-toggle';
 import { type SystemHealthData } from './kb-system-health-indicator';
 import { KBNotificationBell, type LogNotification } from './kb-notification-bell';
+import styles from './kb-header.module.css';
 
 const { Header: AntHeader } = Layout;
 
 export interface KBHeaderProps {
   logo?: React.ReactNode;
   logoLink?: string;
-  LinkComponent?: React.ComponentType<{ to: string; children: React.ReactNode; style?: React.CSSProperties; className?: string }>;
+  LinkComponent?: React.ComponentType<{ to: string; children: React.ReactNode; className?: string }>;
   onLogout?: () => void;
   profileMenuItems?: MenuProps['items'];
   userAvatar?: string;
@@ -19,7 +20,9 @@ export interface KBHeaderProps {
   systemHealth?: SystemHealthData;
   systemHealthLoading?: boolean;
   onSearchClick?: () => void;
-  // Notifications
+  sidebarCollapsed?: boolean;
+  onSidebarCollapse?: (collapsed: boolean) => void;
+  sidebarWidth?: number;
   notifications?: LogNotification[];
   unreadNotificationsCount?: number;
   onMarkNotificationAsRead?: (id: string) => void;
@@ -37,9 +40,8 @@ export function KBHeader({
   profileMenuItems,
   userAvatar,
   userName = 'User',
-  systemHealth,
-  systemHealthLoading = false,
   onSearchClick,
+  sidebarWidth = 220,
   notifications = [],
   unreadNotificationsCount = 0,
   onMarkNotificationAsRead,
@@ -49,68 +51,34 @@ export function KBHeader({
   onNotificationClick,
 }: KBHeaderProps) {
   const profileItems: MenuProps['items'] = profileMenuItems || [
-    ...(onLogout
-      ? [
-          {
-            key: 'logout',
-            label: 'Logout',
-            danger: true,
-            onClick: onLogout,
-          },
-        ]
-      : []),
+    ...(onLogout ? [{ key: 'logout', label: 'Logout', danger: true, onClick: onLogout }] : []),
   ];
-
-  const logoStyle: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'var(--text-primary)',
-    textDecoration: 'none',
-  };
 
   return (
     <AntHeader
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 24px',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 1000,
-        height: 64,
-        backgroundColor: 'var(--bg-secondary)',
-        color: 'var(--text-primary)',
-        borderBottom: 'none',
-        boxShadow: '0 1px 0 var(--border-primary), 0 2px 8px rgba(0,0,0,0.04)',
-      }}
+      className={styles.header}
+      style={{ paddingLeft: sidebarWidth + 24 }}
     >
       {LinkComponent ? (
-        <LinkComponent to={logoLink} style={logoStyle}>
+        <LinkComponent to={logoLink} className={styles.logo}>
           {logo}
         </LinkComponent>
       ) : (
-        <a href={logoLink} style={logoStyle}>
+        <a href={logoLink} className={styles.logo}>
           {logo}
         </a>
       )}
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div className={styles.actions}>
         {onSearchClick && (
           <UIButton
             variant="text"
-            icon={<Search size={18} />}
+            icon={<Search size={16} />}
             onClick={onSearchClick}
-            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+            className={styles.actionBtn}
           />
         )}
 
-        {/* Notification Bell */}
         {onMarkNotificationAsRead &&
           onMarkAllNotificationsAsRead &&
           onClearAllNotifications &&
@@ -129,26 +97,16 @@ export function KBHeader({
         <KBThemeToggle />
 
         <Dropdown menu={{ items: profileItems }} placement="bottomRight">
-          <UIButton
-            variant="text"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '4px 8px',
-            }}
-          >
+          <UIButton variant="text" className={styles.userBtn}>
             <Avatar
-              size="small"
-              icon={!userAvatar && <User size={14} />}
+              size={20}
+              icon={!userAvatar && <User size={12} />}
               src={userAvatar}
-              style={{ flexShrink: 0 }}
             />
-            {userName && <span>{userName}</span>}
+            {userName && <span className={styles.userName}>{userName}</span>}
           </UIButton>
         </Dropdown>
       </div>
     </AntHeader>
   );
 }
-

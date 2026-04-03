@@ -9,6 +9,8 @@ import { SettingsProvider } from './providers/settings-provider';
 import { EventBusProvider } from '@kb-labs/studio-event-bus';
 import { router } from './router';
 import { studioConfig } from './config/studio.config';
+import { DevToolsProvider } from './providers/devtools-provider';
+import { DevToolsPanel } from './components/devtools/devtools-panel';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,12 +28,15 @@ export function App() {
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
             <DataSourcesProvider>
-              <RegistryV2Provider apiBaseUrl={studioConfig.apiBaseUrl}>
-                <EventBusProvider>
-                  <RouterProvider router={router} />
-                  <ReactQueryDevtools initialIsOpen={false} />
-                </EventBusProvider>
-              </RegistryV2Provider>
+              <DevToolsProvider>
+                <RegistryV2Provider apiBaseUrl={studioConfig.apiBaseUrl}>
+                  <EventBusProvider>
+                    <RouterProvider router={router} />
+                    <ReactQueryDevtools initialIsOpen={false} />
+                  </EventBusProvider>
+                </RegistryV2Provider>
+                <DevToolsPanel />
+              </DevToolsProvider>
             </DataSourcesProvider>
           </QueryClientProvider>
         </AuthProvider>

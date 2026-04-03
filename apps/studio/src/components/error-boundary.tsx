@@ -78,7 +78,7 @@ export function ErrorBoundary() {
           boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
           backgroundColor: 'var(--bg-secondary)',
         }}
-        bodyStyle={{ padding: '3rem' }}
+        styles={{ body: { padding: '3rem' } }}
       >
         <UIResult
           status={status}

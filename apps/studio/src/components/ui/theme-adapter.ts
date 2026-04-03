@@ -9,7 +9,7 @@ type MappingAlgorithm = typeof antdTheme.defaultAlgorithm;
  * This adapter maintains framework-agnostic nature of ui-core
  * All Ant Design tokens are mapped to our CSS variables for consistency
  */
-export function getAntDesignTokens(theme: 'light' | 'dark' | 'auto' = 'light'): ThemeConfig['token'] {
+export function getAntDesignTokens(): ThemeConfig['token'] {
   // CSS variables automatically change based on .light/.dark classes
   // We use var() references so they update reactively
   // Map all Ant Design tokens to our CSS variables for complete theme consistency
@@ -663,9 +663,9 @@ export function getAntDesignComponents(): ThemeConfig['components'] {
       colorText: 'var(--text-secondary)',
     },
     Layout: {
-      colorBgHeader: 'var(--bg-secondary)',
-      colorBgBody: 'var(--bg-primary)',
-      colorBgTrigger: 'var(--bg-tertiary)',
+      headerBg: 'var(--bg-secondary)',
+      bodyBg: 'var(--bg-primary)',
+      triggerBg: 'var(--bg-tertiary)',
       colorText: 'var(--text-primary)',
     },
     Collapse: {

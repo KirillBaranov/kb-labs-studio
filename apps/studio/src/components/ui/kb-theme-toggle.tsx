@@ -31,8 +31,8 @@ export function KBThemeToggle() {
     <Dropdown menu={{ items, selectedKeys: [theme] }} placement="bottomRight">
       <UIButton
         variant="text"
-        icon={React.cloneElement(currentTheme.icon as React.ReactElement, { size: 18 })}
-        style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+        icon={React.cloneElement(currentTheme.icon as React.ReactElement, { size: 16 })}
+        style={{ height: 32, display: 'flex', alignItems: 'center', gap: 4, fontSize: 13 }}
       >
         {currentTheme.label}
       </UIButton>
