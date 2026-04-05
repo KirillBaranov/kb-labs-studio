@@ -27,7 +27,7 @@
 
 ### Created
 - `studio-event-bus` — EventBus singleton + React context
-- `studio-hooks` — useData, usePermissions, useEventBus, useNavigation, useNotification, useTheme, usePage
+- `studio-hooks` — useData, useMutateData, useSSE, useInfiniteData, useWebSocket, useEventBus, usePermissions, useNavigation, useNotification, useTheme, usePage
 - `studio-federation` — PageContainer, PageErrorBoundary, widget-loader, initFederation
 - `studio-plugin-tools` — `kbStudioRemote()` Vite plugin for building MF remotes
 - `@kb-labs/sdk/studio` — re-export barrel

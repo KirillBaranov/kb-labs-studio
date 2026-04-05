@@ -23,6 +23,24 @@ export default await createStudioRemoteConfig({
 - Import all UI from `@kb-labs/sdk/studio` — never from `@kb-labs/studio-ui-kit` directly
 - No top-level side effects in the page module
 
+## Available hooks
+
+All hooks are available via `import { ... } from '@kb-labs/sdk/studio'`:
+
+| Hook | Purpose |
+|------|---------|
+| `useData<T>(endpoint, opts?)` | REST GET with caching and polling |
+| `useMutateData<I,O>(endpoint, method?)` | REST POST/PUT/PATCH/DELETE mutations |
+| `useSSE<T>(endpoint, opts?)` | Server-sent events with reconnect |
+| `useInfiniteData<T>(endpoint, opts)` | Cursor/offset pagination |
+| `useWebSocket<S,R>(url, opts?)` | Bidirectional WebSocket |
+| `useEventBus()` | Cross-plugin pub/sub communication |
+| `usePermissions()` | Permission checks |
+| `useNavigation()` | Programmatic routing |
+| `useNotification()` | Toast/alert notifications |
+| `useTheme()` | Design tokens and theme mode |
+| `usePage()` | Page context (pageId, pluginId, permissions) |
+
 ---
 
 ## Troubleshooting

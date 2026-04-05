@@ -1,4 +1,4 @@
-import { init, loadRemote } from '@module-federation/runtime';
+import { init, loadRemote, registerRemotes } from '@module-federation/runtime';
 import type { StudioPluginEntryV2 } from './types.js';
 import type { ComponentType } from 'react';
 import { devToolsStore, GenericChannel } from '@kb-labs/studio-devtools';
@@ -14,14 +14,18 @@ function getMFChannel(): ReturnType<typeof devToolsStore.getChannel<MFEvent>> {
   return ch;
 }
 
-let initialized = false;
+/**
+ * Last known remoteEntryUrl per remoteName.
+ * Updated on init and on each loadPageComponent call (lazy, navigation-triggered).
+ */
+const knownRemotes = new Map<string, string>();
+let mfInitialized = false;
 
 /**
- * Initialize Module Federation runtime with discovered remotes.
- * Called once after registry is fetched.
+ * Initialize Module Federation runtime. Called once after registry is first loaded.
  */
 export function initFederation(plugins: StudioPluginEntryV2[]): void {
-  if (initialized) { return; }
+  if (mfInitialized) { return; }
 
   init({
     name: 'studioHost',
@@ -31,14 +35,33 @@ export function initFederation(plugins: StudioPluginEntryV2[]): void {
     })),
   });
 
-  initialized = true;
+  mfInitialized = true;
+  for (const p of plugins) {
+    knownRemotes.set(p.remoteName, p.remoteEntryUrl);
+  }
+}
+
+/**
+ * Notify federation about the current remoteEntryUrl for a remote.
+ * If the URL changed since last load (i.e. plugin was rebuilt), re-registers
+ * the remote so the next loadRemote() fetches the fresh bundle.
+ *
+ * Called lazily at navigation time — never in background — so the running
+ * page is never disrupted mid-session.
+ */
+export function syncRemoteEntry(remoteName: string, currentEntryUrl: string): void {
+  if (knownRemotes.get(remoteName) === currentEntryUrl) { return; }
+
+  registerRemotes([{ name: remoteName, entry: currentEntryUrl }], { force: true });
+  knownRemotes.set(remoteName, currentEntryUrl);
 }
 
 /**
  * Reset federation state. For testing only.
  */
 export function resetFederation(): void {
-  initialized = false;
+  knownRemotes.clear();
+  mfInitialized = false;
 }
 
 /**
@@ -64,13 +87,23 @@ export class PageLoadError extends Error {
 /**
  * Load a page component from a Module Federation remote.
  * Retries on failure with backoff.
+ *
+ * @param remoteEntryUrl - Current remoteEntryUrl from registry. If it changed since
+ *   the last load (plugin was rebuilt), the remote is re-registered before loading
+ *   so the browser fetches the fresh bundle. This check happens at navigation time
+ *   only — never in the background — so the active page is never disrupted.
  */
 export async function loadPageComponent(
   remoteName: string,
   exposedModule: string,
+  remoteEntryUrl?: string,
   retries = 2,
   retryDelay = 1000,
 ): Promise<{ default: ComponentType<unknown> }> {
+  if (remoteEntryUrl) {
+    syncRemoteEntry(remoteName, remoteEntryUrl);
+  }
+
   const modulePath = `${remoteName}/${exposedModule.replace('./', '')}`;
   const eventId = `mf-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const startedAt = Date.now();

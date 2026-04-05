@@ -11,7 +11,7 @@ const DEFAULT_HEIGHT = 280;
 
 export function DevToolsPanel() {
   const { isEnabled } = useFeatureFlags();
-  if (!isEnabled('devtools-panel')) return null;
+  if (!isEnabled('devtools-panel')) {return null;}
   return <DevToolsPanelInner />;
 }
 
@@ -25,7 +25,7 @@ function DevToolsPanelInner() {
     let count = 0;
     channels.forEach((ch) => {
       (ch.getEvents() as Array<{ status?: string }>).forEach((e) => {
-        if (e.status === 'error' || e.status === 'warning') count++;
+        if (e.status === 'error' || e.status === 'warning') {count++;}
       });
     });
     return count;
@@ -39,7 +39,7 @@ function DevToolsPanelInner() {
     dragRef.current = { startY: e.clientY, startH: height };
 
     const onMove = (ev: MouseEvent) => {
-      if (!dragRef.current) return;
+      if (!dragRef.current) {return;}
       const delta = dragRef.current.startY - ev.clientY;
       setHeight(Math.max(MIN_HEIGHT, dragRef.current.startH + delta));
       setMaximized(false);

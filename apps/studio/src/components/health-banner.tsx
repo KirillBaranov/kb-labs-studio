@@ -17,7 +17,7 @@ export function HealthBanner() {
   const lastRefetchedTs = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!sseHealth) return;
+    if (!sseHealth) {return;}
     const shouldRefetch =
       (!sseHealth.ready || sseHealth.status === 'degraded') &&
       sseHealth.ts &&
@@ -53,7 +53,7 @@ export function HealthBanner() {
       pluginMounts && typeof pluginMounts.failed === 'number'
         ? (pluginMounts.failed as number)
         : undefined;
-    if (succeeded === undefined && failed === undefined) return null;
+    if (succeeded === undefined && failed === undefined) {return null;}
     return { succeeded: succeeded ?? 0, failed: failed ?? 0 };
   }, [healthSnapshot]);
 
@@ -64,7 +64,7 @@ export function HealthBanner() {
     studioConfig.dataSourceMode === 'mock' ||
     (studioConfig.dataSourceMode === 'http' && !healthSnapshot && error);
 
-  if (!isDegraded && !isDown && !isMockMode) return null;
+  if (!isDegraded && !isDown && !isMockMode) {return null;}
 
   const variant = isDown ? 'error' : isDegraded ? 'warning' : 'info';
 

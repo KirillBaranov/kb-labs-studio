@@ -57,7 +57,7 @@ export function KBHeader({
   return (
     <AntHeader
       className={styles.header}
-      style={{ paddingLeft: sidebarWidth + 24 }}
+      style={{ paddingLeft: sidebarWidth + 16 }}
     >
       {LinkComponent ? (
         <LinkComponent to={logoLink} className={styles.logo}>

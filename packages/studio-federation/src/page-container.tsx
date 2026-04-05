@@ -9,6 +9,8 @@ import { EventBusProvider } from '@kb-labs/studio-event-bus';
 export interface PageContainerProps {
   remoteName: string;
   entry: string;
+  /** Current remoteEntryUrl from registry. Used to detect plugin rebuilds at navigation time. */
+  remoteEntryUrl?: string;
   pageId: string;
   pluginId: string;
   config?: Record<string, unknown>;
@@ -30,6 +32,7 @@ export interface PageContainerProps {
 export function PageContainer({
   remoteName,
   entry,
+  remoteEntryUrl,
   pageId,
   pluginId,
   config = {},
@@ -51,7 +54,7 @@ export function PageContainer({
     setLoadError(null);
     setPageComponent(null);
 
-    loadPageComponent(remoteName, entry)
+    loadPageComponent(remoteName, entry, remoteEntryUrl)
       .then((mod) => {
         if (!cancelled) {
           setPageComponent(() => mod.default);

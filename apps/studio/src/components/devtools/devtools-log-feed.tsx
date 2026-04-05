@@ -26,9 +26,9 @@ interface LogEntry {
 
 function buildMFEntry(event: MFEvent, channelLabel: string): LogEntry {
   let status: LogEntry['status'] = 'pending';
-  if (event.status === 'success') status = 'success';
-  else if (event.status === 'warning') status = 'warning';
-  else if (event.status === 'error') status = 'error';
+  if (event.status === 'success') {status = 'success';}
+  else if (event.status === 'warning') {status = 'warning';}
+  else if (event.status === 'error') {status = 'error';}
 
   return {
     id: event.id,
@@ -71,8 +71,8 @@ function buildGenericEntry(event: unknown, channelId: string, channelLabel: stri
 
 function channelToEntries(channel: DevToolsChannel): LogEntry[] {
   return (channel.getEvents() as unknown[]).map((e) => {
-    if (channel.id === 'mf-events') return buildMFEntry(e as MFEvent, channel.label);
-    if (channel.id === 'eventbus') return buildEventBusEntry(e as EventBusEvent, channel.label);
+    if (channel.id === 'mf-events') {return buildMFEntry(e as MFEvent, channel.label);}
+    if (channel.id === 'eventbus') {return buildEventBusEntry(e as EventBusEvent, channel.label);}
     return buildGenericEntry(e, channel.id, channel.label);
   });
 }

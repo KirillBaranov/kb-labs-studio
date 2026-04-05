@@ -40,8 +40,8 @@ export function HeroMetricsWidget() {
       };
 
       setMetricsHistory(prev => {
-        const updated = [...prev, newPoint].slice(-20); // Keep last 20 points
-        return updated;
+        // Keep last 20 points
+        return [...prev, newPoint].slice(-20);
       });
     }
   }, [metrics.data]);

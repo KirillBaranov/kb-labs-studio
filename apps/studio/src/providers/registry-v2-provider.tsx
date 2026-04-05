@@ -51,8 +51,6 @@ export function RegistryV2Provider({
   children: React.ReactNode;
   apiBaseUrl?: string;
 }) {
-  const federationInitialized = React.useRef(false);
-
   const { data, isLoading, error } = useQuery({
     queryKey: ['studio-registry-v2', apiBaseUrl],
     queryFn: () => fetchRegistryV2(apiBaseUrl, studioConfig.gatewayToken),
@@ -62,7 +60,11 @@ export function RegistryV2Provider({
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10_000),
   });
 
-  // Initialize Module Federation when registry is loaded
+  const federationInitialized = React.useRef(false);
+
+  // Initialize Module Federation once when registry is first loaded.
+  // Cache invalidation is handled lazily at navigation time via syncRemoteEntry()
+  // inside loadPageComponent — so the running page is never disrupted mid-session.
   React.useEffect(() => {
     if (data && data.plugins.length > 0 && !federationInitialized.current) {
       initFederation(data.plugins);

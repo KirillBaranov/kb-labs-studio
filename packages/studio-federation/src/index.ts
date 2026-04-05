@@ -1,5 +1,5 @@
 // Loader
-export { initFederation, loadPageComponent, PageLoadError, resetFederation } from './widget-loader.js';
+export { initFederation, syncRemoteEntry, loadPageComponent, PageLoadError, resetFederation } from './widget-loader.js';
 
 // Components
 export { PageContainer, type PageContainerProps } from './page-container.js';

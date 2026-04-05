@@ -73,7 +73,7 @@ async function validateReactVersion(resolve: (id: string) => string): Promise<vo
     }
   })();
 
-  if (!reactVersion) return;
+  if (!reactVersion) {return;}
 
   const majorStr = reactVersion.split('.').at(0) ?? '0';
   const major = parseInt(majorStr, 10);

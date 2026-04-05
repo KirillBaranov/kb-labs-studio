@@ -109,7 +109,7 @@ export function KBSidebar({
         }
         if (item.children?.length) {
           const childKeys = findKeys(path, item.children);
-          if (childKeys.length > 0) return childKeys;
+          if (childKeys.length > 0) {return childKeys;}
         }
       }
       for (const item of navItems) {

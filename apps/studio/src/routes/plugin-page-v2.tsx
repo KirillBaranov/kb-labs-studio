@@ -1,43 +1,52 @@
 /**
  * Dynamic plugin page resolver.
- * Matches the current route against the V2 registry and renders
- * the appropriate MF remote page via PageContainer.
+ *
+ * Studio router mounts this component at /p/*. Plugin page routes are declared
+ * as absolute paths like /p/workflows/runs/:runId. We render them as a <Routes>
+ * tree with relative paths (stripping the /p/ prefix) so React Router resolves
+ * them correctly within the /p/* wildcard and sets useParams() for plugin pages.
  */
 
 import * as React from 'react';
-import { useLocation } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { PageContainer } from '@kb-labs/studio-federation';
 import { useRegistryV2 } from '../providers/registry-v2-provider';
 import { NotFoundPage } from '../pages/not-found-page';
 
+const P_PREFIX = /^\/p\//;
+
 export function PluginPageV2() {
-  const location = useLocation();
   const { registry, loading } = useRegistryV2();
 
   if (loading) {return null;}
 
-  // Find a page whose route matches the current path
-  for (const plugin of registry.plugins) {
-    for (const page of plugin.pages) {
-      // Exact match or prefix match (for sub-routes like /commit/history)
-      if (
-        location.pathname === page.route ||
-        location.pathname.startsWith(page.route + '/')
-      ) {
-        // TODO: page-level permission check here
+  const allPages = registry.plugins.flatMap((plugin) =>
+    plugin.pages.map((page) => ({ plugin, page })),
+  );
+
+  return (
+    <Routes>
+      {allPages.map(({ plugin, page }) => {
+        // Strip /p/ prefix → relative path for <Routes> inside /p/*
+        const relativePath = page.route.replace(P_PREFIX, '');
         return (
-          <PageContainer
+          <Route
             key={`${plugin.remoteName}::${page.entry}`}
-            remoteName={plugin.remoteName}
-            entry={page.entry}
-            pageId={page.id}
-            pluginId={plugin.pluginId}
-            permissions={page.permissions}
+            path={relativePath}
+            element={
+              <PageContainer
+                remoteName={plugin.remoteName}
+                entry={page.entry}
+                remoteEntryUrl={plugin.remoteEntryUrl}
+                pageId={page.id}
+                pluginId={plugin.pluginId}
+                permissions={page.permissions}
+              />
+            }
           />
         );
-      }
-    }
-  }
-
-  return <NotFoundPage />;
+      })}
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  );
 }

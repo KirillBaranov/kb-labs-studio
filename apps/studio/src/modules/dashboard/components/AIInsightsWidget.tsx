@@ -186,7 +186,7 @@ export function AIInsightsWidget() {
     setIsTyping(true);
 
     // Simulate AI thinking delay
-    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
+    await new Promise<void>(resolve => { setTimeout(resolve, 1000 + Math.random() * 1000); });
 
     const context = buildContext();
     const { content, contextUsed } = generateMockResponse(text, context);

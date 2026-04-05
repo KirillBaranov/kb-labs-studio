@@ -118,7 +118,7 @@ interface StudioMenuEntry {
 
 | Package | Purpose |
 |---------|---------|
-| `studio-hooks` | SDK hooks: useData, usePermissions, useEventBus, useNavigation, useNotification, useTheme, usePage |
+| `studio-hooks` | SDK hooks: useData, useMutateData, useSSE, useInfiniteData, useWebSocket, useEventBus, usePermissions, useNavigation, useNotification, useTheme, usePage |
 | `studio-event-bus` | StudioEventBus singleton, React context, types |
 | `studio-federation` | Host-side MF logic: PageContainer, widget-loader, ErrorBoundary, PageContext |
 | `studio-plugin-tools` | Vite plugin (`kbStudioRemote()`) for building MF remotes, dev harness |
