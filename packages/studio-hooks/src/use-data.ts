@@ -85,10 +85,11 @@ export function useMutateData<TInput = unknown, TOutput = unknown>(
 ): UseMutateDataReturn<TInput, TOutput> {
   const mutation = useMutation<TOutput, Error, TInput>({
     mutationFn: async (input: TInput) => {
+      const hasBody = input !== undefined && input !== null;
       const res = await fetch(`/api${endpoint}`, {
         method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(input),
+        headers: hasBody ? { 'Content-Type': 'application/json' } : {},
+        body: hasBody ? JSON.stringify(input) : undefined,
       });
       if (!res.ok) {
         throw new Error(`${method} ${endpoint} failed: ${res.status} ${res.statusText}`);
