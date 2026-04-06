@@ -1,6 +1,6 @@
 {
   "name": "@kb-labs/studio-devtools",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Studio DevTools — extensible event channel store for developer debugging",
   "type": "module",
   "main": "./dist/index.js",
