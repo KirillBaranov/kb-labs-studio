@@ -1,6 +1,6 @@
 {
   "name": "@kb-labs/studio-plugin-tools",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Build tooling for plugin Studio pages — Rspack config for Module Federation remotes",
   "type": "module",
   "main": "./dist/index.js",
@@ -11,7 +11,9 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "sideEffects": false,
   "scripts": {
     "clean": "rimraf dist",
