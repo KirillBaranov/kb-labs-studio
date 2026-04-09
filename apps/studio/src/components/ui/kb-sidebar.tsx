@@ -148,8 +148,8 @@ export function KBSidebar({
     }
   };
 
-  const mainItems = menuItems.filter((item: any) => item?.key !== 'settings');
-  const settingsItems = menuItems.filter((item: any) => item?.key === 'settings');
+  const mainItems = (menuItems ?? []).filter((item: any) => item?.key !== 'settings');
+  const settingsItems = (menuItems ?? []).filter((item: any) => item?.key === 'settings');
 
   return (
     <AntSider

@@ -16,3 +16,7 @@ export function UIList<T>(props: UIListProps<T>) {
 export function UIListItem(props: React.ComponentProps<typeof AntList.Item>) {
   return <AntList.Item {...props} />;
 }
+
+export function UIListItemMeta(props: React.ComponentProps<typeof AntList.Item.Meta>) {
+  return <AntList.Item.Meta {...props} />;
+}

@@ -2,6 +2,8 @@ import * as React from 'react';
 import {
   UITabs,
   UIList,
+  UIListItem,
+  UIListItemMeta,
   UIButton,
   UISpace,
   UITypographyText,
@@ -23,13 +25,11 @@ import { ExperimentalSettings } from '../components/experimental-settings';
 import { ConfigurationSettings } from '../components/configuration-settings';
 import { RoleSwitcher } from '@/components/role-switcher';
 import { ApiRoutesViewer } from '../components/api-routes-viewer';
-import { useFeatureFlags } from '@/hooks/use-feature-flags';
 import { NavigationSettings } from '../components/navigation-settings';
 import { UICard, UISkeleton, UIStack } from '@kb-labs/studio-ui-kit';
 import { UIPage, UIPageHeader, UIPageSection } from '@kb-labs/studio-ui-kit';
 
 export function SettingsPage() {
-  const { isEnabled } = useFeatureFlags();
   const sources = useDataSources();
   const { data, isLoading } = useHealthStatus(sources.system);
   const { registry } = useRegistryV2();
@@ -133,12 +133,12 @@ export function SettingsPage() {
                       ? 'degraded'
                       : 'down';
                     return (
-                      <UIList.Item key={source.name} extra={<HealthIndicator status={status} />}>
-                        <UIList.Item.Meta
+                      <UIListItem key={source.name} extra={<HealthIndicator status={status} />}>
+                        <UIListItemMeta
                           title={source.name}
                           description={source.latency ? `${source.latency}ms` : undefined}
                         />
-                      </UIList.Item>
+                      </UIListItem>
                     );
                   }}
                 />

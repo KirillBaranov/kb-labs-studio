@@ -5,7 +5,7 @@
 
 import * as React from 'react';
 import {
-  UICard, UIRadio, UISpace, UITitle, UITypographyText, UITypographyParagraph,
+  UICard, UIRadio, UIRadioGroup, UISpace, UITitle, UITypographyText, UITypographyParagraph,
   UIAlert, UIDivider, UIIcon,
 } from '@kb-labs/studio-ui-kit';
 import type { UserRole } from '@/providers/auth-provider';
@@ -81,7 +81,7 @@ export function RoleSwitcher() {
       />
 
       <UICard>
-        <UIRadio.Group
+        <UIRadioGroup
           value={role}
           onChange={(e) => handleRoleChange(e.target.value as UserRole)}
           style={{ width: '100%' }}
@@ -133,7 +133,7 @@ export function RoleSwitcher() {
               )
             )}
           </UISpace>
-        </UIRadio.Group>
+        </UIRadioGroup>
       </UICard>
 
       <UIAlert

@@ -6,6 +6,7 @@ import {
   UITypographyText,
   UITypographyParagraph,
   UISpace,
+  UISpaceCompact,
   UITag,
   UISpin,
   UIStatistic,
@@ -325,7 +326,7 @@ export function AIInsightsPage() {
 
         {/* Input Area */}
         <div style={{ padding: 16, borderTop: '1px solid #f0f0f0' }}>
-          <UISpace.Compact style={{ width: '100%' }}>
+          <UISpaceCompact style={{ width: '100%' }}>
             <UIInputTextArea
               ref={inputRef}
               value={input}
@@ -349,7 +350,7 @@ export function AIInsightsPage() {
             >
               Send
             </UIButton>
-          </UISpace.Compact>
+          </UISpaceCompact>
           <UITypographyText type="secondary" style={{ fontSize: 11, marginTop: 4, display: 'block' }}>
             Press Enter to send, Shift+Enter for new line
           </UITypographyText>

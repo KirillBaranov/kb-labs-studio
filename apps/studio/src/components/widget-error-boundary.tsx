@@ -4,11 +4,9 @@
  */
 
 import * as React from 'react';
-import { Button, Typography, Tag } from 'antd';
+import { UIButton, UITypographyText, UITag } from '@kb-labs/studio-ui-kit';
 import { AlertTriangle, ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
 import { trackWidgetEvent } from '../utils/analytics';
-
-const { Text } = Typography;
 
 export interface WidgetErrorBoundaryProps {
   widgetId?: string;
@@ -81,18 +79,18 @@ export class WidgetErrorBoundary extends React.Component<WidgetErrorBoundaryProp
         {/* Header row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <AlertTriangle size={14} style={{ color: 'var(--error)', flexShrink: 0 }} />
-          <Text strong style={{ fontSize: 13 }}>Widget error</Text>
+          <UITypographyText strong style={{ fontSize: 13 }}>Widget error</UITypographyText>
         </div>
 
         {/* Context */}
         {(pluginId || widgetId) && (
-          <Text type="secondary" style={{ fontSize: 11, fontFamily: 'monospace' }}>
+          <UITypographyText type="secondary" style={{ fontSize: 11, fontFamily: 'monospace' }}>
             {[pluginId, widgetId].filter(Boolean).join(' › ')}
-          </Text>
+          </UITypographyText>
         )}
 
         {/* Message — truncated */}
-        <Text
+        <UITypographyText
           type="secondary"
           style={{
             fontSize: 12,
@@ -103,13 +101,13 @@ export class WidgetErrorBoundary extends React.Component<WidgetErrorBoundaryProp
           }}
         >
           {error.message || 'Unknown error'}
-        </Text>
+        </UITypographyText>
 
         {/* Actions */}
         <div style={{ display: 'flex', gap: 6, marginTop: 2 }}>
-          <Button size="small" icon={<RotateCcw size={11} />} onClick={this.resetError}>
+          <UIButton size="small" icon={<RotateCcw size={11} />} onClick={this.resetError}>
             Retry
-          </Button>
+          </UIButton>
           <button
             onClick={this.toggleDetails}
             style={{
@@ -144,7 +142,7 @@ export class WidgetErrorBoundary extends React.Component<WidgetErrorBoundaryProp
               alignItems: 'center',
               gap: 6,
             }}>
-              <Tag color="red" style={{ margin: 0, fontSize: 10 }}>{error.name}</Tag>
+              <UITag variant="error" style={{ margin: 0, fontSize: 10 }}>{error.name}</UITag>
             </div>
             {error.stack && (
               <div style={{

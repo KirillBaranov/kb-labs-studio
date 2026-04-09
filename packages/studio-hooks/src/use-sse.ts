@@ -113,6 +113,10 @@ export function useSSE<T = unknown>(
   onDoneRef.current = onDone;
   parseRef.current = parse;
 
+  // Stable serialized deps for objects/arrays — avoids inline JSON.stringify in dep array
+  const eventNamesKey = JSON.stringify(eventNames);
+  const paramsKey = JSON.stringify(params);
+
   const close = useCallback(() => {
     closedByUser.current = true;
     if (reconnectTimer.current) {
@@ -229,10 +233,8 @@ export function useSSE<T = unknown>(
         esRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [endpoint, enabled, doneEvent, reconnect, maxReconnects, reconnectIntervalMs, maxEvents,
-      // Serialize eventNames and params for stable deps
-      JSON.stringify(eventNames), JSON.stringify(params)]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [endpoint, enabled, doneEvent, reconnect, maxReconnects, reconnectIntervalMs, maxEvents, eventNamesKey, paramsKey]);
 
   return { events: items, latest, isConnected, error, close, clear, reconnectCount };
 }

@@ -84,6 +84,27 @@ export class PageLoadError extends Error {
   }
 }
 
+interface MFEventContext {
+  id: string;
+  remoteName: string;
+  exposedModule: string;
+  startedAt: number;
+}
+
+function pushMFEvent(
+  ctx: MFEventContext,
+  fields: Omit<MFEvent, 'id' | 'remoteName' | 'exposedModule' | 'startedAt'>,
+): void {
+  getMFChannel()?.push({ ...ctx, ...fields } as MFEvent);
+}
+
+function buildErrorPayload(err: unknown): { message: string; cause?: string } {
+  return {
+    message: err instanceof Error ? err.message : String(err),
+    cause: err instanceof Error && err.cause instanceof Error ? err.cause.message : undefined,
+  };
+}
+
 /**
  * Load a page component from a Module Federation remote.
  * Retries on failure with backoff.
@@ -105,11 +126,14 @@ export async function loadPageComponent(
   }
 
   const modulePath = `${remoteName}/${exposedModule.replace('./', '')}`;
-  const eventId = `mf-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  const startedAt = Date.now();
-  const ch = getMFChannel();
+  const ctx: MFEventContext = {
+    id: `mf-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    remoteName,
+    exposedModule,
+    startedAt: Date.now(),
+  };
 
-  ch?.push({ id: eventId, remoteName, exposedModule, status: 'loading', startedAt, attempt: 1 });
+  pushMFEvent(ctx, { status: 'loading', attempt: 1 });
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
@@ -118,46 +142,15 @@ export async function loadPageComponent(
 
       if (module.default === undefined) {
         // Module loaded but has no default export — e.g. `export function X()` instead of `export default`
-        ch?.push({
-          id: eventId,
-          remoteName,
-          exposedModule,
-          status: 'warning',
-          startedAt,
-          durationMs: Date.now() - startedAt,
-          attempt: attempt + 1,
-          isDefaultUndefined: true,
-        });
+        pushMFEvent(ctx, { status: 'warning', durationMs: Date.now() - ctx.startedAt, attempt: attempt + 1, isDefaultUndefined: true });
         return module;
       }
 
-      ch?.push({
-        id: eventId,
-        remoteName,
-        exposedModule,
-        status: 'success',
-        startedAt,
-        durationMs: Date.now() - startedAt,
-        attempt: attempt + 1,
-      });
+      pushMFEvent(ctx, { status: 'success', durationMs: Date.now() - ctx.startedAt, attempt: attempt + 1 });
       return module;
     } catch (err) {
       if (attempt === retries) {
-        ch?.push({
-          id: eventId,
-          remoteName,
-          exposedModule,
-          status: 'error',
-          startedAt,
-          durationMs: Date.now() - startedAt,
-          attempt: attempt + 1,
-          error: {
-            message: err instanceof Error ? err.message : String(err),
-            cause: err instanceof Error && err.cause instanceof Error
-              ? err.cause.message
-              : undefined,
-          },
-        });
+        pushMFEvent(ctx, { status: 'error', durationMs: Date.now() - ctx.startedAt, attempt: attempt + 1, error: buildErrorPayload(err) });
         throw new PageLoadError(
           `Failed to load page after ${retries + 1} attempts: ${modulePath}`,
           remoteName,
@@ -165,14 +158,7 @@ export async function loadPageComponent(
           err instanceof Error ? err : undefined,
         );
       }
-      ch?.push({
-        id: eventId,
-        remoteName,
-        exposedModule,
-        status: 'loading',
-        startedAt,
-        attempt: attempt + 2,
-      });
+      pushMFEvent(ctx, { status: 'loading', attempt: attempt + 2 });
       await new Promise<void>((resolve) => { setTimeout(resolve, retryDelay * (attempt + 1)); });
     }
   }

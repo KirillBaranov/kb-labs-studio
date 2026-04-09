@@ -2,3 +2,14 @@ packages:
   - apps/*
   - packages/*
   - ../../infra/kb-labs-devkit
+  - ../../infra/kb-labs-plugin/apps/*
+  - ../../infra/kb-labs-plugin/packages/*
+  - ../../plugins/kb-labs-agents/packages/*
+  - ../../plugins/kb-labs-commit-plugin/packages/*
+  - ../../plugins/kb-labs-qa-plugin/packages/*
+  - ../../plugins/kb-labs-quality-plugin/packages/*
+  - ../../plugins/kb-labs-release-manager/packages/*
+  - ../kb-labs-core/apps/*
+  - ../kb-labs-core/packages/*
+  - ../kb-labs-rest-api/apps/*
+  - ../kb-labs-rest-api/packages/*

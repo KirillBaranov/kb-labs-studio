@@ -5,6 +5,7 @@ import {
   UIBadge,
   UITag,
   UIList,
+  UIListItem,
   UITypographyText,
   UITypographyParagraph,
   UISpace,
@@ -410,7 +411,7 @@ export function LogsPage() {
             <UIList
               dataSource={groupLogs}
               renderItem={(log, index) => (
-                <UIList.Item style={{ padding: '8px 0' }}>{renderLogItem(log, index)}</UIList.Item>
+                <UIListItem style={{ padding: '8px 0' }}>{renderLogItem(log, index)}</UIListItem>
               )}
             />
           ),
@@ -816,7 +817,7 @@ export function LogsPage() {
             <UIList
               dataSource={filteredLogs}
               renderItem={(log, index) => (
-                <UIList.Item style={{ padding: '8px 0' }}>{renderLogItem(log, index)}</UIList.Item>
+                <UIListItem style={{ padding: '8px 0' }}>{renderLogItem(log, index)}</UIListItem>
               )}
               pagination={
                 viewMode === 'history'
@@ -1080,13 +1081,13 @@ export function LogsPage() {
                     size="small"
                     dataSource={summaryResult.summary.stats.topErrors.slice(0, 5)}
                     renderItem={(err: any, idx: number) => (
-                      <UIList.Item>
+                      <UIListItem>
                         <UITypographyText>
                           <UITypographyText type="secondary">{idx + 1}.</UITypographyText>{' '}
                           <UITypographyText code>{err.message}</UITypographyText>{' '}
                           <UITypographyText type="secondary">({err.count} times)</UITypographyText>
                         </UITypographyText>
-                      </UIList.Item>
+                      </UIListItem>
                     )}
                   />
                 </UICard>

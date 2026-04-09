@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {
   UIRadio,
+  UIRadioGroup,
   UISwitch,
   UISpace,
   UICard,
@@ -174,7 +175,7 @@ export function AppearanceSettings() {
           Adjust the base font size across the application
         </UITypographyParagraph>
 
-        <UIRadio.Group
+        <UIRadioGroup
           value={settings.appearance.fontSize}
           onChange={handleFontSizeChange}
           style={{ width: '100%' }}
@@ -192,7 +193,7 @@ export function AppearanceSettings() {
               </UIRadio>
             ))}
           </UISpace>
-        </UIRadio.Group>
+        </UIRadioGroup>
       </div>
     </UISpace>
   );

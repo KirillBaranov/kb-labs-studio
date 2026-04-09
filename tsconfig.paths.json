@@ -63,6 +63,12 @@
       "@kb-labs/studio-data-client/*": [
         "packages/studio-data-client/src/*"
       ],
+      "@kb-labs/studio-devtools": [
+        "packages/studio-devtools/src/index.ts"
+      ],
+      "@kb-labs/studio-devtools/*": [
+        "packages/studio-devtools/src/*"
+      ],
       "@kb-labs/studio-event-bus": [
         "packages/studio-event-bus/src/index.ts"
       ],

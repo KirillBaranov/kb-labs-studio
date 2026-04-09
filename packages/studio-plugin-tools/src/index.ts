@@ -131,7 +131,15 @@ export async function createStudioRemoteConfig(options: KbStudioRemoteOptions): 
           },
         },
         {
+          test: /\.module\.css$/,
+          use: [
+            require.resolve('style-loader'),
+            { loader: require.resolve('css-loader'), options: { modules: true } },
+          ],
+        },
+        {
           test: /\.css$/,
+          exclude: /\.module\.css$/,
           use: [require.resolve('style-loader'), require.resolve('css-loader')],
         },
       ],
